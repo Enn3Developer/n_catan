@@ -27,7 +27,7 @@ func run():
 	board.day_seconds=450;board.advance_day(0)
 	check(board.night_lights.all(func(light):return light.visible and light.light_energy>0),"lights on at midnight")
 	check(not farmer.root.visible,"workers indoors at night")
-	check(sheep.root.visible and sheep.root.scale.y<.7 and sheep.root.position.distance_to(daytime)>.1,"sheep gather and rest at night")
+	check(sheep.root.visible and sheep.body.position.y<.06 and sheep.root.scale==Vector3.ONE and sheep.root.position.distance_to(daytime)>.1,"sheep gather and rest at night")
 	var limb=sheep.limbs[0].rotation
 	board.living_world.animate(board.actors,40,board.art,0)
 	check(sheep.limbs[0].rotation==limb,"sleeping sheep do not walk")

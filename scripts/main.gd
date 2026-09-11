@@ -33,7 +33,6 @@ var layout_queued=false
 var trade_players=false
 var trade_give=0
 var trade_get=1
-var music_widgets={}
 var music_dialog_widgets={}
 var music_ui_clock=0.0
 var music_volume_before_mute=.42
@@ -132,7 +131,6 @@ func _theme() -> Theme:
 	return load("res://assets/ui_theme.tres")
 
 func _clear(scene_path: String=""):
-	music_widgets={}
 	if is_instance_valid(screen): screen.free()
 	var keep_modal=is_instance_valid(modal) and (modal.name in ["Settings","Cosmetics","MusicLibrary","Updates"] or (scene_path=="res://scenes/ui/hud.tscn" and modal.name in ["Guide","GameLog","LeaveConfirm"]))
 	if is_instance_valid(modal) and not keep_modal: modal.free()
@@ -375,7 +373,6 @@ func _process(delta):
 		music_ui_clock-=delta
 		if music_ui_clock<=0:
 			music_ui_clock=.15
-			_refresh_music_widgets(music_widgets,soundtrack)
 			_refresh_music_widgets(music_dialog_widgets,soundtrack)
 	if not server_only and is_instance_valid(board) and net.started and not net.paused and net.roster.all(func(player):return player.connected):
 		board.advance_day(delta)
@@ -393,9 +390,10 @@ func _hud():
 	turn_label.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
 	var phase=_label(row,tr("Paired turn") if state.get("paired",false) else _phase_text(),14,MUTED)
 	phase.name="PhaseLabel"
-	for action in [["inspect",tr("Inspect board (H)"),_toggle_inspection],["journal",tr("Game log"),_journal],["help","Guide",_help],["settings","Settings",_open_settings],["leave",tr("Leave game"),_confirm_leave]]:
+	for action in [["inspect",tr("Inspect board (H)"),_toggle_inspection],["journal",tr("Game log"),_journal],["help","Guide",_help],["music","Music",_open_music],["settings","Settings",_open_settings],["leave",tr("Leave game"),_confirm_leave]]:
 		var button=_button(row,"",action[2])
 		button.custom_minimum_size=Vector2(44,40)
+		if action[0]=="music":button.name="OpenMusic"
 		button.tooltip_text=tr(action[1])
 		CatanIcons.button_icon(button,action[0],20)
 	var players=_node("PlayersBody")
@@ -459,7 +457,6 @@ func _hud():
 	var trade=_button(right,"Trade",_trade);trade.name="TradeAction";CatanIcons.button_icon(trade,"trade")
 	trade.disabled=not play or not state.rolled
 	_card_section(play)
-	_music_section()
 	var end=_button(right,tr("End"),func():net.act({"type":"end"}),true)
 	end.name="EndTurn";CatanIcons.button_icon(end,"arrow");end.disabled=not play or not state.rolled
 	if state.phase=="free_roads" and mine:_button(right,tr("Finish roads"),func():net.act({"type":"finish_roads"}))
@@ -467,7 +464,8 @@ func _hud():
 	if state.phase=="steal" and mine:
 		for p in state.victims:_button(right,tr("Steal: ")+state.players[p].name,func():net.act({"type":"steal","id":p}),true)
 	if not state.offer.is_empty():_button(right,tr("Trade offer"),_view_offer,true)
-	CatanIcons.resources(_node("HandBody"),state.players[net.seat].hand,38,true)
+	var resources=CatanIcons.resources(_node("HandBody"),state.players[net.seat].hand,38,true)
+	resources.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
 	_node("Bottom").minimum_size_changed.connect(_queue_layout)
 	players.minimum_size_changed.connect(_queue_layout)
 	if state.winner!=-1:
@@ -515,19 +513,6 @@ func _toggle_music_mute():
 	if preferences.values.music>0:
 		music_volume_before_mute=preferences.values.music;_set_music_volume(0)
 	else:_set_music_volume(maxf(.1,music_volume_before_mute))
-
-func _music_section():
-	var row=_node("MusicBody")
-	CatanIcons.icon(row,"music",18)
-	var title=_label(row,"",14,MUTED);title.name="NowPlaying"
-	title.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	title.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
-	var clock_label=_label(row,"0:00 / 0:00",14,MUTED)
-	music_widgets=_music_buttons(row)
-	music_widgets.root=row;music_widgets.title=title;music_widgets.clock=clock_label
-	var library=_button(row,"Tracks",_open_music);library.name="MusicLibraryAction";library.custom_minimum_size.y=30
-	_music_volume(row,music_widgets)
-	_refresh_music_widgets(music_widgets,net.music_state())
 
 func _open_music():
 	var box=_dialog("Music")
@@ -818,7 +803,8 @@ func _discard():
 func _card_section(play: bool):
 	var box=_node("CardsBody")
 	var player=state.players[net.seat]
-	var buy=_button(box,tr("Buy card"),func():net.act({"type":"buy_card"}))
+	_label(_node("CardShop"),tr("Development cards"),16,GOLD).name="CardHeading"
+	var buy=_button(_node("CardShop"),tr("Buy card"),func():net.act({"type":"buy_card"}))
 	buy.name="BuyCard";CatanIcons.button_icon(buy,"cards",18)
 	var rules=CatanRules.new();rules.s=state
 	buy.disabled=not play or not state.rolled or not rules.can_pay(net.seat,CatanRules.COST.buy_card) or state.deck_count==0
@@ -829,15 +815,77 @@ func _card_section(play: bool):
 	var tips=[tr("Move the robber and steal a resource."),tr("Build two roads for free."),tr("Take two resources from the bank."),tr("Take one resource type from every player."),tr("Already included in your score; never needs to be played.")]
 	for i in 5:
 		var count=player.cards[i]+player.new_cards[i]
-		var b=_button(box,"%s %d" % [tr(names[i]),count],func():
+		if count==0:continue
+		var b=_button(box,"",func():
 			if i<2:net.act({"type":"play_card","id":i})
 			elif i<4:_resource_card(i))
 		b.name="Card%d" % i
-		CatanIcons.button_icon(b,["knight","road","hand","trade","star"][i],18)
+		b.custom_minimum_size=Vector2.ZERO
+		b.mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND
+		var accent=[Color("97654b"),Color("527e72"),Color("72904e"),Color("54768e"),Color("b28a36")][i]
+		for variant in ["normal","hover","pressed","disabled","focus"]:
+			var paper=_style(Color("eee1bb") if variant!="hover" else Color("fff1ce"),10)
+			paper.set_border_width_all(2);paper.border_color=accent
+			paper.shadow_color=Color(0,0,0,.32);paper.shadow_size=5;paper.shadow_offset=Vector2(-2,3)
+			b.add_theme_stylebox_override(variant,paper)
+		var face=VBoxContainer.new();face.name="CardFace"
+		face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		face.offset_left=10;face.offset_right=-10;face.offset_top=8;face.offset_bottom=-8
+		face.mouse_filter=Control.MOUSE_FILTER_IGNORE;b.add_child(face)
+		var header=HBoxContainer.new();face.add_child(header)
+		var title=_label(header,tr(names[i]),16,Color("263c36"));title.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		title.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
+		_label(header,"×%d" % count,16,accent)
+		var picture=CenterContainer.new();picture.name="CardPicture";face.add_child(picture)
+		var art=CatanIcons.icon(picture,["knight","road","hand","trade","star"][i],48)
+		art.modulate=accent
+		var effects=["Move the robber", "Build two free roads", "Take two resources", "Claim one resource type", "+1 victory point"]
+		var effect=_label(face,tr(effects[i]),13,Color("44574b"));effect.name="CardEffect"
+		effect.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;effect.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+		var space=Control.new();space.size_flags_vertical=Control.SIZE_EXPAND_FILL;face.add_child(space)
+		var ready=player.cards[i]>0 and not state.card_played and play
+		var status=tr("Victory points") if i==4 else (tr("Ready") if ready else (tr("Next turn") if player.cards[i]==0 else tr("Waiting")))
+		var caption=_label(face,status,14,Color("44574b"));caption.name="CardStatus";caption.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+		for child in face.find_children("*","Control",true,false):child.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		b.mouse_entered.connect(func():_card_preview(b,true))
+		b.mouse_exited.connect(func():_card_preview(b,false))
+		b.focus_entered.connect(func():_card_preview(b,true))
+		b.focus_exited.connect(func():_card_preview(b,false))
 		b.tooltip_text=tips[i]+tr("\n%d ready · %d bought this turn") % [player.cards[i],player.new_cards[i]]
 		b.disabled=i==4 or not play or player.cards[i]==0 or state.card_played
 		if i<4 and player.new_cards[i]>0:b.tooltip_text+=tr("\nNew action cards become playable next turn.")
 		if i<4 and state.card_played:b.tooltip_text+=tr("\nYou have already played an action card this turn.")
+	if box.get_child_count()==0:
+		var empty=_label(box,tr("No development cards"),14,MUTED)
+		empty.name="EmptyCards";empty.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+		empty.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+
+func _layout_cards(top: float,bottom: float):
+	var rail=_node("CardsRail")
+	rail.offset_top=top;rail.offset_bottom=bottom
+	_node("CardHeading").visible=ui.size.x>=1000
+	var body=_node("CardsBody")
+	body.offset_top=_node("CardShop").get_combined_minimum_size().y+12
+	var cards=body.get_children().filter(func(child):return child is Button)
+	var available=maxf(100,rail.size.y-body.offset_top)
+	var card_height=minf(180,maxf(76,available-32*maxi(0,cards.size()-1)))
+	var step=minf(92,maxf(0,(available-card_height)/maxi(1,cards.size()-1)))
+	for i in cards.size():
+		cards[i].position=Vector2(0,i*step)
+		cards[i].size=Vector2(rail.size.x,card_height)
+		cards[i].set_meta("hand_rect",Rect2(cards[i].position,cards[i].size))
+		_card_preview(cards[i],false)
+
+func _card_preview(card: Button,expanded: bool):
+	if not card.has_meta("hand_rect"):return
+	var rest: Rect2=card.get_meta("hand_rect")
+	card.z_index=2 if expanded else 0
+	card.position=rest.position+Vector2(-12 if expanded else 0,0)
+	card.size=Vector2(rest.size.x,180 if expanded else rest.size.y)
+	if expanded:card.position.y=minf(card.position.y,card.get_parent().size.y-card.size.y)
+	card.find_child("CardEffect",true,false).visible=card.size.y>=140
+	card.find_child("CardStatus",true,false).visible=card.size.y>=110
+	card.find_child("CardPicture",true,false).get_child(0).custom_minimum_size=Vector2.ONE*(48 if card.size.y>=140 else 32)
 
 func _cards():
 	# Compatibility for tutorial shortcuts: cards are always present in the HUD.
@@ -1035,6 +1083,8 @@ func _layout_screen():
 		var players=_node("PlayersBody")
 		for chip in players.get_children():chip.custom_minimum_size.x=minf(180,(width-32-(state.players.size()-1)*6)/state.players.size())
 		var bottom=_node("Bottom")
+		bottom.offset_left=16
+		bottom.offset_right=-16
 		var bottom_height=maxf(116,bottom.get_combined_minimum_size().y)
 		bottom.offset_top=-12-bottom_height
 		_node("Players").offset_bottom=76+players.get_combined_minimum_size().y
@@ -1042,7 +1092,8 @@ func _layout_screen():
 		if guide!=null and is_instance_valid(tutorial_panel):
 			top=tutorial_panel.find_child("LessonPanel",true,false).get_global_rect().end.y+10
 		notifications.offset_top=top
-		board.view_region=Rect2(20,top,width-40,maxf(100,height-top-bottom_height-30))
+		_layout_cards(top,height-bottom_height-26)
+		board.view_region=Rect2(20,top,width-236,maxf(100,height-top-bottom_height-30))
 	elif screen.name=="Lobby":
 		_node("Voyage").custom_minimum_size.x=280 if width<1100 else 340
 		board.view_region=Rect2(0,0,width,height)

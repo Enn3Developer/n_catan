@@ -3,7 +3,8 @@ extends RefCounted
 const BIOMES=["forest","hills","pasture","fields","mountains","desert"]
 const GROUND=["forest_ground_04","brown_mud_dry","leafy_grass","brown_mud_dry","rock_ground","red_sand"]
 const TINTS=[Color("768b62"),Color("be8b69"),Color("9cab71"),Color("bba276"),Color("93a0a1"),Color("d2b886")]
-const LEAVES={"PineNeedles":Color("426e57"),"PineTips":Color("588568"),"OakLeaves":Color("749455"),"OakLight":Color("8ba766"),"Grass":Color("85a766"),"DryGrass":Color("b69c63"),"Wheat":Color("dab15e"),"Fern":Color("659060"),"Moss":Color("6b8660")}
+# Ground cover needs a darker value than the sunlit terrain to read at board scale.
+const LEAVES={"PineNeedles":Color("426e57"),"PineTips":Color("588568"),"OakLeaves":Color("749455"),"OakLight":Color("8ba766"),"Grass":Color("417638"),"DryGrass":Color("84603c"),"Wheat":Color("dab15e"),"Fern":Color("476b3e"),"Moss":Color("6b8660")}
 const SURFACES={"PBR_Rock":Color("83939d"),"PBR_Wood":Color("b39162"),"PBR_Bark":Color("74543c"),"PBR_Clay":Color("bd7655"),"Brick":Color("ba7555"),"Sandstone":Color("d0ac79"),"Plaster":Color("dfcba3"),"Roof":Color("657a85")}
 
 var scenes={}
@@ -36,6 +37,14 @@ func ground(kind: int,index: int) -> ShaderMaterial:
 	material.set_shader_parameter("terrain_kind",float(kind))
 	material.set_shader_parameter("variation",float(index%7))
 	material.set_shader_parameter("tint",TINTS[kind])
+	var paths=PackedVector4Array()
+	for route in CatanWorldLayout.biome(kind).paths:
+		for step in range(1,route.size()):
+			var a=route[step-1];var b=route[step]
+			paths.append(Vector4(a[0],a[1],b[0],b[1]))
+	material.set_shader_parameter("footpath_count",mini(paths.size(),16))
+	while paths.size()<16:paths.append(Vector4.ZERO)
+	material.set_shader_parameter("footpaths",paths)
 	return material
 
 func cliff() -> ShaderMaterial:
@@ -53,6 +62,7 @@ func surface(name: String,base: Material,values: Dictionary) -> Material:
 		var leaf=ShaderMaterial.new()
 		leaf.shader=load("res://shaders/premium_foliage.gdshader")
 		leaf.set_shader_parameter("leaf_color",LEAVES[name])
+		leaf.set_shader_parameter("soft_blades",name in ["Grass","DryGrass","Fern","Wheat"])
 		leaf.set_shader_parameter("flexibility",.018 if name in ["Wheat","Grass","DryGrass","Fern"] else .008)
 		leaf.set_shader_parameter("motion_speed",0.0 if values.reduce_motion else values.wind)
 		materials[name]=leaf

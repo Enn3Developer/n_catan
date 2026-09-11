@@ -55,10 +55,10 @@ grow_vertical = 0
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 8
-[node name="Hand" type="HBoxContainer" parent="Bottom/BottomBody"]
+[node name="Hand" type="VBoxContainer" parent="Bottom/BottomBody"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 18
+theme_override_constants/separation = 4
 [node name="HandBody" type="VBoxContainer" parent="Bottom/BottomBody/Hand"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -67,6 +67,7 @@ size_flags_horizontal = 3
 unique_name_in_owner = true
 layout_mode = 2
 text = ""
+horizontal_alignment = 1
 theme_override_font_sizes/font_size = 15
 size_flags_horizontal = 3
 autowrap_mode = 3
@@ -77,14 +78,24 @@ theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 6
 alignment = 1
 
-[node name="CardsBody" type="HFlowContainer" parent="Bottom/BottomBody"]
+[node name="CardsRail" type="Control" parent="."]
 unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/h_separation = 6
-theme_override_constants/v_separation = 4
-alignment = 1
-
-[node name="MusicBody" type="HBoxContainer" parent="Bottom/BottomBody"]
+layout_mode = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -192.0
+offset_right = -16.0
+offset_top = 142.0
+offset_bottom = 600.0
+mouse_filter = 2
+[node name="CardShop" type="VBoxContainer" parent="CardsRail"]
 unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 8
+layout_mode = 0
+anchor_right = 1.0
+[node name="CardsBody" type="Control" parent="CardsRail"]
+unique_name_in_owner = true
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 80.0
+mouse_filter = 2

@@ -138,3 +138,11 @@ English and Italian catalogs live in `locales/en.po` and `locales/it.po`. Use En
 Player colors are opaque six-digit RGB values. An empty value uses the seat palette. The host validates changes and includes them in lobby and game snapshots. Players can edit their own appearance; the room controller can also edit bots. Protocol 10 adds the color handshake and structured localized messages.
 
 Run `python3 -m unittest discover -s tests -p 'test_localization.py'`, `tests/localization_appearance_test.gd`, and `tests/cosmetics_network_test.gd` when changing these features. Pass `-- --italian` to `tests/layout_test.gd` to check Italian at all supported window sizes.
+
+## Scenery and placement
+
+`assets/world/layout.json` defines cottages, work areas, return paths and sleeping places. Both `scripts/world_layout.gd` and the Blender generator read it. Keep the numbered tiles and a 0.40-unit radius around board corners clear; cities extend beyond their circular bases. One tile unit is 10 metres.
+
+Rebuild scenery with `blender --background --factory-startup --python tools/build_premium_tiles.py`, then import the project in Godot. The generator writes twelve biome models and `assets/source/sculpted-tiles.blend`. Plants and small props avoid occupied areas. Sheep are created only at runtime.
+
+Run `tests/world_placement_test.gd` headlessly to check the imported meshes against worker routes, token positions, city footprints and harbors. Run `tests/world_capture.gd` with graphics to capture each biome from both sides, night pasture and the board at low detail. Captures are saved under `/tmp/catan-world-*.png`.

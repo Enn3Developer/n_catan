@@ -21,6 +21,11 @@ var cache=[]
 var scenery: Node3D
 var clouds=[]
 var boats=[]
+var sea_traffic=preload("res://scripts/sea_traffic.gd").new()
+var beacon: Node3D
+var beacon_lamp: MeshInstance3D
+var beacon_beam: MeshInstance3D
+var beacon_spot: SpotLight3D
 var terrain_noise: NoiseTexture2D
 var elapsed=0.0
 var windmills=[]
@@ -351,17 +356,18 @@ func build(data: Dictionary):
 		actors.append_array(living_world.populate(root,t.kind,i,art))
 		tile_nodes.append({"root":root,"ground":top,"cliff":side,"diorama":diorama,"kind":t.kind,"index":i})
 		if t.number>0:
+			var marker=CatanWorldLayout.point(CatanWorldLayout.data.token)
 			var rim=cylinder(.19,.038,Color("897444"),64)
-			rim.position=Vector3(0,.224,.54)
+			rim.position=Vector3(marker.x,.224,marker.y)
 			root.add_child(rim)
 			var token=cylinder(.173,.023,Color("e5d8b9"),64)
-			token.position=Vector3(0,.251,.54)
+			token.position=Vector3(marker.x,.251,marker.y)
 			root.add_child(token)
-			root.add_child(label3(str(t.number),Vector3(0,.275,.49),43,Color("913f2d") if t.number in [6,8] else Color("302d21")))
+			root.add_child(label3(str(t.number),Vector3(marker.x,.275,marker.y-.05),43,Color("913f2d") if t.number in [6,8] else Color("302d21")))
 			var dot_count=6-absi(7-t.number)
 			for dot in dot_count:
 				var pip=cylinder(.012,.003,Color("913f2d") if t.number in [6,8] else Color("634e35"),12)
-				pip.position=Vector3((dot-(dot_count-1)*.5)*.033,.265,.62)
+				pip.position=Vector3(marker.x+(dot-(dot_count-1)*.5)*.033,.265,marker.y+.08)
 				root.add_child(pip)
 
 	while centers.size()<30:centers.append(Vector2(10000,10000))
@@ -384,6 +390,10 @@ func build(data: Dictionary):
 		harbors.append(harbor)
 		terrain.add_child(label3("3:1" if a.port==-1 else "2:1",pos+outward*.82+Vector3.UP*.28,27,Color("fff1ce"),a.port))
 	refresh(data)
+	sea_traffic.configure(self)
+	_update_boat_wakes()
+
+func _update_boat_wakes():
 	var sources=PackedVector4Array()
 	var vessels=boats.duplicate()
 	for harbor in harbors:vessels.append(harbor.get_node("MooredBoat"))
@@ -491,9 +501,9 @@ func _process(delta):
 		var tangent=Vector3(-6.5*sin(angle),0,5*cos(angle)).normalized()
 		birds[i].rotation.y=atan2(-tangent.x,-tangent.z)
 		birds[i].rotation.z=sin(elapsed*2+i)*0.10
-	for i in boats.size():
-		boats[i].position.y=-.27/scenery.scale.y+.055+sin(elapsed*.7+i)*.012
-		boats[i].rotation.z=sin(elapsed*0.8+i)*0.025
+	sea_traffic.animate(delta,elapsed)
+	_update_boat_wakes()
+	_animate_beacon()
 	for i in clouds.size():
 		clouds[i].position.x+=delta*0.025
 		if clouds[i].position.x>16: clouds[i].position.x=-16
@@ -681,9 +691,21 @@ func _world_props():
 		band.mesh.top_radius=.16-(i+1)*.012
 		band.position.y=0.2+i*0.16
 		island.add_child(band)
-	var lamp=cylinder(0.12,0.16,Color("e9b85e"),32)
-	lamp.position.y=1.0
-	island.add_child(lamp)
+	beacon_lamp=cylinder(0.12,0.16,Color("e9b85e"),32)
+	beacon_lamp.position.y=1.0
+	beacon_lamp.material_override.emission_enabled=true
+	beacon_lamp.material_override.emission=Color("ffc86b")
+	island.add_child(beacon_lamp)
+	beacon=Node3D.new();beacon.name="LighthouseBeacon";beacon.position.y=1.0;island.add_child(beacon)
+	beacon_spot=SpotLight3D.new();beacon.add_child(beacon_spot)
+	beacon_spot.light_color=Color("ffdc95");beacon_spot.spot_range=7.0;beacon_spot.spot_angle=12
+	beacon_spot.rotation.x=deg_to_rad(-8);beacon_spot.shadow_enabled=true
+	var cone=CylinderMesh.new();cone.top_radius=.025;cone.bottom_radius=.60;cone.height=5.5;cone.radial_segments=48;cone.cap_top=false;cone.cap_bottom=false
+	beacon_beam=MeshInstance3D.new();beacon_beam.mesh=cone
+	beacon_beam.rotation.x=PI/2-deg_to_rad(8);beacon_beam.position=Vector3(0,-sin(deg_to_rad(8))*2.75,-cos(deg_to_rad(8))*2.75)
+	beacon_beam.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var beam_material=ShaderMaterial.new();beam_material.shader=load("res://shaders/lighthouse_beam.gdshader")
+	beacon_beam.material_override=beam_material;beacon.add_child(beacon_beam)
 	var cap=CylinderMesh.new()
 	cap.top_radius=0
 	cap.bottom_radius=0.2
@@ -851,6 +873,16 @@ func show_production(roll: int):
 		animation.parallel().tween_property(ring,"scale",Vector3.ONE*1.15,0.5)
 		animation.tween_callback(ring.queue_free)
 
+func _animate_beacon():
+	if not is_instance_valid(beacon):return
+	var night=1.0-daylight
+	beacon.rotation.y=fposmod(elapsed*.38,TAU)
+	beacon.visible=night>.01
+	beacon_spot.light_energy=night*5.0
+	beacon_spot.spot_range=7.0*scenery.scale.y
+	beacon_lamp.material_override.emission_energy_multiplier=night*3.5
+	beacon_beam.material_override.set_shader_parameter("strength",night)
+
 # A complete day lasts ten minutes of active play. Solo pause freezes the clock.
 func advance_day(delta: float):
 	day_seconds=fposmod(day_seconds+delta,600.0)
@@ -870,6 +902,7 @@ func advance_day(delta: float):
 	sky.sky_horizon_color=Color("33445d").lerp(Color("ccd3c7"),daylight)
 	sky.ground_horizon_color=Color("243952").lerp(Color("bdd6d3"),daylight)
 	living_world.night_lighting(night_lights,1.0-daylight)
+	_animate_beacon()
 	living_world.animate(actors,elapsed,art,daylight)
 	living_world.animate(band_actors,elapsed,art,daylight)
 

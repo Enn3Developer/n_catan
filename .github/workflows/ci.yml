@@ -28,6 +28,11 @@ jobs:
           "$GODOT_BIN" --headless --path . --script tests/rules_test.gd
           "$GODOT_BIN" --headless --path . --script tests/updater_ui_test.gd
           "$GODOT_BIN" --headless --path . --script tests/notifications_test.gd
+          "$GODOT_BIN" --headless --path . --script tests/actor_animation_test.gd
+          "$GODOT_BIN" --headless --path . --script tests/world_placement_test.gd
+          "$GODOT_BIN" --headless --path . --script tests/cards_ui_test.gd
+          "$GODOT_BIN" --headless --path . --script tests/sea_traffic_test.gd
+          "$GODOT_BIN" --headless --path . --script tests/night_world_test.gd
           "$GODOT_BIN" --headless --path . --script tests/localization_appearance_test.gd
           "$GODOT_BIN" --headless --path . --script tests/cosmetics_network_test.gd
           "$GODOT_BIN" --headless --path . --script tests/version_network_test.gd
