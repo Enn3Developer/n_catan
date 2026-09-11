@@ -26,6 +26,10 @@ func run():
 	var daytime=sheep.root.position
 	board.day_seconds=450;board.advance_day(0)
 	check(board.night_lights.all(func(light):return light.visible and light.light_energy>0),"lights on at midnight")
+	check(board.night_lights.all(func(light):return is_equal_approx(light.omni_range,.38*light.get_parent().global_basis.get_scale().y)),"lamp reach uses parent world scale")
+	check(board.night_lights.all(func(light):return light.omni_range>light.position.y*light.get_parent().global_basis.get_scale().y),"lamp light reaches surrounding ground")
+	check("blend_mix" in board.beacon_beam.material_override.shader.code,"beam avoids additive bloom")
+	check(board.beacon_lamp.material_override.emission_energy_multiplier<1.8,"lighthouse lantern emission stays controlled")
 	check(not farmer.root.visible,"workers indoors at night")
 	check(sheep.root.visible and sheep.body.position.y<.06 and sheep.root.scale==Vector3.ONE*board.living_world.TILE_ACTOR_SCALE and sheep.root.position.distance_to(daytime)>.1,"sheep gather and rest at night")
 	var limb=sheep.limbs[0].rotation

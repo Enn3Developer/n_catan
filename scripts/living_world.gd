@@ -449,6 +449,9 @@ func night_lighting(lights: Array,night: float):
 	glow.albedo_color=Color("665544").lerp(Color("ffd092"),night)
 	glow.emission_energy_multiplier=night*3.2
 	for light in lights:
-		light.omni_range=.38*light.global_basis.get_scale().y
+		# Light3D disables inherited scale; its own global basis is always unit
+		# length. The parent retains the miniature-to-world conversion.
+		var world_scale=light.get_parent().global_basis.get_scale().y
+		light.omni_range=.38*world_scale
 		light.visible=night>.01
-		light.light_energy=night*1.15
+		light.light_energy=night*4.0

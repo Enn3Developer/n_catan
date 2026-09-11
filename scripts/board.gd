@@ -74,7 +74,7 @@ func _ready():
 	camera.projection=Camera3D.PROJECTION_PERSPECTIVE
 	camera.fov=35
 	camera.size=12.2
-	camera.far=1500
+	camera.far=9000
 	camera.near=.08
 	_update_camera()
 	var world=get_node_or_null("WorldEnvironment")
@@ -134,7 +134,7 @@ func _ready():
 	terrain_noise.height=256
 	terrain_noise.seamless=true
 	var water=PlaneMesh.new()
-	water.size=Vector2(2000,2000)
+	water.size=Vector2(7000,7000)
 	water.subdivide_width=150
 	water.subdivide_depth=150
 	ocean=MeshInstance3D.new()
@@ -301,7 +301,7 @@ func apply_preferences(values: Dictionary):
 	sea_material.set_shader_parameter("water_quality",values.water_quality)
 	if last_water_quality!=values.water_quality:
 		var plane=PlaneMesh.new()
-		plane.size=Vector2(2000,2000)
+		plane.size=Vector2(7000,7000)
 		plane.subdivide_width=[64,128,224,320][values.water_quality]
 		plane.subdivide_depth=plane.subdivide_width
 		ocean.mesh=plane
@@ -887,7 +887,7 @@ func _animate_beacon():
 	beacon.visible=night>.01
 	beacon_spot.light_energy=night*5.0
 	beacon_spot.spot_range=7.0*scenery.scale.y
-	beacon_lamp.material_override.emission_energy_multiplier=night*3.5
+	beacon_lamp.material_override.emission_energy_multiplier=night*1.4
 	beacon_beam.material_override.set_shader_parameter("strength",night)
 
 # A complete day lasts ten minutes of active play. Solo pause freezes the clock.
