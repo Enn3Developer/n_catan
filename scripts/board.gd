@@ -318,8 +318,11 @@ func apply_preferences(values: Dictionary):
 	var pollen_amount=32 if values.particles<2 else 112
 	if pollen.amount!=pollen_amount:pollen.amount=pollen_amount
 	fps_label.visible=values.show_fps
+	advance_day(0)
+	CatanDiagnostics.event("board.settings.complete")
 
 func build(data: Dictionary):
+	CatanDiagnostics.event("board.build.begin","tiles=%d"%data.get("tiles",[]).size())
 	if is_instance_valid(active_dice):active_dice.queue_free()
 	day_seconds=data.get("world_seconds",150.0)
 	state=data
@@ -439,6 +442,7 @@ func refresh(data: Dictionary):
 	night_lights=find_children("NightLight*","OmniLight3D",true,false)
 	advance_day(0)
 	set_mode(mode,seat)
+	CatanDiagnostics.event("board.refresh.complete")
 
 func set_mode(value: String,player: int):
 	mode=value
@@ -894,9 +898,10 @@ func _animate_beacon():
 # A complete day lasts ten minutes of active play. Solo pause freezes the clock.
 func advance_day(delta: float):
 	day_seconds=fposmod(day_seconds+delta,600.0)
-	daylight=smoothstep(-.15,.35,sin(day_seconds/600.0*TAU))
+	var lighting_seconds=day_seconds if render_values.get("day_night_cycle",true) else 150.0
+	daylight=smoothstep(-.15,.35,sin(lighting_seconds/600.0*TAU))
 	var sun=get_node("Sun")
-	sun.rotation_degrees=Vector3(-15-60*absf(sin(day_seconds/600.0*TAU)),-34+day_seconds*.06,0)
+	sun.rotation_degrees=Vector3(-15-60*absf(sin(lighting_seconds/600.0*TAU)),-34+lighting_seconds*.06,0)
 	sun.light_energy=lerpf(.52,1.65,daylight)
 	var dusk=Color("efa46f").lerp(Color("ffe4b9"),daylight)
 	sun.light_color=Color("92b6ed").lerp(dusk,daylight)

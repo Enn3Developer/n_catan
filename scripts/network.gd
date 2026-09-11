@@ -19,17 +19,8 @@ var my_name="Voyager"
 var my_style=0
 var my_color=""
 var room_password=""
-var room_certificate: X509Certificate
-var public_certificate=PackedByteArray()
-var pending_connection: ENetConnection
-var pending_id=0
-var connection_deadline=0
-const CERT_NAME="n-catan-room"
-
-# The public certificate is carried in the invite; the private key stays in memory.
-func secure_invite(address: String) -> String:
-	if room_certificate==null:return reconnect_address
-	return "n-catan://"+address.strip_edges()+"#"+Marshalls.raw_to_base64(public_certificate)
+func invite(address: String) -> String:
+	return address.strip_edges()
 
 var last_action={}
 var upnp_thread: Thread
@@ -68,37 +59,21 @@ func _ready():
 	_reset_music()
 	_load_session()
 	multiplayer.connected_to_server.connect(_connected)
-	multiplayer.connection_failed.connect(func(): leave(); notice.emit("Connection failed. Check the address, UDP port and firewall."))
-	multiplayer.server_disconnected.connect(func(): leave(); notice.emit("Connection lost. Use Reconnect to return to your seat if the server is still running."))
+	multiplayer.connection_failed.connect(_connection_ended.bind("Connection failed. Check the address, UDP port and firewall."),CONNECT_DEFERRED)
+	multiplayer.server_disconnected.connect(_connection_ended.bind("Connection lost. Use Reconnect to return to your seat if the server is still running."),CONNECT_DEFERRED)
 	multiplayer.peer_disconnected.connect(_disconnected)
 
+func _connection_ended(message: String):
+	leave()
+	notice.emit(message)
+
 func host(pname: String,password: String="",server_only: bool=false) -> Error:
+	CatanDiagnostics.event("network.host","dedicated=%s"%server_only)
 	leave()
 	var peer=ENetMultiplayerPeer.new()
 	var err=peer.create_server(PORT,8)
 	if err!=OK: return err
 	peer.get_host().compress(ENetConnection.COMPRESS_RANGE_CODER)
-	var crypto=Crypto.new()
-	var key=crypto.generate_rsa(2048)
-	room_certificate=crypto.generate_self_signed_certificate(key,"CN="+CERT_NAME+",O=N Catan","20240101000000","20400101000000")
-	if room_certificate==null:
-		peer.close()
-		return ERR_CANT_CREATE
-	# Godot 4.7's save_to_string includes a terminating NUL in its UTF-8 decode.
-	# Save/read the public PEM bytes instead; the private key never leaves memory.
-	var certificate_path="user://.room-certificate-%s.crt"%get_instance_id()
-	err=room_certificate.save(certificate_path)
-	if err==OK:
-		public_certificate=FileAccess.get_file_as_bytes(certificate_path)
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(certificate_path))
-		while not public_certificate.is_empty() and public_certificate[-1]==0:public_certificate.resize(public_certificate.size()-1)
-	if err!=OK or public_certificate.is_empty():
-		peer.close()
-		return ERR_CANT_CREATE
-	err=peer.get_host().dtls_server_setup(TLSOptions.server(key,room_certificate))
-	if err!=OK:
-		peer.close()
-		return err
 	multiplayer.multiplayer_peer=peer
 	online=true
 	dedicated=server_only
@@ -113,16 +88,12 @@ func host(pname: String,password: String="",server_only: bool=false) -> Error:
 	return OK
 
 func join_room(address: String,pname: String,password: String="") -> Error:
+	CatanDiagnostics.event("network.join")
 	address=address.strip_edges()
-	# Trust is supplied out of band by the host's invite, never fetched from the socket.
-	if not address.begins_with("n-catan://") or address.count("#")!=1:
-		notice.emit("Paste the complete secure invite from the host (Copy invite).")
+	if address.contains("#") or address.contains("://"):
+		notice.emit("Enter the host address and optional UDP port.")
 		return ERR_INVALID_PARAMETER
-	var parts=address.trim_prefix("n-catan://").split("#")
-	if parts[1].length()>16384:return ERR_INVALID_PARAMETER
-	var certificate=X509Certificate.new()
-	if certificate.load_from_string(Marshalls.base64_to_raw(parts[1]).get_string_from_utf8())!=OK:return ERR_INVALID_DATA
-	var endpoint=parts[0].split(":")
+	var endpoint=address.split(":")
 	if endpoint.size()>2 or endpoint[0].is_empty():return ERR_INVALID_PARAMETER
 	var port=PORT
 	if endpoint.size()==2:
@@ -136,47 +107,18 @@ func join_room(address: String,pname: String,password: String="") -> Error:
 	reconnect_address=address
 	reconnect_name=pname
 	reconnect_password=password
-	var connection=ENetConnection.new()
-	var err=connection.create_host(1,3)
-	if err==OK:connection.compress(ENetConnection.COMPRESS_RANGE_CODER)
-	if err==OK:err=connection.dtls_client_setup(CERT_NAME,TLSOptions.client(certificate,CERT_NAME))
-	if err!=OK:
-		connection.destroy()
-		return err
-	pending_id=ENetMultiplayerPeer.new().generate_unique_id()
-	if connection.connect_to_host(endpoint[0],port,3,pending_id)==null:
-		connection.destroy()
-		return ERR_CANT_CONNECT
 	var peer=ENetMultiplayerPeer.new()
-	peer.create_mesh(pending_id)
+	var err=peer.create_client(endpoint[0],port)
+	if err!=OK:return err
+	peer.get_host().compress(ENetConnection.COMPRESS_RANGE_CODER)
 	multiplayer.multiplayer_peer=peer
-	pending_connection=connection
-	connection_deadline=Time.get_ticks_msec()+10000
 	online=true
 	changed.emit()
 	return OK
 
-func _poll_secure_connection():
-	if pending_connection==null:return
-	var event=pending_connection.service(0)
-	if event[0]==ENetConnection.EVENT_CONNECT:
-		var peer=multiplayer.multiplayer_peer
-		var connection=pending_connection
-		pending_connection=null
-		if peer.add_mesh_peer(1,connection)!=OK:
-			leave()
-			notice.emit("Secure connection failed.")
-	elif event[0] in [ENetConnection.EVENT_ERROR,ENetConnection.EVENT_DISCONNECT] or Time.get_ticks_msec()>connection_deadline:
-		leave()
-		notice.emit("Secure connection failed. Check the invite, host availability and UDP port.")
-
 func leave():
-	var continuing_music=music_state()
-	if pending_connection!=null:
-		pending_connection.destroy()
-		pending_connection=null
-	room_certificate=null
-	public_certificate.clear()
+	CatanDiagnostics.event("network.leave","online=%s started=%s"%[online,started])
+	var continuing_music=music_state() if multiplayer.multiplayer_peer.get_connection_status()!=MultiplayerPeer.CONNECTION_DISCONNECTED else {}
 	if multiplayer.multiplayer_peer: multiplayer.multiplayer_peer.close()
 	multiplayer.multiplayer_peer=OfflineMultiplayerPeer.new()
 	online=false
@@ -199,6 +141,7 @@ func leave():
 	changed.emit()
 
 func _connected():
+	CatanDiagnostics.event("network.connected")
 	_register.rpc_id(1,my_name,room_password,PROTOCOL,reconnect_token,my_style,CatanBuildInfo.VERSION,my_color)
 
 @rpc("any_peer","call_remote","reliable")
@@ -250,8 +193,8 @@ func _load_session():
 
 @rpc("authority","call_remote","reliable")
 func _registration_failed(message: String):
-	leave()
-	notice.emit(message)
+	CatanDiagnostics.event("network.registration_failed")
+	_connection_ended.call_deferred(message)
 
 func reconnect():
 	if not reconnect_address.is_empty():
@@ -335,7 +278,9 @@ func _apply(id: int,action: Dictionary):
 		if not row.connected:
 			_send_error(id,"Game paused while a disconnected player reconnects.")
 			return
+	CatanDiagnostics.event("action.begin","seat=%d type=%s turn=%s phase=%s"%[p,str(action.get("type","")).substr(0,40),rules.s.get("turn",-1),rules.s.get("phase","")])
 	var error=rules.apply(p,action)
+	CatanDiagnostics.event("action.complete","accepted=%s"%error.is_empty())
 	if not error.is_empty(): _send_error(id,error)
 	else:
 		applied.emit(p,action)
@@ -367,9 +312,9 @@ func _error(message: String):
 	notice.emit(message)
 
 func _disconnected(id: int):
+	CatanDiagnostics.event("network.disconnected","seat=%d"%_seat_for(id))
 	if id==1 and online and not multiplayer.is_server():
-		leave()
-		notice.emit("Connection lost. Use Reconnect to return to your seat.")
+		# server_disconnected performs teardown after ENet finishes polling.
 		return
 	if not multiplayer.is_server(): return
 	var p=_seat_for(id)
@@ -471,7 +416,6 @@ func _set_piece_style(sender: int,target: int,style: int):
 	if started:_sync()
 
 func _process(delta: float):
-	_poll_secure_connection()
 	_process_music(delta)
 	if online and started and multiplayer.is_server() and not paused and roster.all(func(row):return row.connected):
 		world_seconds=fposmod(world_seconds+delta,600.0)

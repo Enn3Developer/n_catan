@@ -433,7 +433,7 @@ func add_night_light(parent: Node3D,pos: Vector3,reach: float,energy: float) -> 
 func robber_band(kind: int,art) -> Dictionary:
 	var root=Node3D.new();root.name="RobberBand"
 	var entries=[]
-	var center=Vector2(0,.82)
+	var center=Vector2.ZERO
 	for i in 4:
 		var angle=i*TAU/4
 		var origin=center+Vector2(cos(angle)*.145,sin(angle)*.05)
@@ -441,7 +441,7 @@ func robber_band(kind: int,art) -> Dictionary:
 		entry.merge({"origin":origin,"home":center+Vector2(cos(angle)*.115,sin(angle)*.05),"kind":kind,"phase":i*1.8})
 		root.add_child(entry.root,true);entries.append(entry)
 	# Stolen supplies and a small hearth keep the blocking piece identifiable.
-	for i in 3:craft.orb(root,Vector3(.21+i*.035,art.height_at(Vector2(.21+i*.035,.74),kind)+.026,.74),Vector3(.04,.052,.04),Color("96754e"))
+	for i in 3:craft.orb(root,Vector3(.21+i*.035,art.height_at(Vector2(.21+i*.035,-.08),kind)+.026,-.08),Vector3(.04,.052,.04),Color("96754e"))
 	var ground=art.height_at(center,kind)
 	for i in 7:
 		var angle=i*TAU/7

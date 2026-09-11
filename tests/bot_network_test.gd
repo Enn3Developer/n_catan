@@ -22,8 +22,8 @@ func run():
 	var a=make_peer(1)
 	var b=make_peer(2)
 	host.host("Host")
-	a.join_room(host.secure_invite("127.0.0.1"),"Ada")
-	b.join_room(host.secure_invite("127.0.0.1"),"Bo")
+	a.join_room(host.invite("127.0.0.1"),"Ada")
+	b.join_room(host.invite("127.0.0.1"),"Bo")
 	await create_timer(0.5).timeout
 	a.configure_bot("add")
 	await wait_net()
@@ -52,9 +52,9 @@ func run():
 	await wait_net()
 	# The first human on a dedicated server is its lobby controller.
 	host.host("Dedicated","",true)
-	a.join_room(host.secure_invite("127.0.0.1"),"Ada")
+	a.join_room(host.invite("127.0.0.1"),"Ada")
 	await create_timer(0.3).timeout
-	b.join_room(host.secure_invite("127.0.0.1"),"Bo")
+	b.join_room(host.invite("127.0.0.1"),"Bo")
 	await create_timer(0.3).timeout
 	check(a.is_controller() and not b.is_controller(),"dedicated lobby authority")
 	a.configure_bot("add",-1,0)

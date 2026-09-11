@@ -15,13 +15,13 @@ func run():
 	client.multiplayer.connected_to_server.disconnect(client._connected)
 	var incompatible=func():client._register.rpc_id(1,"Guest","",CatanBuildInfo.PROTOCOL-1,"",0,"v0.1.0")
 	client.multiplayer.connected_to_server.connect(incompatible)
-	client.join_room(host.secure_invite("127.0.0.1"),"Guest","")
+	client.join_room(host.invite("127.0.0.1"),"Guest","")
 	await create_timer(1).timeout
 	check(host.roster.size()==1 and not client.online,"incompatible client rejected")
 	check(not notices.is_empty() and "Incompatible multiplayer" in notices[0] and "v0.1.0" in notices[0],"version mismatch provides versions and update guidance")
 	client.multiplayer.connected_to_server.disconnect(incompatible)
 	client.multiplayer.connected_to_server.connect(client._connected)
-	client.join_room(host.secure_invite("127.0.0.1"),"Guest","")
+	client.join_room(host.invite("127.0.0.1"),"Guest","")
 	await create_timer(1).timeout
 	check(host.roster.size()==2 and client.seat==1,"compatible client joins after rejection")
 	client.leave();host.leave();print("VERSION_NETWORK_TEST: ",failures," failures");quit(1 if failures else 0)

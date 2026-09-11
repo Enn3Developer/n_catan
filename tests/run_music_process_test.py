@@ -13,7 +13,7 @@ with tempfile.TemporaryDirectory(prefix='catan-music-process-') as temp:
             if role == 'host':
                 deadline = time.monotonic() + 10
                 while not (Path(temp) / 'invite').exists():
-                    if time.monotonic() > deadline: raise RuntimeError('No secure host invite')
+                    if time.monotonic() > deadline: raise RuntimeError('No host invite')
                     time.sleep(.05)
             else: time.sleep(.3)
         failed=False

@@ -21,7 +21,7 @@ func run():
 	else:net.join_room(FileAccess.get_file_as_string(folder+"/invite"),role,"music")
 	if role=="host":
 		var invite_file=FileAccess.open(folder+"/invite",FileAccess.WRITE)
-		invite_file.store_string(net.secure_invite("127.0.0.1"));invite_file.close()
+		invite_file.store_string(net.invite("127.0.0.1"));invite_file.close()
 	create_timer(18).timeout.connect(func():quit(1))
 func _process(delta):
 	if net==null or audio==null:return false

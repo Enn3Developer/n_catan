@@ -25,14 +25,14 @@ func run():
 	var peer_root=Node.new();peer_root.name="Catan";branch.add_child(peer_root)
 	client=CatanNetwork.new();client.name="Network";peer_root.add_child(client)
 	client.notice.connect(func(message):notices.append(message))
-	client.join_room(game.net.secure_invite("127.0.0.1"),"Guest","wrong-password");await create_timer(1.5).timeout
+	client.join_room(game.net.invite("127.0.0.1"),"Guest","wrong-password");await create_timer(1.5).timeout
 	check(game.net.roster.size()==1 and client.seat==-1 and not client.online and not notices.is_empty(),"wrong password rejected")
-	client.join_room(game.net.secure_invite("127.0.0.1"),"Guest","test-host-password");await create_timer(1.5).timeout
+	client.join_room(game.net.invite("127.0.0.1"),"Guest","test-host-password");await create_timer(1.5).timeout
 	check(game.net.roster.size()==2 and client.seat==1,"matching password joins")
 	client.leave();game.net.leave();await create_timer(.2).timeout
 	game.host_password_field.text="";game.password_field.text="unused-join-password";game._host()
 	check(game.net.room_password.is_empty() and "Open room" in game._node("RoomSummary").text,"blank host password creates open room")
-	client.join_room(game.net.secure_invite("127.0.0.1"),"Guest");await create_timer(1.5).timeout
+	client.join_room(game.net.invite("127.0.0.1"),"Guest");await create_timer(1.5).timeout
 	check(game.net.roster.size()==2,"open room permits password-free join")
 	client.leave();game.net.leave()
 	game.net.reconnect_token="saved-test-seat";game.net.reconnect_address="127.0.0.1";game.net.reconnect_password="remembered-in-memory"

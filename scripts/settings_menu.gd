@@ -2,6 +2,7 @@ extends Control
 signal preferences_changed
 signal close_requested
 const OPTIONS=[
+	["Lighting","DayNightCycle","day_night_cycle","Day/night cycle","toggle",[],"Turn off to keep the island in daylight. This setting is personal.","Negligible"],
 	["World","Language","language","Language","option",["English","Italiano"],"Choose the language used on this computer.","Accessibility"],
 	["Display","Fullscreen","fullscreen","Fullscreen","toggle",[],"Fill the current display. Window size is used only in windowed mode.","Display"],
 	["Display","WindowSize","window_size","Window size","option",["1280 × 720","1440 × 900","1920 × 1080","2560 × 1440","3840 × 2160"],"Size of the game window. Fullscreen uses your desktop resolution; render scale controls 3D resolution independently.","GPU workload increases with resolution"],

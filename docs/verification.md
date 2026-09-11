@@ -177,3 +177,27 @@ Replaced short vertex waves on the 2,000 m ocean mesh with long, low-amplitude s
 - Compatibility OpenGL 3.3 smoke run compiles and renders the shader without errors.
 - Graphics suite: 201 checks pass, including water quality tiers and reduced motion settings.
 - Inspected `docs/water-day.png`, `docs/water-night.png`, `docs/water-coast.png`; softened the first pass's overly strong shallow patterns and boat rings.
+
+
+### Release 0.2.1 diagnostics and transport
+
+Protocol 12 replaces the historical DTLS transport above with plain ENet and
+address-only invites. Password admission, reconnect tokens and update signatures
+remain in place. Deferring disconnect/rejection teardown until after ENet polling
+fixes the native disconnect crash reproduced by the new transport test.
+
+Local Godot 4.7.2 verification:
+- `diagnostics_test.gd`: byte caps, four-file rotation, repeat suppression, rate
+  limiting, redaction and engine error source/stack capture pass.
+- `enet_transport_test.gd`: bare/explicit-port addresses, invalid and old invites,
+  wrong passwords, password-free rooms and host disconnect pass.
+- Network, protocol mismatch, bot network, cosmetics network (18 checks), music
+  network (141 checks), independent dedicated server plus three clients, shared
+  music processes and saved-seat process reconnect tests pass.
+- `sea_traffic_test.gd`: 24 checks pass, including bow-first sailing, route safety,
+  centered robber group/campfire and saved day/night preference with a running clock.
+- `ui_day_night_test.gd`: 14 checks pass with Vulkan/Forward+ on RTX 4060,
+  including the actual settings toggle and day/night interface restoration.
+- Python suite: 6 tests pass. Native crash output from the transport regression
+  was captured by the bounded logger; existing user logs did not establish the
+  cause of the user's earlier intermittent crashes.

@@ -47,6 +47,7 @@ var active_language=-1
 var quitting=false
 
 func _ready():
+	CatanDiagnostics.event("main.ready")
 	get_tree().auto_accept_quit=false
 	CatanI18n.apply(preferences.values.language)
 	active_language=preferences.values.language
@@ -67,7 +68,7 @@ func _ready():
 			var address="127.0.0.1:24567"
 			for arg in OS.get_cmdline_user_args():
 				if arg.begins_with("--address="):address=arg.trim_prefix("--address=")
-			print("CATAN_SECURE_INVITE "+net.secure_invite(address))
+			print("CATAN_INVITE "+net.invite(address))
 		return
 	board=$Board
 	board.picked.connect(func(kind,id): net.act({"type":kind,"id":id}))
@@ -120,6 +121,7 @@ func _ready():
 	_home()
 	if updater.supported:updater.check_updates.call_deferred()
 	_update_health_ready()
+	CatanDiagnostics.event("main.ready.complete")
 
 func _style(color: Color,radius: int=10) -> StyleBoxFlat:
 	var s=StyleBoxFlat.new()
@@ -143,6 +145,7 @@ func _theme() -> Theme:
 	return load("res://assets/ui_theme.tres")
 
 func _clear(scene_path: String=""):
+	CatanDiagnostics.event("ui.screen",scene_path)
 	if is_instance_valid(screen): screen.free()
 	var keep_modal=is_instance_valid(modal) and (modal.name in ["Settings","Cosmetics","MusicLibrary","Updates"] or (scene_path=="res://scenes/ui/hud.tscn" and modal.name in ["Guide","GameLog","LeaveConfirm"]))
 	if is_instance_valid(modal) and not keep_modal: modal.free()
@@ -265,7 +268,7 @@ func _join():
 	var err=net.join_room(address,pname,password)
 	if err!=OK:
 		_home()
-		_notice(tr("Paste the complete secure invite from the host."))
+		_notice(tr("Enter the host address and optional UDP port."))
 	else: _notice(tr("Connecting to the island…"))
 
 func _network_changed():
@@ -339,15 +342,16 @@ func _lobby():
 	_bind("CopyInvite",func():
 		var address=_node("InviteAddress").text.strip_edges()
 		if address.is_empty(): _notice(tr("Enter your public address first, or use Map router."))
-		else: DisplayServer.clipboard_set(net.secure_invite(address)); _notice(tr("Secure invite copied. Share it with your guests.")))
+		else: DisplayServer.clipboard_set(net.invite(address)); _notice(tr("Invite copied. Share it with your guests.")))
 	_node("InviteAddress").text=invite_address if net.multiplayer.is_server() else net.reconnect_address
 	_node("InviteAddress").editable=net.multiplayer.is_server()
 	_node("InviteAddress").text_changed.connect(func(text):invite_address=text)
 	for node_name in ["InviteHeading","InviteAddress","InviteActions"]: _node(node_name).visible=not net.solo
 	_node("MapRouter").disabled=not net.multiplayer.is_server()
-	_node("ConnectionHelp").text=tr("Choose each bot’s difficulty.") if net.solo else tr("Share the secure invite. Host: open UDP 24567.")
+	_node("ConnectionHelp").text=tr("Choose each bot’s difficulty.") if net.solo else tr("Share the host address. Host: open UDP 24567.")
 	if not connection_status.is_empty() and not net.solo: _node("ConnectionHelp").text=CatanI18n.render(connection_status)
 func _received(data: Dictionary):
+	CatanDiagnostics.event("state.received","turn=%s phase=%s"%[data.get("turn",-1),data.get("phase","")])
 	if server_only: return
 	var previous_trade=state.get("trade_event",{})
 	var previous_offer=state.get("offer",{})
@@ -969,6 +973,7 @@ func _solo():
 	net.configure_bot("add",-1,1)
 
 func _apply_preferences():
+	CatanDiagnostics.event("settings.apply","quality=%s day_night=%s"%[preferences.values.quality,preferences.values.day_night_cycle])
 	var language_changed=active_language!=preferences.values.language
 	active_language=preferences.values.language
 	CatanI18n.apply(active_language)
@@ -1145,6 +1150,7 @@ func _notification(what: int):
 	if what==NOTIFICATION_WM_CLOSE_REQUEST:_exit_desktop()
 
 func _exit_desktop():
+	CatanDiagnostics.event("shutdown.requested")
 	if quitting:return
 	quitting=true
 	set_process(false)

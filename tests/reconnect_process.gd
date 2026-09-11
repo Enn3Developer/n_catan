@@ -17,7 +17,7 @@ func run():
 		net.reconnect_password="test";net.reconnect()
 	if role=="host":
 		var invite_file=FileAccess.open(folder+"/invite",FileAccess.WRITE)
-		invite_file.store_string(net.secure_invite("127.0.0.1"));invite_file.close()
+		invite_file.store_string(net.invite("127.0.0.1"));invite_file.close()
 	create_timer(25).timeout.connect(func():quit(1))
 func lobby():
 	if role=="host":

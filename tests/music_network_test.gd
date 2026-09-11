@@ -27,7 +27,7 @@ func aligned(label):
 func run():
 	var host=make_peer(0);var a=make_peer(1);var b=make_peer(2)
 	check(host.host("Host")==OK,"host starts")
-	a.join_room(host.secure_invite("127.0.0.1"),"Ada");b.join_room(host.secure_invite("127.0.0.1"),"Bo")
+	a.join_room(host.invite("127.0.0.1"),"Ada");b.join_room(host.invite("127.0.0.1"),"Bo")
 	await create_timer(.8).timeout;aligned("initial join")
 	host.music_control("select",2);await create_timer(.3).timeout;aligned("track change")
 	check(a.music_state().track==2,"host selects shared track")
@@ -50,8 +50,8 @@ func run():
 	for peer in [b,a,host]:peer.leave()
 	await create_timer(.2).timeout
 	check(host.host("Dedicated","",true)==OK,"dedicated host starts")
-	a.join_room(host.secure_invite("127.0.0.1"),"Controller");await create_timer(.25).timeout
-	b.join_room(host.secure_invite("127.0.0.1"),"Guest");await create_timer(.5).timeout
+	a.join_room(host.invite("127.0.0.1"),"Controller");await create_timer(.25).timeout
+	b.join_room(host.invite("127.0.0.1"),"Guest");await create_timer(.5).timeout
 	check(a.seat==0 and a.can_control_music() and not b.can_control_music(),"first dedicated player controls music")
 	a.music_control("select",1);await create_timer(.3).timeout;aligned("dedicated selection")
 	for peer in [b,a,host]:peer.leave()

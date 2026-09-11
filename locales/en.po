@@ -855,14 +855,11 @@ msgstr "Particle effects"
 msgid "Password required to join"
 msgstr "Password required to join"
 
-msgid "Paste secure invite from host"
-msgstr "Paste secure invite from host"
+msgid "Host address (optional :port)"
+msgstr "Host address (optional :port)"
 
-msgid "Paste the complete secure invite from the host (Copy invite)."
-msgstr "Paste the complete secure invite from the host (Copy invite)."
-
-msgid "Paste the complete secure invite from the host."
-msgstr "Paste the complete secure invite from the host."
+msgid "Enter the host address and optional UDP port."
+msgstr "Enter the host address and optional UDP port."
 
 msgid "Pause soundtrack"
 msgstr "Pause soundtrack"
@@ -1068,8 +1065,8 @@ msgstr "Secure connection failed."
 msgid "Secure connection failed. Check the invite, host availability and UDP port."
 msgstr "Secure connection failed. Check the invite, host availability and UDP port."
 
-msgid "Secure invite copied. Share it with your guests."
-msgstr "Secure invite copied. Share it with your guests."
+msgid "Invite copied. Share it with your guests."
+msgstr "Invite copied. Share it with your guests."
 
 msgid "Set a room password (optional)"
 msgstr "Set a room password (optional)"
@@ -1092,8 +1089,8 @@ msgstr "Shadow quality"
 msgid "Share it with your players. Leave blank for an open room."
 msgstr "Share it with your players. Leave blank for an open room."
 
-msgid "Share the secure invite. Host: open UDP 24567."
-msgstr "Share the secure invite. Host: open UDP 24567."
+msgid "Share the host address. Host: open UDP 24567."
+msgstr "Share the host address. Host: open UDP 24567."
 
 msgid "Shared with the room · "
 msgstr "Shared with the room · "
@@ -1505,3 +1502,11 @@ msgstr "Build, trade and make yourself at home."
 
 msgid "%d cards left in deck."
 msgstr "%d cards left in deck."
+
+
+msgid "Day/night cycle"
+msgstr "Day/night cycle"
+
+
+msgid "Turn off to keep the island in daylight. This setting is personal."
+msgstr "Turn off to keep the island in daylight. This setting is personal."

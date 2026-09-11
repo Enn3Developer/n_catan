@@ -43,6 +43,15 @@ func run():
 	theme.advance(0,0)
 	check(fresh.get_theme_color("font_color")==label.get_theme_color("font_color"),"new controls inherit active night palette")
 	check(semantic.get_theme_color("font_color").is_equal_approx(Color("df6252")),"semantic colors remain unchanged")
+	var toggle=game.modal.controls.day_night_cycle
+	toggle.button_pressed=false
+	check(not game.preferences.values.day_night_cycle and game.board.daylight==1,"settings toggle immediately applies daylight")
+	theme.advance(game.board.daylight,5)
+	check(theme.amount==0,"disabled cycle restores daytime interface")
+	await shot("cycle-disabled")
+	toggle.button_pressed=true
+	check(game.board.daylight==0,"enabling cycle returns to current world time")
+	theme.advance(game.board.daylight,5)
 	game._close_modal()
 	theme.advance(1,.231049)
 	check(theme.amount>.49 and theme.amount<.51,"dawn also fades progressively")

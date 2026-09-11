@@ -30,7 +30,7 @@ Export presets exclude authoring textures, old models, tests, generated releases
 
 The game checks [GitHub Releases](https://github.com/Enn3Developer/n_catan/releases) for the latest stable version at startup. Open **Game updates** on the home screen or **Updates** in Settings, choose **Download update**, then **Restart to update**. You can keep playing while it downloads, but must leave the room before installing. Dedicated servers do not update automatically.
 
-The exact Git tag sets the application and manifest version. Multiplayer uses a separate protocol number, currently 10. Releases with the same protocol can play together. A protocol mismatch rejects the join and identifies both versions. If a release changes the protocol, the group should update together.
+The exact Git tag sets the application and manifest version. Multiplayer uses a separate protocol number, currently 12. Releases with the same protocol can play together. A protocol mismatch rejects the join and identifies both versions. If a release changes the protocol, the group should update together.
 
 The updater verifies the manifest's RSA/SHA-256 signature with its embedded public key, then checks the package and executable SHA-256 hashes. It uses a delta patch only when the installed executable matches a published base and the patch is smaller than 85% of the full download. If the delta fails, it downloads the full package.
 
@@ -81,7 +81,7 @@ Edit the interface in `scenes/ui/`. Its named Controls define the layout, and `a
 
 The server owns dice rolls, the deck, hands, resources and action validation. Clients receive other players' public counts, not private cards.
 
-Secure invites contain the room's public certificate, never its private key or password. Share invites through a trusted channel. A substituted invite can authenticate a different host. The client sends the room password only after certificate verification. The server rejects bare addresses and plaintext connections. Each hosted room creates a new certificate, and reconnection uses its original invite while the host stays running. Play with a host you trust.
+Online rooms use plain ENet over UDP. Room passwords still gate admission, but transport is unencrypted. Share the host address (optionally `:port`); old certificate invites are no longer supported. Protocol 12 clients must update together. Update downloads retain signature and hash verification.
 
 ## Verification
 
@@ -150,3 +150,26 @@ Run `tests/world_placement_test.gd` headlessly to check the imported meshes agai
 The surrounding archipelago is generated at runtime by `scripts/background_landscape.gd`, with one mesh per island. Keep all its geometry beyond 9.5 scenery units so boat routes remain open. `shaders/background_landscape.gdshader` adds distance haze and fades the camera-facing islands during orbiting. Run `tests/background_landscape_test.gd` and `tests/sea_traffic_test.gd` when changing it.
 
 Audio shutdown drains pending playback commands before releasing players, then allows the mixer to finish cleanup. Test scenes that free live audio wait briefly before quitting for the same reason. Fullscreen and window-size preferences apply only to standalone windows; embedded editor sessions retain their host window.
+
+
+## Diagnostic logs
+
+Release 0.2.1 records debug breadcrumbs for startup, screen changes, settings,
+board updates, gameplay actions, connections and shutdown, plus a health sample
+once a minute. Engine errors include source locations and GDScript call stacks;
+engine crash-handler output is captured when the process can still write it.
+No player hands, names, room passwords or reconnect tokens are deliberately logged.
+Standard stdout is excluded so printed dedicated-server invites stay out of logs.
+
+Logs are in Godot's user-data `logs/diagnostics.log`, with `.1` through `.3`
+rotated backups: at most four 1 MiB files. Each accepted write is flushed. Identical
+messages are suppressed for 30 seconds and output is limited to 60 messages per
+10 seconds, with suppression totals on the next accepted entry. The old engine
+file logger is disabled; existing `godot*.log` files are left untouched.
+On Linux the folder is `~/.local/share/godot/app_userdata/CATAN · Tides & Timber/logs/`.
+Attach all four diagnostic files after a crash. A hard OS kill can leave only the
+last completed breadcrumb; the logger cannot guarantee a native stack for every crash.
+
+Settings → Graphics → Day/night cycle can hold the island and interface in daylight.
+The preference is local and saved independently of graphics presets; the shared
+world clock continues, so enabling it again restores the room's current time.

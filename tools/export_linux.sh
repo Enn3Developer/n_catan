@@ -36,7 +36,7 @@ Launch the updater directly to recover an interrupted installation.
 Start with Learn to play or Play solo. Configure 2-5 bots in a solo lobby.
 Online rooms support 3-6 participants, including bots. The host must make
 UDP port 24567 reachable. Enter the public IP/DNS in the lobby and Copy invite;
-guests paste the complete secure invite. All online traffic uses verified DTLS.
+guests enter the host address. Online traffic uses plain ENet (no encryption).
 All players need this game version (network protocol 10).
 
 Right-drag: orbit. Middle-drag: pan. Scroll: zoom. Home: fit board.
@@ -44,7 +44,7 @@ H: inspect board. Esc: return. Settings and Piece cosmetics are on the menu.
 
 Dedicated server: ./"N Catan.x86_64" --headless -- --server
 Optional room password: append --password=your-room-password
-Set --address=your-public-hostname:24567 and share the printed CATAN_SECURE_INVITE.
+Set --address=your-public-hostname:24567 and share the printed CATAN_INVITE.
 
 Project license: GNU GPL version 3 only. See LICENSE for the full text.
 Source: https://github.com/Enn3Developer/n_catan

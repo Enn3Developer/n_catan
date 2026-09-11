@@ -855,14 +855,11 @@ msgstr "Effetti particellari"
 msgid "Password required to join"
 msgstr "Password richiesta per entrare"
 
-msgid "Paste secure invite from host"
-msgstr "Incolla l’invito sicuro dell’host"
+msgid "Host address (optional :port)"
+msgstr "Indirizzo host (:porta facoltativa)"
 
-msgid "Paste the complete secure invite from the host (Copy invite)."
-msgstr "Incolla l’invito sicuro completo ottenuto dall’host con Copia invito."
-
-msgid "Paste the complete secure invite from the host."
-msgstr "Incolla l’invito sicuro completo ricevuto dall’host."
+msgid "Enter the host address and optional UDP port."
+msgstr "Inserisci l’indirizzo dell’host e, se necessario, la porta UDP."
 
 msgid "Pause soundtrack"
 msgstr "Metti in pausa la musica"
@@ -1068,8 +1065,8 @@ msgstr "Non è stato possibile stabilire una connessione sicura. Chiedi all’ho
 msgid "Secure connection failed. Check the invite, host availability and UDP port."
 msgstr "Connessione sicura non riuscita. Controlla l’invito, che l’host sia online e che la porta UDP sia aperta."
 
-msgid "Secure invite copied. Share it with your guests."
-msgstr "Invito sicuro copiato. Condividilo con gli altri giocatori."
+msgid "Invite copied. Share it with your guests."
+msgstr "Invito copiato. Condividilo con i tuoi ospiti."
 
 msgid "Set a room password (optional)"
 msgstr "Password della stanza (facoltativa)"
@@ -1092,8 +1089,8 @@ msgstr "Qualità ombre"
 msgid "Share it with your players. Leave blank for an open room."
 msgstr "Condividila con i giocatori. Lascia vuoto per una stanza senza password."
 
-msgid "Share the secure invite. Host: open UDP 24567."
-msgstr "Condividi l’invito sicuro. L’host deve aprire la porta UDP 24567."
+msgid "Share the host address. Host: open UDP 24567."
+msgstr "Condividi l’indirizzo dell’host. Host: apri la porta UDP 24567."
 
 msgid "Shared with the room · "
 msgstr "Musica della stanza · "
@@ -1505,3 +1502,11 @@ msgstr "Costruisci, commercia e sentiti a casa."
 
 msgid "%d cards left in deck."
 msgstr "%d carte rimaste nel mazzo."
+
+
+msgid "Day/night cycle"
+msgstr "Ciclo giorno/notte"
+
+
+msgid "Turn off to keep the island in daylight. This setting is personal."
+msgstr "Disattiva per mantenere l’isola alla luce del giorno. Questa impostazione è personale."

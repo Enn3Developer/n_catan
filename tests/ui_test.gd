@@ -31,7 +31,7 @@ func run():
 	var client=CatanNetwork.new()
 	client.name="Network"
 	peer_root.add_child(client)
-	client.join_room(game.net.secure_invite("127.0.0.1"),"Guest")
+	client.join_room(game.net.invite("127.0.0.1"),"Guest")
 	await create_timer(0.5).timeout
 	check(game.net.roster.size()==2,"guest appears in lobby")
 	await click(game.screen.find_child("ReadyButton",true,false))

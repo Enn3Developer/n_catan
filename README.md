@@ -18,7 +18,7 @@ The game uses the Forward+ renderer and requires a Vulkan-capable GPU.
 
 ## Play with friends
 
-Choose **Play online**, create a room and share the lobby's secure invite. Friends can paste it into the join form. The host needs UDP port 24567 reachable through their router and firewall. There is no hosted relay, so hosting behind carrier-grade NAT requires a public server.
+Choose **Play online**, create a room and share the lobby's host address. Friends can paste it into the join form. The host needs UDP port 24567 reachable through their router and firewall. There is no hosted relay, so hosting behind carrier-grade NAT requires a public server.
 
 Closing the host closes the room. Disconnected players can reconnect while the host remains running.
 

@@ -113,7 +113,7 @@ visible = false
 [node name="ServerAddress" type="LineEdit" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions"]
 unique_name_in_owner = true
 layout_mode = 2
-placeholder_text = "Paste secure invite from host"
+placeholder_text = "Host address (optional :port)"
 custom_minimum_size = Vector2(0, 40)
 [node name="RoomPassword" type="LineEdit" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions"]
 unique_name_in_owner = true

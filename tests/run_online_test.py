@@ -12,8 +12,8 @@ try:
     invite = ""
     while not invite:
         line = server.stdout.readline()
-        if not line: raise RuntimeError("Server failed before producing secure invite")
-        if line.startswith('CATAN_SECURE_INVITE '): invite = line.strip().split(' ', 1)[1]
+        if not line: raise RuntimeError("Server failed before producing invite")
+        if line.startswith('CATAN_INVITE '): invite = line.strip().split(' ', 1)[1]
     for name in ['Ada','Morgan','Robin','Kai','Ash','Sage'][:player_count]:
         clients.append(subprocess.Popen(base+['--script','res://tests/online_client.gd','--',name,str(player_count),invite], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, env=env))
     failed=False

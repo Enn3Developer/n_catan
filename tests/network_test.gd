@@ -27,8 +27,8 @@ func run():
 	var a=make_peer(1)
 	var b=make_peer(2)
 	check(host.host("Host","secret")==OK,"server listens")
-	check(a.join_room(host.secure_invite("127.0.0.1"),"Ada","secret")==OK,"client A connects")
-	check(b.join_room(host.secure_invite("127.0.0.1"),"Bo","secret")==OK,"client B connects")
+	check(a.join_room(host.invite("127.0.0.1"),"Ada","secret")==OK,"client A connects")
+	check(b.join_room(host.invite("127.0.0.1"),"Bo","secret")==OK,"client B connects")
 	await create_timer(0.8).timeout
 	check(host.roster.size()==3 and a.roster.size()==3 and b.roster.size()==3,"lobby replicated")
 	check(a.seat>0 and b.seat>0 and a.seat!=b.seat,"distinct player seats")

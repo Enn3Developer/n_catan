@@ -99,7 +99,7 @@ func animate(delta: float,time: float):
 				if next.distance_to(q)<.85 and next.distance_to(q)<p.distance_to(q):next=p;break
 			boat.position.x=next.x;boat.position.z=next.y
 			if next.distance_to(p)>.00001:
-				var heading=atan2(-(next.x-p.x),-(next.y-p.y))
+				var heading=atan2(next.x-p.x,next.y-p.y)
 				boat.rotation.y=lerp_angle(boat.rotation.y,heading,1-exp(-delta*2.0))
 			if next.distance_to(target)<.006:
 				ship.step+=1

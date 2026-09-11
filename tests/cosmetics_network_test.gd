@@ -19,7 +19,7 @@ func run():
 	host.my_style=1;guest.my_style=3
 	host.my_color="123456";guest.my_color="abcdef"
 	check(host.host("Host")==OK,"host starts")
-	check(guest.join_room(host.secure_invite("127.0.0.1"),"Guest")==OK,"guest joins")
+	check(guest.join_room(host.invite("127.0.0.1"),"Guest")==OK,"guest joins")
 	for attempt in 40:
 		if host.roster.size()==2 and guest.roster.size()==2:break
 		await create_timer(.1).timeout
