@@ -38,6 +38,7 @@ jobs:
           "$GODOT_BIN" --headless --path . --script tests/sea_traffic_test.gd
           "$GODOT_BIN" --headless --path . --script tests/background_landscape_test.gd
           "$GODOT_BIN" --headless --path . --script tests/night_world_test.gd
+          "$GODOT_BIN" --headless --path . --script tests/ui_localization_test.gd
           "$GODOT_BIN" --headless --path . --script tests/localization_appearance_test.gd
           "$GODOT_BIN" --headless --path . --script tests/cosmetics_network_test.gd
           "$GODOT_BIN" --headless --path . --script tests/version_network_test.gd

@@ -1510,3 +1510,222 @@ msgstr "Day/night cycle"
 
 msgid "Turn off to keep the island in daylight. This setting is personal."
 msgstr "Turn off to keep the island in daylight. This setting is personal."
+
+msgid "Bot"
+msgstr "Bot"
+
+msgid "Voyager"
+msgstr "Voyager"
+
+msgid "Bilinear"
+msgstr "Bilinear"
+
+msgid "Anti-aliasing"
+msgstr "Anti-aliasing"
+
+msgid "FORWARD+ / VULKAN"
+msgstr "FORWARD+ / VULKAN"
+
+msgid "CONTROLS"
+msgstr "CONTROLS"
+
+msgid "Move the robber"
+msgstr "Move the robber"
+
+msgid "Build two free roads"
+msgstr "Build two free roads"
+
+msgid "Take two resources"
+msgstr "Take two resources"
+
+msgid "Claim one resource type"
+msgstr "Claim one resource type"
+
+msgid "+1 victory point"
+msgstr "+1 victory point"
+
+msgid "Next turn"
+msgstr "Next turn"
+
+msgid "No development cards"
+msgstr "No development cards"
+
+msgid "Harbor at Dawn"
+msgstr "Harbor at Dawn"
+
+msgid "Sunlit Fields"
+msgstr "Sunlit Fields"
+
+msgid "Trade Winds"
+msgstr "Trade Winds"
+
+msgid "Lanterns on the Water"
+msgstr "Lanterns on the Water"
+
+msgid "Voyager's Waltz"
+msgstr "Voyager's Waltz"
+
+msgid "%d FPS · %.1f ms · %.0f MB VRAM"
+msgstr "%d FPS · %.1f ms · %.0f MB VRAM"
+
+msgid "Steal from %s"
+msgstr "Steal from %s"
+
+msgid "%s wins!"
+msgstr "%s wins!"
+
+msgid "%s offers:"
+msgstr "%s offers:"
+
+msgid "%s disconnected. Waiting to reconnect."
+msgstr "%s disconnected. Waiting to reconnect."
+
+msgid "30 FPS"
+msgstr "30 FPS"
+
+msgid "60 FPS"
+msgstr "60 FPS"
+
+msgid "90 FPS"
+msgstr "90 FPS"
+
+msgid "120 FPS"
+msgstr "120 FPS"
+
+msgid "144 FPS"
+msgstr "144 FPS"
+
+msgid "240 FPS"
+msgstr "240 FPS"
+
+msgid "AMD FSR 1.0"
+msgstr "AMD FSR 1.0"
+
+msgid "FXAA"
+msgstr "FXAA"
+
+msgid "MSAA 2×"
+msgstr "MSAA 2×"
+
+msgid "MSAA 4×"
+msgstr "MSAA 4×"
+
+msgid "MSAA 8×"
+msgstr "MSAA 8×"
+
+msgid "TAA"
+msgstr "TAA"
+
+msgid "2×"
+msgstr "2×"
+
+msgid "4×"
+msgstr "4×"
+
+msgid "8×"
+msgstr "8×"
+
+msgid "16×"
+msgstr "16×"
+
+msgid "1280 × 720"
+msgstr "1280 × 720"
+
+msgid "1440 × 900"
+msgstr "1440 × 900"
+
+msgid "1920 × 1080"
+msgstr "1920 × 1080"
+
+msgid "2560 × 1440"
+msgstr "2560 × 1440"
+
+msgid "3840 × 2160"
+msgstr "3840 × 2160"
+
+msgid "Search"
+msgstr "Search"
+
+msgid "Pick a color from the application window."
+msgstr "Pick a color from the application window."
+
+msgid "Select a picker shape."
+msgstr "Select a picker shape."
+
+msgid "HSV Rectangle"
+msgstr "HSV Rectangle"
+
+msgid "HSV Wheel"
+msgstr "HSV Wheel"
+
+msgid "VHS Circle"
+msgstr "VHS Circle"
+
+msgid "OKHSL Circle"
+msgstr "OKHSL Circle"
+
+msgid "OK HS Rectangle"
+msgstr "OK HS Rectangle"
+
+msgid "OK HL Rectangle"
+msgstr "OK HL Rectangle"
+
+msgid "Linear"
+msgstr "Linear"
+
+msgid "Select a picker mode."
+msgstr "Select a picker mode."
+
+msgid "Colorized Sliders"
+msgstr "Colorized Sliders"
+
+msgid "Hex"
+msgstr "Hex"
+
+msgid "Enter a hex code (\"#ff0000\") or named color (\"red\")."
+msgstr "Enter a hex code (\"#ff0000\") or named color (\"red\")."
+
+msgid "Hex code or named color"
+msgstr "Hex code or named color"
+
+msgid "Copy the color value."
+msgstr "Copy the color value."
+
+msgid "Swatches"
+msgstr "Swatches"
+
+msgid "Show all options available."
+msgstr "Show all options available."
+
+msgid "Add current color as a preset."
+msgstr "Add current color as a preset."
+
+msgid "Recent Colors"
+msgstr "Recent Colors"
+
+msgid "Screen Recording permission is required to pick colors from the other application windows.\nClick here to request access..."
+msgstr "Screen Recording permission is required to pick colors from the other application windows.\nClick here to request access..."
+
+msgid "Screen Recording permission missing!"
+msgstr "Screen Recording permission missing!"
+
+msgid "Cut"
+msgstr "Cut"
+
+msgid "Copy"
+msgstr "Copy"
+
+msgid "Paste"
+msgstr "Paste"
+
+msgid "Select All"
+msgstr "Select All"
+
+msgid "Clear"
+msgstr "Clear"
+
+msgid "Undo"
+msgstr "Undo"
+
+msgid "Redo"
+msgstr "Redo"

@@ -493,7 +493,7 @@ func _process(delta):
 		if entry.port:label_scale=clampf(label_scale,.8,1.5)
 		entry.label.scale=Vector2.ONE*label_scale
 		entry.label.position=(camera.unproject_position(entry.anchor.global_position)-entry.label.size*entry.label.scale*0.5).round()
-	if fps_label.visible:fps_label.text="%d FPS · %.1f ms · %.0f MB VRAM" % [Engine.get_frames_per_second(),1000.0/maxf(1,Engine.get_frames_per_second()),Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED)/1048576.0]
+	if fps_label.visible:fps_label.text=tr("%d FPS · %.1f ms · %.0f MB VRAM") % [Engine.get_frames_per_second(),1000.0/maxf(1,Engine.get_frames_per_second()),Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED)/1048576.0]
 	if reduce_motion: delta=0.0
 	elapsed+=delta
 	living_world.animate(actors,elapsed,art,daylight)

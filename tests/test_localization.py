@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 
 def catalog(locale):
-    return {ast.literal_eval(k):ast.literal_eval(v) for k,v in re.findall(r'^msgid (".+")\nmsgstr (".+")$', (ROOT/'locales'/f'{locale}.po').read_text(), re.M)}
+    return {ast.literal_eval(k):ast.literal_eval(v) for k,v in re.findall(r'^msgid (".+")\nmsgstr (".*")$', (ROOT/'locales'/f'{locale}.po').read_text(), re.M)}
 
 class LocalizationTests(unittest.TestCase):
     def test_catalogs_and_placeholders(self):
@@ -34,5 +34,33 @@ class LocalizationTests(unittest.TestCase):
         for literal in literals:
             text=ast.literal_eval(literal)
             if text:self.assertTrue(text in translations,text)
+
+    def test_script_translation_calls(self):
+        translations=catalog('it')
+        literal=r'("(?:[^"\\]|\\.)*")'
+        for path in (ROOT/'scripts').glob('*.gd'):
+            # Explicit translation calls and local/wire message entry points.
+            source=path.read_text()
+            for raw in re.findall(r'(?:\btr|TranslationServer.translate|CatanI18n.message|CatanI18n.term|notice.emit)\('+literal,source):
+                key=ast.literal_eval(raw)
+                if key:self.assertIn(key,translations,f'{path.name}: {key}')
+
+    def test_data_driven_ui_text(self):
+        translations=catalog('it')
+        settings=(ROOT/'scripts/settings_menu.gd').read_text()
+        options=ast.literal_eval(settings.split('const OPTIONS=',1)[1].split('\nvar preferences',1)[0])
+        keys=[]
+        for spec in options:
+            keys.extend([spec[0],spec[3],spec[6],spec[7]])
+            if spec[4]=='option':keys.extend(spec[5])
+        for filename,fields in [('soundtrack.gd',['title','mood']),('tutorial.gd',['title','body'])]:
+            source=(ROOT/'scripts'/filename).read_text()
+            for field in fields:
+                keys.extend(ast.literal_eval(raw) for raw in re.findall(r'"'+field+r'":("(?:[^"\\]|\\.)*")',source))
+        main=(ROOT/'scripts/main.gd').read_text()
+        for variable in ['names','effects']:
+            for raw in re.findall(r'var '+variable+r'=([^\n]+)',main):
+                keys.extend(ast.literal_eval(raw))
+        for key in keys:self.assertIn(key,translations,key)
 
 if __name__=='__main__':unittest.main()

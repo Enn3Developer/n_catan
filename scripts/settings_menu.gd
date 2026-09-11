@@ -65,7 +65,7 @@ func setup(settings: CatanSettings):
 		scroll.add_child(box)
 		var heading=Label.new()
 		heading.name=title+"Heading"
-		heading.text=title.to_upper()
+		heading.text={"Graphics":"GRAPHICS","World":"CONTROLS","Audio":"AUDIO"}[title]
 		heading.add_theme_font_size_override("font_size",17)
 		heading.add_theme_color_override("font_color",Color("8c522d"))
 		box.add_child(heading)

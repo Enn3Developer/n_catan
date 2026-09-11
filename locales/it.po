@@ -1510,3 +1510,222 @@ msgstr "Ciclo giorno/notte"
 
 msgid "Turn off to keep the island in daylight. This setting is personal."
 msgstr "Disattiva per mantenere l’isola alla luce del giorno. Questa impostazione è personale."
+
+msgid "Bot"
+msgstr "Bot"
+
+msgid "Voyager"
+msgstr "Viaggiatore"
+
+msgid "Bilinear"
+msgstr "Bilineare"
+
+msgid "Anti-aliasing"
+msgstr "Anti-aliasing"
+
+msgid "FORWARD+ / VULKAN"
+msgstr "FORWARD+ / VULKAN"
+
+msgid "CONTROLS"
+msgstr "COMANDI"
+
+msgid "Move the robber"
+msgstr "Sposta il brigante"
+
+msgid "Build two free roads"
+msgstr "Costruisci due strade gratuite"
+
+msgid "Take two resources"
+msgstr "Prendi due risorse"
+
+msgid "Claim one resource type"
+msgstr "Prendi tutte le risorse di un tipo"
+
+msgid "+1 victory point"
+msgstr "+1 punto vittoria"
+
+msgid "Next turn"
+msgstr "Prossimo turno"
+
+msgid "No development cards"
+msgstr "Nessuna carta sviluppo"
+
+msgid "Harbor at Dawn"
+msgstr "Il porto all’alba"
+
+msgid "Sunlit Fields"
+msgstr "Campi al sole"
+
+msgid "Trade Winds"
+msgstr "Venti del commercio"
+
+msgid "Lanterns on the Water"
+msgstr "Lanterne sull’acqua"
+
+msgid "Voyager's Waltz"
+msgstr "Il valzer del viaggiatore"
+
+msgid "%d FPS · %.1f ms · %.0f MB VRAM"
+msgstr "%d FPS · %.1f ms · %.0f MB VRAM"
+
+msgid "Steal from %s"
+msgstr "Ruba a %s"
+
+msgid "%s wins!"
+msgstr "%s vince!"
+
+msgid "%s offers:"
+msgstr "%s offre:"
+
+msgid "%s disconnected. Waiting to reconnect."
+msgstr "%s si è disconnesso. In attesa della riconnessione."
+
+msgid "30 FPS"
+msgstr "30 FPS"
+
+msgid "60 FPS"
+msgstr "60 FPS"
+
+msgid "90 FPS"
+msgstr "90 FPS"
+
+msgid "120 FPS"
+msgstr "120 FPS"
+
+msgid "144 FPS"
+msgstr "144 FPS"
+
+msgid "240 FPS"
+msgstr "240 FPS"
+
+msgid "AMD FSR 1.0"
+msgstr "AMD FSR 1.0"
+
+msgid "FXAA"
+msgstr "FXAA"
+
+msgid "MSAA 2×"
+msgstr "MSAA 2×"
+
+msgid "MSAA 4×"
+msgstr "MSAA 4×"
+
+msgid "MSAA 8×"
+msgstr "MSAA 8×"
+
+msgid "TAA"
+msgstr "TAA"
+
+msgid "2×"
+msgstr "2×"
+
+msgid "4×"
+msgstr "4×"
+
+msgid "8×"
+msgstr "8×"
+
+msgid "16×"
+msgstr "16×"
+
+msgid "1280 × 720"
+msgstr "1280 × 720"
+
+msgid "1440 × 900"
+msgstr "1440 × 900"
+
+msgid "1920 × 1080"
+msgstr "1920 × 1080"
+
+msgid "2560 × 1440"
+msgstr "2560 × 1440"
+
+msgid "3840 × 2160"
+msgstr "3840 × 2160"
+
+msgid "Search"
+msgstr "Cerca"
+
+msgid "Pick a color from the application window."
+msgstr "Scegli un colore dalla finestra dell’applicazione."
+
+msgid "Select a picker shape."
+msgstr "Scegli la forma del selettore."
+
+msgid "HSV Rectangle"
+msgstr "Rettangolo HSV"
+
+msgid "HSV Wheel"
+msgstr "Ruota HSV"
+
+msgid "VHS Circle"
+msgstr "Cerchio VHS"
+
+msgid "OKHSL Circle"
+msgstr "Cerchio OKHSL"
+
+msgid "OK HS Rectangle"
+msgstr "Rettangolo OK HS"
+
+msgid "OK HL Rectangle"
+msgstr "Rettangolo OK HL"
+
+msgid "Linear"
+msgstr "Lineare"
+
+msgid "Select a picker mode."
+msgstr "Scegli la modalità del selettore."
+
+msgid "Colorized Sliders"
+msgstr "Cursori colorati"
+
+msgid "Hex"
+msgstr "Esadecimale"
+
+msgid "Enter a hex code (\"#ff0000\") or named color (\"red\")."
+msgstr "Inserisci un codice esadecimale (\"#ff0000\") o il nome inglese di un colore (\"red\")."
+
+msgid "Hex code or named color"
+msgstr "Codice esadecimale o nome del colore"
+
+msgid "Copy the color value."
+msgstr "Copia il valore del colore."
+
+msgid "Swatches"
+msgstr "Campioni"
+
+msgid "Show all options available."
+msgstr "Mostra tutte le opzioni disponibili."
+
+msgid "Add current color as a preset."
+msgstr "Salva il colore attuale tra i predefiniti."
+
+msgid "Recent Colors"
+msgstr "Colori recenti"
+
+msgid "Screen Recording permission is required to pick colors from the other application windows.\nClick here to request access..."
+msgstr "Per scegliere colori dalle altre finestre serve il permesso di registrazione dello schermo.\nClicca qui per richiedere l’accesso…"
+
+msgid "Screen Recording permission missing!"
+msgstr "Manca il permesso di registrazione dello schermo!"
+
+msgid "Cut"
+msgstr "Taglia"
+
+msgid "Copy"
+msgstr "Copia"
+
+msgid "Paste"
+msgstr "Incolla"
+
+msgid "Select All"
+msgstr "Seleziona tutto"
+
+msgid "Clear"
+msgstr "Cancella"
+
+msgid "Undo"
+msgstr "Annulla"
+
+msgid "Redo"
+msgstr "Ripeti"

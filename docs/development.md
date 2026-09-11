@@ -137,7 +137,7 @@ English and Italian catalogs live in `locales/en.po` and `locales/it.po`. Use En
 
 Player colors are opaque six-digit RGB values. An empty value uses the seat palette. The host validates changes and includes them in lobby and game snapshots. Players can edit their own appearance; the room controller can also edit bots. Protocol 10 adds the color handshake and structured localized messages.
 
-Run `python3 -m unittest discover -s tests -p 'test_localization.py'`, `tests/localization_appearance_test.gd`, and `tests/cosmetics_network_test.gd` when changing these features. Pass `-- --italian` to `tests/layout_test.gd` to check Italian at all supported window sizes.
+Run `python3 -m unittest discover -s tests -p 'test_localization.py'`, `tests/localization_appearance_test.gd`, and `tests/cosmetics_network_test.gd` when changing these features. Pass `-- --italian` to `tests/layout_test.gd` to check Italian at all supported window sizes. `tests/ui_localization_test.gd` checks dynamic card, resource, phase and soundtrack text, language switching, and checked-hover theme coverage. Run it with graphics to capture day/night hover states and the Italian color picker. Catalog checks cover translation calls, settings options, soundtrack metadata, tutorial content and development cards, including printf argument compatibility.
 
 ## Scenery and placement
 

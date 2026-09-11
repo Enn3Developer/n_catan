@@ -484,7 +484,7 @@ func _hud():
 	if state.phase=="free_roads" and mine:_button(right,tr("Finish roads"),func():net.act({"type":"finish_roads"}))
 	if state.phase=="discard" and state.discards.has(str(net.seat)):_button(right,tr("Discard %d") % state.discards[str(net.seat)],_discard,true)
 	if state.phase=="steal" and mine:
-		for p in state.victims:_button(right,tr("Steal: ")+state.players[p].name,func():net.act({"type":"steal","id":p}),true)
+		for p in state.victims:_button(right,tr("Steal from %s") % state.players[p].name,func():net.act({"type":"steal","id":p}),true)
 	if not state.offer.is_empty():_button(right,tr("Trade offer"),_view_offer,true)
 	var resources=CatanIcons.resources(_node("HandBody"),state.players[net.seat].hand,38,true)
 	resources.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
@@ -493,11 +493,11 @@ func _hud():
 	_node("Top").minimum_size_changed.connect(_queue_layout)
 	if state.winner!=-1:
 		var box=_dialog("Victory")
-		_label(box,state.players[state.winner].name+tr(" wins!"),30,GOLD)
+		_label(box,tr("%s wins!") % state.players[state.winner].name,30,GOLD)
 		_button(box,tr("Back to menu"),net.leave,true)
 	if guide!=null:_tutorial_ui()
 	for row_player in net.roster:
-		if not row_player.connected:_notice(row_player.name+tr(" disconnected. Waiting to reconnect."))
+		if not row_player.connected:_notice(tr("%s disconnected. Waiting to reconnect.") % row_player.name)
 	_queue_layout()
 
 func _music_icon_button(parent: Node,key: String,tip: String,callback: Callable) -> Button:
@@ -558,7 +558,9 @@ func _open_music():
 		var row=HBoxContainer.new();box.add_child(row)
 		var button=_button(row,track.title,func():net.music_control("select",i))
 		button.name="MusicTrack%d" % i;button.toggle_mode=true;button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-		button.add_theme_stylebox_override("pressed",_style(Color("ccdbb2"),8))
+		var selected_style=_style(Color("ccdbb2"),8)
+		button.add_theme_stylebox_override("pressed",selected_style)
+		button.add_theme_stylebox_override("hover_pressed",selected_style)
 		button.add_theme_color_override("font_pressed_color",INK)
 		button.add_theme_color_override("font_hover_pressed_color",INK)
 		button.tooltip_text=track.mood
@@ -572,8 +574,8 @@ func _refresh_music_widgets(widgets: Dictionary,sample: Dictionary):
 	if widgets.is_empty() or not is_instance_valid(widgets.get("root")):return
 	var track=CatanSoundtrack.TRACKS[int(sample.track)]
 	var playback_ready=sample.get("ready",true)
-	widgets.title.text=(tr("Paused · ") if sample.paused else "")+track.title if playback_ready else tr("Joining room soundtrack…")
-	widgets.title.tooltip_text=track.title+" · "+tr(track.mood)
+	widgets.title.text=(tr("Paused · ") if sample.paused else "")+tr(track.title) if playback_ready else tr("Joining room soundtrack…")
+	widgets.title.tooltip_text=tr(track.title)+" · "+tr(track.mood)
 	widgets.clock.text=CatanSoundtrack.time_text(sample.position)+" / "+CatanSoundtrack.time_text(track.duration)
 	var controller=net.can_control_music() and playback_ready
 	for key in ["previous","toggle","next"]:
@@ -599,7 +601,7 @@ func _journal():
 	_button(box,"Close",_close_modal)
 
 func _phase_text() -> String:
-	return {"setup_settlement":"Setup","setup_road":"Setup","play":tr("Build & trade") if state.rolled else tr("Roll dice"),"discard":tr("Discard"),"robber":tr("Robber"),"steal":tr("Steal"),"free_roads":tr("Free roads")}.get(state.phase,"")
+	return {"setup_settlement":tr("Setup"),"setup_road":tr("Setup"),"play":tr("Build & trade") if state.rolled else tr("Roll dice"),"discard":tr("Discard"),"robber":tr("Robber"),"steal":tr("Steal"),"free_roads":tr("Free roads")}.get(state.phase,"")
 
 func _instruction() -> String:
 	if state.winner!=-1: return tr("The expedition is complete.")
@@ -751,9 +753,13 @@ func _trade_choices(parent: Node,selection: OptionButton,giving: bool) -> Array:
 		var b=_button(choices,str(state.players[net.seat].hand[r]) if giving else "",func():
 			selection.select(r);selection.item_selected.emit(r))
 		b.toggle_mode=true;b.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-		b.add_theme_stylebox_override("pressed",_style(GOLD,8))
+		var selected_style=_style(GOLD,8)
+		b.add_theme_stylebox_override("pressed",selected_style)
+		b.add_theme_stylebox_override("hover_pressed",selected_style)
 		b.add_theme_color_override("font_pressed_color",INK)
 		b.add_theme_color_override("icon_pressed_color",INK)
+		b.add_theme_color_override("font_hover_pressed_color",INK)
+		b.add_theme_color_override("icon_hover_pressed_color",INK)
 		CatanIcons.button_icon(b,CatanIcons.RESOURCES[r],24)
 		buttons.append(b)
 	return buttons
@@ -793,7 +799,7 @@ func _trade_notifications(previous: Dictionary,previous_offer: Dictionary,fresh:
 func _view_offer():
 	if state.get("offer",{}).is_empty():return
 	var box=_dialog(tr("A trade on the table"))
-	_label(box,state.players[state.offer.from].name+tr(" offers:"),20)
+	_label(box,tr("%s offers:") % state.players[state.offer.from].name,20)
 	CatanIcons.resources(box,state.offer.give,38)
 	_label(box,tr("In return for:"),20)
 	CatanIcons.resources(box,state.offer.receive,38)
@@ -878,7 +884,7 @@ func _card_section(play: bool):
 		b.mouse_exited.connect(func():_card_preview(b,false))
 		b.focus_entered.connect(func():_card_preview(b,true))
 		b.focus_exited.connect(func():_card_preview(b,false))
-		b.tooltip_text=tips[i]+tr("\n%d card_ready · %d bought this turn") % [player.cards[i],player.new_cards[i]]
+		b.tooltip_text=tips[i]+tr("\n%d ready · %d bought this turn") % [player.cards[i],player.new_cards[i]]
 		b.disabled=i==4 or not play or player.cards[i]==0 or state.card_played
 		if i<4 and player.new_cards[i]>0:b.tooltip_text+=tr("\nNew action cards become playable next turn.")
 		if i<4 and state.card_played:b.tooltip_text+=tr("\nYou have already played an action card this turn.")

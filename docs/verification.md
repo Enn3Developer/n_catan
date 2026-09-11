@@ -201,3 +201,9 @@ Local Godot 4.7.2 verification:
 - Python suite: 6 tests pass. Native crash output from the transport regression
   was captured by the bounded logger; existing user logs did not establish the
   cause of the user's earlier intermittent crashes.
+
+## 0.2.2 interface and localization
+
+Checked switch hover surfaces in day and night themes, selected trade/music buttons, and the color picker panel. Audited scene text, dynamic UI templates, settings choices and help, soundtrack metadata, card descriptions, resource tooltips, tutorial text, network notices and update messages. Added 73 English/Italian catalog entries, including native color-picker and text-menu labels. Player names remain literal.
+
+Validation on Godot 4.7.2: 8 Python tests; UI localization 17 headless / 18 graphical checks; cards 43 checks; localization/appearance 25 checks; trades 9 checks; Italian layout 4,673 checks across seven window sizes. All passed. GPU captures were inspected for checked hover, Italian settings at 800×600, cards, music, and the color picker.
