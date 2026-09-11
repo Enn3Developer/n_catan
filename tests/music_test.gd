@@ -1,37 +1,63 @@
 extends SceneTree
 var checks=0
 var failures=0
+var player
 func check(ok: bool,message: String):
 	checks+=1
 	if not ok:failures+=1;printerr("FAIL: ",message)
 func _initialize():call_deferred("run")
+func pump(sample: Dictionary,seconds: float) -> Dictionary:
+	var start=Time.get_ticks_usec();var previous=start
+	while Time.get_ticks_usec()-start<seconds*1000000:
+		await process_frame
+		var now=Time.get_ticks_usec();var delta=(now-previous)/1000000.0;previous=now
+		sample=CatanSoundtrack.advance(sample,delta);player.follow_soundtrack(sample,delta)
+	return sample
 func run():
-	var player=load("res://scenes/audio.tscn").instantiate();root.add_child(player)
+	Engine.max_fps=60
+	var original_buses=AudioServer.bus_count
+	player=load("res://scenes/audio.tscn").instantiate();root.add_child(player)
 	check(CatanSoundtrack.TRACKS.size()==5,"five original tracks")
-	for i in CatanSoundtrack.TRACKS.size():
+	for i in 5:
 		var source=player.track_stream(i)
-		check(absf(source.get_length()-CatanSoundtrack.TRACKS[i].duration)<.003,"playlist duration matches imported audio: "+str(i))
-		check(source is AudioStreamWAV if i==0 else source is AudioStreamOggVorbis,"new tracks use compressed Vorbis")
-		player.follow_soundtrack({"track":i,"position":3.0,"paused":false,"ready":true},.016)
-		await create_timer(.3).timeout
-		check(player.current_track==i and player.music.playing,"track selection starts playback")
-	var boundary=CatanSoundtrack.advance({"track":4,"position":CatanSoundtrack.TRACKS[4].duration-.2,"paused":false},.65)
-	check(boundary.track==0 and is_equal_approx(boundary.position,.45),"last track wraps to first at exact boundary")
-	var frozen=CatanSoundtrack.advance({"track":2,"position":12.5,"paused":true},100)
-	check(frozen.track==2 and frozen.position==12.5,"paused clock stays fixed")
-	player.follow_soundtrack({"track":4,"position":3.4,"paused":true},.016)
-	await create_timer(.2).timeout
-	check(player.music.stream_paused,"shared pause pauses audio")
-	var position=player.audible_position();await create_timer(.2).timeout
-	check(absf(player.audible_position()-position)<.01,"audio remains at paused position")
+		check(absf(source.get_length()-CatanSoundtrack.TRACKS[i].duration)<.003,"duration matches original recording")
+		check(source is AudioStreamWAV if i==0 else source is AudioStreamOggVorbis,"original formats retained")
+	var sample={"track":0,"position":10.0,"paused":false,"generation":0}
+	sample=await pump(sample,.6)
+	var old=player.music
+	sample=CatanSoundtrack.switch_to(sample,1)
+	sample=await pump(sample,2.0)
+	check(player.current_track==1 and player.music.playing and old.playing,"manual switch overlaps active players")
+	var row=player.music_voices["%s:%s"%[sample.generation,sample.track]]
+	check(row.eq.get_band_gain_db(0)<row.eq.get_band_gain_db(5),"incoming bass enters after upper texture")
+	check(row.wet.playing and row.pitch.pitch_scale>1,"nearby tempo is matched with compensating pitch shift")
+	var earlier=old
+	sample=CatanSoundtrack.switch_to(sample,2)
+	sample=await pump(sample,.2)
+	check(is_instance_valid(earlier) and earlier.playing,"rapid switching preserves first outgoing player")
+	sample.paused=true;sample=await pump(sample,.15)
+	var position=player.audible_position()
+	sample=await pump(sample,.2)
+	check(absf(player.audible_position()-position)<.01 and player.music_spare.stream_paused,"pause freezes every voice")
+	sample.paused=false
+	sample=await pump(sample,9)
+	check(player.fading_tracks.is_empty() and player.music_voices.size()==1,"completed fade releases outgoing players and buses")
+	check(not player.music_voices.values()[0].wet.playing,"natural tempo returns to untouched dry playback")
+	var late=load("res://scenes/audio.tscn").instantiate();root.add_child(late)
+	var joining=CatanSoundtrack.advance(CatanSoundtrack.switch_to(sample,4),2.0)
+	player.follow_soundtrack(joining,.016);late.follow_soundtrack(joining,.016)
+	check(player.music_voices.keys()==late.music_voices.keys(),"late join reconstructs all active voices")
+	for key in player.music_voices:
+		check(is_equal_approx(player.music_voices[key].eq.get_band_gain_db(2),late.music_voices[key].eq.get_band_gain_db(2)),"late join reconstructs current EQ envelope")
+	late.queue_free()
 	var values=CatanSettings.DEFAULTS.duplicate();values.music=0.0;player.apply(values)
-	player.follow_soundtrack({"track":4,"position":3.4,"paused":false},.016)
-	await create_timer(.2).timeout
-	check(AudioServer.is_bus_mute(AudioServer.get_bus_index("Music")),"music mute applies locally")
-	check(player.music.playing and not player.music.stream_paused,"muting keeps shared timeline running")
-	values.music=.42;player.apply(values)
-	player.follow_soundtrack({"track":4,"position":14.0,"paused":false},1.0)
-	await create_timer(.1).timeout
-	check(player.seek_count>0 and player.audible_position()>13.5,"large drift seeks to room position")
-	player.queue_free();await create_timer(.2).timeout;await process_frame;await process_frame
+	sample=await pump(joining,.2)
+	check(AudioServer.is_bus_mute(AudioServer.get_bus_index("Music")) and player.music.playing,"local mute preserves playback")
+	sample.position+=5
+	var seeks=player.seek_count
+	sample=await pump(sample,.6)
+	check(player.seek_count>seeks,"large room drift corrects playback")
+	player.queue_free();await create_timer(.2).timeout
+	for i in AudioServer.bus_count:check(not str(AudioServer.get_bus_name(i)).begins_with("Score_"),"voice buses removed on shutdown")
+	check(AudioServer.bus_count<=original_buses+3,"no audio bus leak")
 	print("MUSIC_TEST: ",checks," checks, ",failures," failures");quit(1 if failures else 0)

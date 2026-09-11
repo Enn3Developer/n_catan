@@ -27,6 +27,8 @@ jobs:
           "$GODOT_BIN" --headless --path . --editor --import --quit
           python3 tests/run_runtime_clean_test.py
           "$GODOT_BIN" --headless --path . --script tests/rules_test.gd
+          "$GODOT_BIN" --headless --path . --script tests/music_transition_test.gd
+          "$GODOT_BIN" --headless --path . --script tests/music_test.gd
           "$GODOT_BIN" --headless --path . --script tests/updater_ui_test.gd
           "$GODOT_BIN" --headless --path . --script tests/notifications_test.gd
           "$GODOT_BIN" --headless --path . --script tests/actor_animation_test.gd

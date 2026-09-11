@@ -54,6 +54,7 @@ var music_paused=false
 var music_position=0.0
 var music_anchor_ms=0
 var music_revision=0
+var music_context={}
 var music_remote={}
 var music_received_ms=0
 var music_one_way=0.0
@@ -170,6 +171,7 @@ func _poll_secure_connection():
 		notice.emit("Secure connection failed. Check the invite, host availability and UDP port.")
 
 func leave():
+	var continuing_music=music_state()
 	if pending_connection!=null:
 		pending_connection.destroy()
 		pending_connection=null
@@ -189,6 +191,11 @@ func leave():
 	seat=-1
 	last_action={}
 	_reset_music()
+	if continuing_music.get("ready",false):
+		music_track=continuing_music.track
+		music_position=continuing_music.position
+		music_paused=continuing_music.paused
+		music_context=continuing_music.duplicate(true)
 	changed.emit()
 
 func _connected():
@@ -490,7 +497,7 @@ func _process(delta: float):
 
 
 func _reset_music():
-	music_track=0;music_position=0.0;music_paused=false;music_revision=0
+	music_track=0;music_position=0.0;music_paused=false;music_revision=0;music_context={}
 	music_anchor_ms=Time.get_ticks_msec();music_remote={};music_one_way=0.0
 	music_ping_clock=0.0;music_ping_sent=-1;music_last_command=-1000
 
@@ -505,7 +512,15 @@ func music_state() -> Dictionary:
 
 func _music_snapshot() -> Dictionary:
 	var now=Time.get_ticks_msec()
-	return CatanSoundtrack.advance({"track":music_track,"position":music_position,"paused":music_paused,"revision":music_revision,"server_ms":now,"ready":true},float(now-music_anchor_ms)/1000.0)
+	var sample=music_context.duplicate(true)
+	sample.merge({"track":music_track,"position":music_position,"paused":music_paused,"revision":music_revision,"server_ms":now,"ready":true},true)
+	var current=CatanSoundtrack.advance(sample,float(now-music_anchor_ms)/1000.0)
+	# Rebase at automatic boundaries so long sessions do not replay hours of
+	# transition planning on every rendered frame.
+	if current.get("generation",0)!=sample.get("generation",0):
+		music_context=current.duplicate(true)
+		music_track=current.track;music_position=current.position;music_paused=current.paused;music_anchor_ms=now
+	return current
 
 func music_control(operation: String,track: int=-1):
 	if not can_control_music():
@@ -528,11 +543,14 @@ func _set_music(sender: int,operation: String,track: int):
 	var current=music_state()
 	match operation:
 		"toggle":current.paused=not current.paused
-		"next":current.track=(int(current.track)+1)%CatanSoundtrack.TRACKS.size();current.position=0.0
+		"next":current=CatanSoundtrack.switch_to(current,(int(current.track)+1)%CatanSoundtrack.TRACKS.size())
 		"previous":
-			if current.position<3:current.track=posmod(int(current.track)-1,CatanSoundtrack.TRACKS.size())
-			current.position=0.0
-		"select":current.track=track;current.position=0.0;current.paused=false
+			var target=posmod(int(current.track)-1,CatanSoundtrack.TRACKS.size()) if current.position<3 else int(current.track)
+			current=CatanSoundtrack.switch_to(current,target,true,true)
+		"select":
+			current=CatanSoundtrack.switch_to(current,track)
+			current.paused=false
+	music_context=current.duplicate(true)
 	music_track=current.track;music_position=current.position;music_paused=current.paused;music_anchor_ms=now
 	music_revision+=1
 	_broadcast_music()

@@ -8,10 +8,11 @@ var voice_index=0
 var music_spare: AudioStreamPlayer
 var track_streams={}
 var current_track=0
-var correction_clock=0.0
-var music_fade: Tween
 var seek_count=0
 var shutting_down=false
+var fading_tracks=[]
+var music_voices={}
+var music_bus_names=[]
 
 func _ready():
 	if "--server" in OS.get_cmdline_user_args(): return
@@ -19,15 +20,10 @@ func _ready():
 		if AudioServer.get_bus_index(bus_name)<0:
 			AudioServer.add_bus()
 			AudioServer.set_bus_name(AudioServer.bus_count-1,bus_name)
-	music=$Music
+	$Music.queue_free()
 	ambience=$Ambience
-	music.bus="Music"
 	ambience.bus="Ambience"
-	music.stream=_loop("harbor")
-	track_streams[0]=music.stream
-	music.volume_db=CatanSoundtrack.TRACKS[0].get("gain_db",0.0)
-	music_spare=AudioStreamPlayer.new()
-	music_spare.name="MusicCrossfade";music_spare.bus="Music";add_child(music_spare)
+	for index in CatanSoundtrack.TRACKS.size():track_stream(index)
 	ambience.stream=_loop("sea")
 	for effect in ["click","build","trade","card","turn","error","dice","win"]:
 		sounds[effect]=load("res://assets/audio/%s.wav" % effect)
@@ -37,7 +33,7 @@ func _ready():
 		add_child(voice)
 		voices.append(voice)
 	apply(CatanSettings.new().values)
-	music.play()
+	follow_soundtrack({"track":0,"position":0.0,"paused":false,"generation":0},.016)
 	ambience.play()
 func _loop(name_value: String) -> AudioStreamWAV:
 	var stream=load("res://assets/audio/%s.wav" % name_value).duplicate() as AudioStreamWAV
@@ -72,75 +68,108 @@ func transition(previous: Dictionary,current: Dictionary,seat: int):
 func track_stream(index: int) -> AudioStream:
 	if not track_streams.has(index):
 		var stream=load(CatanSoundtrack.TRACKS[index].file).duplicate() as AudioStream
-		if stream is AudioStreamOggVorbis:stream.loop=true
+		if stream is AudioStreamOggVorbis:stream.loop=false
+		if stream is AudioStreamWAV:stream.loop_mode=AudioStreamWAV.LOOP_DISABLED
 		track_streams[index]=stream
 	return track_streams[index]
 
-func _start_track(index: int,position_seconds: float,paused_value: bool):
-	if music_fade and music_fade.is_valid():music_fade.kill()
-	var old=music
-	music=music_spare;music_spare=old
-	music.stop();music.stream=track_stream(index);music.pitch_scale=1.0
-	current_track=index
-	var offset=position_seconds if paused_value else position_seconds+AudioServer.get_output_latency()
-	music.play(minf(offset,CatanSoundtrack.TRACKS[index].duration-.001))
-	music.stream_paused=paused_value
-	var gain=float(CatanSoundtrack.TRACKS[index].get("gain_db",0.0))
-	if paused_value or not old.playing:
-		old.stop();music.volume_db=gain
-	else:
-		music.volume_db=-50
-		music_fade=create_tween().set_parallel(true)
-		music_fade.tween_property(music,"volume_db",gain,.25)
-		music_fade.tween_property(old,"volume_db",-50.0,.25)
-		music_fade.chain().tween_callback(old.stop)
-	correction_clock=.5
+func _new_music_voice(voice: Dictionary) -> Dictionary:
+	var bus_name="Score_%s_%s_%s"%[get_instance_id(),voice.id,voice.track]
+	AudioServer.add_bus()
+	var bus=AudioServer.bus_count-1
+	AudioServer.set_bus_name(bus,bus_name);AudioServer.set_bus_send(bus,"Music")
+	var eq=AudioEffectEQ6.new();AudioServer.add_bus_effect(bus,eq)
+	music_bus_names.append(bus_name)
+	var wet_name=bus_name+"_Tempo"
+	AudioServer.add_bus()
+	var wet_bus=AudioServer.bus_count-1
+	AudioServer.set_bus_name(wet_bus,wet_name);AudioServer.set_bus_send(wet_bus,bus_name)
+	var pitch=AudioEffectPitchShift.new()
+	pitch.fft_size=AudioEffectPitchShift.FFT_SIZE_1024
+	AudioServer.add_bus_effect(wet_bus,pitch)
+	music_bus_names.append(wet_name)
+	var player=AudioStreamPlayer.new();player.bus=bus_name
+	player.stream=track_stream(voice.track);player.volume_linear=0;add_child(player)
+	var wet=AudioStreamPlayer.new();wet.bus=wet_name
+	wet.stream=player.stream;wet.volume_linear=0;add_child(wet)
+	return {"player":player,"wet":wet,"eq":eq,"pitch":pitch,"bus":bus_name,"wet_bus":wet_name,"clock":0.0,"age":0.0}
+
+func _remove_music_voice(key: String):
+	var row=music_voices[key]
+	for player in [row.player,row.wet]:player.stop();player.stream=null;player.queue_free()
+	for name_value in [row.wet_bus,row.bus]:
+		var bus=AudioServer.get_bus_index(name_value)
+		if bus>=0:AudioServer.remove_bus(bus)
+		music_bus_names.erase(name_value)
+	music_voices.erase(key)
+
+func _position(player: AudioStreamPlayer,extra_latency: float=0.0) -> float:
+	if player.stream_paused:return player.get_playback_position()
+	return maxf(0,player.get_playback_position()+(AudioServer.get_time_since_last_mix()-AudioServer.get_output_latency()-extra_latency)*player.pitch_scale)
 
 func audible_position() -> float:
-	if not is_instance_valid(music):return 0
-	if music.stream_paused:return music.get_playback_position()
-	return maxf(0,music.get_playback_position()+AudioServer.get_time_since_last_mix()-AudioServer.get_output_latency())
+	return _position(music) if is_instance_valid(music) else 0.0
 
 func follow_soundtrack(sample: Dictionary,delta: float):
-	if shutting_down or not is_instance_valid(music):return
+	if shutting_down:return
 	if not sample.get("ready",true):
-		music.stream_paused=true;music_spare.stream_paused=true
+		for row in music_voices.values():row.player.stream_paused=true;row.wet.stream_paused=true
 		return
-	var index=int(sample.track)
-	if index!=current_track:
-		_start_track(index,float(sample.position),sample.paused)
-		return
-	if music.stream_paused!=sample.paused:
-		music_spare.stop()
-		music.stream_paused=sample.paused
-		music.pitch_scale=1.0
-		music.seek(sample.position+(0.0 if sample.paused else AudioServer.get_output_latency()))
-		correction_clock=.5
-	if not music.playing:
-		music.play(sample.position)
-		music.stream_paused=sample.paused
-	if sample.paused:return
-	correction_clock-=delta
-	if correction_clock>0:return
-	correction_clock=.5
-	var drift=float(sample.position)-audible_position()
-	if absf(drift)>.18:
-		music.seek(minf(sample.position+AudioServer.get_output_latency(),CatanSoundtrack.TRACKS[index].duration-.001))
-		music.pitch_scale=1.0
-		seek_count+=1
-	else:
-		# Correct tiny clock differences gently instead of repeatedly seeking.
-		music.pitch_scale=clampf(1.0+drift*.06,.99,1.01) if absf(drift)>.025 else 1.0
+	var desired=CatanSoundtrack.mix_voices(sample)
+	var keep=[]
+	fading_tracks.clear()
+	for voice in desired:
+		var key="%s:%s"%[voice.id,voice.track]
+		keep.append(key)
+		if not music_voices.has(key):music_voices[key]=_new_music_voice(voice)
+		var row=music_voices[key]
+		var player=row.player as AudioStreamPlayer
+		var wet=row.wet as AudioStreamPlayer
+		row.age+=delta
+		var maximum=float(voice.bands.max())
+		# The EQ receives only cuts; a single bus gain carries the common level.
+		var bus=AudioServer.get_bus_index(row.bus)
+		AudioServer.set_bus_volume_db(bus,CatanSoundtrack.gain_db(voice.track)+linear_to_db(maxf(.00001,maximum*minf(1,row.age/.08))))
+		for band in 6:row.eq.set_band_gain_db(band,linear_to_db(maxf(.001,float(voice.bands[band])/maxf(.00001,maximum))))
+		var rate=float(voice.rate)
+		var latency=AudioServer.get_output_latency()
+		# Pitch processing has a 768-sample FIFO. A parallel dry path fades back
+		# in near natural tempo, avoiding the engine's abrupt pitch=1 bypass.
+		var effect_latency=768.0/AudioServer.get_mix_rate()
+		var stretch_mix=CatanSoundtrack._smooth(absf(rate-1.0)/.002)
+		player.volume_linear=1.0-stretch_mix;wet.volume_linear=stretch_mix
+		row.pitch.pitch_scale=1.0/rate if absf(rate-1.0)>.00002 else 1.00003
+		var resuming=player.stream_paused and not voice.paused
+		player.pitch_scale=rate;wet.pitch_scale=rate
+		if not player.playing or resuming:
+			player.play(minf(voice.position+(0.0 if voice.paused else latency*rate),CatanSoundtrack.TRACKS[voice.track].duration-.001))
+			row.clock=.5
+		if stretch_mix>0 and (not wet.playing or resuming):
+			wet.play(minf(voice.position+(0.0 if voice.paused else (latency+effect_latency)*rate),CatanSoundtrack.TRACKS[voice.track].duration-.001))
+		elif stretch_mix==0 and wet.playing:wet.stop()
+		player.stream_paused=voice.paused;wet.stream_paused=voice.paused
+		row.clock-=delta
+		if not voice.paused and row.clock<=0:
+			row.clock=.5
+			var drift=float(voice.position)-_position(player)
+			if absf(drift)>.18:
+				player.seek(minf(voice.position+latency*rate,CatanSoundtrack.TRACKS[voice.track].duration-.001))
+				if wet.playing:wet.seek(minf(voice.position+(latency+effect_latency)*rate,CatanSoundtrack.TRACKS[voice.track].duration-.001))
+				seek_count+=1
+		if int(voice.id)==int(sample.get("generation",0)) and int(voice.track)==int(sample.track):music=player
+		else:fading_tracks.append(player)
+	for key in music_voices.keys():
+		if not keep.has(key):_remove_music_voice(key)
+	current_track=sample.track
+	music_spare=fading_tracks.back() if not fading_tracks.is_empty() else music
 
 func shutdown():
 	if shutting_down:return
 	shutting_down=true
-	if music_fade and music_fade.is_valid():music_fade.kill()
-	for player in [music,music_spare,ambience]+voices:
-		if is_instance_valid(player):
-			player.stop();player.stream=null;player.queue_free()
-	music_fade=null
-	track_streams.clear();sounds.clear();voices.clear()
+	for key in music_voices.keys():_remove_music_voice(key)
+	for player in [ambience]+voices:
+		if is_instance_valid(player):player.stop();player.stream=null;player.queue_free()
+	track_streams.clear();sounds.clear();voices.clear();fading_tracks.clear()
 
 func _exit_tree():
 	shutdown()

@@ -10,6 +10,13 @@ func settle():await create_timer(.25).timeout
 func run():
 	game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await settle()
 	check(game._node("OpenMusic")!=null,"music accessible from main menu")
+	game.net.music_control("select",2);await settle()
+	var before_menu=game.net.music_state()
+	var seeks_before=game.audio.seek_count
+	game._solo();await settle();game.net.leave();await settle()
+	var after_menu=game.net.music_state()
+	check(after_menu.track==before_menu.track and after_menu.position>=before_menu.position,"singleplayer round trip preserves track and timeline")
+	check(game.audio.seek_count==seeks_before,"singleplayer round trip does not restart audio")
 	game._open_music();await settle()
 	check(game.music_dialog_widgets.tracks.size()==5,"library lists all five tracks")
 	game.music_dialog_widgets.tracks[2].pressed.emit();await settle()
