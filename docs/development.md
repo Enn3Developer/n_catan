@@ -1,0 +1,131 @@
+# Development
+
+Build, release and test reference for contributors.
+
+## Build standalone executables
+
+Install Go and the Godot export templates matching your editor, then run:
+
+```bash
+./tools/export_linux.sh
+./tools/export_windows.sh
+```
+
+Set `GODOT_BIN` if needed. Each script stages an export, verifies every packed resource checksum and builds the native updater. It replaces the local build only after the game export passes its checks.
+
+| Platform | Game executable | Archive | Game size limit |
+| --- | --- | --- | --- |
+| Linux | `build/linux/N Catan.x86_64` | `build/N-Catan-linux-x86_64.tar.xz` | 250 MiB |
+| Windows | `build/win/N Catan.exe` | `build/N-Catan-windows-x86_64.zip` | 275 MiB |
+
+The scripts also write size reports and checksums under `build/`. Windows has a larger engine template, so its size limit is higher. Inspect a build with:
+
+```bash
+python3 tools/audit_build_size.py 'build/linux/N Catan.x86_64' --verify
+```
+
+Export presets exclude authoring textures, old models, tests, generated releases and unused material maps. They retain the game's texture tiers, audio, font license and texture source information. The original assets and Blender sources remain in the repository. See [build size measurements](build-size.md) for the earlier size reduction and validation results.
+
+## Releases and updates
+
+The game checks [GitHub Releases](https://github.com/Enn3Developer/n_catan/releases) for the latest stable version at startup. Open **Game updates** on the home screen or **Updates** in Settings, choose **Download update**, then **Restart to update**. You can keep playing while it downloads, but must leave the room before installing. Dedicated servers do not update automatically.
+
+The exact Git tag sets the application and manifest version. Multiplayer uses a separate protocol number, currently 9. Releases with the same protocol can play together. A protocol mismatch rejects the join and identifies both versions. If a release changes the protocol, the group should update together.
+
+The updater verifies the manifest's RSA/SHA-256 signature with its embedded public key, then checks the package and executable SHA-256 hashes. It uses a delta patch only when the installed executable matches a published base and the patch is smaller than 85% of the full download. If the delta fails, it downloads the full package.
+
+The release builder reuses unchanged blocks from the exact previous published executable. The first release has full packages only. Later releases can include patches from the previous stable release.
+
+Installation waits for the game to exit and keeps the old executables. If the new game fails to finish startup, the updater restores the old version. After an interrupted installation, launch the updater directly to recover and open the game. Keep the installation folder together. The updater retains one previous backup and leaves preferences in Godot's user data folder.
+
+Pre-releases are available for manual testing. The stable update channel does not offer them.
+
+### Publishing
+
+Git LFS tracks assets and image files. Git ignores local builds, release output, caches and private keys.
+
+The Release workflow runs when you push a version tag or publish a GitHub release. Use a SemVer tag such as `v1.0.0` or `v1.1.0-rc.1`. The workflow preserves the tag exactly in the manifest.
+
+It builds Linux x86-64 and Windows x86-64 packages with their native updaters. The Godot version and download checksums are pinned in `config/release.json`. Release assets include full ZIPs, delta ZIPs where they save enough space, `SHA256SUMS` and `update-manifest.json`.
+
+A tag push creates a draft release, uploads the packages and signed manifest, then publishes it. Publishing a release manually triggers the same build and upload. The workflow does not overwrite completed signed releases or accept a tag moved to a different commit. Retry a failed run to finish an incomplete release.
+
+The repository has the required `UPDATE_SIGNING_PRIVATE_KEY` secret. Its public key is `updater/update_public.pem`. Back up the private key securely. Without it, existing clients cannot trust new updates. Replacing the public key without a transition release requires users to install manually. Never commit the private key or include it in a build.
+
+You can also dispatch the workflow manually for an existing tag. Publishing defaults to off, so this can validate a build and produce downloadable Actions artifacts. Release tooling is in `tools/release.py`. Its `stamp` command changes version metadata in the build checkout.
+
+## Source structure
+
+The main scene, `scenes/main.tscn`, contains the Network, Board and Audio scenes. The board scene contains the camera, sun, environment, terrain, buildings and scenery nodes. The game generates terrain at runtime.
+
+Edit the interface in `scenes/ui/`. Its named Controls define the layout, and `assets/ui_theme.tres` supplies the shared theme. The game does not run `tools/create_ui_scenes.py`. Rerunning that generator can overwrite manual scene edits.
+
+| Path | Purpose |
+| --- | --- |
+| `scripts/rules.gd` | Board topology, rules, resources, scoring and private snapshots |
+| `scripts/network.gd` | ENet host, lobby, passwords, replication, reconnection and UPnP |
+| `scripts/board.gd` | Terrain, buildings, picking, camera and animations |
+| `scripts/main.gd` | Scene connections and game interface |
+| `scripts/bot.gd` | Bot decisions and difficulty settings |
+| `scripts/tutorial.gd` | Guided practice scenarios |
+| `scripts/settings.gd`, `scripts/audio.gd` | Preferences and audio buses |
+| `scripts/cosmetics.gd`, `scripts/cosmetics_menu.gd` | Piece models and cosmetics screen |
+| `scripts/tile_art.gd` | Terrain materials, model detail and texture tiers |
+| `assets/premium/` | Twelve Blender biome variants |
+| `assets/materials/` | Texture sources and runtime maps |
+| `assets/source/` | Editable Blender models |
+| `tools/prepare_tile_textures.py` | Texture preparation |
+| `shaders/` | Ground, cliffs, foliage and water |
+| `scripts/build_info.gd`, `scripts/updater.gd` | Version metadata and update interface |
+| `updater/` | Native update verification and installation helper |
+
+The server owns dice rolls, the deck, hands, resources and action validation. Clients receive other players' public counts, not private cards.
+
+Secure invites contain the room's public certificate, never its private key or password. Share invites through a trusted channel. A substituted invite can authenticate a different host. The client sends the room password only after certificate verification. The server rejects bare addresses and plaintext connections. Each hosted room creates a new certificate, and reconnection uses its original invite while the host stays running. Play with a host you trust.
+
+## Verification
+
+CI runs updater tests, Go race checks, patch producer tests, Windows updater compilation, game rules, update interface checks and multiplayer version checks. To run game tests locally:
+
+```bash
+# Replace godot with your Godot executable as needed.
+godot --headless --path . --script res://tests/rules_test.gd
+godot --headless --path . --script res://tests/network_test.gd
+godot --headless --path . --script res://tests/bot_test.gd
+godot --headless --path . --script res://tests/bot_network_test.gd
+godot --headless --path . --script res://tests/solo_match_test.gd
+godot --headless --path . --script res://tests/updater_ui_test.gd
+godot --headless --path . --script res://tests/version_network_test.gd
+GODOT_BIN=/path/to/godot python3 tests/run_online_test.py
+
+go -C updater test -race ./...
+python3 -m unittest discover -s tests -p 'test_*.py'
+```
+
+The rules suite checks setup, resource conservation, legal actions, trades, development cards, privacy, awards and victory. Network tests cover lobby replication, private hands, invalid moves, disconnects and reconnection. The dedicated-server test starts a server and two clients in separate processes. These tests use loopback networking. Internet access still depends on the host's router and firewall.
+
+Bot tests cover every difficulty and mixed opponents. The feature suite checks lobby controls, bot setup, tutorial lessons, settings and audio. A solo match test runs the bot scheduler through to victory.
+
+Run extension tests with:
+
+```bash
+godot --headless --path . --script res://tests/extension_test.gd
+godot --headless --path . --script res://tests/extension_bot_test.gd
+godot --headless --path . --script res://tests/extension_solo_test.gd
+godot --path . --script res://tests/extension_ui_test.gd
+python3 tests/run_online_test.py 6
+```
+
+Music tests are in `tests/music_test.gd`, `tests/music_network_test.gd` and `tests/music_ui_test.gd`. The script `tests/run_music_process_test.py` checks playback across separate processes.
+
+Visual tests need a graphical session. They write captures under `/tmp`:
+
+```bash
+godot --path . --script res://tests/capture.gd
+godot --path . --script res://tests/ui_test.gd
+godot --path . --script res://tests/feature_test.gd
+godot --path . --script res://tests/features_capture.gd
+godot --path . --script res://tests/style_capture.gd
+```
+
+Layout, graphics and cosmetics checks are in `tests/layout_test.gd`, `tests/graphics_test.gd` and `tests/cosmetics_test.gd`. See [verification results](verification.md) for recorded test runs and visual checks.
