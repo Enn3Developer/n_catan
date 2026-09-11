@@ -1,156 +1,249 @@
 # CATAN · Tides & Timber
 
-A playable 3D Catan-style game with **singleplayer and 3–6 participant online rooms**, built in Godot 4 with original Blender scenery. Fill empty seats with adjustable bots in either mode. Textured terrain, animated water, boats, seabirds, a lighthouse, forests, fields, sheep, rocky mountains, and detailed settlements form a miniature island world.
+## AI usage disclaimer
 
-## Run
+This game was made 100% by AI, GPT-6 Astra, mainly for me and my friends. If this project's existence bothers you because you're anti-AI or for any other reason, you can close the tab. If you want to try it out and play with your friends, keep reading.
 
-Open `project.godot` in Godot 4 and press **F5**, or run:
+## About the game
+
+A 3D Catan-style game built in Godot 4, with solo play and online rooms for 3 to 6 participants. Bots can fill empty seats in either mode. The board has animated water, boats, sheep and workers, with a day/night cycle that changes their activity.
+
+This is an independent fan project, not an official Catan product. Texture maps come from Poly Haven. Asset sources and licenses are listed below.
+
+## Run the game
+
+Download a ZIP from [GitHub Releases](https://github.com/Enn3Developer/n_catan/releases) when a release is available. Extract it into a writable folder and launch `N Catan.x86_64` on Linux or `N Catan.exe` on Windows. Keep the updater beside the game executable.
+
+To run from source, install Git LFS and run `git lfs pull` after cloning. Open `project.godot` in Godot 4, let it import the assets, then press F5. You can also use:
 
 ```bash
 ./run.sh
 ```
 
-Tested with Godot 4.7.2 on Linux using Forward+ (Vulkan). Forward+ is the default and enables screen-space lighting, reflections, SDFGI and cinematic depth of field. The launcher finds `godot`, `godot4`, or the Godot executable installed on this machine. Set `GODOT_BIN` to use another executable. Import the project in the editor once when opening a fresh checkout so the GLB assets are imported.
+The project has been tested with Godot 4.7.2 on Linux. It uses the Forward+ renderer and requires a Vulkan-capable GPU. The launcher looks for `godot`, `godot4`, or the local Godot installation. Set `GODOT_BIN` to use another executable.
 
-## Compact Linux build
+## Solo play and bots
 
-The current standalone executable is **220.77 MiB**, compared with **490.88 MiB** for the older build: **55.0% smaller**. Run `build/linux/N Catan.x86_64`; the source project and Godot editor are not required. A compressed copy is available at `build/N-Catan-linux-x86_64.tar.xz`.
+Choose **Play solo** to open an offline lobby with two Normal bots. Solo games need 2 to 5 bots. All matches need 3 to 6 participants, and adding a fifth or sixth enables the extension board. Add or remove bots, choose their difficulty, then start the game. Solo play opens no network socket.
 
-Rebuild with matching Godot export templates installed:
+Online hosts can add bots too. On a dedicated server, the first human player controls them.
 
-```bash
-./tools/export_linux.sh
-```
+- Easy bots explore placement options and trade less consistently.
+- Normal bots value production and build toward reachable settlement sites.
+- Hard bots also account for resource diversity, existing income, ports and expansion costs.
 
-Set `GODOT_BIN` if needed. The script stages a release export, verifies every packed file checksum, rejects builds over 250 MiB, replaces the local executable, writes `build/linux-size-report.json`, and creates the archive. This size guard catches accidentally cleared exclusion filters before overwriting the previous release. To inspect any subsequent build:
+Bots follow the same rules as humans. They build, upgrade, trade with the bank, accept player offers, discard, move the robber and use development cards. They cannot see opponents' private hands or the development deck.
 
-```bash
-python3 tools/audit_build_size.py 'build/linux/N Catan.x86_64' --verify
-```
-
-The Linux preset excludes authoring textures, old models, tests, build output and unused material maps. Dynamic game resources remain included. Every retained texture and audio payload is unchanged, including all 512/1024/2048 texture tiers and full-quality PCM loops. Original assets and Blender sources remain available in the project. Font licensing and texture provenance are included in the package. See [size measurements and validation](docs/build-size.md).
-
-## Solo, bots, and the tutorial
-
-Choose **Play solo** to open an offline lobby with two Normal bots. Solo games require 2–5 bots; all matches require 3–6 total participants. Adding a fifth or sixth participant automatically enables the extension. Add or remove bots, select **Easy / Normal / Hard** for each, then begin. Solo play opens no network socket. You can also add bots to online rooms; only the host (or first human on a dedicated server) can modify them.
-
-- **Easy:** exploratory placement and less consistent trading.
-- **Normal:** values production and builds toward reachable settlement sites.
-- **Hard:** also weighs resource diversity, existing income, ports, and expansion costs.
-
-All difficulties use normal rules and the same private information available to a human. They build, upgrade, trade with the bank, accept worthwhile player offers, discard, move the robber, and use development cards. Bots never see opponents' private hands or the development deck.
-
-Choose **Learn to play** for ten guided lessons. Practice settlement and road placement, production, city upgrades, bank trading, the robber, and development cards on the actual board. The tutorial explains scoring and then opens the solo lobby. Later lessons use clearly identified practice resources. Previous, retry, and skip controls let you learn at your own pace; the in-game Guide remains available afterward.
-
-## 5–6 player extension
-
-Add players or bots until the lobby has five or six participants. The room summary switches to **30 hexes · Paired turns**. Three or four participants still use the base board. The same rules apply in solo, hosted online, and dedicated-server games.
-
-The extension includes 30 terrain hexes (two deserts), 28 number tokens, 11 ports, 24 cards of each resource, and 34 development cards (20 knights, 5 victory points, and 3 of each progress card). Each of the six colors has the normal 15 roads, 5 settlements, and 4 cities. Terrain and number tokens are randomized, with adjacent 6/8 tokens separated, matching this game's existing randomized setup style.
-
-Paired turns follow the [official extension rules](https://www.catan.com/sites/default/files/2024-03/Catan%20Game%205-6%20Rules%202022%20240313.pdf):
-
-- The main player rolls, resolves production or the robber, and trades/builds normally.
-- After they end, the player three seats ahead takes a paired turn. This player can build, buy/play development cards, and trade with the bank or ports. They cannot roll or trade with other players.
-- After the paired turn, the next main player receives the dice. Both roles advance one seat.
-- Each player may play one eligible development card in their own portion. Newly purchased cards become available after that portion ends. Either role can win at 10 points; the main player has priority before the paired portion starts.
-
-The HUD identifies paired turns and disables unavailable actions. The server enforces the same restrictions for humans and bots. Six-person rooms retain private hands and reconnection support. All online participants need this project version (network protocol 9).
-
-## Sound, settings, and readability
-
-**Settings** is available in the menu, lobby, and game. Master, music, effects, and ocean ambience have separate volume controls. The five settings tabs cover display, graphics, lighting, controls, and audio. Display options include window size, fullscreen, VSync, frame limits, render scale, bilinear/FSR 1 upscaling, and a performance overlay. Low, Medium, High, Ultra, and Custom presets coordinate model detail, real 512/1024/2048-pixel PBR textures, vegetation density, particles, shadow quality, ambient occlusion, indirect lighting, reflections and water. Choose Off/FXAA/MSAA 2×/4×/8×/TAA, anisotropic filtering up to 16×, screen-space bounce or SDFGI, bloom, haze, exposure and optional depth of field. Reduced motion, larger small text, and camera sensitivity are also adjustable. Bot turn speed is adjustable. Changes apply immediately and persist in `user://settings.cfg`; restoring defaults resets them. Opening settings pauses a solo match, while online matches continue.
-
-The game includes an original looping instrumental score, ocean ambience, and cues for clicks, dice, construction, trades, cards, turns, errors, and victory. Source synthesis is in `tools/generate_audio.py`; no downloaded music or samples are used. The original harbor theme and ocean ambience use 44.1 kHz lossless stereo PCM, full-length sample-counted loops and silent loop boundaries. The additional soundtrack tracks use stereo Vorbis to keep exports small. Ocean noise is softly filtered to reduce hiss.
-
-UI text uses an included MSDF Fira Sans font. Board numbers and port labels are projected into a sharp 2D layer instead of being filtered text textures in 3D. The default window is 1440×900; high graphics enables 4× MSAA on the world without applying blur to UI text. Vegetation moves in the wind, chimneys emit smoke, and producing hexes briefly highlight. Reduced motion disables those animations.
-
-## Player piece cosmetics
-
-Choose **Piece cosmetics** directly from the main menu, below Learn to play, or from the lobby. Preview four coordinated sets: **Voyager** (timber and tiled roofs), **Harbor** (docks and lighthouse cities), **Citadel** (stonework and battlements), and **Wildwood** (log cabins and treehouse cities). Drag the live 3D preview to rotate all three pieces, then choose **Equip set**. Previewing alone does not apply a choice.
-
-Every set includes roads, settlements and cities, with the player's color retained on roofs, trim and bases. Your selection is saved locally, used for new games and shared with online participants. Hosts and dedicated-room controllers can also choose bot sets through the player selector; other human players control their own appearance. Reconnection restores the server's equipped style. Cosmetics do not change rules, costs or scoring.
-
-Models are generated by `scripts/cosmetics.gd`. The separate native screen `scenes/ui/cosmetics.tscn` uses `scripts/cosmetics_menu.gd` and the same model builder as the actual board.
-
-## Sculpted island graphics
-
-The board, terrain scenery, harbor props and player pieces share one sculpted miniature style: smooth silhouettes, beveled edges, a restrained matte palette and subtle surface grain. All six biomes have two original Blender variants. Forests use solid tree crowns, pastures have rounded sheep and inset ponds, fields have readable grain clusters and cottages, clay tiles have terraced hills and kilns, and mountains have broad ridges and mine entrances.
-
-The geometry uses welded surface normals and closed roof faces. Shared beveled meshes coordinate the cosmetic pieces, docks and scenery. Ocean self-shadowing is disabled to prevent repeating shadow artifacts; the sun's bias is tuned for the enlarged tiles. Number labels scale with their projected token size, probability pips are actual geometry, and ports show resource icons. The robber sits on the local ground height.
-
-Tiles remain 2.2× larger in world space, with orbit, pan and inspection zoom. Model settings adjust terrain tessellation and imported mesh LODs; foliage density and 512/1024/2048-pixel texture tiers remain adjustable. Screen-space reflections retain their normal visibility limitations. The new editable source is `assets/source/sculpted-tiles.blend`, generated by `tools/build_premium_tiles.py`. The earlier source files are retained as archives.
-
-Subtle texture grain uses [Poly Haven CC0 maps](https://polyhaven.com/license), with provenance in `assets/materials/sources.json`. Biome geometry, UI icons and sound synthesis are original project assets. Everything is local at runtime.
-
-## Responsive interface
-
-The native interface responds to the window's actual dimensions, with a minimum of **800×600**. Anchored frames, containers and scrolling keep menus, six-player lobbies, settings, cosmetics and dialogs usable in small, portrait and ultrawide layouts. The camera fits the board into the space available above the action bar.
-
-The HUD has compact player chips and a bottom resource/action bar. Hover a player for their public card counts and awards. Resource icons are shared across the hand, build costs, ports and trade offers; hover for names. The book icon opens the game log, the question mark opens the guide, the eye enters inspection, and the gear opens settings. **Play online** expands the connection form on the main menu. The trade dialog separates bank trades from player offers and displays the bank's actual exchange quantities.
+Choose **Learn to play** for ten guided lessons on the game board. The lessons cover placement, production, upgrades, trading, the robber, development cards and scoring. Later lessons identify the extra resources supplied for practice. You can revisit, retry or skip lessons, and the in-game Guide remains available afterward.
 
 ## Play over the internet
 
-1. One player chooses **Play online → Host**, enters an optional room password, then chooses **Create room**.
-2. Make **UDP 24567** reachable on that host. The lobby has an explicit **Enable automatic router mapping** button for UPnP-capable routers. Otherwise, forward UDP 24567 to the host computer and allow it through the firewall.
-3. Enter the host's **public IP or DNS name** in the lobby, then choose **Copy invite**. Share that complete secure invite through a trusted channel. Friends choose **Play online → Join**, paste the invite and enter the room password, then choose **Join room**.
-4. Everyone clicks **I'm ready**. The host starts the expedition.
+1. Choose **Play online**, select **Host**, enter an optional room password, then choose **Create room**.
+2. Make UDP port 24567 reachable on the host. Use **Enable automatic router mapping** if the router supports UPnP. Otherwise, forward UDP 24567 to the host computer and allow it through the firewall.
+3. Enter the host's public IP address or DNS name in the lobby, then choose **Copy invite**. Share the complete invite through a trusted channel.
+4. Friends choose **Play online**, select **Join**, paste the invite and enter the room password, then choose **Join room**.
+5. Everyone chooses **I'm ready**, then the host starts the game.
 
-This uses real ENet internet networking. It does not include a hosted relay, account system, public matchmaking service, or NAT hole punching. A host behind carrier-grade NAT should use a public dedicated server. `127.0.0.1` works only for testing on the same machine. Router mapping is requested for one hour; long sessions should use a persistent manual forwarding rule or a public server.
+The game uses ENet with DTLS certificate verification. It has no hosted relay, accounts, public matchmaking or NAT hole punching. A host behind carrier-grade NAT needs a public dedicated server. The address `127.0.0.1` works only for testing on the same machine.
+
+Automatic router mapping requests a one-hour lease. For longer sessions, use a persistent forwarding rule or a public server.
 
 ### Dedicated server
 
-On a machine with a public address:
+On a machine with a public address, run:
 
 ```bash
 ./run.sh --server --address=your-public-hostname:24567 --password=your-room-password
 ```
 
-No graphics or local player are required. Open UDP 24567 in the server firewall. The first connected player controls starting the game after everyone is ready. Each server process hosts one room. The server writes `CATAN_SERVER_READY port=24567` and a `CATAN_SECURE_INVITE` on successful startup. Share the latter with guests; `--address` sets its public endpoint.
+The server needs no graphics or local player. Open UDP 24567 in its firewall. Each process hosts one room, and the first connected player can start the game once everyone is ready.
 
-### Disconnects
+On startup, the server prints `CATAN_SERVER_READY port=24567` and a `CATAN_SECURE_INVITE`. Share the invite with guests. The `--address` argument sets the public address included in it.
 
-If a client disconnects, the match pauses. **Reconnect to expedition** on that client's menu restores its seat and private hand using a saved session token and certificate invite, including after restarting the client. Re-enter the room password after a restart. Closing the host closes the room. Persistent game saves and server migration are not implemented.
+### Disconnects and reconnection
+
+A disconnected client pauses the match. Choose **Reconnect to expedition** on that client's menu to reclaim its seat and private hand. The saved session token and certificate invite survive client restarts. Re-enter the room password after restarting.
+
+The host must still be running. Closing the host closes the room. Persistent match saves and server migration are not implemented.
 
 ## Rules and controls
 
-- Place two settlements and adjoining roads in snake order. The second settlement grants its adjacent starting resources.
-- Roll each turn. Settlements collect one resource from matching adjacent hexes; cities collect two. The robber blocks its hex.
-- Build connected roads and well-spaced settlements; upgrade settlements into cities. Standard costs and 15-road/5-settlement/4-city limits apply.
-- Trade with other players or with the bank at 4:1, improved by 3:1 or resource-specific 2:1 ports. The trade UI offers one resource type for another, with adjustable quantities.
-- On seven, players with more than seven resources choose half to discard, then the active player moves the robber and chooses a neighboring victim.
-- Development cards include knights, road building, year of plenty, monopoly, and hidden victory points. New action cards wait until the next turn, and only one may be played per turn.
-- Longest road (at least five edges) and largest army (at least three knights) each award two points. Longest-road paths respect enemy settlements and incumbent ties.
-- Reach ten points on your turn to win. Two-player games use the same economy and turn rules; this is not the separate official two-player variant.
+- Place two settlements and adjoining roads in snake order. The second settlement grants resources from its adjacent hexes.
+- Roll each turn. Settlements collect one resource from matching adjacent hexes, and cities collect two. The robber blocks production on its hex.
+- Build connected roads and keep settlements at least two edges apart. Upgrade settlements into cities. Each player has 15 roads, 5 settlements and 4 cities.
+- Trade with other players or with the bank at 4:1. Ports improve the rate to 3:1 or a resource-specific 2:1. The trade screen supports one resource type for another, with adjustable quantities.
+- On a seven, players holding more than seven resources choose half to discard. The active player then moves the robber and chooses a neighboring victim.
+- Development cards include knights, road building, year of plenty, monopoly and hidden victory points. New action cards wait until the next turn, and players may use only one per turn.
+- Longest road requires at least five edges. Largest army requires at least three played knights. Each awards two points. Enemy settlements break road paths, and ties leave the award with its current holder.
+- Reach ten points on your turn to win.
 
-**Click** glowing board markers to build or move the robber. **Right-drag** to orbit and tilt. **Middle-drag** to pan. **Scroll** to zoom toward the pointer. **F** focuses the tile under the pointer. **H** or **Inspect** hides the interface for close exploration (pauses solo play); **H/Esc** returns. **Home** fits the board. Button tooltips show costs. The in-game guide explains the flow.
+Development cards appear below the action bar. Hover for their effects and ready or newly purchased counts. Your score tooltip includes hidden victory-point cards. Other players' hidden points appear only when the game ends. Build buttons require enough resources, an available piece and a legal location.
 
-## Editable scene structure
+The bank trade screen shows port rates, bank stock and a preview of the exchange. It stays open after a trade. Dice animations finish on the values rolled by the server. Reduced motion shows the result immediately.
 
-`scenes/main.tscn` instances **Network**, **Board**, and **Audio** scenes. `scenes/board.tscn` contains the camera rig, sun, environment, terrain, buildings, markers, and scenery nodes. Terrain is generated at runtime.
+| Control | Action |
+| --- | --- |
+| Click a glowing marker | Build or move the robber |
+| Right-drag | Orbit and tilt |
+| Middle-drag | Pan |
+| Scroll | Zoom toward the pointer |
+| F | Focus the tile under the pointer |
+| H or Inspect | Hide the interface and inspect the board. This pauses solo play. |
+| H or Esc | Leave inspection |
+| Home | Fit the board in view |
 
-The editable native UI scenes are `scenes/ui/home.tscn`, `lobby.tscn`, `player_slot.tscn`, `hud.tscn`, `settings.tscn`, and `tutorial.tscn`. Their named Controls define layout in the Godot scene editor. `assets/ui_theme.tres` supplies the shared editor-visible theme. `tools/create_ui_scenes.py` is an optional authoring helper; it is never run by the game and should not be rerun over manual scene edits unless regeneration is intended.
+Hover over buttons to see costs. The in-game Guide explains the turn sequence.
 
-## Implementation
+## Five- and six-player extension
 
-- `scripts/rules.gd`: deterministic board topology, rules, economy, scoring, private snapshots.
-- `scripts/network.gd`: authoritative ENet host, lobby, passwords, per-peer snapshots, rate limiting, reconnection, optional UPnP.
-- `scripts/board.gd`: procedural 3D terrain, buildings, scenery, picking, camera, animations.
-- `scripts/main.gd`: scene wiring and game interface.
-- `scripts/bot.gd`: fair bot decisions and difficulty policies.
-- `scripts/tutorial.gd`: guided practice scenarios.
-- `scripts/settings.gd` and `scripts/audio.gd`: persisted preferences and audio buses.
-- `assets/premium/*.glb`: twelve original sculpted Blender biome variants with imported mesh LODs.
-- `scripts/tile_art.gd`: textured terrain, biome materials, mesh detail and texture tiers.
-- `assets/materials/`: Poly Haven CC0 source maps and runtime PBR tiers; exact sources, URLs and hashes in `sources.json`.
-- `assets/source/sculpted-tiles.blend`: editable sculpted biome models, excluded from Godot auto-import. `tools/build_premium_tiles.py` regenerates them using Blender; texture preparation is in `tools/prepare_tile_textures.py`.
-- `shaders/`: textured ground/cliffs, triplanar PBR surfaces, animated foliage, and a layered ocean with shoreline foam and shallow-water tint.
+A lobby with five or six participants uses 30 hexes and paired turns. Three or four participants use the base board. These rules apply to solo, hosted and dedicated-server games.
 
-The server owns dice, deck, hands, resources, and action validation. Clients receive other players' card/resource counts, not their private contents. All online ENet traffic uses DTLS with certificate verification. Secure invites contain the room’s public certificate, never its private key or password. Share invites through a trusted channel: possession of a substituted invite could authenticate a different host. The room password is sent only after DTLS verification. Bare addresses and plaintext connections are rejected. Each hosted room generates a new certificate; reconnect retains the original invite while that host stays running. Play with a trusted host.
+The extension has 30 terrain hexes, including two deserts, 28 number tokens, 11 ports and 24 cards of each resource. Its 34 development cards comprise 20 knights, 5 victory points and 3 of each progress card. Each player keeps the usual piece limits. Terrain and number tokens are randomized, with adjacent 6 and 8 tokens kept apart.
+
+Paired turns follow the [official extension rules](https://www.catan.com/sites/default/files/2024-03/Catan%20Game%205-6%20Rules%202022%20240313.pdf):
+
+- The main player rolls, resolves production or the robber, then trades and builds.
+- The player three seats ahead takes the paired turn next. They can build, buy or play development cards, and trade with the bank or ports. They cannot roll or trade with other players.
+- The next main player receives the dice after the paired turn. Both roles advance one seat.
+- Each player may play one eligible development card during their part of the turn. Cards bought during that part become available once it ends. Either player can win at ten points, but the main player has priority before the paired turn starts.
+
+The interface identifies paired turns and disables unavailable actions. The server enforces the restrictions for humans and bots. Six-player rooms support private hands and reconnection.
+
+## Settings and interface
+
+Open **Settings** from the main menu, lobby or game. Graphics, Controls and Audio have separate tabs. Changes apply immediately and persist in `user://settings.cfg`. Settings pause a solo match, while online matches continue.
+
+Graphics options include window size, fullscreen, VSync, frame limits, render scale, bilinear or FSR 1 upscaling, and a performance overlay. Low, Medium, High, Ultra and Custom presets control model detail, texture resolution, vegetation, particles, shadows, lighting, reflections and water.
+
+You can choose FXAA, MSAA or TAA, anisotropic filtering up to 16×, screen-space indirect lighting or SDFGI, bloom, haze, exposure and depth of field. Texture tiers use 512-, 1024- or 2048-pixel maps. Controls include reduced motion, larger small text, camera sensitivity and bot turn speed. Audio has separate master, music, effects and ocean ambience volumes.
+
+The default window is 1440×900, with a minimum of 800×600. Menus and dialogs scroll where needed. The camera fits the board above the action bar. Text uses Fira Sans, and board numbers and port labels appear in a 2D layer to stay readable.
+
+Hover over player badges to see public card counts, road length and awards. Hover over resource icons for their names. The book opens the game log, the question mark opens the Guide, the eye opens inspection, and the gear opens Settings.
+
+**Exit to desktop** closes the current connection. If you are hosting, it also closes the room.
+
+## Piece cosmetics
+
+Open **Piece cosmetics** from the main menu or lobby. Four sets are available:
+
+- Voyager uses timber and tiled roofs.
+- Harbor uses docks and lighthouse cities.
+- Citadel uses stonework and battlements.
+- Wildwood uses log cabins and treehouse cities.
+
+Drag the 3D preview to rotate the pieces, then choose **Equip set**. Previewing a set does not equip it.
+
+Each set contains roads, settlements and cities. Roofs, trim and bases retain the player's color. The game saves your choice locally and shares it with online players. The host or dedicated-room controller can choose bot sets. Each human controls their own set, and reconnection restores the server's equipped choice. Cosmetics do not affect rules, costs or scoring.
+
+## Island graphics
+
+Each hex spans 20 metres from point to point, or about 17.3 metres across its flats. All six biomes have two Blender model variants. Forests have solid tree crowns, pastures have sheep and ponds, fields have crops and cottages, clay tiles have terraced hills and kilns, and mountains have ridges and mine entrances.
+
+Settlements are three-house villages with wells. Cities have six houses, streets, a keep, walls and towers. Player colors appear on roofs and banners. Harbors have stone quays, steps, timber docks, warehouses and sailboats. A group of four hooded outlaws represents the robber.
+
+A ten-minute day/night cycle runs during play and stops when the match pauses. Workers return to cottages at dusk, sheep gather by their fences, and birds roost. Windows and lanterns light up at night. Reduced motion freezes movement while preserving the time-of-day appearance.
+
+Water has long swells, shoreline wash and ripples around boats. Higher Water detail adds boat ripples and foam. The sea responds to day/night lighting and harbor lamps, with direct sun specular disabled to avoid white glare. Screen-space reflections can show only what the camera sees.
+
+The editable biome source is `assets/source/sculpted-tiles.blend`. The script `tools/build_premium_tiles.py` generates it. Earlier Blender sources remain in the repository.
+
+Textures use [Poly Haven CC0 maps](https://polyhaven.com/license). Their sources, URLs and hashes are in `assets/materials/sources.json`. The project contains its geometry, UI icons and synthesized audio, and bundles the Fira Sans license. Art and audio load locally at runtime.
+
+## Sound and shared music
+
+The soundtrack has five instrumental tracks, about six and a half minutes in total. Harbor at Dawn, Sunlit Fields, Trade Winds, Lanterns on the Water and Voyager's Waltz play in a repeating playlist.
+
+Open **Music** on the main menu or lobby, or **Tracks** below your cards. You can view the playlist and playback progress. The host controls playback in an online room. On a dedicated server, the first player controls it. Volume and mute affect only your device.
+
+The host supplies the playlist clock. Clients estimate network delay every two seconds and correct playback drift. Joining or reconnecting players seek to the current track and position. Track changes crossfade, and muting does not stop the local clock. Music continues during a gameplay pause unless the host pauses playback. Device latency and uneven network delays can cause small differences between players.
+
+The game also has ocean ambience and sound cues for actions and events. The scripts `tools/generate_audio.py` and `tools/generate_soundtrack.py` synthesize the audio without downloaded music or samples. The original harbor theme and ocean ambience use 44.1 kHz stereo PCM loops. The four additional tracks use stereo Vorbis and occupy about 4 MiB combined.
+
+## Build standalone executables
+
+Install Go and the Godot export templates matching your editor, then run:
+
+```bash
+./tools/export_linux.sh
+./tools/export_windows.sh
+```
+
+Set `GODOT_BIN` if needed. Each script stages an export, verifies every packed resource checksum and builds the native updater. It replaces the local build only after the game export passes its checks.
+
+| Platform | Game executable | Archive | Game size limit |
+| --- | --- | --- | --- |
+| Linux | `build/linux/N Catan.x86_64` | `build/N-Catan-linux-x86_64.tar.xz` | 250 MiB |
+| Windows | `build/win/N Catan.exe` | `build/N-Catan-windows-x86_64.zip` | 275 MiB |
+
+The scripts also write size reports and checksums under `build/`. Windows has a larger engine template, so its size limit is higher. Inspect a build with:
+
+```bash
+python3 tools/audit_build_size.py 'build/linux/N Catan.x86_64' --verify
+```
+
+Export presets exclude authoring textures, old models, tests, generated releases and unused material maps. They retain the game's texture tiers, audio, font license and texture source information. The original assets and Blender sources remain in the repository. See [build size measurements](docs/build-size.md) for the earlier size reduction and validation results.
+
+## Releases and updates
+
+The game checks [GitHub Releases](https://github.com/Enn3Developer/n_catan/releases) for the latest stable version at startup. Open **Game updates** on the home screen or **Updates** in Settings, choose **Download update**, then **Restart to update**. You can keep playing while it downloads, but must leave the room before installing. Dedicated servers do not update automatically.
+
+The exact Git tag sets the application and manifest version. Multiplayer uses a separate protocol number, currently 9. Releases with the same protocol can play together. A protocol mismatch rejects the join and identifies both versions. If a release changes the protocol, the group should update together.
+
+The updater verifies the manifest's RSA/SHA-256 signature with its embedded public key, then checks the package and executable SHA-256 hashes. It uses a delta patch only when the installed executable matches a published base and the patch is smaller than 85% of the full download. If the delta fails, it downloads the full package.
+
+The release builder reuses unchanged blocks from the exact previous published executable. The first release has full packages only. Later releases can include patches from the previous stable release.
+
+Installation waits for the game to exit and keeps the old executables. If the new game fails to finish startup, the updater restores the old version. After an interrupted installation, launch the updater directly to recover and open the game. Keep the installation folder together. The updater retains one previous backup and leaves preferences in Godot's user data folder.
+
+Pre-releases are available for manual testing. The stable update channel does not offer them.
+
+### Publishing
+
+Git LFS tracks assets and image files. Git ignores local builds, release output, caches and private keys.
+
+The Release workflow runs when you push a version tag or publish a GitHub release. Use a SemVer tag such as `v1.0.0` or `v1.1.0-rc.1`. The workflow preserves the tag exactly in the manifest.
+
+It builds Linux x86-64 and Windows x86-64 packages with their native updaters. The Godot version and download checksums are pinned in `config/release.json`. Release assets include full ZIPs, delta ZIPs where they save enough space, `SHA256SUMS` and `update-manifest.json`.
+
+A tag push creates a draft release, uploads the packages and signed manifest, then publishes it. Publishing a release manually triggers the same build and upload. The workflow does not overwrite completed signed releases or accept a tag moved to a different commit. Retry a failed run to finish an incomplete release.
+
+The repository has the required `UPDATE_SIGNING_PRIVATE_KEY` secret. Its public key is `updater/update_public.pem`. Back up the private key securely. Without it, existing clients cannot trust new updates. Replacing the public key without a transition release requires users to install manually. Never commit the private key or include it in a build.
+
+You can also dispatch the workflow manually for an existing tag. Publishing defaults to off, so this can validate a build and produce downloadable Actions artifacts. Release tooling is in `tools/release.py`. Its `stamp` command changes version metadata in the build checkout.
+
+## Source structure
+
+The main scene, `scenes/main.tscn`, contains the Network, Board and Audio scenes. The board scene contains the camera, sun, environment, terrain, buildings and scenery nodes. The game generates terrain at runtime.
+
+Edit the interface in `scenes/ui/`. Its named Controls define the layout, and `assets/ui_theme.tres` supplies the shared theme. The game does not run `tools/create_ui_scenes.py`. Rerunning that generator can overwrite manual scene edits.
+
+| Path | Purpose |
+| --- | --- |
+| `scripts/rules.gd` | Board topology, rules, resources, scoring and private snapshots |
+| `scripts/network.gd` | ENet host, lobby, passwords, replication, reconnection and UPnP |
+| `scripts/board.gd` | Terrain, buildings, picking, camera and animations |
+| `scripts/main.gd` | Scene connections and game interface |
+| `scripts/bot.gd` | Bot decisions and difficulty settings |
+| `scripts/tutorial.gd` | Guided practice scenarios |
+| `scripts/settings.gd`, `scripts/audio.gd` | Preferences and audio buses |
+| `scripts/cosmetics.gd`, `scripts/cosmetics_menu.gd` | Piece models and cosmetics screen |
+| `scripts/tile_art.gd` | Terrain materials, model detail and texture tiers |
+| `assets/premium/` | Twelve Blender biome variants |
+| `assets/materials/` | Texture sources and runtime maps |
+| `assets/source/` | Editable Blender models |
+| `tools/prepare_tile_textures.py` | Texture preparation |
+| `shaders/` | Ground, cliffs, foliage and water |
+| `scripts/build_info.gd`, `scripts/updater.gd` | Version metadata and update interface |
+| `updater/` | Native update verification and installation helper |
+
+The server owns dice rolls, the deck, hands, resources and action validation. Clients receive other players' public counts, not private cards.
+
+Secure invites contain the room's public certificate, never its private key or password. Share invites through a trusted channel. A substituted invite can authenticate a different host. The client sends the room password only after certificate verification. The server rejects bare addresses and plaintext connections. Each hosted room creates a new certificate, and reconnection uses its original invite while the host stays running. Play with a host you trust.
 
 ## Verification
 
-The current art/UI regression checks are `tests/layout_test.gd`, `tests/graphics_test.gd`, `tests/ui_test.gd`, `tests/feature_test.gd`, and `tests/cosmetics_test.gd`. Render the populated board and all biomes with `tests/style_capture.gd`. See `docs/verification.md` for results.
+CI runs updater tests, Go race checks, patch producer tests, Windows updater compilation, game rules, update interface checks and multiplayer version checks. To run game tests locally:
 
 ```bash
 # Replace godot with your Godot executable as needed.
@@ -159,120 +252,38 @@ godot --headless --path . --script res://tests/network_test.gd
 godot --headless --path . --script res://tests/bot_test.gd
 godot --headless --path . --script res://tests/bot_network_test.gd
 godot --headless --path . --script res://tests/solo_match_test.gd
+godot --headless --path . --script res://tests/updater_ui_test.gd
+godot --headless --path . --script res://tests/version_network_test.gd
 GODOT_BIN=/path/to/godot python3 tests/run_online_test.py
 
-# Requires a graphical session; writes PNG captures under /tmp.
-godot --path . --script res://tests/capture.gd
-godot --path . --script res://tests/ui_test.gd
-godot --path . --script res://tests/feature_test.gd
-godot --path . --script res://tests/features_capture.gd
+go -C updater test -race ./...
+python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
-The rule suite checks topology, setup, conservation over 150 turns, legality, trades, development cards, privacy, longest road, largest army, and victory. The network suite creates three ENet peers and tests lobby replication, setup, private hands, invalid moves, dice, disconnects, and reconnection. The dedicated test runs a separate server and two separate clients through several turns. These transport tests run over loopback; connectivity through a particular internet router still depends on its forwarding/firewall configuration.
+The rules suite checks setup, resource conservation, legal actions, trades, development cards, privacy, awards and victory. Network tests cover lobby replication, private hands, invalid moves, disconnects and reconnection. The dedicated-server test starts a server and two clients in separate processes. These tests use loopback networking. Internet access still depends on the host's router and firewall.
 
-The bot suite completed twelve full games (4,117 actions) covering every difficulty and mixed opponents. The feature suite exercises the native lobby controls, bot configuration, live solo setup, all ten tutorial lessons, saved settings, audio gains and playback. A separate live solo match runs the actual bot scheduler to victory. Mixed online rooms test bot synchronization, private bot hands, guest restrictions, and dedicated-server control.
+Bot tests cover every difficulty and mixed opponents. The feature suite checks lobby controls, bot setup, tutorial lessons, settings and audio. A solo match test runs the bot scheduler through to victory.
 
-Visual captures of the menu, setup board, developed island, card dialog, and lower-angle world view were inspected in Godot. This project is an independent fan implementation with original generated art, not an official Catan product.
+Run extension tests with:
 
-Extension regression commands:
-
-```sh
+```bash
 godot --headless --path . --script res://tests/extension_test.gd
 godot --headless --path . --script res://tests/extension_bot_test.gd
 godot --headless --path . --script res://tests/extension_solo_test.gd
 godot --path . --script res://tests/extension_ui_test.gd
-python tests/run_online_test.py 6
+python3 tests/run_online_test.py 6
 ```
 
-## September gameplay update
+Music tests are in `tests/music_test.gd`, `tests/music_network_test.gd` and `tests/music_ui_test.gd`. The script `tests/run_music_process_test.py` checks playback across separate processes.
 
-Development cards are always visible below the action bar. Hover a card for its ready/new counts and effect. Your score tooltip includes both held and newly bought victory-point cards; opponents' hidden points are revealed only at game end. Player badges show points, resources, cards, road length, and played knights. Building buttons require an available piece and a legal location as well as resources.
+Visual tests need a graphical session. They write captures under `/tmp`:
 
-Trading uses clickable resource icons, a give/receive preview, port rates, bank stock, and affordability explanations. The bank screen stays open after an exchange. A ten-minute day/night cycle runs during active play; solo pause and a disconnected participant freeze it. Dice tumble onto the map and finish on the server's rolled values. Reduced motion shows their results immediately.
+```bash
+godot --path . --script res://tests/capture.gd
+godot --path . --script res://tests/ui_test.gd
+godot --path . --script res://tests/feature_test.gd
+godot --path . --script res://tests/features_capture.gd
+godot --path . --script res://tests/style_capture.gd
+```
 
-Reconnect credentials survive client restarts. Use **Play online → Reconnect** to reclaim your seat. For a password-protected room, re-enter its password after restarting the app. The host must still be running. The same saved seat can replace a stale connection without waiting for its timeout. This update uses protocol 9; all participants need the updated build.
-
-Export Windows with `bash tools/export_windows.sh`. It uses the same asset exclusions as Linux, verifies every packed resource, rejects releases above 275 MiB (Windows has a larger engine template), and creates `build/N-Catan-windows-x86_64.zip` with `build/WINDOWS-SHA256SUMS`. Linux retains its 250 MiB guard.
-
-
-## Shared soundtrack
-
-The original **Harbor at Dawn** is joined by **Sunlit Fields**, **Trade Winds**, **Lanterns on the Water**, and **Voyager's Waltz**: about six and a half minutes of original instrumental music. The playlist advances automatically and repeats. New tracks are synthesized from original arrangements by `tools/generate_soundtrack.py` and stored as 44.1 kHz stereo Vorbis; their combined compressed size is about 4 MiB. The original soundtrack and effects remain intact.
-
-Open **Music** on the main menu or lobby, or **Tracks** in the persistent music section below your cards. View the playlist, current track, and progress. Previous, pause/resume, next, and track selection control playback; volume and mute apply only to your device. In an online room only the host controls transport; on a dedicated server the first player controls it. Solo and menu playback are fully controllable.
-
-The host owns the playlist clock. Clients estimate one-way delay from round-trip probes every two seconds, predict track boundaries between samples, and correct local playback drift. Joining/reconnecting players seek to the room's current track and position. A short crossfade softens track changes; muting never stops your clock. Music continues while gameplay is paused unless the host pauses the soundtrack itself. This is network clock synchronization, not sample-accurate multi-speaker audio; device latency and asymmetric internet connections can introduce small differences.
-
-All online participants need this update (protocol 9). Music checks: `tests/music_test.gd`, `tests/music_network_test.gd`, `tests/music_ui_test.gd`, and `python3 tests/run_music_process_test.py`.
-
-## Living medieval island
-
-Hex tiles now span 20 metres point to point (about 17.3 metres across the flats), retaining their regular hex geometry. The camera, shadows, haze and dice use the enlarged scale. Pastures have grazing, walking sheep; fields have working farmers, with woodcutters and quarry workers on other productive terrain. Reduced motion freezes their animation.
-
-Settlements are three-house medieval villages with wells; cities contain six houses, streets, a central keep, walls and towers. Player colours remain on roofs and banners. Coastal harbors have raised stone quays, descending steps, timber docks, rope rails, warehouses and bobbing sailboats.
-
-All display, rendering, lighting and water options share the **Graphics** tab. Controls/accessibility and audio retain their own tabs. **Exit to desktop** is available on the main menu and in settings; exiting closes the current connection (and the room if hosting).
-
-The robber is a four-person hooded outlaw band with stolen supplies and a small camp, kept in the clearing at the front of its blocked tile. Its game rules are unchanged. The shared ten-minute day/night cycle now governs island life: workers return to cottages at dusk and reappear at dawn; sheep gather by the fence and rest overnight; birds roost after sunset. Window and lantern light fades in at dusk. Cities have six lit houses and five street lanterns, compared with one lit house and one lantern in settlements. Harbor lanterns and the outlaw camp also light up at night. Reduced motion preserves the time-of-day appearance while freezing movement.
-
-Water uses a matte teal palette with gentle long swells, broken shoreline wash, subtle shallow-water patterns and ripples around boats. Continuous world-space normals and filtered detail avoid mesh-grid seams and distant shimmer. Direct sun specular is disabled on the sea to prevent white glare; the surface still responds to day/night lighting and harbor lamps. Higher Water detail adds boat ripples and small foam accents. Reduced motion freezes the water effects.
-
-## Releases and updates
-
-Public repository: https://github.com/Enn3Developer/n_catan
-
-Release ZIPs contain the game, `n-catan-updater` (`.exe` on Windows), and a
-README. Extract all files into a writable folder. The first installation is a
-manual download; after that the game checks GitHub's latest stable release at
-startup. **Game updates** on the home screen or **Settings → Updates** offers
-**Download update**, then **Restart to update**. Leave the current room first.
-The running game remains usable while downloading. Dedicated servers do not
-update automatically.
-
-The exact Git tag is the application and manifest version. Multiplayer protocol
-9 is checked separately: compatible release versions can play together, while a
-protocol mismatch rejects the join and identifies both versions. Releases that
-change the protocol should be installed by the whole group.
-
-The helper verifies an RSA/SHA-256 signed manifest using its embedded public key,
-then verifies package and executable SHA-256 hashes. It chooses a delta only if
-the installed executable exactly matches a published base and the patch is less
-than 85% of the full download. Any delta failure falls back to a full package.
-The release builder reuses unchanged blocks of packed resources and always uses
-the exact previous published binary, never a rebuilt old tag. The first release
-has full packages only; later releases can patch from the previous stable release.
-
-Installation waits for the game to exit, retains the old executables, and rolls
-back if the replacement fails to finish startup. If installation is interrupted,
-launch the updater directly to recover and open the game. Keep the entire install
-folder together; one previous backup is retained. Settings and saves remain in
-Godot's user data folder. Pre-releases are available for manual testing and are
-not offered by the stable update channel.
-
-### Publishing
-
-Git LFS tracks all assets and image files; clone with Git LFS installed and run
-`git lfs pull`. Local `build/`, `dist/`, caches, and private keys are ignored.
-
-The **Release** GitHub Actions workflow runs on a version tag push or a published
-release. Use SemVer tags such as `v1.0.0` or `v1.1.0-rc.1`; the tag is preserved
-exactly in the manifest. The workflow builds Linux x86-64 and Windows x86-64,
-including their native updater helpers, using the verified Godot version pinned
-in `config/release.json`. It uploads full ZIPs, useful delta ZIPs, `SHA256SUMS`,
-and the signed `update-manifest.json`. A tag push creates a draft release and
-publishes it after uploading the assets; publishing a release manually attaches
-the same assets. Completed signed releases are not overwritten, and moving a tag
-to another commit is rejected. Retry a failed run to finish an incomplete release.
-
-The repository secret `UPDATE_SIGNING_PRIVATE_KEY` is required and has been
-configured. Its matching public key is `updater/update_public.pem`. Back up the
-private key securely: losing it prevents existing clients from trusting new
-updates. Replacing the public key without a transition release requires a manual
-installation. The private key must never be committed or included in a build.
-
-The workflow also supports manual dispatch for an existing tag, with publishing
-disabled by default, to validate the complete build and download its Actions
-artifacts. CI runs updater, patch producer, and game rules tests on main and PRs.
-For local builds, use `tools/export_linux.sh` and `tools/export_windows.sh` with
-Godot export templates and Go installed. Release tooling lives in
-`tools/release.py`; `stamp` changes version metadata only in the build checkout.
+Layout, graphics and cosmetics checks are in `tests/layout_test.gd`, `tests/graphics_test.gd` and `tests/cosmetics_test.gd`. See [verification results](docs/verification.md) for recorded test runs and visual checks.
