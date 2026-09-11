@@ -186,6 +186,8 @@ def completed(tag, commit):
 
 def publish(tag, commit):
     if completed(tag, commit):
+        # Finish a draft if a prior run stopped after uploading the manifest.
+        gh('release', 'edit', tag, '--repo', REPO, '--draft=false', '--prerelease=' + ('true' if '-' in tag else 'false'))
         print('Signed release already complete')
         return
     existing = subprocess.run(['gh', 'release', 'view', tag, '--repo', REPO], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0
@@ -219,5 +221,7 @@ if __name__ == '__main__':
             publish(args.tag, args.commit)
         else:
             done = completed(args.tag, args.commit)
+            if done:
+                done = not json.loads(gh('release', 'view', args.tag, '--repo', REPO, '--json', 'isDraft'))['isDraft']
             with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
                 output.write(f'complete={str(done).lower()}\n')
