@@ -702,6 +702,7 @@ func _world_props():
 	beacon_lamp.material_override.emission_enabled=true
 	beacon_lamp.material_override.emission=Color("ffc86b")
 	island.add_child(beacon_lamp)
+	beacon_lamp.set_meta("night_light",living_world.add_night_light(island,Vector3(0,1.0,0),1.3,2.0))
 	beacon=Node3D.new();beacon.name="LighthouseBeacon";beacon.position.y=1.0;island.add_child(beacon)
 	beacon_spot=SpotLight3D.new();beacon.add_child(beacon_spot)
 	beacon_spot.light_color=Color("ffdc95");beacon_spot.spot_range=7.0;beacon_spot.spot_angle=12

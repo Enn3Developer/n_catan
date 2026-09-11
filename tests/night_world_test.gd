@@ -16,8 +16,8 @@ func run():
 	check(board.band_actors.size()==4,"robber is four people")
 	var city=board.pieces_root.find_child("MedievalCity",true,false)
 	var village=board.pieces_root.find_child("MedievalVillage",true,false)
-	check(city.find_children("NightLight*","OmniLight3D",true,false).size()==3,"city has three local light sources")
-	check(village.find_children("NightLight*","OmniLight3D",true,false).size()==1,"settlement has fewer local lights")
+	check(city.find_children("NightLight*","OmniLight3D",true,false).size()==11,"all five city lanterns and six windows cast light")
+	check(village.find_children("NightLight*","OmniLight3D",true,false).size()==2,"settlement lantern and lit window both cast light")
 	board.day_seconds=150;board.advance_day(0)
 	check(board.night_lights.all(func(light):return not light.visible and light.light_energy==0),"lights off at noon")
 	var farmer=board.actors.filter(func(actor):return actor.type=="worker")[0]
@@ -26,10 +26,13 @@ func run():
 	var daytime=sheep.root.position
 	board.day_seconds=450;board.advance_day(0)
 	check(board.night_lights.all(func(light):return light.visible and light.light_energy>0),"lights on at midnight")
-	check(board.night_lights.all(func(light):return is_equal_approx(light.omni_range,.38*light.get_parent().global_basis.get_scale().y)),"lamp reach uses parent world scale")
+	check(board.night_lights.all(func(light):return is_equal_approx(light.omni_range,float(light.get_meta("local_range",.38))*light.get_parent().global_basis.get_scale().y)),"lamp reach uses parent world scale")
 	check(board.night_lights.all(func(light):return light.omni_range>light.position.y*light.get_parent().global_basis.get_scale().y),"lamp light reaches surrounding ground")
 	check("blend_mix" in board.beacon_beam.material_override.shader.code,"beam avoids additive bloom")
 	check(board.beacon_lamp.material_override.emission_energy_multiplier<1.8,"lighthouse lantern emission stays controlled")
+	var emitters=board.find_children("NightLantern*","MeshInstance3D",true,false)+board.find_children("NightWindow*","MeshInstance3D",true,false)+[board.beacon_lamp]
+	check(emitters.all(func(emitter):return is_instance_valid(emitter.get_meta("night_light",null))),"every glowing lantern and window has a real light")
+	check(emitters.all(func(emitter):return emitter.get_meta("night_light").visible and emitter.get_meta("night_light").light_energy>0),"every emitter illuminates at night")
 	check(not farmer.root.visible,"workers indoors at night")
 	check(sheep.root.visible and sheep.body.position.y<.06 and sheep.root.scale==Vector3.ONE*board.living_world.TILE_ACTOR_SCALE and sheep.root.position.distance_to(daytime)>.1,"sheep gather and rest at night")
 	var limb=sheep.limbs[0].rotation

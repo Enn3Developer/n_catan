@@ -268,7 +268,9 @@ func cottage(parent: Node3D,pos: Vector3,color: Color,angle: float=0,scale_facto
 	craft.roof(house,Vector3(0,.153,0),.20,.20,color)
 	craft.block(house,Vector3(.046,.047,.079),Vector3(.035,.073,.01),WOOD)
 	var window=craft.block(house,Vector3(-.036,.105,.079),Vector3(.027,.027,.013),Color("665544"))
-	if lit:window.material_override=glow_material()
+	if lit:
+		window.name="NightWindow";window.material_override=glow_material()
+		window.set_meta("night_light",add_night_light(house,Vector3(-.036,.105,.102),.28,2.2))
 	craft.block(house,Vector3(.045,.195,-.038),Vector3(.027,.09,.031),Color("986c53"))
 
 func town(style: int,color: Color,city: bool) -> Node3D:
@@ -302,7 +304,7 @@ func town(style: int,color: Color,city: bool) -> Node3D:
 		craft.beam(root,Vector3(-.05,.139,0),Vector3(.05,.139,0),.007,WOOD)
 	for i in (5 if city else 1):
 		var angle=TAU*i/(5 if city else 1)+.2
-		lantern(root,Vector3(sin(angle)*radius*.84,.15,cos(angle)*radius*.84),i<(3 if city else 1))
+		lantern(root,Vector3(sin(angle)*radius*.84,.15,cos(angle)*radius*.84))
 	# Owner's banner and market canopy remain clear from the overview.
 	craft.flag(root,Vector3(-.24 if not city else -.18,.09,.11),color)
 	root.set_meta("dwellers",populate_town(root,city,color))
@@ -393,7 +395,7 @@ func harbor(resource: int) -> Node3D:
 	for x in [-.135,.135]:craft.beam(root,Vector3(x,.13,.38),Vector3(x,.13,.72),.005,Color("c1ad7b"))
 	cottage(root,Vector3(-.025,.238,.055),Color("687b80"),0,.50)
 	for i in 3:craft.block(root,Vector3(.060,.254+i*.020,.055),Vector3(.025,.020,.039),Color("9b7348"))
-	lantern(root,Vector3(.135,.16,.54),true)
+	lantern(root,Vector3(.135,.16,.54))
 	var boat=Node3D.new();boat.name="MooredBoat";boat.position=Vector3(.29,-.025,.61);boat.scale=Vector3.ONE*.65;root.add_child(boat)
 	craft.part(boat,CatanMiniature.hull(),Vector3.ZERO,Color("6e4b35"))
 	craft.block(boat,Vector3(0,.10,0),Vector3(.20,.02,.50),Color("b28c5e"))
@@ -411,17 +413,22 @@ func glow_material() -> StandardMaterial3D:
 		night_glow.emission_energy_multiplier=0.0
 	return night_glow
 
-func lantern(parent: Node3D,pos: Vector3,cast_light: bool):
+func lantern(parent: Node3D,pos: Vector3) -> OmniLight3D:
 	craft.beam(parent,pos-Vector3.UP*.12,pos,.006,WOOD)
 	var bulb=craft.block(parent,pos,Vector3(.028,.038,.028),Color("ffc475"))
 	bulb.name="NightLantern";bulb.material_override=glow_material()
 	craft.block(parent,pos+Vector3.UP*.023,Vector3(.038,.009,.038),WOOD)
-	if cast_light:
-		var light=OmniLight3D.new();light.name="NightLight"
-		light.position=pos;light.light_color=Color("ffb765")
-		light.omni_range=3.8;light.omni_attenuation=1.5
-		light.light_energy=0;light.shadow_enabled=false
-		parent.add_child(light,true)
+	var light=add_night_light(parent,pos,.38,4.0)
+	bulb.set_meta("night_light",light)
+	return light
+
+func add_night_light(parent: Node3D,pos: Vector3,reach: float,energy: float) -> OmniLight3D:
+	var light=OmniLight3D.new();light.name="NightLight"
+	light.position=pos;light.light_color=Color("ffb765")
+	light.omni_attenuation=1.5;light.light_energy=0;light.shadow_enabled=false
+	light.set_meta("local_range",reach);light.set_meta("night_energy",energy)
+	parent.add_child(light,true)
+	return light
 
 func robber_band(kind: int,art) -> Dictionary:
 	var root=Node3D.new();root.name="RobberBand"
@@ -441,7 +448,7 @@ func robber_band(kind: int,art) -> Dictionary:
 		craft.orb(root,Vector3(center.x+cos(angle)*.037,ground+.012,center.y+sin(angle)*.037),Vector3(.028,.023,.027),STONE)
 	var fire=craft.round_part(root,Vector3(center.x,ground+.028,center.y),.022,.05,Color("ef9e40"),0,9)
 	fire.name="Campfire";fire.material_override=glow_material()
-	lantern(root,Vector3(center.x,ground+.13,center.y),true)
+	fire.set_meta("night_light",lantern(root,Vector3(center.x,ground+.13,center.y)))
 	return {"root":root,"actors":entries}
 
 func night_lighting(lights: Array,night: float):
@@ -452,6 +459,6 @@ func night_lighting(lights: Array,night: float):
 		# Light3D disables inherited scale; its own global basis is always unit
 		# length. The parent retains the miniature-to-world conversion.
 		var world_scale=light.get_parent().global_basis.get_scale().y
-		light.omni_range=.38*world_scale
+		light.omni_range=float(light.get_meta("local_range",.38))*world_scale
 		light.visible=night>.01
-		light.light_energy=night*4.0
+		light.light_energy=night*float(light.get_meta("night_energy",4.0))
