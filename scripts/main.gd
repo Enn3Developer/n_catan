@@ -1,9 +1,10 @@
 extends Node3D
 
-const INK=Color("102938")
-const MUTED=Color("9ab4be")
-const CREAM=Color("f4e8ce")
-const GOLD=Color("dcb978")
+const INK=Color("493521")
+const MUTED=Color("796347")
+const PAPER=Color("fff1d2")
+const GOLD=Color("8c522d")
+const HEADING_FONT=preload("res://assets/fonts/NotoSerif-Medium.ttf")
 var net: CatanNetwork
 var board: CatanBoard
 var ui: Control
@@ -87,7 +88,7 @@ func _ready():
 	toast.offset_bottom=-20
 	toast.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	toast.add_theme_color_override("font_color",GOLD)
-	toast.add_theme_stylebox_override("normal",_style(Color("173443"),12))
+	toast.add_theme_stylebox_override("normal",_style(Color("f3deb4"),12))
 	toast.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	toast.hide()
 	ui.add_child(toast)
@@ -117,6 +118,11 @@ func _ready():
 func _style(color: Color,radius: int=10) -> StyleBoxFlat:
 	var s=StyleBoxFlat.new()
 	s.bg_color=color
+	s.set_border_width_all(1)
+	s.border_color=Color("ac8654")
+	s.shadow_color=Color(0.18,0.10,0.04,.18)
+	s.shadow_size=3
+	s.shadow_offset=Vector2(0,2)
 	s.corner_radius_top_left=radius
 	s.corner_radius_top_right=radius
 	s.corner_radius_bottom_left=radius
@@ -146,13 +152,14 @@ func _clear(scene_path: String=""):
 	if is_instance_valid(notifications):ui.move_child(notifications,ui.get_child_count()-1)
 	_queue_layout()
 
-func _label(parent: Node,text: String,size: int=16,color: Color=CREAM,translate: bool=true) -> Label:
+func _label(parent: Node,text: String,size: int=16,color: Color=INK,translate: bool=true) -> Label:
 	var node=Label.new()
 	node.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED if not translate else Node.AUTO_TRANSLATE_MODE_INHERIT
 	node.text=CatanI18n.render(text) if translate else text
 	node.set_meta("base_font_size",size)
 	node.add_theme_font_size_override("font_size",maxi(size,16 if preferences.values.large_text else 14))
 	node.add_theme_color_override("font_color",color)
+	if size>=20:node.add_theme_font_override("font",HEADING_FONT)
 	parent.add_child(node)
 	return node
 
@@ -162,13 +169,7 @@ func _button(parent: Node,text: String,callback: Callable,primary: bool=false) -
 	button.custom_minimum_size.y=38
 	button.size_flags_vertical=Control.SIZE_SHRINK_BEGIN
 	button.mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND
-	if primary:
-		button.add_theme_stylebox_override("normal",_style(GOLD))
-		button.add_theme_stylebox_override("hover",_style(GOLD.lightened(0.12)))
-		button.add_theme_color_override("font_color",INK)
-		button.add_theme_color_override("font_hover_color",INK)
-		button.add_theme_color_override("icon_normal_color",INK)
-		button.add_theme_color_override("icon_hover_color",INK)
+	if primary:button.theme_type_variation="PrimaryButton"
 	button.pressed.connect(func():
 		if is_instance_valid(audio): audio.play("click")
 		callback.call(),CONNECT_DEFERRED)
@@ -219,6 +220,13 @@ func _home():
 	_bind("OpenCosmetics",_open_cosmetics)
 	var music_button=_button(_node("MenuItems"),"Music",_open_music)
 	music_button.name="OpenMusic";CatanIcons.button_icon(music_button,"music")
+	var utilities=GridContainer.new();utilities.name="MenuUtilities";utilities.columns=2
+	utilities.add_theme_constant_override("h_separation",8);utilities.add_theme_constant_override("v_separation",8)
+	_node("MenuItems").add_child(utilities)
+	for entry in ["OpenCosmetics","OpenMusic","CheckUpdates","ExitDesktop"]:
+		var utility=_node(entry);utility.reparent(utilities)
+		utility.size_flags_horizontal=Control.SIZE_EXPAND_FILL;utility.add_theme_font_size_override("font_size",14)
+	_node("ShowOnline").custom_minimum_size.y=48
 	_bind("Reconnect",func():
 		net.reconnect_password=password_field.text
 		net.reconnect())
@@ -268,6 +276,9 @@ func _lobby():
 	var music_button=_music_icon_button(_node("LobbySettings").get_parent(),"music","Music",_open_music)
 	music_button.name="OpenMusic"
 	board.camera.h_offset=0
+	_node("LobbyTitle").add_theme_color_override("font_color",PAPER)
+	_node("LobbyTitle").add_theme_color_override("font_outline_color",INK)
+	_node("LobbyTitle").add_theme_constant_override("outline_size",3)
 	_node("LobbyTitle").text=tr("Solo game") if net.solo else tr("Online room")
 	_node("PlayerCount").text="%d / 6" % net.roster.size()
 	_node("RoomType").text="SOLO" if net.solo else "ONLINE"
@@ -278,10 +289,10 @@ func _lobby():
 	for i in CatanNetwork.MAX_PLAYERS:
 		var slot=load("res://scenes/ui/player_slot.tscn").instantiate()
 		slots.add_child(slot)
-		slot.add_theme_stylebox_override("panel",_style(Color("102a36"),12))
+		slot.add_theme_stylebox_override("panel",_style(Color("f6e4be"),12))
 		var occupied=i<net.roster.size()
 		var bot=occupied and net.roster[i].get("bot",false)
-		slot.get_node("Row/Accent").color=net.player_color(i) if occupied else Color("38505a")
+		slot.get_node("Row/Accent").color=net.player_color(i) if occupied else Color("c3aa80")
 		slot.get_node("Row/Details/PlayerName").auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED
 		slot.get_node("Row/Details/PlayerName").text=net.roster[i].name if occupied else tr("Open seat")
 		var info=""
@@ -385,6 +396,8 @@ func _hud():
 	var turn=state.players[state.turn]
 	var turn_label=_label(row,turn.name+" · "+(tr("Your turn") if state.turn==net.seat else tr("Playing")),16,board.player_color(state.turn))
 	turn_label.name="TurnLabel"
+	turn_label.add_theme_color_override("font_outline_color",INK)
+	turn_label.add_theme_constant_override("outline_size",2)
 	turn_label.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	turn_label.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
 	var phase=_label(row,tr("Paired turn") if state.get("paired",false) else _phase_text(),14,MUTED)
@@ -402,10 +415,10 @@ func _hud():
 		var score=scoring.visible_points(i)
 		var chip=PanelContainer.new()
 		chip.name="PlayerChip%d" % i
-		var style=_style(Color("112630"),8)
+		var style=_style(Color("f8e8c6"),8)
 		style.content_margin_left=10;style.content_margin_right=10
 		style.set_border_width_all(1)
-		style.border_color=net.player_color(i) if i==state.turn else Color("30434a")
+		style.border_color=net.player_color(i) if i==state.turn else Color("bba17a")
 		chip.add_theme_stylebox_override("panel",style)
 		chip.tooltip_text=tr("%s%s\n%d points · %d resources · %d development cards\nRoad length %d · %d knights%s%s") % [player.name,tr(" (you)") if i==net.seat else "",score,player.resource_count,player.card_count,player.road_length,player.knights,tr("\nLongest road +2") if state.longest==i else "",tr("\nLargest army +2") if state.army==i else ""]
 		players.add_child(chip)
@@ -415,13 +428,15 @@ func _hud():
 		name_label.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		name_label.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
 		name_label.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		name_label.add_theme_color_override("font_outline_color",INK)
+		name_label.add_theme_constant_override("outline_size",2)
 		var hidden_points=player.cards[4]+player.new_cards[4] if player.cards.size()==5 else 0
 		chip.tooltip_text+=tr("\n%d public points + %d victory-point cards = %d total") % [player.points,hidden_points,score] if player.cards.size()==5 else tr("\nVictory-point cards stay private until game end.")
 		var stats=HFlowContainer.new();stats.add_theme_constant_override("h_separation",6);column.add_child(stats)
 		for stat in [["star",score,tr("Victory points")],["hand",player.resource_count,"Resources"],["cards",player.card_count,tr("Development cards")],["road",player.road_length,tr("Longest road length")],["knight",player.knights,tr("Played knights")]]:
 			var badge=HBoxContainer.new();badge.tooltip_text=tr(stat[2])+": "+str(stat[1]);stats.add_child(badge)
 			if stat[0]=="star":badge.tooltip_text=chip.tooltip_text
-			CatanIcons.icon(badge,stat[0],16)
+			CatanIcons.icon(badge,stat[0],16).modulate=INK
 			_label(badge,str(stat[1]),14).mouse_filter=Control.MOUSE_FILTER_IGNORE
 	var right=_node("ActionsBody")
 	var instruction=_node("Instruction")
@@ -479,7 +494,7 @@ func _hud():
 func _music_icon_button(parent: Node,key: String,tip: String,callback: Callable) -> Button:
 	var button=_button(parent,"",callback)
 	for variant in ["normal","hover","pressed"]:
-		var style=_style(Color("203e4c") if variant=="normal" else Color("365765"),6)
+		var style=_style(Color("e4c18c") if variant=="normal" else Color("f2d4a0"),6)
 		style.content_margin_left=8;style.content_margin_right=8
 		style.content_margin_top=4;style.content_margin_bottom=4
 		button.add_theme_stylebox_override(variant,style)
@@ -534,7 +549,9 @@ func _open_music():
 		var row=HBoxContainer.new();box.add_child(row)
 		var button=_button(row,track.title,func():net.music_control("select",i))
 		button.name="MusicTrack%d" % i;button.toggle_mode=true;button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-		button.add_theme_stylebox_override("pressed",_style(Color("3a535d"),8))
+		button.add_theme_stylebox_override("pressed",_style(Color("ccdbb2"),8))
+		button.add_theme_color_override("font_pressed_color",INK)
+		button.add_theme_color_override("font_hover_pressed_color",INK)
 		button.tooltip_text=track.mood
 		_label(row,CatanSoundtrack.time_text(track.duration),14,MUTED)
 		music_dialog_widgets.tracks.append(button)
@@ -612,7 +629,7 @@ func _dialog(title: String) -> VBoxContainer:
 	modal.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	ui.add_child(modal)
 	var shade=ColorRect.new()
-	shade.color=Color(0.01,0.035,0.05,0.8)
+	shade.color=Color(.12,.085,.05,.78)
 	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	modal.add_child(shade)
 	var center=MarginContainer.new()
@@ -656,7 +673,7 @@ func _spin(parent: Node,limit: int=24) -> SpinBox:
 	spin.size_flags_vertical=Control.SIZE_SHRINK_CENTER
 	parent.add_child(spin)
 	spin.get_line_edit().add_theme_font_size_override("font_size",20)
-	spin.get_line_edit().add_theme_color_override("font_uneditable_color",CREAM)
+	spin.get_line_edit().add_theme_color_override("font_uneditable_color",INK)
 	spin.get_line_edit().alignment=HORIZONTAL_ALIGNMENT_CENTER
 	return spin
 
@@ -802,7 +819,7 @@ func _discard():
 func _card_section(play: bool):
 	var box=_node("CardsBody")
 	var player=state.players[net.seat]
-	_label(_node("CardShop"),tr("Development cards"),16,GOLD).name="CardHeading"
+	_label(_node("CardShop"),tr("Development cards"),16,PAPER).name="CardHeading"
 	var buy=_button(_node("CardShop"),tr("Buy card"),func():net.act({"type":"buy_card"}))
 	buy.name="BuyCard";CatanIcons.button_icon(buy,"cards",18)
 	var rules=CatanRules.new();rules.s=state
@@ -855,7 +872,7 @@ func _card_section(play: bool):
 		if i<4 and player.new_cards[i]>0:b.tooltip_text+=tr("\nNew action cards become playable next turn.")
 		if i<4 and state.card_played:b.tooltip_text+=tr("\nYou have already played an action card this turn.")
 	if box.get_child_count()==0:
-		var empty=_label(box,tr("No development cards"),14,MUTED)
+		var empty=_label(box,tr("No development cards"),14,PAPER)
 		empty.name="EmptyCards";empty.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 		empty.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 
@@ -930,13 +947,7 @@ func _node(node_name: String) -> Node:
 func _bind(node_name: String,callback: Callable,primary: bool=false):
 	var button=_node(node_name) as Button
 	button.mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND
-	if primary:
-		button.add_theme_stylebox_override("normal",_style(GOLD))
-		button.add_theme_stylebox_override("hover",_style(GOLD.lightened(0.1)))
-		button.add_theme_color_override("font_color",INK)
-		button.add_theme_color_override("font_hover_color",INK)
-		button.add_theme_color_override("icon_normal_color",INK)
-		button.add_theme_color_override("icon_hover_color",INK)
+	if primary:button.theme_type_variation="PrimaryButton"
 	button.pressed.connect(func():
 		if is_instance_valid(audio): audio.play("click")
 		callback.call(),CONNECT_DEFERRED)
@@ -1031,6 +1042,7 @@ func _apply_text(root: Node):
 	for label in root.find_children("*","Label",true,false):
 		if not label.has_meta("base_font_size"): label.set_meta("base_font_size",label.get_theme_font_size("font_size"))
 		label.add_theme_font_size_override("font_size",maxi(int(label.get_meta("base_font_size")),16 if preferences.values.large_text else 14))
+		if int(label.get_meta("base_font_size"))>=20:label.add_theme_font_override("font",HEADING_FONT)
 
 func _toggle_inspection():
 	if state.is_empty():return

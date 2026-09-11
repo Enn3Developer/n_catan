@@ -1,5 +1,6 @@
 [gd_scene format=3]
 [ext_resource type="Theme" path="res://assets/ui_theme.tres" id="1"]
+[ext_resource type="Texture2D" path="res://assets/ui/game-logo.png" id="logo"]
 [node name="MainMenu" type="Control"]
 layout_mode = 1
 anchors_preset = 15
@@ -25,14 +26,18 @@ theme_override_constants/separation = 10
 [node name="Brand" type="Label" parent="Expedition/ExpeditionBody"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "T I D E S  &  T I M B E R"
+text = "3–6 players · Solo & online"
+horizontal_alignment = 1
 theme_override_font_sizes/font_size = 13
 
-[node name="Title" type="Label" parent="Expedition/ExpeditionBody"]
+[node name="Title" type="TextureRect" parent="Expedition/ExpeditionBody"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "CATAN"
-theme_override_font_sizes/font_size = 62
+custom_minimum_size = Vector2(0, 144)
+texture = ExtResource("logo")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
 
 [node name="MenuScroll" type="ScrollContainer" parent="Expedition/ExpeditionBody"]
 unique_name_in_owner = true
@@ -149,7 +154,9 @@ tooltip_text = "Preview and equip your roads, settlements and cities"
 [node name="MenuNote" type="Label" parent="Expedition/ExpeditionBody"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "3–6 players · Solo & online"
+text = "Build, trade and make yourself at home."
+horizontal_alignment = 1
+autowrap_mode = 3
 theme_override_font_sizes/font_size = 13
 
 [node name="OpenSettings" type="Button" parent="."]

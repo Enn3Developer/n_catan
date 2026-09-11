@@ -1499,3 +1499,6 @@ msgstr "To upgrade to a city, you still need %s."
 
 msgid "To buy a development card, you still need %s."
 msgstr "To buy a development card, you still need %s."
+
+msgid "Build, trade and make yourself at home."
+msgstr "Build, trade and make yourself at home."

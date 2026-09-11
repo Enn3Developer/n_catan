@@ -18,7 +18,7 @@ var turn=0.0
 var updating=false
 var color_picker: ColorPickerButton
 
-func label(parent: Node,text: String,size: int,color: Color=Color("f4e8ce")) -> Label:
+func label(parent: Node,text: String,size: int,color: Color=Color("493521")) -> Label:
 	var n=Label.new();n.text=tr(text);n.add_theme_font_size_override("font_size",size);n.add_theme_color_override("font_color",color);parent.add_child(n);return n
 func button(parent: Node,text: String) -> Button:
 	var n=Button.new();n.text=tr(text);n.custom_minimum_size.y=42;parent.add_child(n);return n
@@ -49,8 +49,8 @@ func setup(settings: CatanSettings,net: CatanNetwork):
 	preview_camera=Camera3D.new();preview_camera.position=Vector3(.82,1.02,2.55);preview_camera.projection=Camera3D.PROJECTION_ORTHOGONAL;preview_camera.keep_aspect=Camera3D.KEEP_WIDTH;preview_camera.size=2.25;viewport.add_child(preview_camera);preview_camera.look_at(Vector3(0,.22,0))
 	display_root=Node3D.new();viewport.add_child(display_root)
 	drag_area.gui_input.connect(_preview_input)
-	label(preview_box,tr("Road · Settlement · City"),14,Color("dcb978")).horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-	label(preview_box,tr("Drag the preview to turn the pieces"),14,Color("9ab4be")).horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	label(preview_box,tr("Road · Settlement · City"),14,Color("8c522d")).horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	label(preview_box,tr("Drag the preview to turn the pieces"),14,Color("796347")).horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	var styles=VBoxContainer.new();styles.custom_minimum_size.x=210;styles.add_theme_constant_override("separation",12);content.add_child(styles)
 	for i in CatanCosmetics.SETS.size():
 		var choose=button(styles,CatanCosmetics.SETS[i]);choose.name="Style"+str(i);choose.toggle_mode=true;choose.alignment=HORIZONTAL_ALIGNMENT_LEFT;choose.add_theme_font_size_override("font_size",21);choose.pressed.connect(func():select_style(i));style_buttons.append(choose)
@@ -60,7 +60,7 @@ func setup(settings: CatanSettings,net: CatanNetwork):
 	color_picker.color_changed.connect(func(value):preview_color=Color(value,1.0);select_style(selected))
 	button(styles,tr("Use seat color")).pressed.connect(func():preview_color=CatanBoard.PLAYERS[maxi(0,target)];color_picker.color=preview_color;select_style(selected))
 	var bottom=HBoxContainer.new();bottom.add_theme_constant_override("separation",16);layout.add_child(bottom)
-	status=label(bottom,"",16,Color("dcb978"));status.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	status=label(bottom,"",16,Color("8c522d"));status.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	equip=button(bottom,tr("Apply appearance"));equip.name="EquipSet";equip.custom_minimum_size.x=130;equip.pressed.connect(_equip)
 	var close=button(bottom,"Done");close.name="CloseCosmetics";close.custom_minimum_size.x=100;close.pressed.connect(func():close_requested.emit())
 	network.changed.connect(refresh_roster)

@@ -66,7 +66,7 @@ func setup(settings: CatanSettings):
 		heading.name=title+"Heading"
 		heading.text=title.to_upper()
 		heading.add_theme_font_size_override("font_size",17)
-		heading.add_theme_color_override("font_color",Color("dcb978"))
+		heading.add_theme_color_override("font_color",Color("8c522d"))
 		box.add_child(heading)
 		tabs[title]=scroll
 		var nav=Button.new()
@@ -90,7 +90,7 @@ func _add_control(parent: Node,spec: Array):
 	var panel=PanelContainer.new()
 	panel.name=spec[1]+"Row"
 	var style=StyleBoxFlat.new()
-	style.bg_color=Color("142f3b")
+	style.bg_color=Color("eedab0")
 	style.content_margin_left=14
 	style.content_margin_right=14
 	style.content_margin_top=10

@@ -18,8 +18,8 @@ func show_notice(key: String,message: String,action_text: String="",action: Call
 	while cards.size()>=3:dismiss(cards.keys()[0])
 	var card=PanelContainer.new()
 	var style=StyleBoxFlat.new()
-	style.bg_color=Color("173443")
-	style.border_color=Color("dcb978")
+	style.bg_color=Color("f3deb4")
+	style.border_color=Color("8c522d")
 	style.set_border_width_all(1)
 	style.set_corner_radius_all(10)
 	style.content_margin_left=14;style.content_margin_right=14
