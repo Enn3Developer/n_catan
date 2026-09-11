@@ -30,7 +30,7 @@ Export presets exclude authoring textures, old models, tests, generated releases
 
 The game checks [GitHub Releases](https://github.com/Enn3Developer/n_catan/releases) for the latest stable version at startup. Open **Game updates** on the home screen or **Updates** in Settings, choose **Download update**, then **Restart to update**. You can keep playing while it downloads, but must leave the room before installing. Dedicated servers do not update automatically.
 
-The exact Git tag sets the application and manifest version. Multiplayer uses a separate protocol number, currently 9. Releases with the same protocol can play together. A protocol mismatch rejects the join and identifies both versions. If a release changes the protocol, the group should update together.
+The exact Git tag sets the application and manifest version. Multiplayer uses a separate protocol number, currently 10. Releases with the same protocol can play together. A protocol mismatch rejects the join and identifies both versions. If a release changes the protocol, the group should update together.
 
 The updater verifies the manifest's RSA/SHA-256 signature with its embedded public key, then checks the package and executable SHA-256 hashes. It uses a delta patch only when the installed executable matches a published base and the patch is smaller than 85% of the full download. If the delta fails, it downloads the full package.
 
@@ -129,3 +129,12 @@ godot --path . --script res://tests/style_capture.gd
 ```
 
 Layout, graphics and cosmetics checks are in `tests/layout_test.gd`, `tests/graphics_test.gd` and `tests/cosmetics_test.gd`. See [verification results](verification.md) for recorded test runs and visual checks.
+
+
+## Localization and player appearance
+
+English and Italian catalogs live in `locales/en.po` and `locales/it.po`. Use English source text as the translation key. Translate UI templates before formatting arguments. For messages sent over the network, use `CatanI18n.message()` and mark resource terms with `CatanI18n.term()`; clients render these in their own language. Leave player names as plain arguments. Language selection is saved locally under Settings → Controls.
+
+Player colors are opaque six-digit RGB values. An empty value uses the seat palette. The host validates changes and includes them in lobby and game snapshots. Players can edit their own appearance; the room controller can also edit bots. Protocol 10 adds the color handshake and structured localized messages.
+
+Run `python3 -m unittest discover -s tests -p 'test_localization.py'`, `tests/localization_appearance_test.gd`, and `tests/cosmetics_network_test.gd` when changing these features. Pass `-- --italian` to `tests/layout_test.gd` to check Italian at all supported window sizes.

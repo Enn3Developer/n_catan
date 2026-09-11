@@ -46,4 +46,8 @@ Open UDP 24567 and share the printed `CATAN_SECURE_INVITE` with guests.
 
 ## Asset credits
 
-Textures use [Poly Haven CC0 maps](https://polyhaven.com/license), with sources recorded in [sources.json](assets/materials/sources.json). The project bundles the [Fira Sans license](assets/fonts/LICENSE.txt). Editable Blender models are in `assets/source/`.
+Textures use [Poly Haven CC0 maps](https://polyhaven.com/license), with sources recorded in [sources.json](assets/materials/sources.json). Fira Sans uses the [SIL Open Font License](assets/fonts/LICENSE.txt). Editable Blender models are in `assets/source/`.
+
+## License
+
+The project uses [GPLv3](LICENSE). Third-party assets retain the licenses listed above.

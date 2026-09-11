@@ -50,24 +50,6 @@ layout_mode = 2
 placeholder_text = "Your name"
 max_length = 20
 custom_minimum_size = Vector2(0, 40)
-[node name="Singleplayer" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Play solo"
-custom_minimum_size = Vector2(0, 40)
-
-[node name="Learn" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Learn to play"
-custom_minimum_size = Vector2(0, 40)
-
-[node name="OpenCosmetics" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Piece cosmetics"
-custom_minimum_size = Vector2(0, 40)
-tooltip_text = "Preview and equip your roads, settlements and cities"
 [node name="ShowOnline" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -146,6 +128,24 @@ layout_mode = 2
 text = "Reconnect"
 custom_minimum_size = Vector2(0, 40)
 visible = false
+[node name="Singleplayer" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Play solo"
+custom_minimum_size = Vector2(0, 40)
+
+[node name="Learn" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Learn to play"
+custom_minimum_size = Vector2(0, 40)
+
+[node name="OpenCosmetics" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Player appearance"
+custom_minimum_size = Vector2(0, 40)
+tooltip_text = "Preview and equip your roads, settlements and cities"
 [node name="MenuNote" type="Label" parent="Expedition/ExpeditionBody"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -176,3 +176,23 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Game updates"
 custom_minimum_size = Vector2(0, 40)
+
+[node name="Version" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -36.0
+offset_right = -20.0
+offset_bottom = -12.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.85, 0.88, 0.87, 1)
+theme_override_colors/font_outline_color = Color(0.04, 0.08, 0.1, 0.9)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 2

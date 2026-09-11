@@ -39,3 +39,8 @@ theme/default_font_multichannel_signed_distance_field=true
 [rendering]
 
 renderer/rendering_method.mobile="gl_compatibility"
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://locales/en.po", "res://locales/it.po")
+locale/fallback="en"

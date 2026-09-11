@@ -100,6 +100,10 @@ func _shuffle(a: Array):
 		a[i]=a[j]
 		a[j]=x
 
+func _trade_event(kind: String,actor: int,other: int=-1):
+	var previous=s.get("trade_event",{})
+	s.trade_event={"id":int(previous.get("id",0))+1,"kind":kind,"actor":actor,"other":other}
+
 func _log(message: String):
 	s.log.append(message)
 	if s.log.size()>35: s.log.pop_front()
@@ -177,22 +181,24 @@ func rate(p: int,r: int) -> int:
 	return result
 
 func apply(p: int,a: Dictionary) -> String:
-	if p<0 or p>=s.players.size(): return "Unknown player."
+	if p<0 or p>=s.players.size(): return "Your seat is unavailable. Please reconnect to the game."
 	if s.winner!=-1: return "The game has finished."
 	var action=str(a.get("type",""))
 	var id=int(a.get("id",-1))
 	if action=="discard":
-		if s.phase!="discard" or not s.discards.has(str(p)): return "No discard is due."
+		if s.phase!="discard" or not s.discards.has(str(p)): return "You do not need to discard any resources."
 		var cards=a.get("cards",[])
-		if not _resource_array(cards) or total(cards)!=int(s.discards[str(p)]) or not can_pay(p,cards): return "Select exactly half your resources."
+		if not _resource_array(cards) or total(cards)!=int(s.discards[str(p)]): return CatanI18n.message("Choose exactly %d resources to discard.",[int(s.discards[str(p)])])
+		if not can_pay(p,cards): return "You can only discard resources you have."
 		pay(p,cards)
 		s.discards.erase(str(p))
 		if s.discards.is_empty(): s.phase="robber"
 		return ""
 	if action=="accept_trade": return _accept(p)
-	if p!=s.turn: return "Wait for your turn."
+	if p!=s.turn: return "It is another player’s turn. You can act when yours begins."
 	var player=s.players[p]
 	if action=="cancel_trade":
+		if not s.offer.is_empty():_trade_event("withdrawn",p)
 		s.offer={}
 		return ""
 	if s.phase=="setup_settlement":
@@ -238,7 +244,7 @@ func apply(p: int,a: Dictionary) -> String:
 		s.players[id].hand[r]-=1
 		player.hand[r]+=1
 		s.phase="play"
-		_log("%s stole a resource from %s." % [player.name,s.players[id].name])
+		_log(CatanI18n.message("%s stole a resource from %s.",[player.name,s.players[id].name]))
 	elif s.phase=="free_roads":
 		if action=="finish_roads":
 			s.free_roads=0
@@ -254,7 +260,7 @@ func apply(p: int,a: Dictionary) -> String:
 			s.rolled=true
 			s.dice=[rng.randi_range(1,6),rng.randi_range(1,6)]
 			var roll=total(s.dice)
-			_log("%s rolled %d." % [player.name,roll])
+			_log(CatanI18n.message("%s rolled %d.",[player.name,roll]))
 			if roll==7:
 				for i in s.players.size():
 					var count=total(s.players[i].hand)
@@ -263,13 +269,17 @@ func apply(p: int,a: Dictionary) -> String:
 			else: produce(roll)
 		elif action=="play_card":
 			var card=id
-			if card<0 or card>3 or player.cards[card]<1 or s.card_played: return "Play one development card per turn; newly bought cards must wait."
-			if card==1 and pieces(p,"road")>=15: return "All roads are already built."
+			if card<0 or card>3: return "Choose a development card to play. Victory point cards count automatically."
+			if s.card_played: return "You have played a development card this turn. You can play another next turn."
+			if player.cards[card]<1:
+				if player.new_cards[card]>0: return "You bought this card this turn. You can play it on your next turn."
+				return "You do not have this development card."
+			if card==1 and pieces(p,"road")>=15: return "All 15 of your roads are on the board. You have none left to place."
 			if card==2:
 				var selected=a.get("cards",[])
 				if not _resource_array(selected) or total(selected)!=2: return "Choose two resources."
 				for r in 5:
-					if s.bank[r]<selected[r]: return "The bank lacks that resource."
+					if s.bank[r]<selected[r]: return CatanI18n.message("The bank has only %d %s. Choose a different resource.",[s.bank[r],CatanI18n.term(RES[r])])
 				for r in 5:
 					s.bank[r]-=selected[r]
 					player.hand[r]+=selected[r]
@@ -288,45 +298,52 @@ func apply(p: int,a: Dictionary) -> String:
 			if card==1:
 				s.free_roads=2
 				s.phase="free_roads"
-			_log("%s played a development card." % player.name)
+			_log(CatanI18n.message("%s played a development card.",[player.name]))
 		else:
 			if not s.rolled: return "Roll the dice first."
 			if action in COST:
-				if not can_pay(p,COST[action]): return "Not enough resources."
+				if not can_pay(p,COST[action]): return cost_error(p,action)
 				if action=="road":
-					if not valid_edge(p,id) or pieces(p,"road")>=15: return "Choose an empty connected edge; maximum 15 roads."
+					if pieces(p,"road")>=15: return "All 15 of your roads are on the board. You have none left to place."
+					if not valid_edge(p,id): return "Choose an empty edge connected to your road or building. Another player’s building blocks the route."
 					s.edges[id].owner=p
 				elif action=="settlement":
-					if not valid_vertex(p,id) or pieces(p,"settlement")>=5: return "Choose a connected, well-spaced corner; maximum 5 settlements."
+					if pieces(p,"settlement")>=5: return "All 5 of your settlements are on the board. Upgrade one to a city to free a settlement piece."
+					if not valid_vertex(p,id): return "Choose an empty corner on your road, at least two edges from every settlement or city."
 					s.vertices[id].owner=p
 					s.vertices[id].level=1
 				elif action=="city":
-					if id<0 or id>=s.vertices.size() or s.vertices[id].owner!=p or s.vertices[id].level!=1 or pieces(p,"city")>=4: return "Upgrade one of your settlements; maximum 4 cities."
+					if pieces(p,"city")>=4: return "All 4 of your cities are on the board. You have none left to place."
+					if id<0 or id>=s.vertices.size() or s.vertices[id].owner!=p or s.vertices[id].level!=1: return "Choose one of your settlements to upgrade to a city."
 					s.vertices[id].level=2
 				else:
 					if s.deck.is_empty(): return "No development cards remain."
 					player.new_cards[s.deck.pop_back()]+=1
 				pay(p,COST[action])
-				_log("%s: %s." % [player.name,action.replace("_"," ")])
+				_log(CatanI18n.message("%s: %s.",[player.name,CatanI18n.term(action.replace("_"," "))]))
 			elif action=="bank_trade":
 				var give=int(a.get("give",-1))
 				var receive=int(a.get("receive",-1))
 				if give<0 or give>4 or receive<0 or receive>4 or give==receive: return "Choose two different resources."
 				var amount=rate(p,give)
-				if player.hand[give]<amount or s.bank[receive]<1: return "Not enough resources in hand or bank."
+				if player.hand[give]<amount: return CatanI18n.message("You need %d more %s for this bank trade.",[amount-player.hand[give],CatanI18n.term(RES[give])])
+				if s.bank[receive]<1: return CatanI18n.message("The bank has no %s left. Choose a different resource.",[CatanI18n.term(RES[receive])])
 				player.hand[give]-=amount
 				s.bank[give]+=amount
 				player.hand[receive]+=1
 				s.bank[receive]-=1
-				_log("%s traded with the bank." % player.name)
+				_log(CatanI18n.message("%s traded with the bank.",[player.name]))
+				_trade_event("bank",p)
 			elif action=="offer_trade":
 				if s.get("paired",false): return "The paired player may trade only with the bank."
 				var give=a.get("give",[])
 				var receive=a.get("receive",[])
-				if not _resource_array(give) or not _resource_array(receive) or total(give)==0 or total(receive)==0 or not can_pay(p,give): return "Choose resources to offer and request."
+				if not _resource_array(give) or not _resource_array(receive) or total(give)==0 or total(receive)==0: return "Choose at least one resource to give and one to receive."
+				if not can_pay(p,give): return CatanI18n.message("You need %s more to make this offer.",[_missing(p,give)])
 				for r in 5:
 					if give[r]>0 and receive[r]>0: return "Offer and request different resources."
 				s.offer={"from":p,"give":give.duplicate(),"receive":receive.duplicate()}
+				_trade_event("offered",p)
 			elif action=="end":
 				_score()
 				if s.winner!=-1: return ""
@@ -338,7 +355,7 @@ func apply(p: int,a: Dictionary) -> String:
 					s.turn=(p+3)%s.players.size()
 					s.paired=true
 					s.rolled=true
-					_log("%s takes the paired turn: build, cards and bank trades." % s.players[s.turn].name)
+					_log(CatanI18n.message("%s takes the paired turn: build, cards and bank trades.",[s.players[s.turn].name]))
 				else:
 					s.turn=(int(s.get("primary",p))+1)%s.players.size() if s.get("extension",false) else (p+1)%s.players.size()
 					s.primary=s.turn
@@ -346,8 +363,8 @@ func apply(p: int,a: Dictionary) -> String:
 					s.rolled=false
 				s.card_played=false
 				s.offer={}
-			else: return "Unknown action."
-	else: return "Invalid phase."
+			else: return "This action is unavailable. Please choose an action from the game controls."
+	else: return "This action is unavailable at this stage of the turn."
 	_score()
 	return ""
 
@@ -358,13 +375,17 @@ func _resource_array(a: Variant) -> bool:
 	return true
 
 func _accept(p: int) -> String:
-	if s.get("paired",false) or s.phase!="play" or s.offer.is_empty() or p==s.turn: return "No trade to accept."
+	if s.get("paired",false): return "During a paired turn, trades are only available with the bank."
+	if s.phase!="play" or s.offer.is_empty(): return "This offer is no longer available. Wait for a new offer."
+	if p==s.turn: return "Other players can accept your offer. You can withdraw it to make a new one."
 	var offer=s.offer
-	if not can_pay(p,offer.receive) or not can_pay(s.turn,offer.give): return "Someone no longer has those resources."
+	if not can_pay(p,offer.receive): return CatanI18n.message("You need %s more to accept this offer.",[_missing(p,offer.receive)])
+	if not can_pay(s.turn,offer.give): return "The player making this offer no longer has the resources. Ask them for a new offer."
 	for r in 5:
 		s.players[p].hand[r]+=offer.give[r]-offer.receive[r]
 		s.players[s.turn].hand[r]+=offer.receive[r]-offer.give[r]
-	_log("%s traded with %s." % [s.players[s.turn].name,s.players[p].name])
+	_log(CatanI18n.message("%s traded with %s.",[s.players[s.turn].name,s.players[p].name]))
+	_trade_event("accepted",s.turn,p)
 	s.offer={}
 	return ""
 
@@ -430,7 +451,7 @@ func _score():
 		s.players[p].points=points
 		if p==s.turn and points+s.players[p].cards[4]+s.players[p].new_cards[4]>=10:
 			s.winner=p
-			_log("%s wins with 10 victory points!" % s.players[p].name)
+			_log(CatanI18n.message("%s wins with 10 victory points!",[s.players[p].name]))
 
 func snapshot(viewer: int) -> Dictionary:
 	var result=s.duplicate(true)
@@ -445,3 +466,14 @@ func snapshot(viewer: int) -> Dictionary:
 			player.cards=[]
 			player.new_cards=[]
 	return result
+
+func _missing(player: int,cost: Array) -> Dictionary:
+	var parts=[]
+	for r in 5:
+		var amount=maxi(0,int(cost[r])-int(s.players[player].hand[r]))
+		if amount>0:parts.append({"key":"%d %s","args":[amount,CatanI18n.term(RES[r])]})
+	return {"list":parts}
+
+func cost_error(player: int,kind: String) -> String:
+	var keys={"road":"To build a road, you still need %s.","settlement":"To build a settlement, you still need %s.","city":"To upgrade to a city, you still need %s.","buy_card":"To buy a development card, you still need %s."}
+	return CatanI18n.message(keys[kind],[_missing(player,COST[kind])])

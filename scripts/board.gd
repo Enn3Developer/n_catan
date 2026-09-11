@@ -403,7 +403,7 @@ func refresh(data: Dictionary):
 		if e.owner<0: continue
 		var a=state.vertices[e.a]
 		var b=state.vertices[e.b]
-		var road=cosmetics.road(_piece_style(e.owner),PLAYERS[e.owner])
+		var road=cosmetics.road(_piece_style(e.owner),player_color(e.owner))
 		road.position=Vector3((a.x+b.x)/2,.2385 if _piece_style(e.owner)==2 else .2285,(a.z+b.z)/2)
 		road.rotation.y=atan2(b.x-a.x,b.z-a.z)
 		pieces_root.add_child(road)
@@ -413,7 +413,7 @@ func refresh(data: Dictionary):
 		var village=Node3D.new()
 		village.position=Vector3(v.x,0.22,v.z)
 		pieces_root.add_child(village)
-		_house(village,Vector3.ZERO,PLAYERS[v.owner],v.level==2,_piece_style(v.owner))
+		_house(village,Vector3.ZERO,player_color(v.owner),v.level==2,_piece_style(v.owner))
 		if not reduce_motion and not old.is_empty() and (old.vertices[vid].owner!=v.owner or old.vertices[vid].level!=v.level):
 			village.scale=Vector3.ONE*0.1
 			create_tween().tween_property(village,"scale",Vector3.ONE,0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
@@ -884,3 +884,8 @@ func throw_dice(values: Array):
 	active_dice.scale=Vector3.ONE*(TILE_SIZE/2.2)
 	active_dice.setup(values,Vector3(tile.x*2.2,.9,(tile.z+.64)*2.2),reduce_motion)
 	active_dice.settled.connect(show_production)
+
+func player_color(player: int) -> Color:
+	var colors=state.get("player_colors",[])
+	var value=str(colors[player]) if player>=0 and player<colors.size() else ""
+	return Color(value) if not value.is_empty() and CatanNetwork.valid_color(value) else PLAYERS[clampi(player,0,5)]

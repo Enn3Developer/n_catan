@@ -1,7 +1,7 @@
 class_name CatanSettings
 extends RefCounted
 
-const DEFAULTS={"master":0.8,"music":0.42,"effects":0.75,"ambience":0.45,"fullscreen":false,"vsync":true,"quality":2,"reduce_motion":false,"large_text":false,"camera_speed":1.0,"bot_speed":1,"player_name":"Voyager","window_size":1,"frame_limit":0,"render_scale":1.0,"anti_aliasing":3,"upscaling":0,"anisotropy":4,"model_quality":2,"texture_quality":2,"foliage_quality":2,"shadow_quality":3,"ambient_occlusion":2,"global_illumination":1,"reflections":2,"water_quality":2,"particles":2,"bloom":true,"atmosphere":true,"depth_of_field":false,"exposure":1.0,"wind":0.65,"show_fps":false,"piece_style":0}
+const DEFAULTS={"master":0.8,"music":0.42,"effects":0.75,"ambience":0.45,"fullscreen":false,"vsync":true,"quality":2,"reduce_motion":false,"large_text":false,"camera_speed":1.0,"bot_speed":1,"player_name":"Voyager","window_size":1,"frame_limit":0,"render_scale":1.0,"anti_aliasing":3,"upscaling":0,"anisotropy":4,"model_quality":2,"texture_quality":2,"foliage_quality":2,"shadow_quality":3,"ambient_occlusion":2,"global_illumination":1,"reflections":2,"water_quality":2,"particles":2,"bloom":true,"atmosphere":true,"depth_of_field":false,"exposure":1.0,"wind":0.65,"show_fps":false,"piece_style":0,"player_color":"","language":0}
 const PRESETS=[
 	{"model_quality":0,"texture_quality":0,"foliage_quality":0,"shadow_quality":1,"ambient_occlusion":0,"global_illumination":0,"reflections":0,"water_quality":0,"particles":0,"anti_aliasing":1,"anisotropy":1,"bloom":false,"atmosphere":false,"depth_of_field":false},
 	{"model_quality":1,"texture_quality":1,"foliage_quality":1,"shadow_quality":2,"ambient_occlusion":1,"global_illumination":0,"reflections":1,"water_quality":1,"particles":1,"anti_aliasing":2,"anisotropy":2,"bloom":true,"atmosphere":true,"depth_of_field":false},
@@ -9,7 +9,7 @@ const PRESETS=[
 	{"model_quality":3,"texture_quality":2,"foliage_quality":3,"shadow_quality":4,"ambient_occlusion":2,"global_illumination":3,"reflections":2,"water_quality":3,"particles":2,"anti_aliasing":4,"anisotropy":4,"bloom":true,"atmosphere":true,"depth_of_field":false}]
 const FRAME_LIMITS=[0,30,60,90,120,144,240]
 const WINDOW_SIZES=[Vector2i(1280,720),Vector2i(1440,900),Vector2i(1920,1080),Vector2i(2560,1440),Vector2i(3840,2160)]
-const LIMITS={"piece_style":3,"quality":4,"window_size":4,"frame_limit":6,"anti_aliasing":5,"upscaling":1,"anisotropy":4,"model_quality":3,"texture_quality":2,"foliage_quality":3,"shadow_quality":4,"ambient_occlusion":2,"global_illumination":3,"reflections":2,"water_quality":3,"particles":2,"bot_speed":2}
+const LIMITS={"language":1,"piece_style":3,"quality":4,"window_size":4,"frame_limit":6,"anti_aliasing":5,"upscaling":1,"anisotropy":4,"model_quality":3,"texture_quality":2,"foliage_quality":3,"shadow_quality":4,"ambient_occlusion":2,"global_illumination":3,"reflections":2,"water_quality":3,"particles":2,"bot_speed":2}
 const SLIDERS={"master":[0.0,1.0],"music":[0.0,1.0],"effects":[0.0,1.0],"ambience":[0.0,1.0],"camera_speed":[0.4,2.0],"render_scale":[0.5,1.5],"exposure":[0.6,1.5],"wind":[0.0,1.0]}
 var values=DEFAULTS.duplicate()
 var path="user://settings.cfg"
@@ -28,6 +28,7 @@ func _init(config_path: String="user://settings.cfg"):
 			values.merge(PRESETS[values.quality],true)
 
 func _sanitize(key: String,value: Variant) -> Variant:
+	if key=="player_color": return str(value).to_lower() if str(value).is_empty() or (str(value).length()==6 and Color.html_is_valid(str(value))) else ""
 	if LIMITS.has(key): return clampi(int(value),0,LIMITS[key]) if value is int or value is float else DEFAULTS[key]
 	if SLIDERS.has(key): return clampf(float(value),SLIDERS[key][0],SLIDERS[key][1]) if (value is int or value is float) and is_finite(float(value)) else DEFAULTS[key]
 	if DEFAULTS[key] is bool: return value if value is bool else DEFAULTS[key]

@@ -36,7 +36,7 @@ Start with Learn to play or Play solo. Configure 2-5 bots in a solo lobby.
 Online rooms support 3-6 participants, including bots. The host must make
 UDP port 24567 reachable. Enter the public IP/DNS in the lobby and Copy invite;
 guests paste the complete secure invite. All online traffic uses verified DTLS.
-All players need this game version (network protocol 9).
+All players need this game version (network protocol 10).
 
 Right-drag: orbit. Middle-drag: pan. Scroll: zoom. Home: fit board.
 H: inspect board. Esc: return. Settings and Piece cosmetics are on the menu.
@@ -44,6 +44,10 @@ H: inspect board. Esc: return. Settings and Piece cosmetics are on the menu.
 Dedicated server: "N Catan.exe" --headless -- --server
 Optional room password: append --password=your-room-password
 Set --address=your-public-hostname:24567 and share the printed CATAN_SECURE_INVITE.
+
+Project license: GNU GPL version 3 only. See LICENSE for the full text.
+Source: https://github.com/Enn3Developer/n_catan
+Use the release tag for the matching source version; fetch assets with Git LFS.
 
 Font: Fira Sans, SIL Open Font License; license included in the resource pack.
 Texture sources: Poly Haven (CC0); asset provenance included in the resource pack.
@@ -53,12 +57,13 @@ volume and mute are personal. Open Music on the menu or Tracks in-game.
 Original project geometry, icons and audio. Requires a Vulkan-capable GPU
 for the default Forward+ renderer.
 EOF
+cp -- "$project_dir/LICENSE" "$project_dir/build/win/LICENSE"
 python3 - "$project_dir/build/win" "$stage_dir/N-Catan-windows-x86_64.zip" <<'PYZIP'
 from pathlib import Path
 import sys, zipfile
 folder = Path(sys.argv[1])
 with zipfile.ZipFile(sys.argv[2], "w", zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
-    for name in ["N Catan.exe", "n-catan-updater.exe", "README.txt"]:
+    for name in ["N Catan.exe", "n-catan-updater.exe", "README.txt", "LICENSE"]:
         archive.write(folder / name, "N-Catan/" + name)
 PYZIP
 mv -- "$stage_dir/N-Catan-windows-x86_64.zip" "$project_dir/build/N-Catan-windows-x86_64.zip"

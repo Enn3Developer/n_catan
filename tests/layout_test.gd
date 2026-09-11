@@ -32,6 +32,7 @@ func run():
 	surface=SubViewport.new();surface.own_world_3d=true;surface.size=Vector2i(1440,900);surface.render_target_update_mode=SubViewport.UPDATE_ALWAYS;root.add_child(surface)
 	game=load("res://scenes/main.tscn").instantiate();surface.add_child(game)
 	await create_timer(2).timeout
+	if "--italian" in OS.get_cmdline_user_args():game.preferences.set_value("language",1)
 	game.preferences.set_value("frame_limit",2);game._apply_preferences()
 	for dimensions in SIZES:
 		surface.size=dimensions;await create_timer(.3).timeout;await settle()

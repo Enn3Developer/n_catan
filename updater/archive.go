@@ -155,7 +155,7 @@ func stageArchive(archivePath, stage, install string, p Platform, delta *DeltaSp
 		return e
 	}
 	defer z.Close()
-	allowed := map[string]bool{p.Updater.Name: true, "README.txt": true}
+	allowed := map[string]bool{p.Updater.Name: true, "README.txt": true, "LICENSE": true}
 	if delta == nil {
 		allowed[p.Game.Name] = true
 	} else {

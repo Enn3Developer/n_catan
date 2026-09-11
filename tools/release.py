@@ -126,7 +126,7 @@ def package(tag, key, commit, with_previous=True):
             source = ROOT / 'build' / folder
             full = out / f'n-catan-{tag}-{platform}.zip'
             with zipfile.ZipFile(full, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
-                for name in [game, helper, 'README.txt']:
+                for name in [game, helper, 'README.txt', 'LICENSE']:
                     archive.write(source / name, name)
             data = dict(game=spec(source / game), updater=spec(source / helper), full=spec(full), deltas=[])
             if base_manifest and platform in base_manifest['platforms']:

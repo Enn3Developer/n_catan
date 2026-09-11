@@ -1,0 +1,1501 @@
+msgid ""
+msgstr ""
+"Language: it\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "\n%d public points + %d victory-point cards = %d total"
+msgstr "\n%d punti pubblici + %d carte punto vittoria = %d totali"
+
+msgid "\n%d ready · %d bought this turn"
+msgstr "\n%d disponibili · %d comprate in questo turno"
+
+msgid "\nLargest army +2"
+msgstr "\nEsercito più grande +2"
+
+msgid "\nLeave this room before installing; hosting an update would close it."
+msgstr "\nLascia la stanza prima di installare. Se sei l’host, aggiornare chiuderà la stanza."
+
+msgid "\nLongest road +2"
+msgstr "\nStrada più lunga +2"
+
+msgid "\nNew action cards become playable next turn."
+msgstr "\nLe nuove carte azione si possono giocare dal prossimo turno."
+
+msgid "\nNo legal building space or no pieces remaining."
+msgstr "\nNon ci sono posizioni valide oppure hai finito le pedine."
+
+msgid "\nRelease %s · Protocol %d"
+msgstr "\nVersione %s · Protocollo %d"
+
+msgid "\nThis release changes multiplayer compatibility. Your group should update together."
+msgstr "\nQuesta versione cambia la compatibilità multigiocatore. Aggiornate tutti insieme."
+
+msgid "\nVictory-point cards stay private until game end."
+msgstr "\nLe carte punto vittoria restano nascoste fino alla fine della partita."
+
+msgid "\nYou have already played an action card this turn."
+msgstr "\nHai già giocato una carta azione in questo turno."
+
+msgid " (you)"
+msgstr " (tu)"
+
+msgid " You don't have the requested resources."
+msgstr " Ti mancano le risorse richieste."
+
+msgid " disconnected. Waiting to reconnect."
+msgstr " si è disconnesso. In attesa della riconnessione."
+
+msgid " offers:"
+msgstr " offre:"
+
+msgid " wins!"
+msgstr " vince!"
+
+msgid " · Bot"
+msgstr " · Bot"
+
+msgid " · Equipped"
+msgstr " · In uso"
+
+msgid " · Preview"
+msgstr " · Anteprima"
+
+msgid "%d FPS · %.1f ms / frame · %.0f MB VRAM"
+msgstr "%d FPS · %.1f ms / fotogramma · %.0f MB VRAM"
+
+msgid "%s accepted your trade."
+msgstr "%s ha accettato il tuo scambio."
+
+msgid "%s disconnected. The game is paused."
+msgstr "%s si è disconnesso. La partita è in pausa."
+
+msgid "%s download · %.1f MiB"
+msgstr "Download %s · %.1f MiB"
+
+msgid "%s offers %s for %s."
+msgstr "%s offre %s in cambio di %s."
+
+msgid "%s played a development card."
+msgstr "%s ha giocato una carta sviluppo."
+
+msgid "%s reconnected. The expedition continues."
+msgstr "%s si è riconnesso. La partita riprende."
+
+msgid "%s rolled %d."
+msgstr "%s ha tirato %d."
+
+msgid "%s stole a resource from %s."
+msgstr "%s ha rubato una risorsa a %s."
+
+msgid "%s takes the paired turn: build, cards and bank trades."
+msgstr "Tocca a %s per il turno abbinato: costruzioni, carte e scambi con la banca."
+
+msgid "%s traded with %s."
+msgstr "%s ha scambiato con %s."
+
+msgid "%s traded with the bank."
+msgstr "%s ha scambiato con la banca."
+
+msgid "%s wins with 10 victory points!"
+msgstr "%s vince con 10 punti vittoria!"
+
+msgid "%s withdrew their trade offer."
+msgstr "%s ha ritirato l’offerta di scambio."
+
+msgid "%s · Bank has %d"
+msgstr "%s · La banca ne ha %d"
+
+msgid "%s · You have %d · Bank rate %d:1"
+msgstr "%s · Ne hai %d · Rapporto banca %d:1"
+
+msgid "%s%s\n%d points · %d resources · %d development cards\nRoad length %d · %d knights%s%s"
+msgstr "%s%s\n%d punti · %d risorse · %d carte sviluppo\nLunghezza strada %d · %d cavalieri%s%s"
+
+msgid "+ Add bot"
+msgstr "+ Aggiungi bot"
+
+msgid "1. Gather 3–6 players (humans or bots). Everyone readies up.\n2. Place two settlements and roads in snake order.\n3. Roll: neighboring settlements collect 1 resource; cities 2.\n4. Connect roads, build settlements, upgrade to cities.\n5. Trade with players or the bank; coastal ports give better rates.\n6. A seven means discarding half if you have more than seven,\n    then moving the robber and stealing from a neighbor.\n7. Buy development cards; play at most one per turn.\n8. Reach 10 points on your turn to win. Settlements give 1,\n    cities 2, longest road and largest army 2 each.\n\nClick glowing board markers to build. Right-drag to orbit.\nScroll to zoom; middle-drag pans; F focuses a tile.\nH hides the interface; Home fits the board. Hover for costs.\n\n5–6 players: 30 hexes and paired turns. After the main turn,\n the player 3 seats ahead builds, plays cards and trades only\n with the bank. Then the next main player rolls.\n\nOnline hosts need UDP 24567 reachable from the internet.\nUse router mapping, port forwarding, or a dedicated server."
+msgstr "1. Riunisci 3–6 giocatori, persone o bot. Tutti devono essere pronti.\n2. Posiziona due colonie e due strade, invertendo l’ordine al secondo giro.\n3. Tira i dadi: le colonie vicine raccolgono 1 risorsa, le città 2.\n4. Collega strade, costruisci colonie e trasformale in città.\n5. Scambia con i giocatori o la banca; i porti offrono rapporti migliori.\n6. Con un 7, chi ha più di 7 risorse ne scarta metà, arrotondando per difetto.\n   Poi si sposta il brigante e si ruba una risorsa a un vicino.\n7. Compra carte sviluppo; gioca al massimo una carta azione per turno.\n8. Raggiungi 10 punti nel tuo turno per vincere. Le colonie valgono 1,\n   le città 2, la strada più lunga e l’esercito più grande 2 ciascuno.\n\nClicca sui punti illuminati per costruire. Trascina col destro per ruotare.\nLa rotella regola lo zoom; trascina col centrale per spostarti.\nF mette a fuoco una tessera; H nasconde l’interfaccia; Home inquadra il tabellone.\nPassa il puntatore sui comandi per vedere i costi.\n\nCon 5–6 giocatori: 30 esagoni e turni abbinati. Dopo il turno principale,\nil giocatore tre posti più avanti costruisce, gioca carte e scambia solo\ncon la banca. Poi il giocatore principale successivo tira i dadi.\n\nPer giocare online, la porta UDP 24567 dell’host deve essere raggiungibile.\nUsa la configurazione del router, l’inoltro della porta o un server dedicato."
+
+msgid "19 hexes · Classic"
+msgstr "19 esagoni · Classico"
+
+msgid "30 hexes · Paired turns"
+msgstr "30 esagoni · Turni abbinati"
+
+msgid "3D render scale"
+msgstr "Scala di rendering 3D"
+
+msgid "3–6 players · Solo & online"
+msgstr "3–6 giocatori · Solo e online"
+
+msgid "A trade on the table"
+msgstr "Proposta di scambio"
+
+msgid "AUDIO"
+msgstr "AUDIO"
+
+msgid "Accept trade"
+msgstr "Accetta scambio"
+
+msgid "Accessibility"
+msgstr "Accessibilità"
+
+msgid "Add %d more player(s)"
+msgstr "Aggiungi ancora %d giocatori"
+
+msgid "Add contact shading under grass, in rock cracks and around buildings using screen-space ambient occlusion."
+msgstr "Aggiunge ombre sotto l’erba, nelle fessure delle rocce e intorno agli edifici tramite occlusione ambientale nello spazio schermo."
+
+msgid "Adjust directional shadow-map resolution and soft-shadow filtering. Higher levels preserve fine branches and architecture in shadows."
+msgstr "Regola risoluzione e morbidezza delle ombre. I livelli alti conservano rami sottili e dettagli degli edifici nelle ombre."
+
+msgid "Adjust ocean mesh resolution, wave layers, fine ripples and shoreline foam. Reflections are controlled in this Graphics tab."
+msgstr "Regola il dettaglio dell’oceano, le onde, le increspature e la schiuma sulla costa. I riflessi si regolano in questa scheda Grafica."
+
+msgid "Adjust orbit and pan speed. Right-drag orbits; middle-drag pans; the wheel zooms; Home fits the board."
+msgstr "Regola la velocità della telecamera. Trascina con il destro per ruotare e con il centrale per spostarti. La rotella regola lo zoom; Home inquadra il tabellone."
+
+msgid "Adjust scene brightness before cinematic tone mapping. Does not change the interface."
+msgstr "Regola la luminosità della scena prima della mappatura tonale. Non modifica l’interfaccia."
+
+msgid "Adjust terrain tessellation, mesh level-of-detail bias and small scene details. Large landmarks and gameplay pieces stay visible at every level."
+msgstr "Regola la suddivisione del terreno, il livello di dettaglio dei modelli e i piccoli elementi della scena. I punti di riferimento e le pedine restano sempre visibili."
+
+msgid "Adjust the pause between bot actions without changing their difficulty or decisions."
+msgstr "Regola la pausa tra le azioni dei bot senza modificarne difficoltà o decisioni."
+
+msgid "All 15 of your roads are on the board. You have none left to place."
+msgstr "Tutte le tue 15 strade sono sul tabellone. Non ne hai altre da posizionare."
+
+msgid "All 4 of your cities are on the board. You have none left to place."
+msgstr "Tutte le tue 4 città sono sul tabellone. Non ne hai altre da posizionare."
+
+msgid "All 5 of your settlements are on the board. Upgrade one to a city to free a settlement piece."
+msgstr "Tutte le tue 5 colonie sono sul tabellone. Trasformane una in città per recuperare una pedina colonia."
+
+msgid "All settlements placed. Roll the dice to begin."
+msgstr "Tutte le colonie sono posizionate. Tira i dadi per iniziare."
+
+msgid "Already included in your score; never needs to be played."
+msgstr "Già inclusa nel punteggio; non occorre giocarla."
+
+msgid "Ambient occlusion"
+msgstr "Occlusione ambientale"
+
+msgid "Ambient only"
+msgstr "Solo ambientale"
+
+msgid "Anisotropic filtering"
+msgstr "Filtro anisotropico"
+
+msgid "Any player who can afford this offer may accept it."
+msgstr "Qualsiasi giocatore con le risorse richieste può accettare."
+
+msgid "Appearance"
+msgstr "Aspetto"
+
+msgid "Apply a coordinated set of model, texture, lighting, water and anti-aliasing settings. Individual changes switch this to Custom. Display and audio preferences are preserved."
+msgstr "Applica un insieme di impostazioni per modelli, texture, luci, acqua e anti-aliasing. Le modifiche singole passano a Personalizzata. Le preferenze di schermo e audio restano invariate."
+
+msgid "Apply appearance"
+msgstr "Applica aspetto"
+
+msgid "Atmospheric haze"
+msgstr "Foschia atmosferica"
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Automatic mapping unavailable. Forward UDP 24567 to this computer, or use a public dedicated server."
+msgstr "Configurazione automatica non disponibile. Inoltra la porta UDP 24567 a questo computer, oppure usa un server dedicato pubblico."
+
+msgid "Automatic updates are available in installed releases. Download a release with the updater included."
+msgstr "Gli aggiornamenti automatici sono disponibili nelle versioni installate. Scarica una versione che includa il programma di aggiornamento."
+
+msgid "Back"
+msgstr "Indietro"
+
+msgid "Back to menu"
+msgstr "Torna al menu"
+
+msgid "Bank"
+msgstr "Banca"
+
+msgid "Bank trade"
+msgstr "Scambia con la banca"
+
+msgid "Bank trade completed."
+msgstr "Scambio con la banca completato."
+
+msgid "Bank trade · %d:1"
+msgstr "Scambio con la banca · %d:1"
+
+msgid "Bloom"
+msgstr "Bagliore"
+
+msgid "Bot turn speed"
+msgstr "Velocità turni dei bot"
+
+msgid "Brick"
+msgstr "Argilla"
+
+msgid "Bright harp, flute and warm strings"
+msgstr "Arpa vivace, flauto e archi caldi"
+
+msgid "Build & trade"
+msgstr "Costruisci e scambia"
+
+msgid "Build two roads for free."
+msgstr "Costruisci due strade gratuitamente."
+
+msgid "Build, play a card, or trade with the bank."
+msgstr "Costruisci, gioca una carta o scambia con la banca."
+
+msgid "Build, trade or play a card"
+msgstr "Costruisci, scambia o gioca una carta"
+
+msgid "Buy card"
+msgstr "Compra carta"
+
+msgid "Buy development card: 1 wool, 1 grain, 1 ore. %d left in deck."
+msgstr "Compra carta sviluppo: 1 lana, 1 grano, 1 minerale. Ne restano %d nel mazzo."
+
+msgid "COMPATIBILITY / LIMITED LIGHTING"
+msgstr "COMPATIBILITÀ / ILLUMINAZIONE LIMITATA"
+
+msgid "CPU / GPU geometry"
+msgstr "Geometria su CPU e GPU"
+
+msgid "Camera sensitivity"
+msgstr "Sensibilità telecamera"
+
+msgid "Can add input latency"
+msgstr "Può aumentare il ritardo dei comandi"
+
+msgid "Cannot write the update cache."
+msgstr "Impossibile salvare i file dell’aggiornamento. Controlla spazio libero e permessi della cartella."
+
+msgid "Carved stone, battlements and heraldic shields. An island stronghold."
+msgstr "Pietra scolpita, merli e scudi araldici. Una fortezza sull’isola."
+
+msgid "Change the actual albedo, normal and occlusion/roughness textures used by terrain, stone and wood. Higher settings retain detail during close inspection."
+msgstr "Cambia la risoluzione delle texture di colore, rilievo e superficie per terreno, pietra e legno. I valori alti mantengono i dettagli da vicino."
+
+msgid "Chart a course  →"
+msgstr "Torna al gioco  →"
+
+msgid "Check for a newer release."
+msgstr "Cerca una versione più recente."
+
+msgid "Check for updates"
+msgstr "Cerca aggiornamenti"
+
+msgid "Checking for updates…"
+msgstr "Ricerca aggiornamenti…"
+
+msgid "Choose Easy bots for a gentle first game, Normal for purposeful builders, or Hard for opponents that plan resource diversity and expansion. You can mix difficulty levels in the lobby. The reference guide remains available during every game."
+msgstr "Scegli bot Facili per una prima partita tranquilla, Normali per costruttori più attivi o Difficili per avversari che pianificano risorse ed espansione. Puoi mescolare le difficoltà nella stanza. La guida resta disponibile durante ogni partita."
+
+msgid "Choose a connected road, or finish building."
+msgstr "Scegli un lato collegato alla tua rete, oppure termina la costruzione."
+
+msgid "Choose a development card to play. Victory point cards count automatically."
+msgstr "Scegli una carta sviluppo da giocare. Le carte punto vittoria vengono conteggiate automaticamente."
+
+msgid "Choose a glowing %s on the board."
+msgstr "Scegli un %s illuminato sul tabellone."
+
+msgid "Choose a neighboring player to steal from."
+msgstr "Scegli un giocatore vicino al brigante a cui rubare una risorsa."
+
+msgid "Choose a password for your room"
+msgstr "Scegli una password per la stanza"
+
+msgid "Choose a player to steal from."
+msgstr "Scegli un giocatore a cui rubare una risorsa."
+
+msgid "Choose a resource."
+msgstr "Scegli una risorsa."
+
+msgid "Choose an empty corner at least two edges from another settlement."
+msgstr "Scegli un vertice libero ad almeno due lati di distanza dalle altre colonie."
+
+msgid "Choose an empty corner on your road, at least two edges from every settlement or city."
+msgstr "Scegli un vertice libero lungo una tua strada, ad almeno due lati da qualsiasi colonia o città."
+
+msgid "Choose an empty edge connected to your road or building. Another player’s building blocks the route."
+msgstr "Scegli un lato libero collegato a una tua strada o edificio. Gli edifici degli altri giocatori interrompono il percorso."
+
+msgid "Choose at least one resource to give and one to receive."
+msgstr "Scegli almeno una risorsa da dare e una da ricevere."
+
+msgid "Choose different resources."
+msgstr "Scegli risorse diverse."
+
+msgid "Choose each bot’s difficulty."
+msgstr "Scegli la difficoltà di ogni bot."
+
+msgid "Choose exactly %d resources to discard."
+msgstr "Scegli esattamente %d risorse da scartare."
+
+msgid "Choose half your resources to return to the bank."
+msgstr "Scegli metà delle tue risorse da restituire alla banca, arrotondando per difetto."
+
+msgid "Choose one of your settlements to upgrade to a city."
+msgstr "Scegli una delle tue colonie da trasformare in città."
+
+msgid "Choose the language used on this computer."
+msgstr "Scegli la lingua da usare su questo computer."
+
+msgid "Choose two different resources."
+msgstr "Scegli due risorse diverse."
+
+msgid "Choose two resources."
+msgstr "Scegli due risorse."
+
+msgid "Cinematic depth of field"
+msgstr "Profondità di campo"
+
+msgid "Citadel"
+msgstr "Cittadella"
+
+msgid "City"
+msgstr "Città"
+
+msgid "Classic · 19 hexes"
+msgstr "Classico · 19 esagoni"
+
+msgid "Click Roll dice. This practice roll will produce resources beside one of your settlements. A settlement collects 1 resource, a city 2. Everyone collects on every player's roll, not just their own turn."
+msgstr "Clicca su Tira i dadi. Questo tiro di prova produrrà risorse accanto a una tua colonia. Una colonia raccoglie 1 risorsa, una città 2. Tutti raccolgono a ogni tiro, anche nei turni degli altri."
+
+msgid "Click a different hex to move the robber. Its hex stops producing. You may then steal one random resource from a neighboring opponent. Rolling 7 also makes everyone holding more than 7 cards choose half to discard."
+msgstr "Clicca su un altro esagono per spostare il brigante. Quell’esagono smette di produrre. Puoi poi rubare una risorsa casuale a un avversario vicino. Quando esce 7, chi ha più di 7 risorse ne scarta metà, arrotondando per difetto."
+
+msgid "Click a glowing corner to place a settlement. Adjacent numbered hexes supply your resources. 6 and 8 produce often; varied terrain gives you more options. Keep at least two edges between settlements."
+msgstr "Clicca su un vertice illuminato per posizionare una colonia. Gli esagoni numerati adiacenti forniscono risorse. Il 6 e l’8 escono spesso; terreni diversi ti danno più possibilità. Lascia almeno due lati tra le colonie."
+
+msgid "Click a glowing edge beside your settlement to place a road. Roads connect your future buildings. Opening placements are free; later roads cost 1 timber + 1 brick. Everyone places twice, reversing order for the second round."
+msgstr "Clicca su un lato illuminato accanto alla colonia per posizionare una strada. Le strade collegano i tuoi futuri edifici. I piazzamenti iniziali sono gratuiti; poi ogni strada costa 1 legno e 1 argilla. Tutti piazzano due volte, invertendo l’ordine nel secondo giro."
+
+msgid "Close"
+msgstr "Chiudi"
+
+msgid "Connect your settlement"
+msgstr "Collega la tua colonia"
+
+msgid "Connecting to the island…"
+msgstr "Connessione in corso…"
+
+msgid "Connection failed. Check the address, UDP port and firewall."
+msgstr "Connessione non riuscita. Controlla indirizzo, porta UDP e firewall."
+
+msgid "Connection lost. Use Reconnect to return to your seat if the server is still running."
+msgstr "Connessione persa. Usa Riconnetti per tornare al tuo posto se il server è ancora attivo."
+
+msgid "Connection lost. Use Reconnect to return to your seat."
+msgstr "Connessione persa. Usa Riconnetti per tornare al tuo posto."
+
+msgid "Continue"
+msgstr "Continua"
+
+msgid "Continue  →"
+msgstr "Continua  →"
+
+msgid "Control drifting pollen, chimney smoke and atmospheric motes. Reduced motion also disables animated effects."
+msgstr "Regola polline, fumo dei camini e particelle nell’aria. Movimento ridotto disattiva anche gli effetti animati."
+
+msgid "Control foliage sway and wind-driven wave motion. Reduced motion overrides animated movement."
+msgstr "Regola l’oscillazione delle piante e le onde mosse dal vento. Movimento ridotto disattiva queste animazioni."
+
+msgid "Control grass, ferns, wheat detail and flowers. Trees and resource-identifying landmarks remain visible."
+msgstr "Regola erba, felci, dettagli del grano e fiori. Gli alberi e gli elementi che identificano le risorse restano visibili."
+
+msgid "Controls"
+msgstr "Comandi"
+
+msgid "Copy invite"
+msgstr "Copia invito"
+
+msgid "Cosmetics"
+msgstr "Personalizzazione"
+
+msgid "Could not host on UDP 24567. Another server may be running."
+msgstr "Impossibile aprire la stanza sulla porta UDP 24567. Potrebbe esserci già un altro server attivo."
+
+msgid "Could not reconnect: check the saved server address."
+msgstr "Riconnessione non riuscita. Controlla l’indirizzo del server salvato."
+
+msgid "Could not start the updater. Check free space and folder permissions."
+msgstr "Impossibile avviare l’aggiornamento. Controlla spazio libero e permessi della cartella."
+
+msgid "Create room"
+msgstr "Crea stanza"
+
+msgid "Custom"
+msgstr "Personalizzata"
+
+msgid "Delta"
+msgstr "Incrementale"
+
+msgid "Dense"
+msgstr "Fitta"
+
+msgid "Development cards"
+msgstr "Carte sviluppo"
+
+msgid "Disabled"
+msgstr "Disattivato"
+
+msgid "Discard"
+msgstr "Scarta"
+
+msgid "Discard %d"
+msgstr "Scarta %d"
+
+msgid "Discard selected resources"
+msgstr "Scarta risorse selezionate"
+
+msgid "Dismiss"
+msgstr "Chiudi"
+
+msgid "Display"
+msgstr "Schermo"
+
+msgid "Done"
+msgstr "Fatto"
+
+msgid "Download update"
+msgstr "Scarica aggiornamento"
+
+msgid "Downloading update…"
+msgstr "Download aggiornamento…"
+
+msgid "Drag the preview to turn the pieces"
+msgstr "Trascina l’anteprima per ruotare le pedine"
+
+msgid "During a paired turn, trades are only available with the bank."
+msgstr "Durante un turno abbinato puoi scambiare solo con la banca."
+
+msgid "Easy"
+msgstr "Facile"
+
+msgid "End"
+msgstr "Fine turno"
+
+msgid "English"
+msgstr "English"
+
+msgid "Enter your public address first, or use Map router."
+msgstr "Inserisci prima il tuo indirizzo pubblico, oppure usa Configura router."
+
+msgid "Equipped"
+msgstr "In uso"
+
+msgid "Exit to desktop"
+msgstr "Esci dal gioco"
+
+msgid "Expedition"
+msgstr "Spedizione"
+
+msgid "Exposure"
+msgstr "Esposizione"
+
+msgid "FSR sharpens the world when rendering below 100%. It is spatial upscaling, without frame generation."
+msgstr "FSR rende più nitido il mondo con una scala inferiore al 100%. Usa upscaling spaziale, senza generare fotogrammi."
+
+msgid "Fast"
+msgstr "Rapida"
+
+msgid "Fill the current display. Window size is used only in windowed mode."
+msgstr "Occupa tutto lo schermo. Le dimensioni della finestra si applicano solo in modalità finestra."
+
+msgid "Find a home"
+msgstr "Scegli dove stabilirti"
+
+msgid "Finish roads"
+msgstr "Termina strade"
+
+msgid "Follow the current tutorial step, or choose Skip lesson."
+msgstr "Completa il passaggio della lezione, oppure scegli Salta."
+
+msgid "Frame limit"
+msgstr "Limite fotogrammi"
+
+msgid "Free roads"
+msgstr "Strade gratuite"
+
+msgid "Full"
+msgstr "Completo"
+
+msgid "Fullscreen"
+msgstr "Schermo intero"
+
+msgid "GPU workload increases with resolution"
+msgstr "Il carico sulla GPU aumenta con la risoluzione"
+
+msgid "GRAPHICS"
+msgstr "GRAFICA"
+
+msgid "GUIDED PRACTICE"
+msgstr "ESERCITAZIONE GUIDATA"
+
+msgid "Game log"
+msgstr "Registro partita"
+
+msgid "Game paused while a disconnected player reconnects."
+msgstr "Partita in pausa in attesa che un giocatore si riconnetta."
+
+msgid "Game updates"
+msgstr "Aggiornamenti del gioco"
+
+msgid "Gameplay"
+msgstr "Gioco"
+
+msgid "Gently soften scenery beyond the camera focus distance. Off keeps the whole board sharp for play. Focus a tile with F for close inspection."
+msgstr "Sfuma il paesaggio oltre la distanza di messa a fuoco. Se disattivata, tutto il tabellone resta nitido. Premi F su una tessera per osservarla da vicino."
+
+msgid "Geometry and shadow cost"
+msgstr "Costo di geometria e ombre"
+
+msgid "Give"
+msgstr "Dai"
+
+msgid "Global illumination"
+msgstr "Illuminazione globale"
+
+msgid "Grain"
+msgstr "Grano"
+
+msgid "Graphics"
+msgstr "Grafica"
+
+msgid "Graphics preset"
+msgstr "Qualità grafica"
+
+msgid "Grow a city"
+msgstr "Costruisci una città"
+
+msgid "Guide"
+msgstr "Guida"
+
+msgid "HUMAN · HOST"
+msgstr "GIOCATORE · HOST"
+
+msgid "Harbor"
+msgstr "Porto"
+
+msgid "Hard"
+msgstr "Difficile"
+
+msgid "Harp, flute and the first light on the harbor"
+msgstr "Arpa, flauto e la prima luce sul porto"
+
+msgid "High"
+msgstr "Alta"
+
+msgid "High GPU and memory impact"
+msgstr "Impatto elevato su GPU e memoria"
+
+msgid "High GPU impact"
+msgstr "Impatto elevato sulla GPU"
+
+msgid "High · 2048 px"
+msgstr "Alta · 2048 px"
+
+msgid "High · 4K"
+msgstr "Alta · 4K"
+
+msgid "Host"
+msgstr "Ospita"
+
+msgid "I'm ready"
+msgstr "Sono pronto"
+
+msgid "In return for:"
+msgstr "In cambio di:"
+
+msgid "Incompatible multiplayer versions. Host: %s (protocol %d). Yours: %s (protocol %d). Check for updates from the main menu."
+msgstr "Versioni multigiocatore incompatibili. Host: %s (protocollo %d). Tu: %s (protocollo %d). Cerca aggiornamenti dal menu principale."
+
+msgid "Increase smaller interface labels for readability. Menus scroll when necessary."
+msgstr "Ingrandisce i testi più piccoli per facilitarne la lettura. I menu scorrono quando serve."
+
+msgid "Inspect board (H)"
+msgstr "Osserva tabellone (H)"
+
+msgid "Installed: %s · Multiplayer protocol %d"
+msgstr "Versione installata: %s · Protocollo multigiocatore %d"
+
+msgid "Invite address: "
+msgstr "Indirizzo invito: "
+
+msgid "Invite friends"
+msgstr "Invita amici"
+
+msgid "It is another player’s turn. You can act when yours begins."
+msgstr "È il turno di un altro giocatore. Potrai agire quando inizierà il tuo."
+
+msgid "Italiano"
+msgstr "Italiano"
+
+msgid "Join"
+msgstr "Entra"
+
+msgid "Join room"
+msgstr "Entra nella stanza"
+
+msgid "Joining room soundtrack…"
+msgstr "Sincronizzazione della musica…"
+
+msgid "Keep terrain, roof and timber textures clear when viewed at an angle."
+msgstr "Mantiene nitide le texture di terreno, tetti e legno viste di sbieco."
+
+msgid "Knight"
+msgstr "Cavaliere"
+
+msgid "LESSON %d / %d"
+msgstr "LEZIONE %d / %d"
+
+msgid "Language"
+msgstr "Lingua"
+
+msgid "Larger small text"
+msgstr "Testo piccolo ingrandito"
+
+msgid "Last roll: %d"
+msgstr "Ultimo tiro: %d"
+
+msgid "Later"
+msgstr "Più tardi"
+
+msgid "Learn by building."
+msgstr "Impara costruendo."
+
+msgid "Learn to play"
+msgstr "Impara a giocare"
+
+msgid "Leave game"
+msgstr "Lascia partita"
+
+msgid "Leave the current room before restarting to update."
+msgstr "Lascia la stanza prima di riavviare per aggiornare."
+
+msgid "Leave the expedition?"
+msgstr "Vuoi lasciare la partita?"
+
+msgid "Leave this solo expedition?"
+msgstr "Vuoi lasciare questa partita in solitaria?"
+
+msgid "Leaving pauses this match for the other players.\nIf you host, the room will close."
+msgstr "Se esci, la partita resta in pausa per gli altri.\nSe sei l’host, la stanza verrà chiusa."
+
+msgid "Let the island provide"
+msgstr "Raccogli le risorse"
+
+msgid "Lighting"
+msgstr "Illuminazione"
+
+msgid "Limit rendering to reduce GPU load and power use. Does not change game rules or bot speed."
+msgstr "Limita i fotogrammi per ridurre il carico sulla GPU e i consumi. Non modifica le regole o la velocità dei bot."
+
+msgid "Log cabins, leafy roofs and a treehouse tower. A home among the trees."
+msgstr "Capanne di tronchi, tetti di foglie e una torre sull’albero. Una casa tra gli alberi."
+
+msgid "Longest road length"
+msgstr "Lunghezza strada più lunga"
+
+msgid "Low"
+msgstr "Bassa"
+
+msgid "Low GPU impact"
+msgstr "Impatto ridotto sulla GPU"
+
+msgid "Low to moderate GPU impact"
+msgstr "Impatto basso o moderato sulla GPU"
+
+msgid "Low · 1K"
+msgstr "Bassa · 1K"
+
+msgid "Low · 512 px"
+msgstr "Bassa · 512 px"
+
+msgid "MSAA 8× has a high GPU cost"
+msgstr "MSAA 8× richiede molte risorse della GPU"
+
+msgid "MSAA smooths geometry edges. FXAA is inexpensive. TAA also reduces vegetation shimmer but can soften moving details. Interface text remains sharp."
+msgstr "MSAA smussa i bordi dei modelli. FXAA è leggero. TAA riduce anche lo sfarfallio della vegetazione, ma può sfumare i dettagli in movimento. Il testo resta nitido."
+
+msgid "Map router"
+msgstr "Configura router"
+
+msgid "Master volume"
+msgstr "Volume generale"
+
+msgid "Medium"
+msgstr "Media"
+
+msgid "Medium · 1024 px"
+msgstr "Media · 1024 px"
+
+msgid "Medium · 2K"
+msgstr "Media · 2K"
+
+msgid "Meet the robber"
+msgstr "Conosci il brigante"
+
+msgid "Model detail"
+msgstr "Dettaglio modelli"
+
+msgid "Moderate GPU impact"
+msgstr "Impatto moderato sulla GPU"
+
+msgid "Moderate to high GPU impact"
+msgstr "Impatto medio o elevato sulla GPU"
+
+msgid "Monopoly"
+msgstr "Monopolio"
+
+msgid "Move the robber and steal a resource."
+msgstr "Sposta il brigante e ruba una risorsa."
+
+msgid "Move the robber to a different hex."
+msgstr "Sposta il brigante su un altro esagono."
+
+msgid "Move the robber to a hex"
+msgstr "Sposta il brigante su un esagono"
+
+msgid "Music"
+msgstr "Musica"
+
+msgid "Mute music for you"
+msgstr "Disattiva la tua musica"
+
+msgid "NOT READY"
+msgstr "NON PRONTO"
+
+msgid "Negligible"
+msgstr "Trascurabile"
+
+msgid "Next track"
+msgstr "Brano successivo"
+
+msgid "No development cards remain."
+msgstr "Le carte sviluppo sono esaurite."
+
+msgid "No legal space to build a %s."
+msgstr "Non ci sono posizioni valide per costruire: %s."
+
+msgid "No published update is available yet."
+msgstr "Non sono ancora disponibili aggiornamenti pubblicati."
+
+msgid "Normal"
+msgstr "Normale"
+
+msgid "Not ready"
+msgstr "Non pronto"
+
+msgid "Nylon strings, marimba and gentle percussion"
+msgstr "Chitarra classica, marimba e percussioni leggere"
+
+msgid "Ocean ambience"
+msgstr "Suoni dell’oceano"
+
+msgid "Off"
+msgstr "Disattivato"
+
+msgid "Offer a trade to the other players"
+msgstr "Proponi uno scambio agli altri giocatori"
+
+msgid "Offer and request different resources."
+msgstr "Offri e richiedi risorse diverse."
+
+msgid "Offer to all players"
+msgstr "Proponi a tutti i giocatori"
+
+msgid "Online"
+msgstr "Online"
+
+msgid "Online room"
+msgstr "Stanza online"
+
+msgid "Open Development cards and play the supplied Knight. Knights move the robber and build your army. Other cards grant roads, resources, a monopoly or hidden points. Newly bought action cards wait a turn; play only one per turn."
+msgstr "Apri Carte sviluppo e gioca il Cavaliere fornito. I cavalieri spostano il brigante e rafforzano il tuo esercito. Le altre carte danno strade, risorse, un monopolio o punti nascosti. Le carte azione appena comprate si giocano dal turno successivo, al massimo una per turno."
+
+msgid "Open Trade resources and exchange with the bank. Usually 4 of one resource buys 1 of another. A 3:1 harbor improves every trade; a 2:1 harbor improves its pictured resource. In a real game you can also offer a trade to other players."
+msgstr "Apri Scambia ed effettua uno scambio con la banca. Di solito servono 4 risorse uguali per riceverne 1 diversa. Un porto 3:1 migliora tutti gli scambi; un porto 2:1 migliora quelli della risorsa raffigurata. In partita puoi anche proporre scambi agli altri giocatori."
+
+msgid "Open room · no password"
+msgstr "Stanza aperta · senza password"
+
+msgid "Open seat"
+msgstr "Posto libero"
+
+msgid "Ore"
+msgstr "Minerale"
+
+msgid "Original instrumental music · automatically plays through all five tracks."
+msgstr "Musica strumentale originale · riproduce automaticamente tutti e cinque i brani."
+
+msgid "Other players can accept your offer. You can withdraw it to make a new one."
+msgstr "Gli altri giocatori possono accettare la tua offerta. Puoi ritirarla per proporne una nuova."
+
+msgid "Overall volume, including music, effects and ocean ambience."
+msgstr "Volume generale, inclusi musica, effetti e suoni dell’oceano."
+
+msgid "Paired turn"
+msgstr "Turno abbinato"
+
+msgid "Paired turns allow building, cards and bank trading."
+msgstr "Nei turni abbinati puoi costruire, giocare carte e scambiare con la banca."
+
+msgid "Particle effects"
+msgstr "Effetti particellari"
+
+msgid "Password required to join"
+msgstr "Password richiesta per entrare"
+
+msgid "Paste secure invite from host"
+msgstr "Incolla l’invito sicuro dell’host"
+
+msgid "Paste the complete secure invite from the host (Copy invite)."
+msgstr "Incolla l’invito sicuro completo ottenuto dall’host con Copia invito."
+
+msgid "Paste the complete secure invite from the host."
+msgstr "Incolla l’invito sicuro completo ricevuto dall’host."
+
+msgid "Pause soundtrack"
+msgstr "Metti in pausa la musica"
+
+msgid "Paused · "
+msgstr "In pausa · "
+
+msgid "Performance overlay"
+msgstr "Mostra prestazioni"
+
+msgid "Piece cosmetics"
+msgstr "Aspetto delle pedine"
+
+msgid "Pizzicato strings, woodwinds and a lilting waltz"
+msgstr "Archi pizzicati, fiati e un valzer leggero"
+
+msgid "Place a road beside your new settlement."
+msgstr "Posiziona una strada accanto alla tua nuova colonia."
+
+msgid "Place a settlement"
+msgstr "Posiziona una colonia"
+
+msgid "Place an adjoining road"
+msgstr "Posiziona una strada accanto alla colonia"
+
+msgid "Place up to two connected roads for free."
+msgstr "Posiziona fino a due strade collegate gratuitamente."
+
+msgid "Play a development card"
+msgstr "Gioca una carta sviluppo"
+
+msgid "Play card"
+msgstr "Gioca carta"
+
+msgid "Play online"
+msgstr "Gioca online"
+
+msgid "Play solo"
+msgstr "Gioca da solo"
+
+msgid "Play solo  →"
+msgstr "Gioca da solo  →"
+
+msgid "Played knights"
+msgstr "Cavalieri giocati"
+
+msgid "Player appearance"
+msgstr "Aspetto del giocatore"
+
+msgid "Player color"
+msgstr "Colore del giocatore"
+
+msgid "Players"
+msgstr "Giocatori"
+
+msgid "Playing"
+msgstr "Sta giocando"
+
+msgid "Plenty"
+msgstr "Abbondanza"
+
+msgid "Power / smoothness"
+msgstr "Consumi e fluidità"
+
+msgid "Practice"
+msgstr "Esercitazione"
+
+msgid "Practice lesson: "
+msgstr "Lezione di prova: "
+
+msgid "Practice lesson: %s"
+msgstr "Lezione di prova: %s"
+
+msgid "Practice resources are provided. Click City, then one of your settlements. An upgrade costs 2 grain + 3 ore, is worth 2 points in total, and doubles its production. New settlements cost timber, brick, wool and grain, and must connect to your road."
+msgstr "Hai già le risorse per esercitarti. Clicca su Città, poi su una tua colonia. La trasformazione costa 2 grano e 3 minerali, vale 2 punti totali e raddoppia la produzione. Le nuove colonie costano legno, argilla, lana e grano e devono collegarsi alla tua strada."
+
+msgid "Preparing update…"
+msgstr "Preparazione aggiornamento…"
+
+msgid "Preview and equip your roads, settlements and cities"
+msgstr "Scegli colore e aspetto di strade, colonie e città"
+
+msgid "Previous"
+msgstr "Precedente"
+
+msgid "Previous track / restart"
+msgstr "Brano precedente / ricomincia"
+
+msgid "Public address:24567"
+msgstr "Indirizzo pubblico:24567"
+
+msgid "Reach 10 victory points by building settlements and cities. Resources come from the land around them. This guided expedition lets you try each core action, with a fresh practice board for later lessons."
+msgstr "Raggiungi 10 punti vittoria costruendo colonie e città. Le risorse arrivano dai terreni circostanti. Queste lezioni ti fanno provare le azioni principali, con un nuovo tabellone di prova per le lezioni successive."
+
+msgid "Ready"
+msgstr "Pronto"
+
+msgid "Ready to play"
+msgstr "Pronti a giocare"
+
+msgid "Receive"
+msgstr "Ricevi"
+
+msgid "Reconnect"
+msgstr "Riconnetti"
+
+msgid "Reduced motion"
+msgstr "Movimento ridotto"
+
+msgid "Reflect visible scenery on water and shiny surfaces. Screen-space reflections cannot include objects outside the camera view; sky reflection fills those regions."
+msgstr "Riflette la scena visibile su acqua e superfici lucide. I riflessi nello spazio schermo escludono gli oggetti fuori dall’inquadratura; in quelle zone viene riflesso il cielo."
+
+msgid "Reflections"
+msgstr "Riflessi"
+
+msgid "Relaxed"
+msgstr "Tranquilla"
+
+msgid "Remove bot"
+msgstr "Rimuovi bot"
+
+msgid "Render the world below or above native resolution. Interface text stays at native resolution. 100% is native; 150% supersamples fine detail."
+msgstr "Disegna il mondo a una risoluzione inferiore o superiore a quella nativa. Il testo resta alla risoluzione nativa. 100% è la risoluzione nativa; 150% migliora i dettagli più fini."
+
+msgid "Resources"
+msgstr "Risorse"
+
+msgid "Restart to update"
+msgstr "Riavvia e aggiorna"
+
+msgid "Restore defaults"
+msgstr "Ripristina predefiniti"
+
+msgid "Resume soundtrack"
+msgstr "Riprendi la musica"
+
+msgid "Retry"
+msgstr "Riprova"
+
+msgid "Return exactly %d resources to the bank."
+msgstr "Restituisci esattamente %d risorse alla banca."
+
+msgid "Right-drag to orbit · Scroll to zoom · H / Esc to return"
+msgstr "Trascina col destro per ruotare · Rotella per lo zoom · H / Esc per tornare"
+
+msgid "Road"
+msgstr "Strada"
+
+msgid "Road · Settlement · City"
+msgstr "Strada · Colonia · Città"
+
+msgid "Roads"
+msgstr "Strade"
+
+msgid "Robber"
+msgstr "Brigante"
+
+msgid "Roll"
+msgstr "Tira"
+
+msgid "Roll dice"
+msgstr "Tira i dadi"
+
+msgid "Roll the dice first."
+msgstr "Prima tira i dadi."
+
+msgid "Roll to collect resources"
+msgstr "Tira i dadi per raccogliere risorse"
+
+msgid "Room password (if required)"
+msgstr "Password della stanza (se richiesta)"
+
+msgid "Router mapped for 1 hour. Invite address: %s:%d"
+msgstr "Router configurato per un’ora. Indirizzo da condividere: %s:%d"
+
+msgid "SDFGI has a high GPU cost"
+msgstr "SDFGI richiede molte risorse della GPU"
+
+msgid "SDFGI · High"
+msgstr "SDFGI · Alta"
+
+msgid "SDFGI · Medium"
+msgstr "SDFGI · Media"
+
+msgid "Saved automatically"
+msgstr "Salvataggio automatico"
+
+msgid "Screen-space bounce"
+msgstr "Rimbalzi nello spazio schermo"
+
+msgid "Screen-space indirect lighting adds nearby bounced light. SDFGI traces a world-space distance field for broader indirect lighting. SDFGI may take a moment to converge after a change."
+msgstr "L’illuminazione indiretta nello spazio schermo aggiunge luce riflessa vicina. SDFGI calcola la luce indiretta su aree più ampie del mondo. Dopo una modifica può richiedere qualche istante per stabilizzarsi."
+
+msgid "Screen-space · High"
+msgstr "Spazio schermo · Alta"
+
+msgid "Screen-space · Low"
+msgstr "Spazio schermo · Bassa"
+
+msgid "Secure connection failed."
+msgstr "Non è stato possibile stabilire una connessione sicura. Chiedi all’host un nuovo invito."
+
+msgid "Secure connection failed. Check the invite, host availability and UDP port."
+msgstr "Connessione sicura non riuscita. Controlla l’invito, che l’host sia online e che la porta UDP sia aperta."
+
+msgid "Secure invite copied. Share it with your guests."
+msgstr "Invito sicuro copiato. Condividilo con gli altri giocatori."
+
+msgid "Set a room password (optional)"
+msgstr "Password della stanza (facoltativa)"
+
+msgid "Settings"
+msgstr "Impostazioni"
+
+msgid "Settlement"
+msgstr "Colonia"
+
+msgid "Settlements give 1 point; cities give 2. The longest continuous road (at least 5) and largest army (at least 3 knights) give 2 each. Hidden point cards also count. Reach 10 on your turn to win. End turn when you finish building and trading."
+msgstr "Le colonie valgono 1 punto, le città 2. La strada continua più lunga, di almeno 5 tratti, e l’esercito più grande, di almeno 3 cavalieri, valgono 2 punti ciascuno. Contano anche le carte punto nascoste. Raggiungi 10 punti nel tuo turno per vincere. Premi Fine turno quando hai finito di costruire e scambiare."
+
+msgid "Setup"
+msgstr "Preparazione"
+
+msgid "Shadow quality"
+msgstr "Qualità ombre"
+
+msgid "Share it with your players. Leave blank for an open room."
+msgstr "Condividila con i giocatori. Lascia vuoto per una stanza senza password."
+
+msgid "Share the secure invite. Host: open UDP 24567."
+msgstr "Condividi l’invito sicuro. L’host deve aprire la porta UDP 24567."
+
+msgid "Shared with the room · "
+msgstr "Musica della stanza · "
+
+msgid "Show the live frame rate and rendering statistics during gameplay."
+msgstr "Mostra i fotogrammi al secondo e le statistiche grafiche durante la partita."
+
+msgid "Size of the game window. Fullscreen uses your desktop resolution; render scale controls 3D resolution independently."
+msgstr "Dimensioni della finestra di gioco. A schermo intero viene usata la risoluzione del desktop. La scala di rendering regola separatamente la risoluzione 3D."
+
+msgid "Skip"
+msgstr "Salta"
+
+msgid "Sky only"
+msgstr "Solo cielo"
+
+msgid "Soft piano, glass bells and evening strings"
+msgstr "Pianoforte delicato, campane di vetro e archi serali"
+
+msgid "Solo game"
+msgstr "Partita in solitaria"
+
+msgid "Some lighting features require Forward+. Restart using the default renderer to enable them."
+msgstr "Alcuni effetti di luce richiedono Forward+. Riavvia con il renderer predefinito per attivarli."
+
+msgid "Sound effects"
+msgstr "Effetti sonori"
+
+msgid "Sparse"
+msgstr "Scarsa"
+
+msgid "Start game"
+msgstr "Inizia partita"
+
+msgid "Stay"
+msgstr "Resta"
+
+msgid "Steal"
+msgstr "Ruba"
+
+msgid "Steal: "
+msgstr "Ruba a: "
+
+msgid "Stilt houses, dock roads and a lantern tower. Built for life beside the sea."
+msgstr "Palafitte, strade sul molo e una torre con lanterna. Per vivere vicino al mare."
+
+msgid "Stop wind, waves, scenery movement, particles and construction animations while retaining all gameplay actions."
+msgstr "Ferma vento, onde, paesaggio, particelle e animazioni di costruzione. Tutte le azioni di gioco restano disponibili."
+
+msgid "Subtle light bleed from bright reflections and highlights. Does not blur interface text."
+msgstr "Aggiunge un lieve bagliore ai riflessi e alle zone luminose. Non sfoca il testo."
+
+msgid "Synchronize frame presentation with the display to prevent tearing. The frame limit can cap rendering below its refresh rate."
+msgstr "Sincronizza i fotogrammi con lo schermo per evitare immagini spezzate. Il limite fotogrammi può ridurre la frequenza al di sotto di quella dello schermo."
+
+msgid "Take one resource type from every player."
+msgstr "Prendi tutte le risorse di un tipo da ogni giocatore."
+
+msgid "Take two resources from the bank."
+msgstr "Prendi due risorse dalla banca."
+
+msgid "Texture resolution"
+msgstr "Risoluzione texture"
+
+msgid "The bank has no %s left. Choose a different resource."
+msgstr "La banca ha esaurito %s. Scegli un’altra risorsa."
+
+msgid "The bank has none of that resource."
+msgstr "La banca ha esaurito questa risorsa."
+
+msgid "The bank has only %d %s. Choose a different resource."
+msgstr "La banca ha solo %d %s. Scegli un’altra risorsa."
+
+msgid "The expedition is complete."
+msgstr "La partita è finita."
+
+msgid "The game has finished."
+msgstr "La partita è finita."
+
+msgid "The host controls playback. Your volume is personal."
+msgstr "L’host controlla la riproduzione. Il volume è personale."
+
+msgid "The host controls room playback"
+msgstr "L’host controlla la riproduzione della stanza"
+
+msgid "The island awaits. Place your first settlement."
+msgstr "Posiziona la tua prima colonia per iniziare."
+
+msgid "The paired player may trade only with the bank."
+msgstr "Nel turno abbinato puoi scambiare solo con la banca."
+
+msgid "The password is incorrect."
+msgstr "La password non è corretta."
+
+msgid "The player making this offer no longer has the resources. Ask them for a new offer."
+msgstr "Chi ha proposto lo scambio non ha più le risorse necessarie. Chiedi una nuova offerta."
+
+msgid "The robber approaches"
+msgstr "Scarta le risorse"
+
+msgid "The room host controls the shared soundtrack. Your volume is personal."
+msgstr "L’host controlla la musica della stanza. Puoi regolare il tuo volume."
+
+msgid "The update could not finish. Check your connection, free disk space and folder permissions, then try again."
+msgstr "Impossibile completare l’aggiornamento. Controlla connessione, spazio libero e permessi della cartella, poi riprova."
+
+msgid "The updater could not be started."
+msgstr "Impossibile avviare il programma di aggiornamento."
+
+msgid "The updater stopped. Your installed game has not been changed. Try again."
+msgstr "Il programma di aggiornamento si è interrotto. Il gioco installato non è stato modificato. Riprova."
+
+msgid "This action is unavailable at this stage of the turn."
+msgstr "Questa azione non è disponibile in questa fase del turno."
+
+msgid "This action is unavailable. Please choose an action from the game controls."
+msgstr "Questa azione non è disponibile. Scegli un’azione dai comandi di gioco."
+
+msgid "This game has started. Use Reconnect to return to your saved seat."
+msgstr "La partita è già iniziata. Usa Riconnetti per tornare al tuo posto salvato."
+
+msgid "This offer is no longer available. Wait for a new offer."
+msgstr "Questa offerta non è più disponibile. Aspetta una nuova proposta."
+
+msgid "This room is full. Ask the host to free a seat."
+msgstr "La stanza è piena. Chiedi all’host di liberare un posto."
+
+msgid "Timber"
+msgstr "Legno"
+
+msgid "Timber framing, tiled roofs and brass details. A classic island expedition."
+msgstr "Strutture in legno, tetti di tegole e dettagli in ottone. Lo stile classico dell’isola."
+
+msgid "To build or buy this, you still need %s."
+msgstr "Per questa costruzione o acquisto ti servono ancora %s."
+
+msgid "Tracks"
+msgstr "Brani"
+
+msgid "Trade"
+msgstr "Scambia"
+
+msgid "Trade completed with %s."
+msgstr "Scambio completato con %s."
+
+msgid "Trade for what you need"
+msgstr "Scambia per ottenere ciò che ti serve"
+
+msgid "Trade offer"
+msgstr "Offerta di scambio"
+
+msgid "Trade offer withdrawn."
+msgstr "Offerta di scambio ritirata."
+
+msgid "Turn your plans into victory"
+msgstr "Conquista la vittoria"
+
+msgid "Ultra"
+msgstr "Ultra"
+
+msgid "Ultra favors image quality over frame rate"
+msgstr "Ultra privilegia la qualità rispetto alla fluidità"
+
+msgid "Ultra · 8K"
+msgstr "Ultra · 8K"
+
+msgid "Unavailable during a paired turn"
+msgstr "Non disponibile nel turno abbinato"
+
+msgid "Unlimited"
+msgstr "Illimitato"
+
+msgid "Unmute music for you"
+msgstr "Riattiva la tua musica"
+
+msgid "Update %s is available."
+msgstr "È disponibile l’aggiornamento %s."
+
+msgid "Update %s is ready to install."
+msgstr "L’aggiornamento %s è pronto da installare."
+
+msgid "Update available"
+msgstr "Aggiornamento disponibile"
+
+msgid "Update ready"
+msgstr "Aggiornamento pronto"
+
+msgid "Updates"
+msgstr "Aggiornamenti"
+
+msgid "Updates are verified before installation. Downloads can run in the background."
+msgstr "Gli aggiornamenti vengono verificati prima dell’installazione. Puoi continuare a giocare durante il download."
+
+msgid "Upscaling filter"
+msgstr "Filtro di upscaling"
+
+msgid "Use distance haze to soften distant water and scenery while keeping the board clear."
+msgstr "Usa la foschia per sfumare acqua e paesaggio lontani, mantenendo chiaro il tabellone."
+
+msgid "Use seat color"
+msgstr "Usa colore del posto"
+
+msgid "Useful at reduced render scale"
+msgstr "Utile con scala di rendering ridotta"
+
+msgid "Vegetation density"
+msgstr "Densità vegetazione"
+
+msgid "Verifying and preparing update…"
+msgstr "Verifica e preparazione aggiornamento…"
+
+msgid "Vertical sync"
+msgstr "Sincronizzazione verticale"
+
+msgid "Victory"
+msgstr "Vittoria"
+
+msgid "Victory points"
+msgstr "Punti vittoria"
+
+msgid "Video memory"
+msgstr "Memoria video"
+
+msgid "View offer"
+msgstr "Vedi offerta"
+
+msgid "View update"
+msgstr "Vedi aggiornamento"
+
+msgid "Volume of interface and gameplay cues."
+msgstr "Volume dei suoni dell’interfaccia e delle azioni di gioco."
+
+msgid "Volume of the ocean soundscape."
+msgstr "Volume dei suoni dell’oceano."
+
+msgid "Volume of the original instrumental soundtrack."
+msgstr "Volume della colonna sonora strumentale originale."
+
+msgid "WELL DONE"
+msgstr "BEN FATTO"
+
+msgid "WORLD"
+msgstr "COMANDI"
+
+msgid "Wait for all players to discard."
+msgstr "Aspetta che tutti abbiano scartato le risorse."
+
+msgid "Waiting"
+msgstr "In attesa"
+
+msgid "Waiting for players"
+msgstr "In attesa dei giocatori"
+
+msgid "Waiting for players to discard."
+msgstr "In attesa che i giocatori scartino."
+
+msgid "Watch the island grow. Your turn is coming."
+msgstr "È il turno di un altro giocatore."
+
+msgid "Water detail"
+msgstr "Dettaglio acqua"
+
+msgid "Welcome"
+msgstr "Benvenuto"
+
+msgid "Welcome to your first island"
+msgstr "Benvenuto sulla tua prima isola"
+
+msgid "Wildwood"
+msgstr "Bosco"
+
+msgid "Wind strength"
+msgstr "Intensità vento"
+
+msgid "Window size"
+msgstr "Dimensioni finestra"
+
+msgid "Withdraw offer"
+msgstr "Ritira offerta"
+
+msgid "Wool"
+msgstr "Lana"
+
+msgid "World"
+msgstr "Comandi"
+
+msgid "Year of plenty"
+msgstr "Anno dell’abbondanza"
+
+msgid "You already have a seat in this room."
+msgstr "Hai già un posto in questa stanza."
+
+msgid "You already rolled this turn."
+msgstr "Hai già tirato i dadi in questo turno."
+
+msgid "You are up to date."
+msgstr "Il gioco è aggiornato."
+
+msgid "You bought this card this turn. You can play it on your next turn."
+msgstr "Hai comprato questa carta in questo turno. Potrai giocarla nel prossimo."
+
+msgid "You can only discard resources you have."
+msgstr "Puoi scartare solo le risorse che possiedi."
+
+msgid "You control playback. Everyone keeps their own volume."
+msgstr "Controlli la riproduzione. Ognuno regola il proprio volume."
+
+msgid "You do not have the resources requested."
+msgstr "Ti mancano alcune delle risorse richieste per questo scambio."
+
+msgid "You do not have this development card."
+msgstr "Non possiedi questa carta sviluppo."
+
+msgid "You do not need to discard any resources."
+msgstr "Non devi scartare risorse."
+
+msgid "You have played a development card this turn. You can play another next turn."
+msgstr "Hai già giocato una carta sviluppo in questo turno. Potrai giocarne un’altra nel prossimo."
+
+msgid "You need %d more %s for this bank trade."
+msgstr "Ti servono ancora %d %s per questo scambio con la banca."
+
+msgid "You need %d more %s."
+msgstr "Ti servono ancora %d %s."
+
+msgid "You need %s more to accept this offer."
+msgstr "Ti servono ancora %s per accettare questa offerta."
+
+msgid "You need %s more to make this offer."
+msgstr "Ti servono ancora %s per proporre questo scambio."
+
+msgid "You're ready to set sail"
+msgstr "Sei pronto a giocare"
+
+msgid "Your best port rate: %d:1 · Bank stock: %d"
+msgstr "Miglior rapporto al porto: %d:1 · Scorte banca: %d"
+
+msgid "Your guide to the island"
+msgstr "Guida al gioco"
+
+msgid "Your music volume · does not affect other players"
+msgstr "Il tuo volume musicale · non modifica quello degli altri"
+
+msgid "Your name"
+msgstr "Il tuo nome"
+
+msgid "Your pieces"
+msgstr "Le tue pedine"
+
+msgid "Your resources"
+msgstr "Le tue risorse"
+
+msgid "Your room"
+msgstr "La tua stanza"
+
+msgid "Your seat is unavailable. Please reconnect to the game."
+msgstr "Il tuo posto non è disponibile. Riconnettiti alla partita."
+
+msgid "Your soundtrack · choose a track or let the playlist continue."
+msgstr "La tua musica · scegli un brano o lascia proseguire la playlist."
+
+msgid "Your trade offer: %s for %s."
+msgstr "La tua offerta: %s in cambio di %s."
+
+msgid "Your turn"
+msgstr "È il tuo turno"
+
+msgid "buy card"
+msgstr "acquisto carta"
+
+msgid "city"
+msgstr "città"
+
+msgid "corner"
+msgstr "vertice"
+
+msgid "edge"
+msgstr "lato"
+
+msgid "road"
+msgstr "strada"
+
+msgid "settlement"
+msgstr "colonia"
+
+msgid "%s: %s."
+msgstr "%s: %s."
+
+msgid "You"
+msgstr "Tu"
+
+msgid "Player"
+msgstr "Giocatore"
+
+msgid "To build a road, you still need %s."
+msgstr "Per costruire una strada ti servono ancora %s."
+
+msgid "To build a settlement, you still need %s."
+msgstr "Per costruire una colonia ti servono ancora %s."
+
+msgid "To upgrade to a city, you still need %s."
+msgstr "Per trasformare la colonia in città ti servono ancora %s."
+
+msgid "To buy a development card, you still need %s."
+msgstr "Per comprare una carta sviluppo ti servono ancora %s."

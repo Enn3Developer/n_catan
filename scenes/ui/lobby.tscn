@@ -35,7 +35,7 @@ size_flags_horizontal = 3
 [node name="LobbyCosmetics" type="Button" parent="Frame/Header"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Piece cosmetics"
+text = "Player appearance"
 custom_minimum_size = Vector2(0, 40)
 
 [node name="LobbySettings" type="Button" parent="Frame/Header"]

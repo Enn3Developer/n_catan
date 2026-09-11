@@ -94,10 +94,18 @@ autowrap_mode = 3
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-[node name="Performance" type="Label" parent="SettingsPanel/Body/Columns/Help"]
+[node name="Status" type="HBoxContainer" parent="SettingsPanel/Body"]
+layout_mode = 2
+theme_override_constants/separation = 16
+[node name="Performance" type="Label" parent="SettingsPanel/Body/Status"]
 unique_name_in_owner = true
 layout_mode = 2
 text = ""
+theme_override_font_sizes/font_size = 14
+
+[node name="Version" type="Label" parent="SettingsPanel/Body/Status"]
+unique_name_in_owner = true
+layout_mode = 2
 theme_override_font_sizes/font_size = 14
 
 [node name="Buttons" type="HBoxContainer" parent="SettingsPanel/Body"]

@@ -51,7 +51,7 @@ func load_lesson(net: CatanNetwork,pname: String):
 				net.rules.s.bank[res]-=amount
 			if step==6: net.rules.s.phase="robber"
 			if step==7: net.rules.s.players[0].cards[0]=1
-	net.rules._log("Practice lesson: "+current().title)
+	net.rules._log(CatanI18n.message("Practice lesson: %s",[CatanI18n.term(current().title)]))
 	net._sync()
 func observe(action: Dictionary,net: CatanNetwork):
 	if str(action.get("type",""))==current().action:

@@ -2,6 +2,7 @@ extends Control
 signal preferences_changed
 signal close_requested
 const OPTIONS=[
+	["World","Language","language","Language","option",["English","Italiano"],"Choose the language used on this computer.","Accessibility"],
 	["Display","Fullscreen","fullscreen","Fullscreen","toggle",[],"Fill the current display. Window size is used only in windowed mode.","Display"],
 	["Display","WindowSize","window_size","Window size","option",["1280 × 720","1440 × 900","1920 × 1080","2560 × 1440","3840 × 2160"],"Size of the game window. Fullscreen uses your desktop resolution; render scale controls 3D resolution independently.","GPU workload increases with resolution"],
 	["Display","VSync","vsync","Vertical sync","toggle",[],"Synchronize frame presentation with the display to prevent tearing. The frame limit can cap rendering below its refresh rate.","Can add input latency"],
@@ -49,6 +50,7 @@ func _layout():
 	if is_instance_valid(find_child("Help",true,false)):find_child("Help",true,false).visible=size.x>=1160
 
 func setup(settings: CatanSettings):
+	%Version.text=CatanBuildInfo.VERSION
 	preferences=settings
 	for title in ["Graphics","World","Audio"]:
 		var scroll=ScrollContainer.new()
@@ -82,7 +84,7 @@ func setup(settings: CatanSettings):
 	%ResetSettings.pressed.connect(func():preferences.reset();refresh();preferences_changed.emit())
 	refresh()
 	select_tab(last_tab)
-	_help(OPTIONS[7])
+	_help(OPTIONS[8])
 
 func _add_control(parent: Node,spec: Array):
 	var panel=PanelContainer.new()
@@ -144,6 +146,7 @@ func _add_control(parent: Node,spec: Array):
 func _change(spec: Array,value: Variant):
 	if updating:return
 	preferences.set_value(spec[2],value)
+	if spec[2]=="language":CatanI18n.apply(int(value))
 	refresh()
 	preferences_changed.emit()
 
@@ -163,8 +166,8 @@ func refresh():
 	controls.anti_aliasing.set_item_disabled(5,not forward)
 	for key in ["global_illumination","ambient_occlusion","reflections","depth_of_field"]:
 		controls[key].set("disabled",not forward)
-	%RendererInfo.text="FORWARD+ / VULKAN" if forward else "COMPATIBILITY / LIMITED LIGHTING"
-	%SettingsNote.text="Saved automatically" if forward else "Some lighting features require Forward+. Restart using the default renderer to enable them."
+	%RendererInfo.text="FORWARD+ / VULKAN" if forward else tr("COMPATIBILITY / LIMITED LIGHTING")
+	%SettingsNote.text=tr("Saved automatically") if forward else tr("Some lighting features require Forward+. Restart using the default renderer to enable them.")
 	updating=false
 
 func select_tab(title: String):
@@ -182,4 +185,4 @@ func _process(delta):
 	stats_clock-=delta
 	if stats_clock>0:return
 	stats_clock=.5
-	%Performance.text="%d FPS\n%.1f ms / frame\n%.0f MB video memory" % [Engine.get_frames_per_second(),1000.0/maxf(1,Engine.get_frames_per_second()),Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED)/1048576.0]
+	%Performance.text=tr("%d FPS · %.1f ms / frame · %.0f MB VRAM") % [Engine.get_frames_per_second(),1000.0/maxf(1,Engine.get_frames_per_second()),Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED)/1048576.0]

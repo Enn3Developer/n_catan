@@ -17,6 +17,7 @@ var dedicated=false
 var online=false
 var my_name="Voyager"
 var my_style=0
+var my_color=""
 var room_password=""
 var room_certificate: X509Certificate
 var pending_connection: ENetConnection
@@ -93,7 +94,7 @@ func host(pname: String,password: String="",server_only: bool=false) -> Error:
 	seat_tokens={}
 	reconnect_token=""
 	if not dedicated:
-		roster=[{"id":1,"name":pname,"ready":false,"connected":true,"bot":false,"piece_style":my_style}]
+		roster=[{"id":1,"name":pname,"ready":false,"connected":true,"bot":false,"piece_style":my_style,"color":my_color}]
 		seat=0
 	changed.emit()
 	return OK
@@ -178,14 +179,14 @@ func leave():
 	changed.emit()
 
 func _connected():
-	_register.rpc_id(1,my_name,room_password,PROTOCOL,reconnect_token,my_style,CatanBuildInfo.VERSION)
+	_register.rpc_id(1,my_name,room_password,PROTOCOL,reconnect_token,my_style,CatanBuildInfo.VERSION,my_color)
 
 @rpc("any_peer","call_remote","reliable")
-func _register(pname: String,password: String,version: int,token: String="",piece_style: int=0,client_version: String="unknown"):
+func _register(pname: String,password: String,version: int,token: String="",piece_style: int=0,client_version: String="unknown",player_color: String=""):
 	if not online or not multiplayer.is_server(): return
 	var id=multiplayer.get_remote_sender_id()
 	if version!=PROTOCOL:
-		_registration_failed.rpc_id(id,"Incompatible multiplayer versions. Host: %s (protocol %d). Yours: %s (protocol %d). Check for updates from the main menu." % [CatanBuildInfo.VERSION,PROTOCOL,client_version.substr(0,40),version])
+		_registration_failed.rpc_id(id,CatanI18n.message("Incompatible multiplayer versions. Host: %s (protocol %d). Yours: %s (protocol %d). Check for updates from the main menu.",[CatanBuildInfo.VERSION,PROTOCOL,client_version.substr(0,40),version]))
 		return
 	if started and version==PROTOCOL and password==room_password and not token.is_empty():
 		for p in roster.size():
@@ -196,16 +197,16 @@ func _register(pname: String,password: String,version: int,token: String="",piec
 				roster[p].connected=true
 				if old_id!=id and old_id in multiplayer.get_peers():multiplayer.multiplayer_peer.disconnect_peer(old_id)
 				_session.rpc_id(id,token)
-				rules._log("%s reconnected. The expedition continues." % roster[p].name)
+				rules._log(CatanI18n.message("%s reconnected. The expedition continues.",[roster[p].name]))
 				_broadcast_lobby()
 				_sync()
 				return
 	if version!=PROTOCOL or password!=room_password or started or roster.size()>=MAX_PLAYERS or _seat_for(id)!=-1:
-		_registration_failed.rpc_id(id,"Could not join: check the password and game version. An active game requires the saved reconnect seat.")
+		_registration_failed.rpc_id(id,"The password is incorrect." if password!=room_password else "This game has started. Use Reconnect to return to your saved seat." if started else "This room is full. Ask the host to free a seat." if roster.size()>=MAX_PLAYERS else "You already have a seat in this room.")
 		return
 	pname=pname.strip_edges().replace("\n"," ").substr(0,20)
 	if pname.is_empty(): pname="Voyager"
-	roster.append({"id":id,"name":pname,"ready":false,"connected":true,"bot":false,"piece_style":piece_style if CatanCosmetics.valid_set(piece_style) else 0})
+	roster.append({"id":id,"name":pname,"ready":false,"connected":true,"bot":false,"piece_style":piece_style if CatanCosmetics.valid_set(piece_style) else 0,"color":player_color if valid_color(player_color) else ""})
 	var session_token=Crypto.new().generate_random_bytes(24).hex_encode()
 	seat_tokens[roster.size()-1]=session_token
 	_session.rpc_id(id,session_token)
@@ -325,6 +326,8 @@ func _sync():
 		if not roster[p].connected or roster[p].get("bot",false): continue
 		var state=rules.snapshot(p)
 		state["world_seconds"]=world_seconds
+		state["player_colors"]=[]
+		for row in roster:state.player_colors.append(str(row.get("color","")))
 		state["piece_styles"]=[]
 		for row in roster:state.piece_styles.append(int(row.get("piece_style",0)))
 		if roster[p].id==1: received.emit(state)
@@ -353,7 +356,7 @@ func _disconnected(id: int):
 	if p<0: return
 	if started:
 		roster[p].connected=false
-		rules._log("%s disconnected. The game is paused." % roster[p].name)
+		rules._log(CatanI18n.message("%s disconnected. The game is paused.",[roster[p].name]))
 		_sync()
 	else:
 		roster.remove_at(p)
@@ -391,7 +394,7 @@ func host_solo(pname: String):
 	solo=true
 	dedicated=false
 	seat=0
-	roster=[{"id":1,"name":pname,"ready":true,"connected":true,"bot":false,"piece_style":my_style}]
+	roster=[{"id":1,"name":pname,"ready":true,"connected":true,"bot":false,"piece_style":my_style,"color":my_color}]
 	changed.emit()
 
 func is_controller() -> bool:
@@ -562,3 +565,33 @@ func _accept_music(sample: Dictionary,latency: float):
 		if sample.revision==music_remote.revision and sample.server_ms<music_remote.server_ms:return
 	music_remote=CatanSoundtrack.advance(sample,latency)
 	music_received_ms=Time.get_ticks_msec()
+
+static func valid_color(value: String) -> bool:
+	return value.is_empty() or (value.length()==6 and Color.html_is_valid(value))
+
+func player_color(player: int) -> Color:
+	var value=str(roster[player].get("color","")) if player>=0 and player<roster.size() else my_color
+	return Color(value) if not value.is_empty() and valid_color(value) else CatanBoard.PLAYERS[clampi(player,0,5)]
+
+func choose_color(value: String,target: int=-1):
+	if not valid_color(value):return
+	if target<0:target=seat
+	if not online or target<0:
+		my_color=value
+		return
+	if multiplayer.is_server():_set_color(1,target,value)
+	else:_color_request.rpc_id(1,target,value)
+
+@rpc("any_peer","call_remote","reliable")
+func _color_request(target: int,value: String):
+	if online and multiplayer.is_server():_set_color(multiplayer.get_remote_sender_id(),target,value)
+
+func _set_color(sender: int,target: int,value: String):
+	if target<0 or target>=roster.size() or not valid_color(value):return
+	var own=_seat_for(sender)
+	var controller=sender==1 or (dedicated and own==0)
+	if target!=own and not (controller and roster[target].get("bot",false)):return
+	roster[target]["color"]=value.to_lower()
+	if target==seat:my_color=value.to_lower()
+	_broadcast_lobby()
+	if started:_sync()
