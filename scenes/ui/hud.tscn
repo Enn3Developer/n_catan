@@ -17,27 +17,14 @@ offset_left = 16.0
 offset_top = 12.0
 offset_right = -16.0
 offset_bottom = 66.0
-[node name="TopBody" type="VBoxContainer" parent="Top"]
+[node name="TopBody" type="BoxContainer" parent="Top"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Players" type="Control" parent="."]
+[node name="PlayersBody" type="HFlowContainer" parent="Top/TopBody"]
 unique_name_in_owner = true
-layout_mode = 1
-anchor_right = 1.0
-offset_left = 16.0
-offset_top = 76.0
-offset_right = -16.0
-offset_bottom = 122.0
-mouse_filter = 2
-[node name="PlayersBody" type="HFlowContainer" parent="Players"]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/h_separation = 6
 theme_override_constants/v_separation = 6
 [node name="Bottom" type="PanelContainer" parent="."]
@@ -63,14 +50,6 @@ theme_override_constants/separation = 4
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-[node name="Instruction" type="Label" parent="Bottom/BottomBody/Hand"]
-unique_name_in_owner = true
-layout_mode = 2
-text = ""
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 15
-size_flags_horizontal = 3
-autowrap_mode = 3
 [node name="ActionsBody" type="HFlowContainer" parent="Bottom/BottomBody"]
 unique_name_in_owner = true
 layout_mode = 2

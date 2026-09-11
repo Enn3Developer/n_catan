@@ -1502,3 +1502,6 @@ msgstr "To buy a development card, you still need %s."
 
 msgid "Build, trade and make yourself at home."
 msgstr "Build, trade and make yourself at home."
+
+msgid "%d cards left in deck."
+msgstr "%d cards left in deck."

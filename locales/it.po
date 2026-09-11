@@ -1502,3 +1502,6 @@ msgstr "Per comprare una carta sviluppo ti servono ancora %s."
 
 msgid "Build, trade and make yourself at home."
 msgstr "Costruisci, commercia e sentiti a casa."
+
+msgid "%d cards left in deck."
+msgstr "%d carte rimaste nel mazzo."

@@ -398,18 +398,15 @@ func _process(delta):
 func _hud():
 	_clear("res://scenes/ui/hud.tscn")
 	screen.visible=not inspection_mode
+	var tools_column=BoxContainer.new()
+	tools_column.vertical=true
+	tools_column.alignment=BoxContainer.ALIGNMENT_CENTER
+	tools_column.size_flags_vertical=Control.SIZE_SHRINK_CENTER
+	tools_column.name="HUDTools"
+	_node("TopBody").add_child(tools_column)
 	var row=HBoxContainer.new()
-	_node("TopBody").add_child(row)
-	_label(row,"CATAN",23,GOLD)
-	var turn=state.players[state.turn]
-	var turn_label=_label(row,turn.name+" · "+(tr("Your turn") if state.turn==net.seat else tr("Playing")),16,board.player_color(state.turn))
-	turn_label.name="TurnLabel"
-	turn_label.add_theme_color_override("font_outline_color",INK)
-	turn_label.add_theme_constant_override("outline_size",2)
-	turn_label.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	turn_label.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
-	var phase=_label(row,tr("Paired turn") if state.get("paired",false) else _phase_text(),14,MUTED)
-	phase.name="PhaseLabel"
+	row.alignment=BoxContainer.ALIGNMENT_END
+	tools_column.add_child(row)
 	for action in [["inspect",tr("Inspect board (H)"),_toggle_inspection],["journal",tr("Game log"),_journal],["help","Guide",_help],["music","Music",_open_music],["settings","Settings",_open_settings],["leave",tr("Leave game"),_confirm_leave]]:
 		var button=_button(row,"",action[2])
 		button.custom_minimum_size=Vector2(44,40)
@@ -423,33 +420,36 @@ func _hud():
 		var score=scoring.visible_points(i)
 		var chip=PanelContainer.new()
 		chip.name="PlayerChip%d" % i
-		var style=_style(Color("f8e8c6"),8)
+		var style=_style(Color("8c522d",0.07) if i==state.turn else Color.TRANSPARENT,0)
 		style.content_margin_left=10;style.content_margin_right=10
-		style.set_border_width_all(1)
-		style.border_color=net.player_color(i) if i==state.turn else Color("bba17a")
+		style.content_margin_top=6;style.content_margin_bottom=6
+		style.shadow_size=0
+		style.set_border_width_all(0)
+		if i==state.turn:style.border_width_bottom=2
+		elif i<state.players.size()-1:style.border_width_right=1
+		style.border_color=net.player_color(i) if i==state.turn else Color("ac8654",0.35)
 		chip.add_theme_stylebox_override("panel",style)
 		chip.tooltip_text=tr("%s%s\n%d points · %d resources · %d development cards\nRoad length %d · %d knights%s%s") % [player.name,tr(" (you)") if i==net.seat else "",score,player.resource_count,player.card_count,player.road_length,player.knights,tr("\nLongest road +2") if state.longest==i else "",tr("\nLargest army +2") if state.army==i else ""]
 		players.add_child(chip)
-		var column=VBoxContainer.new();chip.add_child(column)
-		var line=HBoxContainer.new();line.add_theme_constant_override("separation",5);column.add_child(line)
-		var name_label=_label(line,player.name,14,net.player_color(i),false)
+		var column=BoxContainer.new();column.name="PlayerContent";column.vertical=true;chip.add_child(column)
+		var line=BoxContainer.new();line.name="PlayerName";line.add_theme_constant_override("separation",5);column.add_child(line)
+		var name_label=_label(line,player.name,16,net.player_color(i),false)
+		name_label.add_theme_font_override("font",HEADING_FONT)
 		name_label.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		name_label.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
 		name_label.mouse_filter=Control.MOUSE_FILTER_IGNORE
 		name_label.add_theme_color_override("font_outline_color",INK)
-		name_label.add_theme_constant_override("outline_size",2)
+		name_label.add_theme_constant_override("outline_size",0)
+		if i==state.turn:_label(line,tr("Your turn") if i==net.seat else tr("Playing"),14,MUTED)
 		var hidden_points=player.cards[4]+player.new_cards[4] if player.cards.size()==5 else 0
 		chip.tooltip_text+=tr("\n%d public points + %d victory-point cards = %d total") % [player.points,hidden_points,score] if player.cards.size()==5 else tr("\nVictory-point cards stay private until game end.")
-		var stats=HFlowContainer.new();stats.add_theme_constant_override("h_separation",6);column.add_child(stats)
+		var stats=HBoxContainer.new();stats.name="PlayerStats";stats.add_theme_constant_override("separation",10);column.add_child(stats)
 		for stat in [["star",score,tr("Victory points")],["hand",player.resource_count,"Resources"],["cards",player.card_count,tr("Development cards")],["road",player.road_length,tr("Longest road length")],["knight",player.knights,tr("Played knights")]]:
-			var badge=HBoxContainer.new();badge.tooltip_text=tr(stat[2])+": "+str(stat[1]);stats.add_child(badge)
+			var badge=HBoxContainer.new();badge.add_theme_constant_override("separation",4);badge.tooltip_text=tr(stat[2])+": "+str(stat[1]);stats.add_child(badge)
 			if stat[0]=="star":badge.tooltip_text=chip.tooltip_text
-			CatanIcons.icon(badge,stat[0],16).modulate=INK
-			_label(badge,str(stat[1]),14).mouse_filter=Control.MOUSE_FILTER_IGNORE
+			CatanIcons.icon(badge,stat[0],24)
+			_label(badge,str(stat[1]),16).mouse_filter=Control.MOUSE_FILTER_IGNORE
 	var right=_node("ActionsBody")
-	var instruction=_node("Instruction")
-	instruction.text=_instruction()
-	instruction.tooltip_text=tr("Paired turns allow building, cards and bank trading.") if state.get("paired",false) else ""
 	var mine=state.turn==net.seat and state.winner==-1
 	var play=mine and state.phase=="play"
 	var roll=_button(right,tr("Roll") if state.dice[0]==0 else "%d + %d" % state.dice,func():net.act({"type":"roll"}),true)
@@ -459,23 +459,19 @@ func _hud():
 	CatanIcons.button_icon(roll,"dice")
 	var rules=CatanRules.new();rules.s=state
 	for kind in ["road","settlement","city"]:
-		var action=VBoxContainer.new()
-		action.add_theme_constant_override("separation",2)
-		right.add_child(action)
-		var button=_button(action,kind.capitalize(),func():_choose(kind))
+		var button=_button(right,kind.capitalize(),func():_choose(kind))
+		button.set_script(preload("res://scripts/build_cost_button.gd"))
+		button.cost=CatanRules.COST[kind].duplicate()
+		for resource in 5:button.missing.append(maxi(0,button.cost[resource]-state.players[net.seat].hand[resource]))
 		button.name=kind.capitalize()+"Action"
 		button.toggle_mode=true;button.button_pressed=mode==kind
-		button.tooltip_text=tr(kind.capitalize())+": "+_resource_text(CatanRules.COST[kind])
+		button.tooltip_text=tr(kind.capitalize())
 		CatanIcons.button_icon(button,kind,20)
 		var sites=rules.build_sites(net.seat,kind)
 		button.disabled=not play or not state.rolled or not rules.can_pay(net.seat,CatanRules.COST[kind]) or sites.is_empty()
 		if rules.pieces(net.seat,kind)>={"road":15,"settlement":5,"city":4}[kind]:
-			button.tooltip_text+="\n"+tr({"road":"All 15 of your roads are on the board. You have none left to place.","settlement":"All 5 of your settlements are on the board. Upgrade one to a city to free a settlement piece.","city":"All 4 of your cities are on the board. You have none left to place."}[kind])
-		elif not rules.can_pay(net.seat,CatanRules.COST[kind]):
-			button.tooltip_text+="\n"+CatanI18n.render(rules.cost_error(net.seat,kind))
-		elif sites.is_empty():button.tooltip_text+="\n"+tr("No legal space to build a %s.") % tr(kind)
-		var cost=CatanIcons.resources(action,CatanRules.COST[kind],18)
-		cost.alignment=BoxContainer.ALIGNMENT_CENTER
+			button.unavailable_reason=tr({"road":"All 15 of your roads are on the board. You have none left to place.","settlement":"All 5 of your settlements are on the board. Upgrade one to a city to free a settlement piece.","city":"All 4 of your cities are on the board. You have none left to place."}[kind])
+		elif rules.can_pay(net.seat,CatanRules.COST[kind]) and sites.is_empty():button.unavailable_reason=tr("No legal space to build a %s.") % tr(kind)
 	var trade=_button(right,"Trade",_trade);trade.name="TradeAction";CatanIcons.button_icon(trade,"trade")
 	trade.disabled=not play or not state.rolled
 	_card_section(play)
@@ -490,6 +486,7 @@ func _hud():
 	resources.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
 	_node("Bottom").minimum_size_changed.connect(_queue_layout)
 	players.minimum_size_changed.connect(_queue_layout)
+	_node("Top").minimum_size_changed.connect(_queue_layout)
 	if state.winner!=-1:
 		var box=_dialog("Victory")
 		_label(box,state.players[state.winner].name+tr(" wins!"),30,GOLD)
@@ -832,9 +829,11 @@ func _card_section(play: bool):
 	buy.name="BuyCard";CatanIcons.button_icon(buy,"cards",18)
 	var rules=CatanRules.new();rules.s=state
 	buy.disabled=not play or not state.rolled or not rules.can_pay(net.seat,CatanRules.COST.buy_card) or state.deck_count==0
-	buy.tooltip_text=tr("Buy development card: 1 wool, 1 grain, 1 ore. %d left in deck.") % state.deck_count
-	if state.deck_count==0:buy.tooltip_text+="\n"+tr("No development cards remain.")
-	elif not rules.can_pay(net.seat,CatanRules.COST.buy_card):buy.tooltip_text+="\n"+CatanI18n.render(rules.cost_error(net.seat,"buy_card"))
+	buy.set_script(preload("res://scripts/build_cost_button.gd"))
+	buy.cost=CatanRules.COST.buy_card.duplicate()
+	for resource in 5:buy.missing.append(maxi(0,buy.cost[resource]-player.hand[resource]))
+	buy.tooltip_text=tr("Buy card")
+	buy.unavailable_reason=tr("No development cards remain.") if state.deck_count==0 else tr("%d cards left in deck.") % state.deck_count
 	var names=["Knight","Roads","Plenty","Monopoly","Victory"]
 	var tips=[tr("Move the robber and steal a resource."),tr("Build two roads for free."),tr("Take two resources from the bank."),tr("Take one resource type from every player."),tr("Already included in your score; never needs to be played.")]
 	for i in 5:
@@ -1098,16 +1097,30 @@ func _layout_screen():
 		panel.offset_bottom=(fixed_height+scroll_height)*.5
 		board.view_region=Rect2(minf(410,width*.42),24,maxf(300,width-430),height-48)
 	elif screen.name=="GameHUD":
-		_node("PhaseLabel").visible=width>=1120
+		var top_body=_node("TopBody")
+		top_body.vertical=width<1100
+		var tools_box=_node("HUDTools")
+		tools_box.vertical=not top_body.vertical
 		var players=_node("PlayersBody")
-		for chip in players.get_children():chip.custom_minimum_size.x=minf(180,(width-32-(state.players.size()-1)*6)/state.players.size())
+		for chip in players.get_children():
+			var content=chip.get_node("PlayerContent")
+			content.vertical=not top_body.vertical
+			var player_name=content.get_node("PlayerName")
+			player_name.vertical=top_body.vertical
+			player_name.custom_minimum_size.x=80 if top_body.vertical else 0
+			player_name.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+			content.get_node("PlayerStats").add_theme_constant_override("separation",6 if top_body.vertical else 10)
+		var available=width-64
+		if not top_body.vertical:available-=_node("HUDTools").get_combined_minimum_size().x+8
+		var columns=maxi(1,mini(state.players.size(),int((available+6)/286)))
+		for chip in players.get_children():chip.custom_minimum_size.x=floorf((available-(columns-1)*6)/columns)
 		var bottom=_node("Bottom")
 		bottom.offset_left=16
 		bottom.offset_right=-16
-		var bottom_height=maxf(116,bottom.get_combined_minimum_size().y)
+		var bottom_height=bottom.get_combined_minimum_size().y
 		bottom.offset_top=-12-bottom_height
-		_node("Players").offset_bottom=76+players.get_combined_minimum_size().y
-		var top=maxf(132,76+players.get_combined_minimum_size().y+10)
+		_node("Top").offset_bottom=12+_node("Top").get_combined_minimum_size().y
+		var top=_node("Top").offset_bottom+10
 		if guide!=null and is_instance_valid(tutorial_panel):
 			top=tutorial_panel.find_child("LessonPanel",true,false).get_global_rect().end.y+10
 		notifications.offset_top=top
