@@ -226,7 +226,6 @@ func _home():
 	if not net.reconnect_token.is_empty():
 		address_field.text=net.reconnect_address
 		password_field.text=net.reconnect_password
-		_node("ShowOnline").button_pressed=true
 		_online_mode(false)
 
 func _online_mode(hosting: bool):
