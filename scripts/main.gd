@@ -8,6 +8,7 @@ const HEADING_FONT=preload("res://assets/fonts/NotoSerif-Medium.ttf")
 var net: CatanNetwork
 var board: CatanBoard
 var ui: Control
+var ui_day_night
 var screen: Control
 var toast: Label
 var modal: Control
@@ -82,6 +83,9 @@ func _ready():
 	ui.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	ui.theme=_theme()
 	canvas.add_child(ui)
+	ui_day_night=preload("res://scripts/ui_day_night.gd").new()
+	add_child(ui_day_night)
+	ui_day_night.setup(ui)
 	toast=Label.new()
 	toast.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	toast.offset_left=-470
@@ -388,6 +392,8 @@ func _process(delta):
 			_refresh_music_widgets(music_dialog_widgets,soundtrack)
 	if not server_only and is_instance_valid(board) and net.started and not net.paused and net.roster.all(func(player):return player.connected):
 		board.advance_day(delta)
+	if not server_only and is_instance_valid(ui_day_night):
+		ui_day_night.advance(board.daylight,delta)
 
 func _hud():
 	_clear("res://scenes/ui/hud.tscn")
