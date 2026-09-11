@@ -16,7 +16,7 @@ func run():
 	await create_timer(.4).timeout
 	check(player.music.playing and player.music.get_playback_position()<1,"music wraps cleanly")
 	check(player.ambience.playing and player.ambience.get_playback_position()<1,"ambience wraps cleanly")
-	player.queue_free()
+	player.queue_free();await create_timer(.2).timeout
 	await process_frame
 	print("AUDIO_TEST: 10 checks, ",failures," failures")
 	quit(1 if failures else 0)

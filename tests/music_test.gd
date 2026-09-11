@@ -33,5 +33,5 @@ func run():
 	player.follow_soundtrack({"track":4,"position":14.0,"paused":false},1.0)
 	await create_timer(.1).timeout
 	check(player.seek_count>0 and player.audible_position()>13.5,"large drift seeks to room position")
-	player.queue_free();await process_frame;await process_frame
+	player.queue_free();await create_timer(.2).timeout;await process_frame;await process_frame
 	print("MUSIC_TEST: ",checks," checks, ",failures," failures");quit(1 if failures else 0)

@@ -13,9 +13,11 @@ func run():
 		check(game.modal.tabs.Graphics.is_ancestor_of(game.modal.controls[key]),"graphics group "+key)
 	game._close_modal()
 	var board=game.board
-	check(is_equal_approx(board.TILE_SIZE*2,20),"20 metre hex diameter")
+	check(is_equal_approx(board.TILE_SIZE*2,50),"50 metre hex diameter")
 	check(board.actors.size()>40,"populated resource tiles")
-	var actor=board.actors[0]
+	var actor=board.actors.filter(func(entry):return entry.type=="sheep")[0]
+	actor.phase=0.0
+	board.living_world.animate([actor],0,board.art)
 	var start=actor.root.position
 	board.living_world.animate(board.actors,5,board.art)
 	check(actor.root.position.distance_to(start)>.001,"actors walk")
@@ -36,8 +38,8 @@ func run():
 		board.camera_focus=Vector3.ZERO;board.camera_zoom=.8;board._update_camera()
 		await create_timer(1).timeout;await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png("/tmp/catan-living-overview.png")
-		var vertex=data.vertices[5];board.camera_focus=Vector3(vertex.x*10,2.5,vertex.z*10);board.camera_zoom=.15;board._update_camera()
+		var vertex=data.vertices[5];board.camera_focus=Vector3(vertex.x*board.TILE_SIZE,.25*board.TILE_SIZE,vertex.z*board.TILE_SIZE);board.camera_zoom=.15;board._update_camera()
 		await create_timer(.5).timeout;await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png("/tmp/catan-living-city.png")
-	game.queue_free();await process_frame
+	game.queue_free();await create_timer(.2).timeout;await process_frame
 	print("LIVING_WORLD_TEST: ",failures," failures");quit(1 if failures else 0)

@@ -66,5 +66,5 @@ func run():
 	game._close_modal();game._help();await shot("guide")
 	game._close_modal();game.preferences.set_value("language",0);game._apply_preferences();await process_frame;await process_frame
 	check(TranslationServer.get_locale().begins_with("en"),"can switch back to English during match")
-	game.net.leave();game.queue_free();await process_frame;await process_frame
+	game.net.leave();game.queue_free();await create_timer(.2).timeout;await process_frame;await process_frame
 	print("LOCALIZATION_APPEARANCE_TEST: ",checks," checks, ",failures," failures");quit(1 if failures else 0)

@@ -48,6 +48,6 @@ func run():
 			if traffic.grid.is_point_solid(traffic.cell_for(p)):grounded=true
 	check(not grounded,"extended island routes avoid obstacles")
 	check(traffic.fleet.all(func(ship):return ship.visits>0),"all boats visit ports on six-player island")
-	game.queue_free();await process_frame;await process_frame
+	game.queue_free();await create_timer(.2).timeout;await process_frame;await process_frame
 	print("SEA_TRAFFIC_TEST: ",checks," checks, ",failures," failures, visited ",destinations.size()," ports")
 	quit(1 if failures else 0)

@@ -82,7 +82,7 @@ func run():
 	game.net.leave();game._tutorial_start()
 	for dimensions in [Vector2i(800,600),Vector2i(1440,900)]:
 		surface.size=dimensions;await create_timer(.3).timeout;await settle();inspect_layout(game.tutorial_panel,"tutorial "+str(dimensions));await shot("tutorial-%d" % dimensions.x)
-	game.net.leave();game.queue_free();await process_frame
+	game.net.leave();game.queue_free();await create_timer(.2).timeout;await process_frame
 	surface.queue_free();await process_frame
 	print("LAYOUT_TEST: ",checks," checks, ",failures," failures")
 	quit(1 if failures else 0)

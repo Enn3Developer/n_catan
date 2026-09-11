@@ -32,5 +32,5 @@ func run():
 	check(r.s.players[0].hand[0]==before[0]-2 and r.s.players[0].hand[1]==1,"bank click exchanges displayed quantities")
 	game._close_modal();r.s.paired=true;game.net._sync();game._trade()
 	check(button("Players").disabled,"paired turn prevents player offers")
-	game._close_modal();game.net.leave();game.queue_free();await process_frame
+	game._close_modal();game.net.leave();game.queue_free();await create_timer(.2).timeout;await process_frame
 	print("TRADE_UI_TEST: ",checks," checks, ",failures," failures");quit(1 if failures else 0)

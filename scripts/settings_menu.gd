@@ -161,7 +161,8 @@ func refresh():
 			control.set_value_no_signal(value*spec[5][3])
 			var label=find_child(spec[1]+"Value",true,false)
 			label.text="%.1f×" % value if spec[2]=="camera_speed" else "%d%%" % (value*100)
-	controls.window_size.disabled=preferences.values.fullscreen
+	controls.fullscreen.disabled=CatanSettings.embedded_window()
+	controls.window_size.disabled=preferences.values.fullscreen or CatanSettings.embedded_window()
 	var forward=RenderingServer.get_current_rendering_method()=="forward_plus"
 	controls.anti_aliasing.set_item_disabled(5,not forward)
 	for key in ["global_illumination","ambient_occlusion","reflections","depth_of_field"]:

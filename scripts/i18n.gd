@@ -15,7 +15,7 @@ static func render(value: Variant) -> String:
 			var parts=PackedStringArray()
 			for part in value.list:parts.append(render(part))
 			return ", ".join(parts)
-		var result=TranslationServer.translate(str(value.get("key","")))
+		var result=String(TranslationServer.translate(str(value.get("key",""))))
 		var args=[]
 		for arg in value.get("args",[]):args.append(render(arg) if arg is Dictionary else arg)
 		return result % args if not args.is_empty() else result

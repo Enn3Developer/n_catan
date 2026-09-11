@@ -143,7 +143,7 @@ func run():
 	var migrated=CatanSettings.new("user://legacy.cfg")
 	check(migrated.values.model_quality==0 and migrated.values.global_illumination==0,"legacy preset migration")
 	game.net.leave()
-	game.queue_free()
+	game.queue_free();await create_timer(.2).timeout
 	await process_frame
 	print("GRAPHICS_TEST: ",checks," checks, ",failures," failures")
 	quit(1 if failures else 0)

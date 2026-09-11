@@ -18,8 +18,8 @@ var turn=0.0
 var updating=false
 var color_picker: ColorPickerButton
 
-func label(parent: Node,text: String,size: int,color: Color=Color("493521")) -> Label:
-	var n=Label.new();n.text=tr(text);n.add_theme_font_size_override("font_size",size);n.add_theme_color_override("font_color",color);parent.add_child(n);return n
+func label(parent: Node,text: String,font_size: int,color: Color=Color("493521")) -> Label:
+	var n=Label.new();n.text=tr(text);n.add_theme_font_size_override("font_size",font_size);n.add_theme_color_override("font_color",color);parent.add_child(n);return n
 func button(parent: Node,text: String) -> Button:
 	var n=Button.new();n.text=tr(text);n.custom_minimum_size.y=42;parent.add_child(n);return n
 

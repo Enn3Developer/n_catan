@@ -43,8 +43,10 @@ var notified_updates={}
 var turn_banner: Label
 var turn_banner_timer: Timer
 var active_language=-1
+var quitting=false
 
 func _ready():
+	get_tree().auto_accept_quit=false
 	CatanI18n.apply(preferences.values.language)
 	active_language=preferences.values.language
 	net=$Network
@@ -152,10 +154,10 @@ func _clear(scene_path: String=""):
 	if is_instance_valid(notifications):ui.move_child(notifications,ui.get_child_count()-1)
 	_queue_layout()
 
-func _label(parent: Node,text: String,size: int=16,color: Color=INK,translate: bool=true) -> Label:
+func _label(parent: Node,text: String,size: int=16,color: Color=INK,translate_text: bool=true) -> Label:
 	var node=Label.new()
-	node.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED if not translate else Node.AUTO_TRANSLATE_MODE_INHERIT
-	node.text=CatanI18n.render(text) if translate else text
+	node.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED if not translate_text else Node.AUTO_TRANSLATE_MODE_INHERIT
+	node.text=CatanI18n.render(text) if translate_text else text
 	node.set_meta("base_font_size",size)
 	node.add_theme_font_size_override("font_size",maxi(size,16 if preferences.values.large_text else 14))
 	node.add_theme_color_override("font_color",color)
@@ -562,11 +564,11 @@ func _open_music():
 func _refresh_music_widgets(widgets: Dictionary,sample: Dictionary):
 	if widgets.is_empty() or not is_instance_valid(widgets.get("root")):return
 	var track=CatanSoundtrack.TRACKS[int(sample.track)]
-	var ready=sample.get("ready",true)
-	widgets.title.text=(tr("Paused · ") if sample.paused else "")+track.title if ready else tr("Joining room soundtrack…")
+	var playback_ready=sample.get("ready",true)
+	widgets.title.text=(tr("Paused · ") if sample.paused else "")+track.title if playback_ready else tr("Joining room soundtrack…")
 	widgets.title.tooltip_text=track.title+" · "+tr(track.mood)
 	widgets.clock.text=CatanSoundtrack.time_text(sample.position)+" / "+CatanSoundtrack.time_text(track.duration)
-	var controller=net.can_control_music() and ready
+	var controller=net.can_control_music() and playback_ready
 	for key in ["previous","toggle","next"]:
 		widgets[key].disabled=not controller
 	CatanIcons.button_icon(widgets.toggle,"play" if sample.paused else "pause",18)
@@ -762,12 +764,12 @@ func _trade_notifications(previous: Dictionary,previous_offer: Dictionary,fresh:
 	if offer.is_empty():notifications.dismiss("trade")
 	if not offer.is_empty() and (fresh or offer!=previous_offer or changed and event.get("kind","")=="offered"):
 		var sender=int(offer.from)
-		var message=tr("%s offers %s for %s.") % [state.players[sender].name,_resource_text(offer.give),_resource_text(offer.receive)]
-		if sender==net.seat:message=tr("Your trade offer: %s for %s.") % [_resource_text(offer.give),_resource_text(offer.receive)]
+		var offer_message=tr("%s offers %s for %s.") % [state.players[sender].name,_resource_text(offer.give),_resource_text(offer.receive)]
+		if sender==net.seat:offer_message=tr("Your trade offer: %s for %s.") % [_resource_text(offer.give),_resource_text(offer.receive)]
 		else:
 			var rules=CatanRules.new();rules.s=state
-			if not rules.can_pay(net.seat,offer.receive):message+=tr(" You don't have the requested resources.")
-		notifications.show_notice("trade",message,tr("View offer"),_view_offer)
+			if not rules.can_pay(net.seat,offer.receive):offer_message+=tr(" You don't have the requested resources.")
+		notifications.show_notice("trade",offer_message,tr("View offer"),_view_offer)
 	if fresh or not changed:return
 	var actor=int(event.actor)
 	var message=""
@@ -859,15 +861,15 @@ func _card_section(play: bool):
 		var effect=_label(face,tr(effects[i]),13,Color("44574b"));effect.name="CardEffect"
 		effect.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;effect.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 		var space=Control.new();space.size_flags_vertical=Control.SIZE_EXPAND_FILL;face.add_child(space)
-		var ready=player.cards[i]>0 and not state.card_played and play
-		var status=tr("Victory points") if i==4 else (tr("Ready") if ready else (tr("Next turn") if player.cards[i]==0 else tr("Waiting")))
+		var card_ready=player.cards[i]>0 and not state.card_played and play
+		var status=tr("Victory points") if i==4 else (tr("Ready") if card_ready else (tr("Next turn") if player.cards[i]==0 else tr("Waiting")))
 		var caption=_label(face,status,14,Color("44574b"));caption.name="CardStatus";caption.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 		for child in face.find_children("*","Control",true,false):child.mouse_filter=Control.MOUSE_FILTER_IGNORE
 		b.mouse_entered.connect(func():_card_preview(b,true))
 		b.mouse_exited.connect(func():_card_preview(b,false))
 		b.focus_entered.connect(func():_card_preview(b,true))
 		b.focus_exited.connect(func():_card_preview(b,false))
-		b.tooltip_text=tips[i]+tr("\n%d ready · %d bought this turn") % [player.cards[i],player.new_cards[i]]
+		b.tooltip_text=tips[i]+tr("\n%d card_ready · %d bought this turn") % [player.cards[i],player.new_cards[i]]
 		b.disabled=i==4 or not play or player.cards[i]==0 or state.card_played
 		if i<4 and player.new_cards[i]>0:b.tooltip_text+=tr("\nNew action cards become playable next turn.")
 		if i<4 and state.card_played:b.tooltip_text+=tr("\nYou have already played an action card this turn.")
@@ -897,7 +899,7 @@ func _card_preview(card: Button,expanded: bool):
 	var rest: Rect2=card.get_meta("hand_rect")
 	card.z_index=2 if expanded else 0
 	card.position=rest.position+Vector2(-12 if expanded else 0,0)
-	card.size=Vector2(rest.size.x,180 if expanded else rest.size.y)
+	card.size=Vector2(rest.size.x,180.0 if expanded else rest.size.y)
 	if expanded:card.position.y=minf(card.position.y,card.get_parent().size.y-card.size.y)
 	card.find_child("CardEffect",true,false).visible=card.size.y>=140
 	card.find_child("CardStatus",true,false).visible=card.size.y>=110
@@ -1083,7 +1085,7 @@ func _layout_screen():
 		var panel=_node("Expedition")
 		panel.offset_right=minf(390,width-90)
 		var fixed_height=panel.get_theme_stylebox("panel").get_minimum_size().y+30
-		for name in ["Brand","Title","MenuNote"]:fixed_height+=_node(name).get_combined_minimum_size().y
+		for header_name in ["Brand","Title","MenuNote"]:fixed_height+=_node(header_name).get_combined_minimum_size().y
 		var scroll_height=minf(_node("MenuItems").get_combined_minimum_size().y,height-48-fixed_height)
 		_node("MenuScroll").custom_minimum_size.y=maxf(0,scroll_height)
 		panel.offset_top=-(fixed_height+scroll_height)*.5
@@ -1120,8 +1122,19 @@ func _exit_tree():
 	CatanIcons.textures.clear()
 	CatanMiniature.boxes.clear()
 
+func _notification(what: int):
+	if what==NOTIFICATION_WM_CLOSE_REQUEST:_exit_desktop()
+
 func _exit_desktop():
+	if quitting:return
+	quitting=true
+	set_process(false)
 	net.leave()
+	# Let play commands from this input frame reach the mixer before stopping them.
+	await get_tree().create_timer(.06).timeout
+	if is_instance_valid(audio):audio.shutdown()
+	# Let the audio mixer release queued playback references before engine teardown.
+	await get_tree().create_timer(.15).timeout
 	get_tree().quit()
 
 func _open_updates():

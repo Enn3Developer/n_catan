@@ -44,5 +44,5 @@ func run():
 	check(not game.notifications.cards.has("trade") and "withdrew" in text("trade_result"),"withdrawal removes offer and notifies")
 	game._home()
 	check(not game.notifications.cards.has("trade_result"),"leaving game clears trade alerts")
-	game.net.leave();game.queue_free();await process_frame;await process_frame
+	game.net.leave();game.queue_free();await create_timer(.2).timeout;await process_frame;await process_frame
 	print("NOTIFICATIONS_TEST: ",checks," checks, ",failures," failures");quit(1 if failures else 0)

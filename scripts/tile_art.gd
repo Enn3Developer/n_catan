@@ -69,15 +69,15 @@ func surface(name: String,base: Material,values: Dictionary) -> Material:
 		return leaf
 	var sources={"PBR_Rock":"rock_boulder_dry","PBR_Wood":"weathered_brown_planks","PBR_Bark":"pine_bark","PBR_Clay":"brown_mud_dry","Brick":"brown_mud_dry","Sandstone":"rock_ground","Plaster":"rock_ground","Roof":"weathered_brown_planks"}
 	if sources.has(name):
-		var material=ShaderMaterial.new()
-		material.shader=load("res://shaders/premium_surface.gdshader")
-		bind_maps(material,sources[name],["albedo"])
-		material.set_shader_parameter("tint",SURFACES[name])
-		material.set_shader_parameter("texture_scale",2.0)
-		material.set_shader_parameter("texture_strength",.10)
+		var surface_material=ShaderMaterial.new()
+		surface_material.shader=load("res://shaders/premium_surface.gdshader")
+		bind_maps(surface_material,sources[name],["albedo"])
+		surface_material.set_shader_parameter("tint",SURFACES[name])
+		surface_material.set_shader_parameter("texture_scale",2.0)
+		surface_material.set_shader_parameter("texture_strength",.10)
 
-		materials[name]=material
-		return material
+		materials[name]=surface_material
+		return surface_material
 	var material=base.duplicate() if base else StandardMaterial3D.new()
 	if material is StandardMaterial3D:
 		material.texture_filter=BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC

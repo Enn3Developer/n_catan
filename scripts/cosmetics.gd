@@ -68,7 +68,7 @@ func roof(parent: Node3D,center: Vector3,width: float,depth: float,color: Color)
 		panel.rotation.z=-side*.56
 		for row in 4:
 			for col in 5:
-				var tile=block(parent,center+Vector3(side*(.02+row*width*.12),.075-row*width*.071,-depth*.4+col*depth*.2),Vector3(width*.16,.018,depth*.19),color.lightened(.04 if (row+col)%2==0 else 0))
+				var tile=block(parent,center+Vector3(side*(.02+row*width*.12),.075-row*width*.071,-depth*.4+col*depth*.2),Vector3(width*.16,.018,depth*.19),color.lightened(.04 if (row+col)%2==0 else 0.0))
 				tile.rotation.z=-side*.56
 	beam(parent,center+Vector3(0,.09,-depth*.53),center+Vector3(0,.09,depth*.53),.022,color.darkened(.14))
 
@@ -146,7 +146,7 @@ func settlement(style: int,color: Color,city: bool=false) -> Node3D:
 			block(root,Vector3(0,.19,.12),Vector3(.24,.24,.04),Color("96734c"))
 			for i in 6:
 				var a=i*TAU/6
-				orb(root,Vector3(cos(a)*.105,.36,sin(a)*.11),Vector3(.20,.09,.21),color.darkened(.10 if i%2 else 0))
+				orb(root,Vector3(cos(a)*.105,.36,sin(a)*.11),Vector3(.20,.09,.21),color.darkened(.10 if i%2 else 0.0))
 			orb(root,Vector3(0,.415,0),Vector3(.20,.10,.20),color.lightened(.10))
 			window(root,Vector3(-.07,.22,.146))
 			if city:

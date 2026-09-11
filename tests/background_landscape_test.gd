@@ -23,6 +23,6 @@ func run():
 	board.day_seconds=150;board.advance_day(0);var day=landscape.material.get_shader_parameter("haze_color")
 	board.day_seconds=450;board.advance_day(0);var night=landscape.material.get_shader_parameter("haze_color")
 	check(night.get_luminance()<day.get_luminance(),"background haze darkens at night")
-	game.queue_free();await process_frame;await process_frame
+	game.queue_free();await create_timer(.2).timeout;await process_frame;await process_frame
 	print("BACKGROUND_TEST: ",checks," checks, ",failures," failures, ",vertices," vertices")
 	quit(1 if failures else 0)

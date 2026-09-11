@@ -45,7 +45,7 @@ func run():
 	await shot("trade")
 	game._close_modal()
 	game.net.leave()
-	game.queue_free()
+	game.queue_free();await create_timer(.2).timeout
 	await process_frame
 	print("EXTENSION_UI_TEST: ",failures," failures")
 	quit(1 if failures else 0)

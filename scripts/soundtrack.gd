@@ -20,4 +20,4 @@ static func advance(sample: Dictionary,seconds: float) -> Dictionary:
 	return result
 
 static func time_text(seconds: float) -> String:
-	return "%d:%02d" % [int(seconds)/60,int(seconds)%60]
+	return "%d:%02d" % [int(seconds/60.0),int(seconds)%60]

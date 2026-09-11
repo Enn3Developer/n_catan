@@ -264,7 +264,7 @@ func apply(p: int,a: Dictionary) -> String:
 			if roll==7:
 				for i in s.players.size():
 					var count=total(s.players[i].hand)
-					if count>7: s.discards[str(i)]=int(count/2)
+					if count>7: s.discards[str(i)]=floori(count/2.0)
 				s.phase="discard" if not s.discards.is_empty() else "robber"
 			else: produce(roll)
 		elif action=="play_card":

@@ -20,6 +20,7 @@ var my_style=0
 var my_color=""
 var room_password=""
 var room_certificate: X509Certificate
+var public_certificate=PackedByteArray()
 var pending_connection: ENetConnection
 var pending_id=0
 var connection_deadline=0
@@ -28,7 +29,7 @@ const CERT_NAME="n-catan-room"
 # The public certificate is carried in the invite; the private key stays in memory.
 func secure_invite(address: String) -> String:
 	if room_certificate==null:return reconnect_address
-	return "n-catan://"+address.strip_edges()+"#"+Marshalls.raw_to_base64(room_certificate.save_to_string().to_utf8_buffer())
+	return "n-catan://"+address.strip_edges()+"#"+Marshalls.raw_to_base64(public_certificate)
 
 var last_action={}
 var upnp_thread: Thread
@@ -80,6 +81,17 @@ func host(pname: String,password: String="",server_only: bool=false) -> Error:
 	var key=crypto.generate_rsa(2048)
 	room_certificate=crypto.generate_self_signed_certificate(key,"CN="+CERT_NAME+",O=N Catan","20240101000000","20400101000000")
 	if room_certificate==null:
+		peer.close()
+		return ERR_CANT_CREATE
+	# Godot 4.7's save_to_string includes a terminating NUL in its UTF-8 decode.
+	# Save/read the public PEM bytes instead; the private key never leaves memory.
+	var certificate_path="user://.room-certificate-%s.crt"%get_instance_id()
+	err=room_certificate.save(certificate_path)
+	if err==OK:
+		public_certificate=FileAccess.get_file_as_bytes(certificate_path)
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(certificate_path))
+		while not public_certificate.is_empty() and public_certificate[-1]==0:public_certificate.resize(public_certificate.size()-1)
+	if err!=OK or public_certificate.is_empty():
 		peer.close()
 		return ERR_CANT_CREATE
 	err=peer.get_host().dtls_server_setup(TLSOptions.server(key,room_certificate))
@@ -162,6 +174,7 @@ func leave():
 		pending_connection.destroy()
 		pending_connection=null
 	room_certificate=null
+	public_certificate.clear()
 	if multiplayer.multiplayer_peer: multiplayer.multiplayer_peer.close()
 	multiplayer.multiplayer_peer=OfflineMultiplayerPeer.new()
 	online=false
@@ -182,7 +195,7 @@ func _connected():
 	_register.rpc_id(1,my_name,room_password,PROTOCOL,reconnect_token,my_style,CatanBuildInfo.VERSION,my_color)
 
 @rpc("any_peer","call_remote","reliable")
-func _register(pname: String,password: String,version: int,token: String="",piece_style: int=0,client_version: String="unknown",player_color: String=""):
+func _register(pname: String,password: String,version: int,token: String="",piece_style: int=0,client_version: String="unknown",requested_color: String=""):
 	if not online or not multiplayer.is_server(): return
 	var id=multiplayer.get_remote_sender_id()
 	if version!=PROTOCOL:
@@ -206,7 +219,7 @@ func _register(pname: String,password: String,version: int,token: String="",piec
 		return
 	pname=pname.strip_edges().replace("\n"," ").substr(0,20)
 	if pname.is_empty(): pname="Voyager"
-	roster.append({"id":id,"name":pname,"ready":false,"connected":true,"bot":false,"piece_style":piece_style if CatanCosmetics.valid_set(piece_style) else 0,"color":player_color if valid_color(player_color) else ""})
+	roster.append({"id":id,"name":pname,"ready":false,"connected":true,"bot":false,"piece_style":piece_style if CatanCosmetics.valid_set(piece_style) else 0,"color":requested_color if valid_color(requested_color) else ""})
 	var session_token=Crypto.new().generate_random_bytes(24).hex_encode()
 	seat_tokens[roster.size()-1]=session_token
 	_session.rpc_id(id,session_token)

@@ -39,5 +39,5 @@ func run():
 	game._home()
 	check(game._node("JoinOptions").visible and game._node("OnlineForm").visible,"returning client sees join password form")
 	check(game.password_field.text=="remembered-in-memory" and game.address_field.text=="127.0.0.1","reconnect form restores in-memory connection details")
-	game.queue_free();branch.queue_free();await process_frame;await process_frame
+	game.queue_free();await create_timer(.2).timeout;branch.queue_free();await process_frame;await process_frame
 	print("HOST_PASSWORD_TEST: ",checks," checks, ",failures," failures");quit(1 if failures else 0)

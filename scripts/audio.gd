@@ -11,6 +11,7 @@ var current_track=0
 var correction_clock=0.0
 var music_fade: Tween
 var seek_count=0
+var shutting_down=false
 
 func _ready():
 	if "--server" in OS.get_cmdline_user_args(): return
@@ -51,7 +52,7 @@ func apply(values: Dictionary):
 		AudioServer.set_bus_mute(index,float(values[pair[1]])<=0.001)
 		AudioServer.set_bus_volume_db(index,linear_to_db(maxf(0.001,float(values[pair[1]]))))
 func play(effect: String):
-	if not sounds.has(effect) or voices.is_empty(): return
+	if shutting_down or not sounds.has(effect) or voices.is_empty(): return
 	var voice=voices[voice_index%voices.size()]
 	voice_index+=1
 	voice.stream=sounds[effect]
@@ -101,7 +102,7 @@ func audible_position() -> float:
 	return maxf(0,music.get_playback_position()+AudioServer.get_time_since_last_mix()-AudioServer.get_output_latency())
 
 func follow_soundtrack(sample: Dictionary,delta: float):
-	if not is_instance_valid(music):return
+	if shutting_down or not is_instance_valid(music):return
 	if not sample.get("ready",true):
 		music.stream_paused=true;music_spare.stream_paused=true
 		return
@@ -131,8 +132,15 @@ func follow_soundtrack(sample: Dictionary,delta: float):
 		# Correct tiny clock differences gently instead of repeatedly seeking.
 		music.pitch_scale=clampf(1.0+drift*.06,.99,1.01) if absf(drift)>.025 else 1.0
 
-func _exit_tree():
+func shutdown():
+	if shutting_down:return
+	shutting_down=true
 	if music_fade and music_fade.is_valid():music_fade.kill()
 	for player in [music,music_spare,ambience]+voices:
-		if is_instance_valid(player):player.stop();player.stream=null
-	track_streams.clear();sounds.clear()
+		if is_instance_valid(player):
+			player.stop();player.stream=null;player.queue_free()
+	music_fade=null
+	track_streams.clear();sounds.clear();voices.clear()
+
+func _exit_tree():
+	shutdown()

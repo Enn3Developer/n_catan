@@ -18,5 +18,5 @@ func run():
 	game.updater.status={"state":"ready"};game.net.online=true;game._updates_changed()
 	check(game.modal.find_child("UpdateInstall",true,false).disabled,"online room blocks install")
 	check(not game.updater.install_update(true),"client independently blocks install during room")
-	game.net.online=false;game.queue_free();await process_frame;await process_frame
+	game.net.online=false;game.queue_free();await create_timer(.2).timeout;await process_frame;await process_frame
 	print("UPDATER_UI_TEST: ",failures," failures");quit(1 if failures else 0)

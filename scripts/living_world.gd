@@ -1,10 +1,11 @@
 extends RefCounted
-# All dimensions are in normalized tile units; the board maps each unit to 10 m.
+# All dimensions are in normalized tile units; the board maps each unit to 25 m.
 var craft=CatanCosmetics.new()
 var night_glow: StandardMaterial3D
 const WOOD=Color("64432d")
 const STONE=Color("949487")
 const PLASTER=Color("e3cfaa")
+const TILE_ACTOR_SCALE=.4
 
 func pivot(parent: Node3D,pos: Vector3,label: String) -> Node3D:
 	var node=Node3D.new();node.name=label;node.position=pos;parent.add_child(node)
@@ -124,8 +125,10 @@ func populate(parent: Node3D,kind: int,index: int,art) -> Array:
 		var origin=CatanWorldLayout.point(layout.workers[i])
 		entry.merge({"origin":origin,"kind":kind,"phase":index*.71+i*1.8,"home":CatanWorldLayout.point(layout.homes[i]),"path":CatanWorldLayout.travel_path(kind,i)})
 		parent.add_child(entry.root)
+		entry.root.scale=Vector3.ONE*TILE_ACTOR_SCALE
 		if kind!=2:
 			var worksite=pivot(parent,Vector3(origin.x,art.height_at(origin,kind),origin.y),"Worksite")
+			worksite.scale=Vector3.ONE*TILE_ACTOR_SCALE
 			if kind==0:
 				craft.round_part(worksite,Vector3(0,.023,-.14),.030,.046,WOOD,.026,10)
 				craft.round_part(worksite,Vector3(0,.047,-.14),.025,.003,Color("c8a477"),-1,10)
@@ -270,6 +273,7 @@ func cottage(parent: Node3D,pos: Vector3,color: Color,angle: float=0,scale_facto
 
 func town(style: int,color: Color,city: bool) -> Node3D:
 	var root=Node3D.new();root.name="MedievalCity" if city else "MedievalVillage";root.set_meta("cosmetic",style)
+	root.scale.y=1.20
 	var radius=.34 if city else .29
 	craft.round_part(root,Vector3(0,.008,0),radius,.035,Color("9f9479"),-1,32)
 	# Crossing streets retain an open center and connect to the road endpoints.
@@ -277,12 +281,12 @@ func town(style: int,color: Color,city: bool) -> Node3D:
 		var street=craft.block(root,Vector3(0,.030,0),Vector3(.045,.012,radius*2),Color("c4b99d"));street.rotation.y=angle
 	var count=6 if city else 3
 	for i in count:
-		var angle=TAU*i/count+.5
-		cottage(root,Vector3(sin(angle)*radius*.63,.033,cos(angle)*radius*.63),color.darkened(.12*(i%3)),angle, .72 if city else .95,style,city or i==0)
+		var angle=TAU*i/count+.5 if city else PI+(i-1)*1.48
+		cottage(root,Vector3(sin(angle)*radius*.70,.033,cos(angle)*radius*.70),color.darkened(.12*(i%3)),angle+PI, .72 if city else .95,style,city or i==0)
 	if city:
-		craft.block(root,Vector3(0,.14,-.03),Vector3(.135,.22,.135),STONE)
-		craft.round_part(root,Vector3(0,.285,-.03),.096,.11,color,0,12)
-		craft.flag(root,Vector3(0,.32,-.03),color)
+		craft.block(root,Vector3(0,.14,0),Vector3(.11,.22,.11),STONE)
+		craft.round_part(root,Vector3(0,.285,0),.096,.11,color,0,12)
+		craft.flag(root,Vector3(0,.32,0),color)
 		for i in 12:
 			var angle=i*TAU/12
 			if i%4==0:continue # Three gateways align with the street network.
@@ -300,8 +304,79 @@ func town(style: int,color: Color,city: bool) -> Node3D:
 		var angle=TAU*i/(5 if city else 1)+.2
 		lantern(root,Vector3(sin(angle)*radius*.84,.15,cos(angle)*radius*.84),i<(3 if city else 1))
 	# Owner's banner and market canopy remain clear from the overview.
-	craft.flag(root,Vector3(-.10,.09,.08),color)
+	craft.flag(root,Vector3(-.24 if not city else -.18,.09,.11),color)
+	root.set_meta("dwellers",populate_town(root,city,color))
 	return root
+
+const SETTLEMENT_POPULATION=6
+const CITY_POPULATION=16
+
+func populate_town(town_root: Node3D,city: bool,color: Color) -> Array:
+	var residents=[]
+	var count=CITY_POPULATION if city else SETTLEMENT_POPULATION
+	for i in count:
+		var person=Node3D.new();person.name="Dweller%02d"%i;town_root.add_child(person)
+		# Adult height is roughly 1.8 m at the new world scale.
+		person.scale=Vector3(.34,.29,.34)
+		var shirt=[color,Color("b58a58"),Color("778868"),Color("b57865"),Color("718998")][i%5]
+		var skin=[Color("d2a37e"),Color("b68160"),Color("916449")][i%3]
+		var body=pivot(person,Vector3(0,.079,0),"Torso")
+		craft.round_part(body,Vector3(0,.033,0),.028,.066,shirt,.023,8)
+		craft.round_part(body,Vector3(0,.075,0),.009,.018,skin,-1,8)
+		craft.orb(body,Vector3(0,.104,0),Vector3(.037,.045,.036),skin)
+		craft.orb(body,Vector3(0,.118,.006),Vector3(.039,.027,.035),Color("584333"))
+		if i%3==0:
+			craft.round_part(body,Vector3(0,.133,0),.037,.008,Color("c9a86d"),-1,10)
+		var legs=[];var arms=[]
+		for side in [-1,1]:
+			var leg=bone(person,Vector3(side*.017,.079,0),.064,.010,Color("514638"),"Leg")
+			craft.block(leg,Vector3(0,-.065,-.009),Vector3(.023,.016,.036),Color("46392b"));legs.append(leg)
+			arms.append(bone(body,Vector3(side*.031,.052,0),.064,.009,shirt,"Arm"))
+		var angle=TAU*i/count
+		var radial=Vector2(sin(angle),cos(angle))
+		var start=radial*(.114 if city else .082)
+		var finish=radial*(.150 if city else .20 if radial.y>.1 else .11)
+		residents.append({"root":person,"body":body,"limbs":legs,"arms":arms,"index":i,"origin":start,"destination":finish,"moving":false})
+	animate_dwellers(residents,0,1)
+	return residents
+
+func animate_dwellers(residents: Array,time: float,daylight: float):
+	for actor in residents:
+		# Short errands stay within each resident's clear street corridor. Different
+		# schedules keep most people chatting/resting while a few walk to another spot.
+		var outward=actor.destination-actor.origin
+		var duration=outward.length()/.024
+		var wait_home=4.0+float(actor.index%5)*1.3
+		var wait_away=6.0+float((actor.index*3)%7)*1.1
+		var cycle=fposmod(time+actor.index*7.73,wait_home+wait_away+duration*2)
+		var forward_yaw=atan2(-outward.x,-outward.y)
+		var backward_yaw=forward_yaw+PI
+		var progress=0.0;var moving=0.0;var yaw=forward_yaw
+		if cycle<wait_home:
+			yaw=lerp_angle(backward_yaw,forward_yaw,smoothstep(wait_home-.65,wait_home,cycle))
+		elif cycle<wait_home+duration:
+			var travel=(cycle-wait_home)/duration
+			progress=smoothstep(0,1,travel);moving=sin(PI*travel)
+		elif cycle<wait_home+duration+wait_away:
+			progress=1.0
+			var rest=cycle-wait_home-duration
+			yaw=lerp_angle(forward_yaw,backward_yaw,smoothstep(wait_away-.65,wait_away,rest))
+		else:
+			var travel=(cycle-wait_home-duration-wait_away)/duration
+			progress=1.0-smoothstep(0,1,travel);moving=sin(PI*travel);yaw=backward_yaw
+		var position=actor.origin.lerp(actor.destination,progress)
+		actor.root.position=Vector3(position.x,.034,position.y)
+		actor.root.rotation.y=yaw
+		actor.root.visible=daylight>.15
+		actor.moving=moving>.08
+		var stride=time*4.6+actor.index*1.7
+		actor.body.position.y=.079+absf(sin(stride))*.003*moving
+		actor.body.rotation.y=sin(time*.5+actor.index)*.10*(1.0-moving)
+		for leg in 2:
+			actor.limbs[leg].rotation.x=sin(stride+leg*PI)*.35*moving
+			actor.arms[leg].rotation.x=-sin(stride+leg*PI)*.28*moving
+		# Occasional small hand gestures while stopped, with planted feet.
+		actor.arms[0].rotation.z=sin(time*.9+actor.index)*.12*(1.0-moving)
 
 func harbor(resource: int) -> Node3D:
 	var root=Node3D.new();root.name="CoastalHarbor";root.set_meta("resource",resource)
@@ -374,5 +449,6 @@ func night_lighting(lights: Array,night: float):
 	glow.albedo_color=Color("665544").lerp(Color("ffd092"),night)
 	glow.emission_energy_multiplier=night*3.2
 	for light in lights:
+		light.omni_range=.38*light.global_basis.get_scale().y
 		light.visible=night>.01
 		light.light_energy=night*1.15

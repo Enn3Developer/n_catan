@@ -67,6 +67,6 @@ func run():
 	game._close_modal();game.net.paused=true
 	await shot("board")
 	game.preferences.set_value("piece_style",0)
-	game.net.leave();game.queue_free();await process_frame
+	game.net.leave();game.queue_free();await create_timer(.2).timeout;await process_frame
 	print("COSMETICS_TEST: ",checks," checks, ",failures," failures")
 	quit(1 if failures else 0)

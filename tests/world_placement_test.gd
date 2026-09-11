@@ -59,6 +59,13 @@ func run():
 					var nearest=INF;var p=CatanWorldLayout.point(origin)
 					for grass in grass_points:nearest=minf(nearest,p.distance_to(grass))
 					check(nearest<.075,"grass grows in sheep grazing area %d %s" % [variant,p])
+				var sheep_body=CapsuleShape3D.new();sheep_body.radius=.023;sheep_body.height=.062
+				for time in [0,9,18,27]:
+					for light in [1.0,.5,0.0]:
+						world.animate(actors,time,art,light)
+						for actor in actors:
+							var contacts=hits(stage,sheep_body,actor.root.position+Vector3.UP*.045)
+							check(contacts.is_empty(),"sheep route avoids solid scenery %d: %s"%[variant,names(contacts)])
 				for light in [1.0,.75,.5,.25,0.0]:
 					world.animate(actors,9,art,light)
 					for i in actors.size():

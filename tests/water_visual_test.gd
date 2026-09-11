@@ -21,4 +21,4 @@ func run():
 	game.preferences.set_value("reduce_motion",true);game._apply_preferences()
 	await shot("still")
 	print("WATER_VISUAL_TEST: day, dusk, night, low/high/ultra coast and reduced motion rendered")
-	game.queue_free();await process_frame;quit()
+	game.queue_free();await create_timer(.2).timeout;await process_frame;quit()

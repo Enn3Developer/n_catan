@@ -1,7 +1,7 @@
 class_name CatanBoard
 extends Node3D
 signal picked(kind: String,id: int)
-const TILE_SIZE=10.0 # Regular hexes: 20 m point to point.
+const TILE_SIZE=25.0 # Regular hexes: 50 m tip to tip, 43.3 m across flats.
 const COLORS=[Color("488963"),Color("bd7250"),Color("8fab60"),Color("c7a456"),Color("7a8b99"),Color("d7bf87")]
 const PLAYERS=[Color("ed815d"),Color("65bfcb"),Color("d9b76c"),Color("b697d7"),Color("7dcc83"),Color("d1aa87")]
 var camera: Camera3D
@@ -59,6 +59,7 @@ var living_world=preload("res://scripts/living_world.gd").new()
 var actors=[]
 var harbors=[]
 var band_actors=[]
+var dwellers=[]
 var night_lights=[]
 var daylight=1.0
 
@@ -143,7 +144,7 @@ func _ready():
 	water_material.shader=load("res://shaders/water.gdshader")
 	ocean.material_override=water_material
 	sea_material=water_material
-	ocean.position.y=-0.27
+	ocean.position.y=-.027*TILE_SIZE
 	add_child(ocean)
 	for branch in [terrain,pieces_root,markers]:branch.scale=Vector3.ONE*TILE_SIZE
 	var stats=CanvasLayer.new()
@@ -399,9 +400,9 @@ func _update_boat_wakes():
 	var vessels=boats.duplicate()
 	for harbor in harbors:vessels.append(harbor.get_node("MooredBoat"))
 	for boat in vessels:
-		var position=boat.global_position
+		var boat_position=boat.global_position
 		var axis=boat.global_basis.z.normalized()
-		sources.append(Vector4(position.x,position.z,axis.x,axis.z))
+		sources.append(Vector4(boat_position.x,boat_position.z,axis.x,axis.z))
 	sea_material.set_shader_parameter("boat_count",mini(sources.size(),16))
 	while sources.size()<16:sources.append(Vector4.ZERO)
 	sea_material.set_shader_parameter("boat_sources",sources)
@@ -409,6 +410,7 @@ func _update_boat_wakes():
 func refresh(data: Dictionary):
 	var old=state
 	state=data
+	dwellers=[]
 	for n in pieces_root.get_children(): n.free()
 	for e in state.edges:
 		if e.owner<0: continue
@@ -492,6 +494,7 @@ func _process(delta):
 	elapsed+=delta
 	living_world.animate(actors,elapsed,art,daylight)
 	living_world.animate(band_actors,elapsed,art,daylight)
+	living_world.animate_dwellers(dwellers,elapsed,daylight)
 	for harbor in harbors:
 		harbor.get_node("MooredBoat").position.y=-.025+sin(elapsed*.7+harbor.position.x)*.003
 	for mill in windmills: mill.rotation.z+=delta*0.4
@@ -598,10 +601,10 @@ func _update_camera():
 func _update_camera_focus():
 	if camera.attributes is CameraAttributesPractical:
 		var distance=camera.position.distance_to(camera_focus)
-		camera.attributes.dof_blur_far_distance=distance+2.5
-		camera.attributes.dof_blur_far_transition=6.0
-		camera.attributes.dof_blur_near_distance=maxf(.1,distance-3.0)
-		camera.attributes.dof_blur_near_transition=3.0
+		camera.attributes.dof_blur_far_distance=distance+.25*TILE_SIZE
+		camera.attributes.dof_blur_far_transition=.6*TILE_SIZE
+		camera.attributes.dof_blur_near_distance=maxf(.1,distance-.3*TILE_SIZE)
+		camera.attributes.dof_blur_near_transition=.3*TILE_SIZE
 
 func _apply_surface(node: MeshInstance3D,surface_name: String):
 	node.set_meta("pbr_surface",surface_name)
@@ -789,13 +792,14 @@ func _house(parent: Node3D,pos: Vector3,color: Color,city: bool=false,style: int
 	var root=living_world.town(style,color,city)
 	root.position=pos
 	parent.add_child(root)
+	dwellers.append_array(root.get_meta("dwellers",[]))
 	if style!=0:return
 	var smoke=CPUParticles3D.new()
 	smoke.name="Smoke"
 	smoke.amount=8
 	smoke.lifetime=2.6
 	smoke.preprocess=0.7
-	smoke.position=Vector3(.045,.28,-.08)
+	smoke.position=Vector3(.045,.336,-.08)
 	smoke.direction=Vector3.UP
 	smoke.spread=15
 	smoke.gravity=Vector3(0.025,0.04,0)
@@ -909,6 +913,7 @@ func advance_day(delta: float):
 	_animate_beacon()
 	living_world.animate(actors,elapsed,art,daylight)
 	living_world.animate(band_actors,elapsed,art,daylight)
+	living_world.animate_dwellers(dwellers,elapsed,daylight)
 
 func throw_dice(values: Array):
 	if values.size()!=2 or values.any(func(value):return value<1 or value>6):return

@@ -42,5 +42,5 @@ func run():
 	check(knight.z_index==0 and knight.position.x==0,"card returns to hand after hover")
 	game._node("Card0").pressed.emit();await settle()
 	check(game.net.rules.s.card_played and game.net.rules.s.players[0].cards[0]==1,"card face plays a knight")
-	game.net.leave();game.queue_free();await process_frame;await process_frame
+	game.net.leave();game.queue_free();await create_timer(.2).timeout;await process_frame;await process_frame
 	print("CARDS_UI_TEST: ",checks," checks, ",failures," failures");quit(1 if failures else 0)

@@ -43,5 +43,5 @@ func run():
 		check((thrown.dice[i].node.basis*CatanDiceThrow.NORMALS[thrown.results[i]-1]).dot(Vector3.UP)>.999,"upper face matches server die result")
 	game.board.reduce_motion=true;game.board.throw_dice([1,3]);await process_frame;await process_frame
 	check(game.board.active_dice.done,"reduced motion shows result immediately")
-	game.net.leave();game.queue_free();await process_frame
+	game.net.leave();game.queue_free();await create_timer(.2).timeout;await process_frame
 	print("UX_WORLD_TEST: ",checks," checks, ",failures," failures");quit(1 if failures else 0)

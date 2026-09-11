@@ -52,8 +52,11 @@ func reset():
 	values=DEFAULTS.duplicate()
 	save()
 
+static func embedded_window() -> bool:
+	return Array(OS.get_cmdline_args()).any(func(arg):return arg=="--wid" or arg.begins_with("--wid="))
+
 func apply_display(viewport: Viewport):
-	if DisplayServer.get_name()!="headless":
+	if DisplayServer.get_name()!="headless" and not embedded_window():
 		if applied_fullscreen!=int(values.fullscreen):
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if values.fullscreen else DisplayServer.WINDOW_MODE_WINDOWED)
 			applied_fullscreen=int(values.fullscreen)

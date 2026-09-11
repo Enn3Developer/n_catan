@@ -308,6 +308,61 @@ class Art:
      a=(x,y,z+h*.46);b=(x+side*.044,y,z+h*.51);c=(b[0],y,z+h*.8)
      self.tube(a,b,.012,.010,'Cactus',12);self.ellipsoid(b,(.010,.010,.010),'Cactus',6,10);self.tube(b,c,.010,.008,'Cactus',12);self.ellipsoid(c,(.008,.008,.009),'Cactus',6,10)
    self.grass(100,'DryGrass')
+ def detail_clear(self,x,y,radius):
+  if not self.clear(x,y,radius):return False
+  if self.kind==2:
+   # Solid props avoid the entire grazing-to-sleeping corridor, unlike grass.
+   for origin,home in zip(self.layout["workers"],self.layout["homes"]):
+    if self.path_distance(x,y,origin,home)<.15+radius:return False
+  return True
+ def village_landscape_details(self):
+  # Extra landmarks occupy genuine free pockets; all clearance rules still apply.
+  planted=0
+  for attempt in range(180):
+   x=self.r.uniform(-.59,.59);y=self.r.uniform(-.54,.45)
+   if self.kind==0 and planted<3 and self.detail_clear(x,y,.075):
+    self.pine(x,y,self.r.uniform(.18,.25));planted+=1
+   elif self.kind==2 and planted<2 and self.detail_clear(x,y,.085):
+    self.oak(x,y,.20);planted+=1
+  placed=0
+  for attempt in range(240):
+   if placed>=3:break
+   x=self.r.uniform(-.57,.57);y=self.r.uniform(-.53,.47)
+   if not self.detail_clear(x,y,.062):continue
+   z=self.ground(x,y);self.occupy(x,y,.065);placed+=1
+   if self.kind==0:
+    # A stump with a pale cut face and split billets beside it.
+    self.tube((x,y,z-.005),(x,y,z+.045),.037,.033,'PBR_Bark',12,'SmallDetails')
+    self.tube((x,y,z+.045),(x,y,z+.047),.030,.030,'PBR_Wood',12,'SmallDetails')
+    for j in range(3):self.box((x-.035+j*.023,y+.039,z+.009),(.018,.04,.018),'PBR_Wood',rot=.15*j,layer='SmallDetails',bevel=.003)
+   elif self.kind==1:
+    # Clay bricks drying on a timber rack.
+    self.box((x,y,z+.019),(.098,.089,.018),'PBR_Wood',layer='SmallDetails',bevel=.003)
+    for j in range(2):
+     for k in range(3):self.box((x-.032+k*.032,y-.022+j*.041,z+.04),(.027,.035,.025),'ClayLight' if k%2 else 'Brick',layer='SmallDetails',bevel=.003)
+   elif self.kind==2:
+    # A low hay feeder makes the pasture look tended.
+    self.box((x,y,z+.024),(.088,.074,.042),'PBR_Wood',layer='SmallDetails',bevel=.004)
+    self.ellipsoid((x,y,z+.052),(.037,.028,.026),'Wheat',5,10,0,'SmallDetails')
+    for side in [-1,1]:self.box((x+side*.049,y,z+.045),(.009,.082,.07),'PBR_Wood',layer='SmallDetails',bevel=.002)
+   elif self.kind in [3,4]:
+    # Small farm/ore wagons: visible cargo, four wheels and a long handle.
+    self.box((x,y,z+.039),(.075,.083,.018),'PBR_Wood',layer='SmallDetails',bevel=.003)
+    for side in [-1,1]:
+     self.box((x+side*.034,y,z+.06),(.008,.083,.04),'PBR_Wood',layer='SmallDetails',bevel=.002)
+     for yy in [-.027,.027]:self.tube((x+side*.040,y+yy,z+.021),(x+side*.049,y+yy,z+.021),.022,.022,'Dark',10,'SmallDetails')
+    self.tube((x,y+.034,z+.031),(x,y+.080,z+.034),.004,.004,'PBR_Wood',8,'SmallDetails')
+    for j in range(3):self.ellipsoid((x+(j-1)*.019,y,z+.059),(.018,.028,.020),'Wheat' if self.kind==3 else 'Ore',5,8,.15,'SmallDetails',False)
+   else:
+    # Weathered masonry fragments and a broken column.
+    self.box((x,y,z+.012),(.09,.09,.028),'Sandstone',rot=.18,layer='SmallDetails',bevel=.007)
+    self.tube((x,y,z+.022),(x+.006,y,z+.13),.027,.022,'Sandstone',8,'SmallDetails')
+    self.box((x+.039,y+.028,z+.020),(.034,.032,.04),'Sandstone',rot=.4,layer='SmallDetails',bevel=.005)
+  for i in range(120):
+   x=self.r.uniform(-.62,.62);y=self.r.uniform(-.55,.48)
+   if not self.detail_clear(x,y,.012):continue
+   if self.kind in [0,2,3]:self.flower(x,y,'FlowerGold' if self.kind==3 else 'FlowerViolet' if i%3 else 'FlowerWhite')
+   elif i%4==0 and self.detail_clear(x,y,.025):self.rock(x,y,self.r.uniform(.010,.019),'Sandstone' if self.kind==5 else 'PBR_Clay' if self.kind==1 else 'PBR_Rock','SmallDetails')
  def export(self,name):
   collection=bpy.data.collections.new(name);scene.collection.children.link(collection);objects=[]
   for (layer,material),(verts,faces,smooths) in self.batches.items():
@@ -330,7 +385,7 @@ class Art:
 reports=[]
 for kind,name in enumerate(['forest','hills','pasture','fields','mountains','desert']):
  for variant in range(2):
-  art=Art(kind,951+kind*193+variant*811);art.generate();reports.append(art.export(name+'_'+str(variant)))
+  art=Art(kind,951+kind*193+variant*811);art.generate();art.village_landscape_details();reports.append(art.export(name+'_'+str(variant)))
 (OUT/'manifest.json').write_text(json.dumps(reports,indent=2)+'\n')
 bpy.context.preferences.filepaths.save_version=0
 bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'assets/source/sculpted-tiles.blend'))

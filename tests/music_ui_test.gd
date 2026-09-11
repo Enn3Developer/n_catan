@@ -32,5 +32,5 @@ func run():
 		var bounds=Rect2(Vector2.ZERO,Vector2(dimensions))
 		check(bounds.encloses(game._node("OpenMusic").get_global_rect()),"top music button fits "+str(dimensions))
 		check(bounds.encloses(game.modal.find_child("DialogScroll",true,false).get_global_rect()),"music library fits "+str(dimensions))
-	game._close_modal();game.net.leave();game.queue_free();await process_frame;await process_frame
+	game._close_modal();game.net.leave();game.queue_free();await create_timer(.2).timeout;await process_frame;await process_frame
 	print("MUSIC_UI_TEST: ",checks," checks, ",failures," failures");quit(1 if failures else 0)
