@@ -19,6 +19,7 @@ var targets=[]
 var marker_nodes=[]
 var cache=[]
 var scenery: Node3D
+var background_landscape: Node3D
 var clouds=[]
 var boats=[]
 var sea_traffic=preload("res://scripts/sea_traffic.gd").new()
@@ -671,6 +672,8 @@ func _tile_props(parent: Node3D,kind: int,index: int):
 		parent.add_child(cactus)
 
 func _world_props():
+	background_landscape=preload("res://scripts/background_landscape.gd").new()
+	scenery.add_child(background_landscape)
 	var random=RandomNumberGenerator.new()
 	random.seed=822
 	# Offshore rocks and tiny islands extend the scene beyond the board.
@@ -901,6 +904,7 @@ func advance_day(delta: float):
 	sky.sky_top_color=Color("091329").lerp(Color("4d7389"),daylight)
 	sky.sky_horizon_color=Color("33445d").lerp(Color("ccd3c7"),daylight)
 	sky.ground_horizon_color=Color("243952").lerp(Color("bdd6d3"),daylight)
+	background_landscape.set_daylight(daylight)
 	living_world.night_lighting(night_lights,1.0-daylight)
 	_animate_beacon()
 	living_world.animate(actors,elapsed,art,daylight)

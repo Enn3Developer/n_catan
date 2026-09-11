@@ -146,3 +146,5 @@ Run `python3 -m unittest discover -s tests -p 'test_localization.py'`, `tests/lo
 Rebuild scenery with `blender --background --factory-startup --python tools/build_premium_tiles.py`, then import the project in Godot. The generator writes twelve biome models and `assets/source/sculpted-tiles.blend`. Plants and small props avoid occupied areas. Sheep are created only at runtime.
 
 Run `tests/world_placement_test.gd` headlessly to check the imported meshes against worker routes, token positions, city footprints and harbors. Run `tests/world_capture.gd` with graphics to capture each biome from both sides, night pasture and the board at low detail. Captures are saved under `/tmp/catan-world-*.png`.
+
+The surrounding archipelago is generated at runtime by `scripts/background_landscape.gd`, with one mesh per island. Keep all its geometry beyond 9.5 scenery units so boat routes remain open. `shaders/background_landscape.gdshader` adds distance haze and fades the camera-facing islands during orbiting. Run `tests/background_landscape_test.gd` and `tests/sea_traffic_test.gd` when changing it.
