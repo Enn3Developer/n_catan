@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://e44mmibmk52t"]
+
+[ext_resource type="Script" uid="uid://dpjhdsarswr30" path="res://scripts/board.gd" id="1_bw3vb"]
+
+[node name="Board" type="Node3D" unique_id=818072003]
+script = ExtResource("1_bw3vb")
+
+[node name="CameraRig" type="Node3D" parent="." unique_id=7073379]
+
+[node name="Camera" type="Camera3D" parent="CameraRig" unique_id=305313148]
+current = true
+fov = 35.0
+far = 100.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=704454542]
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1573321389]
+
+[node name="Terrain" type="Node3D" parent="." unique_id=2024425802]
+
+[node name="Buildings" type="Node3D" parent="." unique_id=1125902531]
+
+[node name="PlacementMarkers" type="Node3D" parent="." unique_id=569788605]
+
+[node name="Scenery" type="Node3D" parent="." unique_id=1276529040]

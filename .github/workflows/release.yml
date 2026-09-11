@@ -1,0 +1,88 @@
+name: Release
+on:
+  push:
+    tags: ['v*', '[0-9]*']
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing SemVer tag to build
+        required: true
+      publish:
+        description: Publish packages (false validates build only)
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.event.release.tag_name || inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag || github.ref_name }}
+          lfs: true
+          fetch-depth: 0
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: '1.25.x'
+          cache: false
+      - name: Resolve tag and check completed release
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+          RELEASE_COMMIT=$(git rev-parse "refs/tags/$RELEASE_TAG^{commit}")
+          test "$RELEASE_COMMIT" = "$(git rev-parse HEAD)"
+          echo "RELEASE_COMMIT=$RELEASE_COMMIT" >> "$GITHUB_ENV"
+          python3 tools/release.py check --tag "$RELEASE_TAG" --commit "$RELEASE_COMMIT"
+      - name: Tests
+        if: steps.release.outputs.complete != 'true'
+        run: |
+          go -C updater test ./...
+          go -C updater vet ./...
+          python3 -m unittest discover -s tests -p 'test_*.py'
+      - name: Install verified Godot and stamp version
+        if: steps.release.outputs.complete != 'true'
+        run: |
+          python3 tools/release.py bootstrap
+          echo "GODOT_BIN=$PWD/build/godot/Godot_v4.7.2-stable_linux.x86_64" >> "$GITHUB_ENV"
+          python3 tools/release.py stamp --tag "$RELEASE_TAG"
+      - name: Export Linux and Windows
+        if: steps.release.outputs.complete != 'true'
+        run: |
+          "$GODOT_BIN" --headless --path . --editor --import --quit
+          bash tools/export_linux.sh
+          bash tools/export_windows.sh
+      - name: Package and sign full and delta updates
+        if: steps.release.outputs.complete != 'true'
+        env:
+          UPDATE_SIGNING_PRIVATE_KEY: ${{ secrets.UPDATE_SIGNING_PRIVATE_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          signing_file=$(mktemp)
+          trap 'rm -f "$signing_file"' EXIT
+          printf '%s\n' "$UPDATE_SIGNING_PRIVATE_KEY" > "$signing_file"
+          unset UPDATE_SIGNING_PRIVATE_KEY
+          python3 tools/release.py package --tag "$RELEASE_TAG" --commit "$RELEASE_COMMIT" --key "$signing_file"
+      - name: Keep build artifacts
+        if: steps.release.outputs.complete != 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-${{ env.RELEASE_TAG }}
+          path: dist/
+          retention-days: 7
+      - name: Publish packages and manifest last
+        if: steps.release.outputs.complete != 'true' && (github.event_name != 'workflow_dispatch' || inputs.publish)
+        run: python3 tools/release.py publish --tag "$RELEASE_TAG" --commit "$RELEASE_COMMIT"

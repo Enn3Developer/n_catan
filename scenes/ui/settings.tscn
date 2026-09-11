@@ -1,0 +1,131 @@
+[gd_scene format=3]
+[ext_resource type="Theme" path="res://assets/ui_theme.tres" id="1"]
+[ext_resource type="Script" path="res://scripts/settings_menu.gd" id="2"]
+[node name="Settings" type="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("1")
+script = ExtResource("2")
+[node name="Shade" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = 0.0
+offset_top = 0.0
+offset_right = -0.0
+offset_bottom = -0.0
+color = Color(0.015, 0.026, 0.035, 0.94)
+[node name="SettingsPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+
+[node name="Body" type="VBoxContainer" parent="SettingsPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+[node name="Title" type="Label" parent="SettingsPanel/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Settings"
+theme_override_font_sizes/font_size = 30
+
+[node name="Navigation" type="HFlowContainer" parent="SettingsPanel/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 6
+[node name="Columns" type="HBoxContainer" parent="SettingsPanel/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+[node name="SettingsContent" type="VBoxContainer" parent="SettingsPanel/Body/Columns"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+[node name="Help" type="VBoxContainer" parent="SettingsPanel/Body/Columns"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(240, 0)
+theme_override_constants/separation = 14
+[node name="RendererInfo" type="Label" parent="SettingsPanel/Body/Columns/Help"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+[node name="HelpTitle" type="Label" parent="SettingsPanel/Body/Columns/Help"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 23
+autowrap_mode = 3
+[node name="HelpBody" type="Label" parent="SettingsPanel/Body/Columns/Help"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 3
+[node name="HelpCost" type="Label" parent="SettingsPanel/Body/Columns/Help"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 3
+[node name="Spacer" type="Control" parent="SettingsPanel/Body/Columns/Help"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+[node name="Performance" type="Label" parent="SettingsPanel/Body/Columns/Help"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 14
+
+[node name="Buttons" type="HBoxContainer" parent="SettingsPanel/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ResetSettings" type="Button" parent="SettingsPanel/Body/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Restore defaults"
+custom_minimum_size = Vector2(0, 40)
+
+[node name="SettingsNote" type="Label" parent="SettingsPanel/Body/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Saved automatically"
+theme_override_font_sizes/font_size = 13
+size_flags_horizontal = 3
+horizontal_alignment = 1
+autowrap_mode = 3
+[node name="CloseSettings" type="Button" parent="SettingsPanel/Body/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Done"
+custom_minimum_size = Vector2(100, 40)
+
+[node name="ExitDesktop" type="Button" parent="SettingsPanel/Body/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Exit to desktop"
+custom_minimum_size = Vector2(0, 40)

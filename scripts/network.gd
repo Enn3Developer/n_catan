@@ -1,0 +1,564 @@
+class_name CatanNetwork
+extends Node
+
+signal changed
+signal received(state: Dictionary)
+signal notice(message: String)
+signal applied(player: int, action: Dictionary)
+const PORT=24567
+const PROTOCOL=CatanBuildInfo.PROTOCOL
+const MIN_PLAYERS=3
+const MAX_PLAYERS=6
+var rules=CatanRules.new()
+var roster: Array=[]
+var seat=-1
+var started=false
+var dedicated=false
+var online=false
+var my_name="Voyager"
+var my_style=0
+var room_password=""
+var room_certificate: X509Certificate
+var pending_connection: ENetConnection
+var pending_id=0
+var connection_deadline=0
+const CERT_NAME="n-catan-room"
+
+# The public certificate is carried in the invite; the private key stays in memory.
+func secure_invite(address: String) -> String:
+	if room_certificate==null:return reconnect_address
+	return "n-catan://"+address.strip_edges()+"#"+Marshalls.raw_to_base64(room_certificate.save_to_string().to_utf8_buffer())
+
+var last_action={}
+var upnp_thread: Thread
+var mapper: UPNP
+var reconnect_token=""
+var reconnect_address=""
+var reconnect_name=""
+var reconnect_password=""
+var seat_tokens={}
+var solo=false
+var tutorial=false
+var tutorial_expected=""
+var paused=false
+var bot_delay=0.7
+var bot_clock=0.0
+var bot_brains={}
+var bot_action_count=0
+var bot_turn=-1
+var world_seconds=150.0
+var music_track=0
+var music_paused=false
+var music_position=0.0
+var music_anchor_ms=0
+var music_revision=0
+var music_remote={}
+var music_received_ms=0
+var music_one_way=0.0
+var music_ping_clock=0.0
+var music_ping_sent=-1
+var music_last_command=-1000
+
+
+func _ready():
+	multiplayer.server_relay=false
+	_reset_music()
+	_load_session()
+	multiplayer.connected_to_server.connect(_connected)
+	multiplayer.connection_failed.connect(func(): leave(); notice.emit("Connection failed. Check the address, UDP port and firewall."))
+	multiplayer.server_disconnected.connect(func(): leave(); notice.emit("Connection lost. Use Reconnect to return to your seat if the server is still running."))
+	multiplayer.peer_disconnected.connect(_disconnected)
+
+func host(pname: String,password: String="",server_only: bool=false) -> Error:
+	leave()
+	var peer=ENetMultiplayerPeer.new()
+	var err=peer.create_server(PORT,8)
+	if err!=OK: return err
+	peer.get_host().compress(ENetConnection.COMPRESS_RANGE_CODER)
+	var crypto=Crypto.new()
+	var key=crypto.generate_rsa(2048)
+	room_certificate=crypto.generate_self_signed_certificate(key,"CN="+CERT_NAME+",O=N Catan","20240101000000","20400101000000")
+	if room_certificate==null:
+		peer.close()
+		return ERR_CANT_CREATE
+	err=peer.get_host().dtls_server_setup(TLSOptions.server(key,room_certificate))
+	if err!=OK:
+		peer.close()
+		return err
+	multiplayer.multiplayer_peer=peer
+	online=true
+	dedicated=server_only
+	my_name=pname
+	room_password=password
+	seat_tokens={}
+	reconnect_token=""
+	if not dedicated:
+		roster=[{"id":1,"name":pname,"ready":false,"connected":true,"bot":false,"piece_style":my_style}]
+		seat=0
+	changed.emit()
+	return OK
+
+func join_room(address: String,pname: String,password: String="") -> Error:
+	address=address.strip_edges()
+	# Trust is supplied out of band by the host's invite, never fetched from the socket.
+	if not address.begins_with("n-catan://") or address.count("#")!=1:
+		notice.emit("Paste the complete secure invite from the host (Copy invite).")
+		return ERR_INVALID_PARAMETER
+	var parts=address.trim_prefix("n-catan://").split("#")
+	if parts[1].length()>16384:return ERR_INVALID_PARAMETER
+	var certificate=X509Certificate.new()
+	if certificate.load_from_string(Marshalls.base64_to_raw(parts[1]).get_string_from_utf8())!=OK:return ERR_INVALID_DATA
+	var endpoint=parts[0].split(":")
+	if endpoint.size()>2 or endpoint[0].is_empty():return ERR_INVALID_PARAMETER
+	var port=PORT
+	if endpoint.size()==2:
+		if not endpoint[1].is_valid_int():return ERR_INVALID_PARAMETER
+		port=int(endpoint[1])
+	if port<1 or port>65535:return ERR_INVALID_PARAMETER
+	leave()
+	my_name=pname
+	room_password=password
+	if address!=reconnect_address or pname!=reconnect_name:reconnect_token=""
+	reconnect_address=address
+	reconnect_name=pname
+	reconnect_password=password
+	var connection=ENetConnection.new()
+	var err=connection.create_host(1,3)
+	if err==OK:connection.compress(ENetConnection.COMPRESS_RANGE_CODER)
+	if err==OK:err=connection.dtls_client_setup(CERT_NAME,TLSOptions.client(certificate,CERT_NAME))
+	if err!=OK:
+		connection.destroy()
+		return err
+	pending_id=ENetMultiplayerPeer.new().generate_unique_id()
+	if connection.connect_to_host(endpoint[0],port,3,pending_id)==null:
+		connection.destroy()
+		return ERR_CANT_CONNECT
+	var peer=ENetMultiplayerPeer.new()
+	peer.create_mesh(pending_id)
+	multiplayer.multiplayer_peer=peer
+	pending_connection=connection
+	connection_deadline=Time.get_ticks_msec()+10000
+	online=true
+	changed.emit()
+	return OK
+
+func _poll_secure_connection():
+	if pending_connection==null:return
+	var event=pending_connection.service(0)
+	if event[0]==ENetConnection.EVENT_CONNECT:
+		var peer=multiplayer.multiplayer_peer
+		var connection=pending_connection
+		pending_connection=null
+		if peer.add_mesh_peer(1,connection)!=OK:
+			leave()
+			notice.emit("Secure connection failed.")
+	elif event[0] in [ENetConnection.EVENT_ERROR,ENetConnection.EVENT_DISCONNECT] or Time.get_ticks_msec()>connection_deadline:
+		leave()
+		notice.emit("Secure connection failed. Check the invite, host availability and UDP port.")
+
+func leave():
+	if pending_connection!=null:
+		pending_connection.destroy()
+		pending_connection=null
+	room_certificate=null
+	if multiplayer.multiplayer_peer: multiplayer.multiplayer_peer.close()
+	multiplayer.multiplayer_peer=OfflineMultiplayerPeer.new()
+	online=false
+	solo=false
+	tutorial=false
+	paused=false
+	bot_brains={}
+	bot_action_count=0
+	bot_turn=-1
+	started=false
+	roster=[]
+	seat=-1
+	last_action={}
+	_reset_music()
+	changed.emit()
+
+func _connected():
+	_register.rpc_id(1,my_name,room_password,PROTOCOL,reconnect_token,my_style,CatanBuildInfo.VERSION)
+
+@rpc("any_peer","call_remote","reliable")
+func _register(pname: String,password: String,version: int,token: String="",piece_style: int=0,client_version: String="unknown"):
+	if not online or not multiplayer.is_server(): return
+	var id=multiplayer.get_remote_sender_id()
+	if version!=PROTOCOL:
+		_registration_failed.rpc_id(id,"Incompatible multiplayer versions. Host: %s (protocol %d). Yours: %s (protocol %d). Check for updates from the main menu." % [CatanBuildInfo.VERSION,PROTOCOL,client_version.substr(0,40),version])
+		return
+	if started and version==PROTOCOL and password==room_password and not token.is_empty():
+		for p in roster.size():
+			if seat_tokens.get(p,"")==token:
+				# The bearer token owns this seat, even before ENet times out the old peer.
+				var old_id=int(roster[p].id)
+				roster[p].id=id
+				roster[p].connected=true
+				if old_id!=id and old_id in multiplayer.get_peers():multiplayer.multiplayer_peer.disconnect_peer(old_id)
+				_session.rpc_id(id,token)
+				rules._log("%s reconnected. The expedition continues." % roster[p].name)
+				_broadcast_lobby()
+				_sync()
+				return
+	if version!=PROTOCOL or password!=room_password or started or roster.size()>=MAX_PLAYERS or _seat_for(id)!=-1:
+		_registration_failed.rpc_id(id,"Could not join: check the password and game version. An active game requires the saved reconnect seat.")
+		return
+	pname=pname.strip_edges().replace("\n"," ").substr(0,20)
+	if pname.is_empty(): pname="Voyager"
+	roster.append({"id":id,"name":pname,"ready":false,"connected":true,"bot":false,"piece_style":piece_style if CatanCosmetics.valid_set(piece_style) else 0})
+	var session_token=Crypto.new().generate_random_bytes(24).hex_encode()
+	seat_tokens[roster.size()-1]=session_token
+	_session.rpc_id(id,session_token)
+	_broadcast_lobby()
+
+@rpc("authority","call_remote","reliable")
+func _session(token: String):
+	reconnect_token=token
+	var file=ConfigFile.new()
+	file.set_value("session","token",token)
+	file.set_value("session","address",reconnect_address)
+	file.set_value("session","name",reconnect_name)
+	file.save("user://reconnect.cfg")
+
+func _load_session():
+	var file=ConfigFile.new()
+	if file.load("user://reconnect.cfg")!=OK:return
+	reconnect_token=str(file.get_value("session","token",""))
+	reconnect_address=str(file.get_value("session","address",""))
+	reconnect_name=str(file.get_value("session","name","Voyager"))
+
+@rpc("authority","call_remote","reliable")
+func _registration_failed(message: String):
+	leave()
+	notice.emit(message)
+
+func reconnect():
+	if not reconnect_address.is_empty():
+		var err=join_room(reconnect_address,reconnect_name,reconnect_password)
+		if err!=OK:notice.emit("Could not reconnect: check the saved server address.")
+
+func _seat_for(id: int) -> int:
+	for i in roster.size():
+		if int(roster[i].id)==id: return i
+	return -1
+
+func _broadcast_lobby():
+	for row in roster:
+		if row.id>1 and row.connected: _lobby.rpc_id(row.id,roster,started,dedicated)
+	changed.emit()
+
+@rpc("authority","call_remote","reliable")
+func _lobby(players: Array,in_game: bool,server_dedicated: bool=false):
+	dedicated=server_dedicated
+	roster=players
+	seat=_seat_for(multiplayer.get_unique_id())
+	started=in_game
+	music_ping_clock=0.0
+	changed.emit()
+
+func ready_up():
+	if multiplayer.is_server(): _set_ready(1)
+	else: _ready_request.rpc_id(1)
+
+@rpc("any_peer","call_remote","reliable")
+func _ready_request():
+	if multiplayer.is_server(): _set_ready(multiplayer.get_remote_sender_id())
+
+func _set_ready(id: int):
+	var p=_seat_for(id)
+	if started or p<0: return
+	roster[p].ready=not roster[p].ready
+	_broadcast_lobby()
+
+func start_game():
+	if multiplayer.is_server(): _start(1)
+	else: _start_request.rpc_id(1)
+
+@rpc("any_peer","call_remote","reliable")
+func _start_request():
+	if multiplayer.is_server(): _start(multiplayer.get_remote_sender_id())
+
+func _start(id: int):
+	if started or roster.size()<MIN_PLAYERS or roster.size()>MAX_PLAYERS: return
+	if id!=1 and (not dedicated or _seat_for(id)!=0): return
+	for row in roster:
+		if not row.ready: return
+	var names=[]
+	for row in roster: names.append(row.name)
+	rules.create(names)
+	world_seconds=150.0
+	started=true
+	_broadcast_lobby()
+	_sync()
+
+func act(action: Dictionary):
+	if not started or seat<0: return
+	if tutorial and not tutorial_expected.is_empty() and str(action.get("type",""))!=tutorial_expected:
+		notice.emit("Follow the current tutorial step, or choose Skip lesson.")
+		return
+	if multiplayer.is_server(): _apply(1,action)
+	else: _action.rpc_id(1,action)
+
+@rpc("any_peer","call_remote","reliable")
+func _action(action: Dictionary):
+	if multiplayer.is_server(): _apply(multiplayer.get_remote_sender_id(),action)
+
+func _apply(id: int,action: Dictionary):
+	if not started or var_to_bytes(action).size()>2048: return
+	var p=_seat_for(id)
+	if p<0: return
+	var now=Time.get_ticks_msec()
+	if now-int(last_action.get(id,0))<80: return
+	last_action[id]=now
+	for row in roster:
+		if not row.connected:
+			_send_error(id,"Game paused while a disconnected player reconnects.")
+			return
+	var error=rules.apply(p,action)
+	if not error.is_empty(): _send_error(id,error)
+	else:
+		applied.emit(p,action)
+		_sync()
+
+func _sync():
+	for p in roster.size():
+		if not roster[p].connected or roster[p].get("bot",false): continue
+		var state=rules.snapshot(p)
+		state["world_seconds"]=world_seconds
+		state["piece_styles"]=[]
+		for row in roster:state.piece_styles.append(int(row.get("piece_style",0)))
+		if roster[p].id==1: received.emit(state)
+		else: _state.rpc_id(roster[p].id,state)
+
+@rpc("authority","call_remote","reliable")
+func _state(state: Dictionary):
+	started=true
+	received.emit(state)
+
+func _send_error(id: int,message: String):
+	if id==1: notice.emit(message)
+	else: _error.rpc_id(id,message)
+
+@rpc("authority","call_remote","reliable")
+func _error(message: String):
+	notice.emit(message)
+
+func _disconnected(id: int):
+	if id==1 and online and not multiplayer.is_server():
+		leave()
+		notice.emit("Connection lost. Use Reconnect to return to your seat.")
+		return
+	if not multiplayer.is_server(): return
+	var p=_seat_for(id)
+	if p<0: return
+	if started:
+		roster[p].connected=false
+		rules._log("%s disconnected. The game is paused." % roster[p].name)
+		_sync()
+	else:
+		roster.remove_at(p)
+		var remapped={}
+		for key in seat_tokens:
+			if key<p: remapped[key]=seat_tokens[key]
+			elif key>p: remapped[key-1]=seat_tokens[key]
+		seat_tokens=remapped
+	_broadcast_lobby()
+
+func map_router():
+	if upnp_thread and upnp_thread.is_alive(): return
+	if upnp_thread: upnp_thread.wait_to_finish()
+	upnp_thread=Thread.new()
+	upnp_thread.start(_map_worker)
+
+func _map_worker():
+	mapper=UPNP.new()
+	var err=mapper.discover(2000,2,"InternetGatewayDevice")
+	var message="Automatic mapping unavailable. Forward UDP 24567 to this computer, or use a public dedicated server."
+	if err==UPNP.UPNP_RESULT_SUCCESS and mapper.get_gateway() and mapper.get_gateway().is_valid_gateway():
+		if mapper.add_port_mapping(PORT,PORT,"Catan online","UDP",3600)==UPNP.UPNP_RESULT_SUCCESS:
+			message="Router mapped for 1 hour. Invite address: %s:%d" % [mapper.query_external_address(),PORT]
+	call_deferred("_mapping_done",message)
+
+func _mapping_done(message: String):
+	notice.emit(message)
+
+func _exit_tree():
+	if upnp_thread: upnp_thread.wait_to_finish()
+
+func host_solo(pname: String):
+	leave()
+	online=true
+	solo=true
+	dedicated=false
+	seat=0
+	roster=[{"id":1,"name":pname,"ready":true,"connected":true,"bot":false,"piece_style":my_style}]
+	changed.emit()
+
+func is_controller() -> bool:
+	return multiplayer.is_server() or (dedicated and seat==0)
+
+func configure_bot(operation: String,index: int=-1,difficulty: int=1):
+	if multiplayer.is_server(): _edit_bot(1,operation,index,difficulty)
+	else: _bot_request.rpc_id(1,operation,index,difficulty)
+
+@rpc("any_peer","call_remote","reliable")
+func _bot_request(operation: String,index: int,difficulty: int):
+	if multiplayer.is_server(): _edit_bot(multiplayer.get_remote_sender_id(),operation,index,difficulty)
+
+func _edit_bot(sender: int,operation: String,index: int,difficulty: int):
+	if started or difficulty<0 or difficulty>2: return
+	if sender!=1 and (not dedicated or _seat_for(sender)!=0): return
+	if operation=="add" and roster.size()<MAX_PLAYERS:
+		var id=-1
+		while _seat_for(id)>=0: id-=1
+		var bot_name=["Juniper","Flint","Coral","Atlas","Willow","Slate"][(-id-1)%6]
+		roster.append({"id":id,"name":bot_name,"ready":true,"connected":true,"bot":true,"difficulty":difficulty,"piece_style":(-id)%CatanCosmetics.SETS.size()})
+	elif index>=0 and index<roster.size() and roster[index].get("bot",false):
+		if operation=="difficulty": roster[index].difficulty=difficulty
+		elif operation=="remove":
+			roster.remove_at(index)
+			var remapped={}
+			for key in seat_tokens:
+				if key<index: remapped[key]=seat_tokens[key]
+				elif key>index: remapped[key-1]=seat_tokens[key]
+			seat_tokens=remapped
+	_broadcast_lobby()
+
+func choose_piece_style(style: int,target: int=-1):
+	if not CatanCosmetics.valid_set(style):return
+	if target<0:target=seat
+	if not online or target<0:
+		my_style=style
+		return
+	if multiplayer.is_server():_set_piece_style(1,target,style)
+	else:_piece_style_request.rpc_id(1,target,style)
+
+@rpc("any_peer","call_remote","reliable")
+func _piece_style_request(target: int,style: int):
+	if online and multiplayer.is_server():_set_piece_style(multiplayer.get_remote_sender_id(),target,style)
+
+func _set_piece_style(sender: int,target: int,style: int):
+	if target<0 or target>=roster.size() or not CatanCosmetics.valid_set(style):return
+	var own=_seat_for(sender)
+	var controller=sender==1 or (dedicated and own==0)
+	if target!=own and not (controller and roster[target].get("bot",false)):return
+	roster[target].piece_style=style
+	if target==seat:my_style=style
+	_broadcast_lobby()
+	if started:_sync()
+
+func _process(delta: float):
+	_poll_secure_connection()
+	_process_music(delta)
+	if online and started and multiplayer.is_server() and not paused and roster.all(func(row):return row.connected):
+		world_seconds=fposmod(world_seconds+delta,600.0)
+	if not online or not started or not multiplayer.is_server() or tutorial or paused or rules.s.is_empty() or rules.s.winner!=-1: return
+	for row in roster:
+		if not row.connected: return
+	bot_clock-=delta
+	if bot_clock>0: return
+	bot_clock=bot_delay
+	if bot_turn!=rules.s.turn:
+		bot_turn=rules.s.turn
+		bot_action_count=0
+	for p in roster.size():
+		if not roster[p].get("bot",false): continue
+		if not bot_brains.has(p): bot_brains[p]=CatanBot.new()
+		var action=bot_brains[p].choose(rules.snapshot(p),p,int(roster[p].difficulty))
+		if action.is_empty(): continue
+		if p==rules.s.turn:
+			bot_action_count+=1
+			if bot_action_count>30 and rules.s.phase=="play" and rules.s.rolled: action={"type":"end"}
+		_apply(roster[p].id,action)
+		return
+
+
+func _reset_music():
+	music_track=0;music_position=0.0;music_paused=false;music_revision=0
+	music_anchor_ms=Time.get_ticks_msec();music_remote={};music_one_way=0.0
+	music_ping_clock=0.0;music_ping_sent=-1;music_last_command=-1000
+
+func can_control_music() -> bool:
+	return not online or solo or (seat>=0 and is_controller())
+
+func music_state() -> Dictionary:
+	if not online or multiplayer.is_server():
+		return _music_snapshot()
+	if music_remote.is_empty():return {"track":0,"position":0.0,"paused":true,"ready":false,"revision":-1}
+	return CatanSoundtrack.advance(music_remote,float(Time.get_ticks_msec()-music_received_ms)/1000.0)
+
+func _music_snapshot() -> Dictionary:
+	var now=Time.get_ticks_msec()
+	return CatanSoundtrack.advance({"track":music_track,"position":music_position,"paused":music_paused,"revision":music_revision,"server_ms":now,"ready":true},float(now-music_anchor_ms)/1000.0)
+
+func music_control(operation: String,track: int=-1):
+	if not can_control_music():
+		notice.emit("The room host controls the shared soundtrack. Your volume is personal.")
+		return
+	if not online or multiplayer.is_server():_set_music(1,operation,track)
+	else:_music_command.rpc_id(1,operation,track)
+
+@rpc("any_peer","call_remote","reliable")
+func _music_command(operation: String,track: int=-1):
+	if online and multiplayer.is_server():_set_music(multiplayer.get_remote_sender_id(),operation,track)
+
+func _set_music(sender: int,operation: String,track: int):
+	if sender!=1 and (not dedicated or _seat_for(sender)!=0):return
+	if operation not in ["toggle","previous","next","select"]:return
+	if operation=="select" and (track<0 or track>=CatanSoundtrack.TRACKS.size()):return
+	var now=Time.get_ticks_msec()
+	if now-music_last_command<100:return
+	music_last_command=now
+	var current=music_state()
+	match operation:
+		"toggle":current.paused=not current.paused
+		"next":current.track=(int(current.track)+1)%CatanSoundtrack.TRACKS.size();current.position=0.0
+		"previous":
+			if current.position<3:current.track=posmod(int(current.track)-1,CatanSoundtrack.TRACKS.size())
+			current.position=0.0
+		"select":current.track=track;current.position=0.0;current.paused=false
+	music_track=current.track;music_position=current.position;music_paused=current.paused;music_anchor_ms=now
+	music_revision+=1
+	_broadcast_music()
+
+func _broadcast_music():
+	var sample=_music_snapshot()
+	for row in roster:
+		if row.id>1 and row.connected:_music_update.rpc_id(row.id,sample)
+
+func _process_music(delta: float):
+	if not online or multiplayer.is_server():return
+	if seat<0 or multiplayer.multiplayer_peer.get_connection_status()!=MultiplayerPeer.CONNECTION_CONNECTED:return
+	music_ping_clock-=delta
+	if music_ping_clock>0:return
+	music_ping_clock=2.0
+	music_ping_sent=Time.get_ticks_msec()
+	_music_ping.rpc_id(1,music_ping_sent)
+
+@rpc("any_peer","call_remote","reliable")
+func _music_ping(sent_ms: int):
+	if not online or not multiplayer.is_server():return
+	var sender=multiplayer.get_remote_sender_id()
+	if _seat_for(sender)<0:return
+	_music_pong.rpc_id(sender,sent_ms,_music_snapshot())
+
+@rpc("authority","call_remote","reliable")
+func _music_pong(sent_ms: int,sample: Dictionary):
+	if sent_ms!=music_ping_sent or sent_ms<0:return
+	var rtt=float(Time.get_ticks_msec()-sent_ms)/1000.0
+	music_ping_sent=-1
+	if rtt<0 or rtt>2.0:return
+	music_one_way=rtt*.5
+	_accept_music(sample,music_one_way)
+
+@rpc("authority","call_remote","reliable")
+func _music_update(sample: Dictionary):
+	_accept_music(sample,music_one_way)
+
+func _accept_music(sample: Dictionary,latency: float):
+	if not online or multiplayer.is_server():return
+	if not music_remote.is_empty():
+		if sample.revision<music_remote.revision:return
+		if sample.revision==music_remote.revision and sample.server_ms<music_remote.server_ms:return
+	music_remote=CatanSoundtrack.advance(sample,latency)
+	music_received_ms=Time.get_ticks_msec()

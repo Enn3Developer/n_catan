@@ -1,0 +1,30 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          lfs: true
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: '1.25.x'
+          cache: false
+      - run: go -C updater test -race ./...
+      - run: go -C updater vet ./...
+      - run: python3 -m unittest discover -s tests -p 'test_*.py'
+      - run: python3 tools/build_updater.py --platform windows-x86_64 --output build/check/n-catan-updater.exe
+      - name: Import and test Godot
+        run: |
+          python3 tools/release.py bootstrap
+          export GODOT_BIN="$PWD/build/godot/Godot_v4.7.2-stable_linux.x86_64"
+          "$GODOT_BIN" --headless --path . --editor --import --quit
+          "$GODOT_BIN" --headless --path . --script tests/rules_test.gd
+          "$GODOT_BIN" --headless --path . --script tests/updater_ui_test.gd
+          "$GODOT_BIN" --headless --path . --script tests/version_network_test.gd

@@ -1,0 +1,22 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+.mcp/
+
+# Local exports, update staging, and generated release artifacts
+/build/
+/dist/
+/releases/
+*.log
+__pycache__/
+*.pyc
+.env
+.env.*
+*.private.pem
+*.key
+*.p12
+*.pfx
+/update-signing-private.pem
+# Developer tool state
+.codex/
+.agents/

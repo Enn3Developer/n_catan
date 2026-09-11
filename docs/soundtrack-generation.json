@@ -1,0 +1,38 @@
+[
+  {
+    "id": "sunlit_fields",
+    "title": "Sunlit Fields",
+    "mood": "Bright harp, flute and warm strings",
+    "duration": 86.47825396825397,
+    "bytes": 880009,
+    "peak": 0.5531061291694641,
+    "rms": 0.10499998927116394
+  },
+  {
+    "id": "trade_winds",
+    "title": "Trade Winds",
+    "mood": "Nylon strings, marimba and gentle percussion",
+    "duration": 94.42857142857143,
+    "bytes": 1510210,
+    "peak": 0.6753169894218445,
+    "rms": 0.10499999672174454
+  },
+  {
+    "id": "lantern_water",
+    "title": "Lanterns on the Water",
+    "mood": "Soft piano, glass bells and evening strings",
+    "duration": 93.0,
+    "bytes": 998441,
+    "peak": 0.6663761138916016,
+    "rms": 0.10499998927116394
+  },
+  {
+    "id": "voyager_waltz",
+    "title": "Voyager's Waltz",
+    "mood": "Pizzicato strings, woodwinds and a lilting waltz",
+    "duration": 69.97673469387755,
+    "bytes": 727211,
+    "peak": 0.6257829070091248,
+    "rms": 0.10500000417232513
+  }
+]

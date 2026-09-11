@@ -1,0 +1,7 @@
+//go:build linux
+
+package main
+
+import "syscall"
+
+func processAlive(pid int) bool { e := syscall.Kill(pid, 0); return e == nil || e == syscall.EPERM }

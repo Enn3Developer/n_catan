@@ -1,0 +1,18 @@
+{
+  "file": "build/linux/N Catan.x86_64",
+  "bytes": 514722520,
+  "engine_bytes": 73672920,
+  "pack_bytes": 441049588,
+  "engine_version": "4.7.2",
+  "resource_count": 475,
+  "categories": {
+    "Unused authoring textures": 162114124,
+    "Runtime textures (2048 px)": 151003490,
+    "Biome models": 65812073,
+    "Runtime textures (1024 px)": 37757278,
+    "Audio": 11272190,
+    "Runtime textures (512 px)": 9445727,
+    "Other resources": 3529876,
+    "Tests": 58200
+  }
+}
