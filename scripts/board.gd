@@ -30,6 +30,7 @@ var terrain_noise: NoiseTexture2D
 var elapsed=0.0
 var windmills=[]
 var birds=[]
+var seagulls=preload("res://scripts/seagulls.gd").new()
 var reduce_motion=false
 var camera_speed=1.0
 var board_labels=[]
@@ -406,6 +407,7 @@ func build(data: Dictionary):
 		terrain.add_child(label3("3:1" if a.port==-1 else "2:1",pos+outward*.82+Vector3.UP*.28,27,Color("fff1ce"),a.port))
 	refresh(data)
 	sea_traffic.configure(self)
+	seagulls.configure()
 	_update_boat_wakes()
 
 func _update_boat_wakes():
@@ -540,13 +542,7 @@ func _process(delta):
 	for harbor in harbors:
 		harbor.get_node("MooredBoat").position.y=-.025+sin(elapsed*.7+harbor.position.x)*.003
 	for mill in windmills: mill.rotation.z+=delta*0.4
-	for i in birds.size():
-		birds[i].visible=daylight>.15
-		var angle=elapsed*0.12+i*2.1
-		birds[i].position=Vector3(cos(angle)*6.5,2.2+sin(angle*2)*0.15,sin(angle)*5)
-		var tangent=Vector3(-6.5*sin(angle),0,5*cos(angle)).normalized()
-		birds[i].rotation.y=atan2(-tangent.x,-tangent.z)
-		birds[i].rotation.z=sin(elapsed*2+i)*0.10
+	seagulls.animate(delta,elapsed,daylight,weather.current if is_instance_valid(weather) else {},reduce_motion)
 	sea_traffic.animate(delta,elapsed)
 	if delta>0:
 		for harbor in harbors:_float_boat(harbor.get_node("MooredBoat"))
@@ -781,18 +777,7 @@ func _world_props():
 		var sail=mesh(CatanMiniature.sail(),Color("ebdbad"))
 		sail.material_override.cull_mode=BaseMaterial3D.CULL_DISABLED
 		boat.add_child(sail)
-	for i in 3:
-		var bird=Node3D.new()
-		scenery.add_child(bird)
-		birds.append(bird)
-		for direction in [-1,1]:
-			var shape=SphereMesh.new();shape.radius=.5;shape.height=1;shape.radial_segments=24;shape.rings=12
-			var wing=mesh(shape,Color("e8e1c9"));wing.scale=Vector3(.26,.022,.083)
-			wing.position.x=direction*0.075
-			wing.rotation.z=direction*0.22
-			bird.add_child(wing)
-		cosmetics.orb(bird,Vector3.ZERO,Vector3(.065,.065,.17),Color("e8e1c9"))
-		cosmetics.orb(bird,Vector3(0,.015,-.09),Vector3(.030,.022,.057),Color("d6a45c"))
+	seagulls.setup(self)
 
 func _terrain_mesh(kind: int) -> ArrayMesh:
 	var surface=SurfaceTool.new()
