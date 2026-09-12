@@ -38,6 +38,10 @@ static func resources(parent: Node,amounts: Array,pixels: int=24,show_zero: bool
 	return row
 static func button_icon(button: Button,key: String,pixels: int=22):
 	button.icon=get_icon(key)
+	# Resource illustrations already carry color; theme ink must not multiply it.
+	if key in RESOURCES:
+		for state in ["normal","hover","pressed","hover_pressed"]:
+			button.add_theme_color_override("icon_"+state+"_color",Color.WHITE)
 	button.expand_icon=true
 	button.add_theme_constant_override("icon_max_width",pixels)
 	button.add_theme_constant_override("h_separation",6)

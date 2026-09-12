@@ -22,6 +22,7 @@ for name,fill,edge,shine,low in [
  svg(name,f'<rect x="2" y="3" width="92" height="43" rx="9" fill="{low}" stroke="{edge}" stroke-width="2"/><rect x="3" y="3" width="90" height="37" rx="8" fill="{fill}"/><path d="M12 6 H84 Q90 6 90 12" stroke="{shine}" stroke-width="2" fill="none"/><path d="M9 37 Q16 39 23 37 M74 38 H86" stroke="{low}" fill="none"/>')
 svg('slider-knob','<circle cx="10" cy="10" r="8" fill="#d4a355" stroke="#694729" stroke-width="2"/><circle cx="10" cy="9" r="5" fill="#f2d48b"/><path d="M8 6 V12 M11 6 V12" stroke="#ad7c3e"/>',20,20)
 svg('arrow-down','<path d="M3 5 L9 11 L15 5" fill="none" stroke="#68472b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>',18,16)
+svg('arrow-up','<path d="M3 11 L9 5 L15 11" fill="none" stroke="#68472b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>',18,16)
 for state,on in [('checked',True),('unchecked',False)]:
  fill='#617f50' if on else '#beac8a';x=30 if on else 12
  svg('switch-'+state,f'<rect x="2" y="6" width="38" height="18" rx="9" fill="{fill}" stroke="#6b5135" stroke-width="2"/><circle cx="{x}" cy="15" r="10" fill="#f3d89c" stroke="#795330" stroke-width="2"/><path d="M{x-3} 12 V18 M{x+1} 12 V18" stroke="#ba8e51"/>',44,30)
@@ -32,7 +33,7 @@ def color(h):
 lines=['[gd_resource type="Theme" format=3 uid="uid://cr50xu8k1vr3e"]','',
  '[ext_resource type="FontFile" path="res://assets/fonts/FiraSans-Regular.ttf" id="body"]',
  '[ext_resource type="FontFile" path="res://assets/fonts/FiraSans-Medium.ttf" id="button-font"]']
-for name in ['parchment-panel','button','button-hover','button-pressed','button-primary','button-primary-hover','button-disabled','slider-knob','arrow-down','switch-checked','switch-unchecked']:
+for name in ['parchment-panel','button','button-hover','button-pressed','button-primary','button-primary-hover','button-disabled','slider-knob','arrow-down','arrow-up','switch-checked','switch-unchecked']:
  lines.append(f'[ext_resource type="Texture2D" path="res://assets/ui/{name}.svg" id="{name}"]')
 def texture_style(name,texture,margin=10,padx=12,pady=8):
  lines.extend(['',f'[sub_resource type="StyleBoxTexture" id="{name}"]',f'texture = ExtResource("{texture}")'])
@@ -71,6 +72,13 @@ prop('PopupPanel/styles/panel','SubResource("Popup")')
 prop('PopupMenu/styles/panel','SubResource("Popup")');prop('PopupMenu/styles/hover','SubResource("button-hover")')
 for key,h in [('font_color','493521'),('font_hover_color','392818'),('font_disabled_color','8b7b63')]:prop('PopupMenu/colors/'+key,color(h))
 prop('OptionButton/icons/arrow','ExtResource("arrow-down")')
+# Match number steppers to the existing dropdown chevrons and day/night palette.
+for direction in ['up','down']:
+ for state in ['', '_hover', '_pressed', '_disabled']:
+  prop('SpinBox/icons/'+direction+state, f'ExtResource("arrow-{direction}")')
+  prop('SpinBox/colors/'+direction+state+'_icon_modulate','Color(1, 1, 1, 0.45)' if state=='_disabled' else 'Color(1, 1, 1, 1)')
+prop('SpinBox/constants/buttons_width','28')
+prop('SpinBox/constants/field_and_buttons_separation','4')
 for state in ['checked','unchecked']:
  for variant in [state,state+'_disabled']:prop('CheckButton/icons/'+variant,f'ExtResource("switch-{state}")')
 for typ in ['HSlider','VSlider']:

@@ -33,7 +33,7 @@ var invite_address=""
 var inspection_mode=false
 var inspection_hint: Label
 var layout_queued=false
-var trade_players=false
+var trade_players=true
 var trade_give=0
 var trade_get=1
 var music_dialog_widgets={}
@@ -691,7 +691,7 @@ func _spin(parent: Node,limit: int=24) -> SpinBox:
 	return spin
 
 func _trade(reset: bool=true):
-	if reset:trade_players=false
+	if reset:trade_players=true
 	var box=_dialog("Trade")
 	modal.name="TradeDialog"
 	_label(box,tr("Your resources"),14,MUTED)
@@ -740,7 +740,10 @@ func _trade(reset: bool=true):
 		reason.text=tr("Choose different resources.") if not different else (tr("You need %d more %s.") % [int(amount_give.value)-state.players[net.seat].hand[trade_give],tr(CatanRules.RES[trade_give])] if not available else (tr("The bank has none of that resource.") if banking and state.bank[trade_get]==0 else (tr("Your best port rate: %d:1 · Bank stock: %d") % [rules.rate(net.seat,trade_give),state.bank[trade_get]] if banking else tr("Any player who can afford this offer may accept it."))))
 	selected_give.item_selected.connect(func(_value):refresh_trade.call())
 	selected_get.item_selected.connect(func(_value):refresh_trade.call())
-	bank_tab.pressed.connect(refresh_trade);player_tab.pressed.connect(refresh_trade)
+	bank_tab.pressed.connect(refresh_trade)
+	player_tab.pressed.connect(func():
+		amount_give.set_value_no_signal(1);amount_get.set_value_no_signal(1)
+		refresh_trade.call())
 	amount_give.value_changed.connect(func(_value):refresh_trade.call())
 	amount_get.value_changed.connect(func(_value):refresh_trade.call())
 	refresh_trade.call()
@@ -755,13 +758,6 @@ func _trade_choices(parent: Node,selection: OptionButton,giving: bool) -> Array:
 		var b=_button(choices,str(state.players[net.seat].hand[r]) if giving else "",func():
 			selection.select(r);selection.item_selected.emit(r))
 		b.toggle_mode=true;b.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-		var selected_style=_style(GOLD,8)
-		b.add_theme_stylebox_override("pressed",selected_style)
-		b.add_theme_stylebox_override("hover_pressed",selected_style)
-		b.add_theme_color_override("font_pressed_color",INK)
-		b.add_theme_color_override("icon_pressed_color",INK)
-		b.add_theme_color_override("font_hover_pressed_color",INK)
-		b.add_theme_color_override("icon_hover_pressed_color",INK)
 		CatanIcons.button_icon(b,CatanIcons.RESOURCES[r],24)
 		buttons.append(b)
 	return buttons
