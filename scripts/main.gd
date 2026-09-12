@@ -391,6 +391,7 @@ func _process(delta):
 	if not server_only and is_instance_valid(audio):
 		var soundtrack=net.music_state()
 		audio.follow_soundtrack(soundtrack,delta)
+		if is_instance_valid(board.weather):audio.follow_weather(board.weather.current,delta)
 		music_ui_clock-=delta
 		if music_ui_clock<=0:
 			music_ui_clock=.15

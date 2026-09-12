@@ -20,7 +20,6 @@ var marker_nodes=[]
 var cache=[]
 var scenery: Node3D
 var background_landscape: Node3D
-var clouds=[]
 var boats=[]
 var sea_traffic=preload("res://scripts/sea_traffic.gd").new()
 var beacon: Node3D
@@ -45,6 +44,7 @@ var cosmetics=CatanCosmetics.new()
 var render_values=CatanSettings.DEFAULTS.duplicate()
 var tile_nodes=[]
 var ocean: MeshInstance3D
+var water_centers=PackedVector2Array()
 var camera_focus=Vector3(0,0,1.0)
 var camera_zoom=1.0
 var last_water_quality=-1
@@ -63,6 +63,7 @@ var dwellers=[]
 var road_travel=preload("res://scripts/road_travel.gd").new()
 var night_lights=[]
 var daylight=1.0
+var weather
 
 func _ready():
 	if "--server" in OS.get_cmdline_user_args():
@@ -85,11 +86,16 @@ func _ready():
 	var env=Environment.new()
 	env.background_mode=Environment.BG_SKY
 	var sky=Sky.new()
-	var atmosphere=ProceduralSkyMaterial.new()
-	atmosphere.sky_top_color=Color("4d7389")
-	atmosphere.sky_horizon_color=Color("ccd3c7")
-	atmosphere.ground_bottom_color=Color("174352")
-	atmosphere.ground_horizon_color=Color("bdd6d3")
+	var atmosphere=ShaderMaterial.new()
+	atmosphere.shader=preload("res://shaders/weather_sky.gdshader")
+	var cloud_noise=FastNoiseLite.new()
+	cloud_noise.seed=7241;cloud_noise.frequency=.008;cloud_noise.fractal_octaves=5
+	var cloud_texture=NoiseTexture2D.new()
+	cloud_texture.width=512;cloud_texture.height=512;cloud_texture.seamless=true
+	cloud_texture.noise=cloud_noise
+	atmosphere.set_shader_parameter("cloud_noise",cloud_texture)
+	sky.radiance_size=Sky.RADIANCE_SIZE_256
+	sky.process_mode=Sky.PROCESS_MODE_REALTIME
 	sky.sky_material=atmosphere
 	env.sky=sky
 	env.fog_enabled=true
@@ -143,9 +149,11 @@ func _ready():
 	ocean.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var water_material=ShaderMaterial.new()
 	water_material.shader=load("res://shaders/water.gdshader")
+	water_material.set_shader_parameter("waves",preload("res://scripts/ocean_waves.gd").WAVES)
 	ocean.material_override=water_material
 	sea_material=water_material
 	ocean.position.y=-.027*TILE_SIZE
+	ocean.extra_cull_margin=4.0
 	add_child(ocean)
 	for branch in [terrain,pieces_root,markers]:branch.scale=Vector3.ONE*TILE_SIZE
 	var stats=CanvasLayer.new()
@@ -184,6 +192,7 @@ func _ready():
 	pollen.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(pollen)
 	_world_props()
+	weather=preload("res://scripts/weather.gd").new();add_child(weather);weather.setup()
 
 func mat(color: Color) -> StandardMaterial3D:
 	var m=StandardMaterial3D.new()
@@ -307,7 +316,6 @@ func apply_preferences(values: Dictionary):
 		plane.subdivide_depth=plane.subdivide_width
 		ocean.mesh=plane
 		last_water_quality=values.water_quality
-	for cloud in clouds:cloud.visible=false
 	for material in vegetation:material.set_shader_parameter("motion_speed",0.0 if reduce_motion else values.wind)
 	for smoke in find_children("Smoke","CPUParticles3D",true,false):
 		smoke.emitting=values.particles>0 and not reduce_motion
@@ -376,6 +384,7 @@ func build(data: Dictionary):
 				pip.position=Vector3(marker.x+(dot-(dot_count-1)*.5)*.033,.265,marker.y+.08)
 				root.add_child(pip)
 
+	water_centers=centers.duplicate()
 	while centers.size()<30:centers.append(Vector2(10000,10000))
 	sea_material.set_shader_parameter("tile_centers",centers)
 	sea_material.set_shader_parameter("tile_count",state.tiles.size())
@@ -523,6 +532,8 @@ func _process(delta):
 	if fps_label.visible:fps_label.text=tr("%d FPS · %.1f ms · %.0f MB VRAM") % [Engine.get_frames_per_second(),1000.0/maxf(1,Engine.get_frames_per_second()),Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED)/1048576.0]
 	if reduce_motion: delta=0.0
 	elapsed+=delta
+	sea_material.set_shader_parameter("animation_time",elapsed)
+	get_node("WorldEnvironment").environment.sky.sky_material.set_shader_parameter("animation_time",elapsed)
 	living_world.animate(actors,elapsed,art,daylight)
 	living_world.animate(band_actors,elapsed,art,daylight)
 	living_world.animate_dwellers(dwellers,elapsed,daylight)
@@ -537,11 +548,11 @@ func _process(delta):
 		birds[i].rotation.y=atan2(-tangent.x,-tangent.z)
 		birds[i].rotation.z=sin(elapsed*2+i)*0.10
 	sea_traffic.animate(delta,elapsed)
+	if delta>0:
+		for harbor in harbors:_float_boat(harbor.get_node("MooredBoat"))
+		for ship in sea_traffic.fleet:_float_boat(ship.boat)
 	_update_boat_wakes()
 	_animate_beacon()
-	for i in clouds.size():
-		clouds[i].position.x+=delta*0.025
-		if clouds[i].position.x>16: clouds[i].position.x=-16
 	if targets.is_empty(): return
 	var mouse=get_viewport().get_mouse_position()
 	var nearest=-1
@@ -648,7 +659,7 @@ func _rock(parent: Node3D,pos: Vector3,size: Vector3,color: Color):
 	sphere.radial_segments=20
 	sphere.rings=10
 	var rock=mesh(sphere,color)
-	if parent not in clouds:_apply_surface(rock,"PBR_Wood" if parent in boats else "PBR_Rock")
+	_apply_surface(rock,"PBR_Wood" if parent in boats else "PBR_Rock")
 	rock.position=pos
 	rock.scale=size
 	rock.rotation=Vector3(pos.x,0.3+pos.z,pos.x*0.5)
@@ -782,14 +793,6 @@ func _world_props():
 			bird.add_child(wing)
 		cosmetics.orb(bird,Vector3.ZERO,Vector3(.065,.065,.17),Color("e8e1c9"))
 		cosmetics.orb(bird,Vector3(0,.015,-.09),Vector3(.030,.022,.057),Color("d6a45c"))
-	# Distant soft, low-poly clouds, away from the interactive board.
-	for i in 7:
-		var cloud=Node3D.new()
-		cloud.position=Vector3(-13+i*4.1,3.5+random.randf()*1.5,-9-random.randf()*4)
-		scenery.add_child(cloud)
-		clouds.append(cloud)
-		for j in 4:
-			_rock(cloud,Vector3(j*0.5,random.randf()*0.12,0),Vector3(1.2,0.42+random.randf()*0.3,0.6),Color("dae4df"))
 
 func _terrain_mesh(kind: int) -> ArrayMesh:
 	var surface=SurfaceTool.new()
@@ -922,6 +925,12 @@ func _animate_beacon():
 	beacon_lamp.material_override.emission_energy_multiplier=night*1.4
 	beacon_beam.material_override.set_shader_parameter("strength",night)
 
+func _float_boat(boat: Node3D):
+	var p=Vector2(boat.global_position.x,boat.global_position.z)
+	var storm=float(weather.current.storm) if is_instance_valid(weather) else 0.0
+	var height=preload("res://scripts/ocean_waves.gd").height(p,elapsed*render_values.wind,storm,render_values.water_quality,water_centers,TILE_SIZE*.993)
+	boat.position.y+=height/boat.get_parent().global_basis.get_scale().y
+
 # A complete day lasts ten minutes of active play. Solo pause freezes the clock.
 func advance_day(delta: float):
 	day_seconds=fposmod(day_seconds+delta,600.0)
@@ -938,9 +947,37 @@ func advance_day(delta: float):
 	env.ambient_light_color=Color("7893bf").lerp(Color("b7d4e0"),daylight)
 	env.fog_light_color=Color("233750").lerp(Color("b2d0ce"),daylight)
 	var sky=env.sky.sky_material
-	sky.sky_top_color=Color("091329").lerp(Color("4d7389"),daylight)
-	sky.sky_horizon_color=Color("33445d").lerp(Color("ccd3c7"),daylight)
-	sky.ground_horizon_color=Color("243952").lerp(Color("bdd6d3"),daylight)
+	var sky_top=Color("091329").lerp(Color("2780cf"),daylight)
+	var sky_horizon=Color("33445d").lerp(Color("a4d5f4"),daylight)
+	if is_instance_valid(weather):
+		weather.update_weather(day_seconds,daylight,render_values,board_scale)
+		var conditions=weather.current
+		var overcast=float(conditions.clouds)
+		var storm=float(conditions.storm)
+		var direct_sun=float(conditions.sun_visibility)
+		var sky_overcast=smoothstep(.28,.72,overcast)
+		# Cloudy, rainy and stormy skies light the board diffusely, without sun shadows.
+		sun.light_energy*=direct_sun
+		sun.shadow_enabled=render_values.get("shadow_quality",3)>0 and direct_sun>.01
+		env.ambient_light_energy=lerpf(.65,.50,storm)
+		env.ambient_light_sky_contribution=lerpf(1.0,.35,overcast)
+		env.ambient_light_color=Color("7893bf").lerp(Color("c4d1db"),daylight)
+		env.fog_density=lerpf(.0018*2.2/TILE_SIZE,.0007,float(conditions.rain))
+		env.fog_light_color=env.fog_light_color.lerp(Color("687c8e"),overcast*.55)
+		sky_top=sky_top.lerp(Color("647586").darkened((1.0-daylight)*.68),sky_overcast*.85)
+		sky_horizon=sky_horizon.lerp(Color("85939c").darkened((1.0-daylight)*.64),sky_overcast*.8)
+		sky.set_shader_parameter("cloud_cover",overcast)
+		sky.set_shader_parameter("sun_visibility",direct_sun)
+		sky.set_shader_parameter("storm_strength",storm)
+		sky.set_shader_parameter("flash",0.0 if reduce_motion else conditions.flash)
+		sea_material.set_shader_parameter("sun_strength",daylight*direct_sun)
+		sea_material.set_shader_parameter("storm_strength",storm)
+		sea_material.set_shader_parameter("rain_strength",0.0 if reduce_motion or render_values.particles==0 else conditions.rain)
+	sky.set_shader_parameter("sky_top_color",sky_top)
+	sky.set_shader_parameter("sky_horizon_color",sky_horizon)
+	sky.set_shader_parameter("daylight",daylight)
+	sky.set_shader_parameter("sun_direction",sun.global_basis.z.normalized())
+	sea_material.set_shader_parameter("sun_direction",sun.global_basis.z.normalized())
 	background_landscape.set_daylight(daylight)
 	living_world.night_lighting(night_lights,1.0-daylight)
 	_animate_beacon()

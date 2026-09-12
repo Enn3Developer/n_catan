@@ -4,6 +4,7 @@ signal close_requested
 const OPTIONS=[
 	["Lighting","DayNightCycle","day_night_cycle","Day/night cycle","toggle",[],"Turn off to keep the island in daylight. This setting is personal.","Negligible"],
 	["World","Language","language","Language","option",["English","Italiano"],"Choose the language used on this computer.","Accessibility"],
+	["Lighting","Weather","weather","Weather","option",["Automatic","Clear skies","Cloudy","Rain","Thunderstorm"],"Choose changing weather or keep one condition. Rain and thunder use the ambience volume. Reduced motion disables rain and lightning flashes.","Clouds and rain"],
 	["Display","Fullscreen","fullscreen","Fullscreen","toggle",[],"Fill the current display. Window size is used only in windowed mode.","Display"],
 	["Display","WindowSize","window_size","Window size","option",["1280 × 720","1440 × 900","1920 × 1080","2560 × 1440","3840 × 2160"],"Size of the game window. Fullscreen uses your desktop resolution; render scale controls 3D resolution independently.","GPU workload increases with resolution"],
 	["Display","VSync","vsync","Vertical sync","toggle",[],"Synchronize frame presentation with the display to prevent tearing. The frame limit can cap rendering below its refresh rate.","Can add input latency"],

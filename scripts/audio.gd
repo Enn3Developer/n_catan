@@ -2,6 +2,9 @@ class_name CatanAudio
 extends Node
 var music: AudioStreamPlayer
 var ambience: AudioStreamPlayer
+var rain_ambience: AudioStreamPlayer
+var thunder_ambience: AudioStreamPlayer
+var weather_last_thunder=-1
 var voices=[]
 var sounds={}
 var voice_index=0
@@ -35,6 +38,10 @@ func _ready():
 	apply(CatanSettings.new().values)
 	follow_soundtrack({"track":0,"position":0.0,"paused":false,"generation":0},.016)
 	ambience.play()
+	rain_ambience=AudioStreamPlayer.new();rain_ambience.name="RainAmbience";rain_ambience.bus="Ambience";add_child(rain_ambience)
+	rain_ambience.stream=_loop("rain");rain_ambience.volume_db=-60
+	thunder_ambience=AudioStreamPlayer.new();thunder_ambience.name="ThunderAmbience";thunder_ambience.bus="Ambience";add_child(thunder_ambience)
+	thunder_ambience.stream=load("res://assets/audio/thunder.wav")
 func _loop(name_value: String) -> AudioStreamWAV:
 	var stream=load("res://assets/audio/%s.wav" % name_value).duplicate() as AudioStreamWAV
 	stream.loop_mode=AudioStreamWAV.LOOP_FORWARD
@@ -163,11 +170,23 @@ func follow_soundtrack(sample: Dictionary,delta: float):
 	current_track=sample.track
 	music_spare=fading_tracks.back() if not fading_tracks.is_empty() else music
 
+func follow_weather(conditions: Dictionary,delta: float):
+	if shutting_down or not is_instance_valid(rain_ambience):return
+	var intensity=float(conditions.get("rain",0.0))
+	var volume=lerpf(rain_ambience.volume_linear,intensity*.65,1.0-exp(-delta*2.0))
+	rain_ambience.volume_linear=volume
+	if volume>.001 and not rain_ambience.playing:rain_ambience.play()
+	elif volume<=.001 and rain_ambience.playing:rain_ambience.stop()
+	var thunder=bool(conditions.get("thunder",false))
+	if thunder and int(conditions.get("strike",-1))!=weather_last_thunder:
+		thunder_ambience.volume_db=-5;thunder_ambience.play()
+		weather_last_thunder=int(conditions.strike)
+
 func shutdown():
 	if shutting_down:return
 	shutting_down=true
 	for key in music_voices.keys():_remove_music_voice(key)
-	for player in [ambience]+voices:
+	for player in [ambience,rain_ambience,thunder_ambience]+voices:
 		if is_instance_valid(player):player.stop();player.stream=null;player.queue_free()
 	track_streams.clear();sounds.clear();voices.clear();fading_tracks.clear()
 

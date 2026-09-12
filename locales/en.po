@@ -1792,3 +1792,27 @@ msgstr "Slate"
 
 msgid "Player color: %s"
 msgstr "Player color: %s"
+
+msgid "Weather"
+msgstr "Weather"
+
+msgid "Automatic"
+msgstr "Automatic"
+
+msgid "Clear skies"
+msgstr "Clear skies"
+
+msgid "Cloudy"
+msgstr "Cloudy"
+
+msgid "Rain"
+msgstr "Rain"
+
+msgid "Thunderstorm"
+msgstr "Thunderstorm"
+
+msgid "Clouds and rain"
+msgstr "Clouds and rain"
+
+msgid "Choose changing weather or keep one condition. Rain and thunder use the ambience volume. Reduced motion disables rain and lightning flashes."
+msgstr "Choose changing weather or keep one condition. Rain and thunder use the ambience volume. Reduced motion disables rain and lightning flashes."
