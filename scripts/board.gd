@@ -60,6 +60,7 @@ var actors=[]
 var harbors=[]
 var band_actors=[]
 var dwellers=[]
+var road_travel=preload("res://scripts/road_travel.gd").new()
 var night_lights=[]
 var daylight=1.0
 
@@ -415,25 +416,51 @@ func refresh(data: Dictionary):
 	state=data
 	dwellers=[]
 	for n in pieces_root.get_children(): n.free()
+	var joins={}
+	for e in state.edges:
+		if e.owner<0:continue
+		for vid in [e.a,e.b]:
+			if state.vertices[vid].owner>=0:continue
+			var key=Vector2i(vid,e.owner)
+			joins[key]=joins.get(key,0)+1
 	for e in state.edges:
 		if e.owner<0: continue
 		var a=state.vertices[e.a]
 		var b=state.vertices[e.b]
 		var road=cosmetics.road(_piece_style(e.owner),player_color(e.owner))
-		road.position=Vector3((a.x+b.x)/2,.2385 if _piece_style(e.owner)==2 else .2285,(a.z+b.z)/2)
+		var start=Vector3(a.x,0,a.z)
+		var end=Vector3(b.x,0,b.z)
+		var direction=(end-start).normalized()
+		var gap=maxf(0,(start.distance_to(end)-.77)*.5)
+		if joins.get(Vector2i(e.a,e.owner),0)<2:start+=direction*gap
+		if joins.get(Vector2i(e.b,e.owner),0)<2:end-=direction*gap
+		road.scale.z=start.distance_to(end)/.77
+		road.scale.y=CatanCosmetics.ROAD_HEIGHT_SCALE
+		road.position=(start+end)*.5+Vector3.UP*CatanCosmetics.road_base_height(_piece_style(e.owner))
 		road.rotation.y=atan2(b.x-a.x,b.z-a.z)
 		pieces_root.add_child(road)
+	for key in joins:
+		if joins[key]<2:continue
+		var v=state.vertices[key.x]
+		var join=cosmetics.road_joint(_piece_style(key.y),player_color(key.y))
+		join.position=Vector3(v.x,CatanCosmetics.road_base_height(_piece_style(key.y)),v.z)
+		join.scale.y=CatanCosmetics.ROAD_HEIGHT_SCALE
+		pieces_root.add_child(join)
+	var town_residents={}
 	for vid in state.vertices.size():
 		var v=state.vertices[vid]
 		if v.owner<0: continue
 		var village=Node3D.new()
 		village.position=Vector3(v.x,0.22,v.z)
 		pieces_root.add_child(village)
+		var first_resident=dwellers.size()
 		_house(village,Vector3.ZERO,player_color(v.owner),v.level==2,_piece_style(v.owner))
+		town_residents[vid]=dwellers[first_resident]
 		if not reduce_motion and not old.is_empty() and (old.vertices[vid].owner!=v.owner or old.vertices[vid].level!=v.level):
 			village.scale=Vector3.ONE*0.1
 			create_tween().tween_property(village,"scale",Vector3.ONE,0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
+	road_travel.assign(state,town_residents,pieces_root)
 	var t=state.tiles[state.robber]
 	var band=living_world.robber_band(t.kind,art)
 	band.root.position=Vector3(t.x,0,t.z)

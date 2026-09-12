@@ -1,6 +1,13 @@
 class_name CatanCosmetics
 extends RefCounted
 
+# Keep the deck close to the terrain while retaining the modeled trim.
+const ROAD_HEIGHT_SCALE=.30
+static func road_base_height(style: int) -> float:
+	return .201+(.0375 if style==2 else .0275)*ROAD_HEIGHT_SCALE
+static func road_deck_height(style: int) -> float:
+	return road_base_height(style)+(.051 if style==2 else .0465)*ROAD_HEIGHT_SCALE
+
 const SETS=["Voyager","Harbor","Citadel","Wildwood"]
 const SET_DESCRIPTIONS=["Timber framing, tiled roofs and brass details. A classic island expedition.","Stilt houses, dock roads and a lantern tower. Built for life beside the sea.","Carved stone, battlements and heraldic shields. An island stronghold.","Log cabins, leafy roofs and a treehouse tower. A home among the trees."]
 var materials={}
@@ -178,4 +185,11 @@ func road(style: int,color: Color) -> Node3D:
 		if style==1:
 			for z in [-.31,.31]:
 				for x in [-.077,.077]:round_part(root,Vector3(x,.065,z),.018,.13,color)
+	return root
+
+func road_joint(style: int,color: Color) -> Node3D:
+	var root=Node3D.new();root.name="RoadJoint"
+	# A small round cap closes bends and three-way branches without overlapping faces.
+	round_part(root,Vector3(0,0,0),.09,.075 if style==2 else .055,Color("6f756f") if style==2 else Color("6b513b"),-1,24)
+	round_part(root,Vector3(0,.042 if style==2 else .0375,0),.091,.018,color,-1,24)
 	return root

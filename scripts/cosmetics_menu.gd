@@ -16,7 +16,13 @@ var preview_color=Color("ed815d")
 var drag_area: SubViewportContainer
 var turn=0.0
 var updating=false
-var color_picker: ColorPickerButton
+const COLOR_SWATCHES=[
+	["Coral","ed815d"],["Red","c94c4c"],["Orange","df903d"],["Gold","d9b76c"],["Yellow","ebd85b"],
+	["Lime","a7cf54"],["Green","7dcc83"],["Forest","39825b"],["Teal","329c91"],["Cyan","65bfcb"],
+	["Sky","6ca9df"],["Blue","426ec4"],["Indigo","5956a8"],["Purple","9062bd"],["Lavender","b697d7"],
+	["Pink","df89b3"],["Sand","d1aa87"],["Brown","946549"],["Ivory","e9e4d4"],["Slate","536578"]]
+var color_buttons=[]
+var color_name: Label
 
 func label(parent: Node,text: String,font_size: int,color: Color=Color("493521")) -> Label:
 	var n=Label.new();n.text=tr(text);n.add_theme_font_size_override("font_size",font_size);n.add_theme_color_override("font_color",color);parent.add_child(n);return n
@@ -32,7 +38,7 @@ func setup(settings: CatanSettings,net: CatanNetwork):
 	var margin=MarginContainer.new()
 	for edge in ["left","right","top","bottom"]:margin.add_theme_constant_override("margin_"+edge,8)
 	panel.add_child(margin)
-	var layout=VBoxContainer.new();layout.add_theme_constant_override("separation",16);margin.add_child(layout)
+	var layout=VBoxContainer.new();layout.add_theme_constant_override("separation",6);margin.add_child(layout)
 
 	var heading=HBoxContainer.new();layout.add_child(heading)
 	var title=label(heading,tr("Player appearance"),28);title.size_flags_horizontal=Control.SIZE_EXPAND_FILL
@@ -51,14 +57,25 @@ func setup(settings: CatanSettings,net: CatanNetwork):
 	drag_area.gui_input.connect(_preview_input)
 	label(preview_box,tr("Road · Settlement · City"),14,Color("8c522d")).horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 	label(preview_box,tr("Drag the preview to turn the pieces"),14,Color("796347")).horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-	var styles=VBoxContainer.new();styles.custom_minimum_size.x=210;styles.add_theme_constant_override("separation",12);content.add_child(styles)
+	var style_scroll=ScrollContainer.new();style_scroll.custom_minimum_size.x=250;style_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;content.add_child(style_scroll)
+	var styles=VBoxContainer.new();styles.size_flags_horizontal=Control.SIZE_EXPAND_FILL;styles.add_theme_constant_override("separation",6);style_scroll.add_child(styles)
 	for i in CatanCosmetics.SETS.size():
-		var choose=button(styles,CatanCosmetics.SETS[i]);choose.name="Style"+str(i);choose.toggle_mode=true;choose.alignment=HORIZONTAL_ALIGNMENT_LEFT;choose.add_theme_font_size_override("font_size",21);choose.pressed.connect(func():select_style(i));style_buttons.append(choose)
-		choose.tooltip_text=CatanCosmetics.SET_DESCRIPTIONS[i]
-	label(styles,tr("Player color"),17)
-	color_picker=ColorPickerButton.new();color_picker.name="PlayerColor";color_picker.edit_alpha=false;color_picker.custom_minimum_size.y=42;styles.add_child(color_picker)
-	color_picker.color_changed.connect(func(value):preview_color=Color(value,1.0);select_style(selected))
-	button(styles,tr("Use seat color")).pressed.connect(func():preview_color=CatanBoard.PLAYERS[maxi(0,target)];color_picker.color=preview_color;select_style(selected))
+		var choose=button(styles,CatanCosmetics.SETS[i]);choose.custom_minimum_size.y=36;choose.name="Style"+str(i);choose.toggle_mode=true;choose.alignment=HORIZONTAL_ALIGNMENT_LEFT;choose.add_theme_font_size_override("font_size",19);choose.pressed.connect(func():select_style(i));style_buttons.append(choose)
+		choose.tooltip_text=tr(CatanCosmetics.SET_DESCRIPTIONS[i])
+	color_name=label(styles,"",16);color_name.name="SelectedColor";color_name.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	var grid=GridContainer.new();grid.name="PlayerColors";grid.columns=5;grid.add_theme_constant_override("h_separation",6);grid.add_theme_constant_override("v_separation",6);styles.add_child(grid)
+	for i in COLOR_SWATCHES.size():
+		var swatch=Button.new();swatch.name="Color"+str(i);swatch.custom_minimum_size=Vector2(40,36);swatch.toggle_mode=true;swatch.tooltip_text=tr(COLOR_SWATCHES[i][0])
+		var color=Color(COLOR_SWATCHES[i][1])
+		var ink=Color("101820") if color.get_luminance()>.35 else Color.WHITE
+		for state in ["normal","hover","pressed","hover_pressed","focus"]:
+			var surface=StyleBoxFlat.new();surface.bg_color=color;surface.set_corner_radius_all(6);surface.set_border_width_all(3 if state in ["pressed","hover_pressed","focus"] else 2 if state=="hover" else 1);surface.border_color=ink
+			swatch.add_theme_stylebox_override(state,surface)
+		for state in ["font_color","font_hover_color","font_pressed_color","font_hover_pressed_color","font_focus_color"]:swatch.add_theme_color_override(state,ink)
+		swatch.add_theme_constant_override("outline_size",0)
+		grid.add_child(swatch);color_buttons.append(swatch)
+		swatch.pressed.connect(func():preview_color=color;select_style(selected))
+	button(styles,tr("Use seat color")).pressed.connect(func():preview_color=CatanBoard.PLAYERS[maxi(0,target)];select_style(selected))
 	var bottom=HBoxContainer.new();bottom.add_theme_constant_override("separation",16);layout.add_child(bottom)
 	status=label(bottom,"",16,Color("8c522d"));status.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	equip=button(bottom,tr("Apply appearance"));equip.name="EquipSet";equip.custom_minimum_size.x=130;equip.pressed.connect(_equip)
@@ -83,14 +100,12 @@ func refresh_roster():
 	if found<0:found=0
 	choices.select(found);target=choices.get_item_metadata(found)
 	preview_color=network.player_color(target)
-	color_picker.color=preview_color
 	updating=false
 	if is_instance_valid(equip):select_style(selected)
 
 func _target_changed(index: int):
 	if updating:return
 	target=choices.get_item_metadata(index);preview_color=network.player_color(target)
-	color_picker.color=preview_color
 	select_style(_equipped())
 
 func _equipped() -> int:
@@ -99,7 +114,13 @@ func _equipped() -> int:
 
 func select_style(index: int):
 	selected=index
-	color_picker.color=preview_color
+	color_name.text=tr("Custom")
+	for i in color_buttons.size():
+		var active=preview_color.is_equal_approx(Color(COLOR_SWATCHES[i][1]))
+		color_buttons[i].set_pressed_no_signal(active)
+		color_buttons[i].text="✓" if active else ""
+		if active:color_name.text=tr(COLOR_SWATCHES[i][0])
+	color_name.text=tr("Player color: %s")%color_name.text
 	for i in style_buttons.size():style_buttons[i].set_pressed_no_signal(i==selected)
 	for child in display_root.get_children():child.free()
 	for i in 3:

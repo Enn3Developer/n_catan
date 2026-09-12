@@ -13,7 +13,7 @@ func dismiss(key: String):
 		remove_child(card)
 		card.queue_free()
 
-func show_notice(key: String,message: String,action_text: String="",action: Callable=Callable(),seconds: float=0):
+func show_notice(key: String,message: String,action_text: String="",action: Callable=Callable(),seconds: float=5):
 	dismiss(key)
 	while cards.size()>=3:dismiss(cards.keys()[0])
 	var card=PanelContainer.new()

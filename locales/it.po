@@ -1729,3 +1729,66 @@ msgstr "Annulla"
 
 msgid "Redo"
 msgstr "Ripeti"
+
+msgid "Coral"
+msgstr "Corallo"
+
+msgid "Red"
+msgstr "Rosso"
+
+msgid "Orange"
+msgstr "Arancione"
+
+msgid "Gold"
+msgstr "Oro"
+
+msgid "Yellow"
+msgstr "Giallo"
+
+msgid "Lime"
+msgstr "Lime"
+
+msgid "Green"
+msgstr "Verde"
+
+msgid "Forest"
+msgstr "Verde bosco"
+
+msgid "Teal"
+msgstr "Verde petrolio"
+
+msgid "Cyan"
+msgstr "Ciano"
+
+msgid "Sky"
+msgstr "Celeste"
+
+msgid "Blue"
+msgstr "Blu"
+
+msgid "Indigo"
+msgstr "Indaco"
+
+msgid "Purple"
+msgstr "Viola"
+
+msgid "Lavender"
+msgstr "Lavanda"
+
+msgid "Pink"
+msgstr "Rosa"
+
+msgid "Sand"
+msgstr "Sabbia"
+
+msgid "Brown"
+msgstr "Marrone"
+
+msgid "Ivory"
+msgstr "Avorio"
+
+msgid "Slate"
+msgstr "Ardesia"
+
+msgid "Player color: %s"
+msgstr "Colore giocatore: %s"

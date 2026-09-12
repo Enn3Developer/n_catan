@@ -61,6 +61,9 @@ class LocalizationTests(unittest.TestCase):
         for variable in ['names','effects']:
             for raw in re.findall(r'var '+variable+r'=([^\n]+)',main):
                 keys.extend(ast.literal_eval(raw))
+        cosmetics=(ROOT/'scripts/cosmetics_menu.gd').read_text()
+        swatches=ast.literal_eval(cosmetics.split('const COLOR_SWATCHES=',1)[1].split('\nvar color_buttons',1)[0])
+        keys.extend(swatch[0] for swatch in swatches)
         for key in keys:self.assertIn(key,translations,key)
 
 if __name__=='__main__':unittest.main()

@@ -37,7 +37,7 @@ func run():
 	game.modal._change(game.modal.OPTIONS[1],1);await settle()
 	check(TranslationServer.translate("Move the robber")=="Sposta il brigante","switch to Italian live")
 	game._close_modal();game._open_cosmetics();await settle()
-	game.modal.color_picker.get_popup().popup_centered();await shot("color-picker-it")
+	check(game.modal.color_buttons.size()==20,"twenty simple color swatches");await shot("color-swatches-it")
 	game._close_modal();game._solo();game.net.roster[0].name="City";game.net.start_game();game.net.paused=true
 	game.net.rules.s.players[0].name="City"
 	game.net.rules.s.players[0].cards=[1,1,1,1,1]

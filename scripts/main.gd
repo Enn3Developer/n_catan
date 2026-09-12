@@ -11,6 +11,7 @@ var ui: Control
 var ui_day_night
 var screen: Control
 var toast: Label
+var toast_generation=0
 var modal: Control
 var state={}
 var mode=""
@@ -630,9 +631,10 @@ func _notice(message: String):
 		if net.online and not net.started: _lobby()
 	toast.text=CatanI18n.render(message)
 	toast.show()
-	var old=toast.text
-	get_tree().create_timer(8).timeout.connect(func():
-		if is_instance_valid(toast) and toast.text==old: toast.hide())
+	toast_generation+=1
+	var generation=toast_generation
+	get_tree().create_timer(5).timeout.connect(func():
+		if is_instance_valid(toast) and toast_generation==generation: toast.hide())
 
 func _dialog(title: String) -> VBoxContainer:
 	if is_instance_valid(modal): modal.free()
@@ -794,7 +796,7 @@ func _trade_notifications(previous: Dictionary,previous_offer: Dictionary,fresh:
 		"withdrawn":message=tr("Trade offer withdrawn.") if actor==net.seat else tr("%s withdrew their trade offer.") % state.players[actor].name
 		"bank":
 			if actor==net.seat:message=tr("Bank trade completed.")
-	if not message.is_empty():notifications.show_notice("trade_result",message,"",Callable(),8)
+	if not message.is_empty():notifications.show_notice("trade_result",message,"",Callable())
 
 func _view_offer():
 	if state.get("offer",{}).is_empty():return
@@ -1004,7 +1006,6 @@ func _open_settings():
 	net.paused=net.solo
 	modal.setup(preferences)
 	_button(modal.get_node("%Navigation"),"Updates",_open_updates)
-	_button(modal.get_node("%Navigation"),"Appearance",_open_cosmetics)
 	modal.find_child("ExitDesktop",true,false).pressed.connect(_exit_desktop)
 	modal.preferences_changed.connect(_apply_preferences)
 	modal.close_requested.connect(_close_modal,CONNECT_DEFERRED)

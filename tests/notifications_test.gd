@@ -44,5 +44,16 @@ func run():
 	check(not game.notifications.cards.has("trade") and "withdrew" in text("trade_result"),"withdrawal removes offer and notifies")
 	game._home()
 	check(not game.notifications.cards.has("trade_result"),"leaving game clears trade alerts")
+	game.notifications.show_notice("expiry","Expires automatically")
+	check(is_equal_approx(game.notifications.cards.expiry.get_child(1).wait_time,5),"default notification lifetime is five seconds")
+	game.notifications.show_notice("replace","Old", "",Callable(),.1)
+	await create_timer(.06).timeout
+	game.notifications.show_notice("replace","New", "",Callable(),.2)
+	await create_timer(.08).timeout
+	check(game.notifications.cards.has("replace"),"old timeout does not remove replacement")
+	await create_timer(.2).timeout
+	check(not game.notifications.cards.has("replace"),"replacement expires on its own timer")
+	await create_timer(4.8).timeout
+	check(not game.notifications.cards.has("expiry"),"default notification disappears automatically")
 	game.net.leave();game.queue_free();await create_timer(.2).timeout;await process_frame;await process_frame
 	print("NOTIFICATIONS_TEST: ",checks," checks, ",failures," failures");quit(1 if failures else 0)

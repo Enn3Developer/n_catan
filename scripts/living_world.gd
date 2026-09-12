@@ -344,6 +344,9 @@ func populate_town(town_root: Node3D,city: bool,color: Color) -> Array:
 
 func animate_dwellers(residents: Array,time: float,daylight: float):
 	for actor in residents:
+		if actor.has("route"):
+			_animate_road_dweller(actor,time,daylight)
+			continue
 		# Short errands stay within each resident's clear street corridor. Different
 		# schedules keep most people chatting/resting while a few walk to another spot.
 		var outward=actor.destination-actor.origin
@@ -371,14 +374,36 @@ func animate_dwellers(residents: Array,time: float,daylight: float):
 		actor.root.rotation.y=yaw
 		actor.root.visible=daylight>.15
 		actor.moving=moving>.08
-		var stride=time*4.6+actor.index*1.7
-		actor.body.position.y=.079+absf(sin(stride))*.003*moving
-		actor.body.rotation.y=sin(time*.5+actor.index)*.10*(1.0-moving)
-		for leg in 2:
-			actor.limbs[leg].rotation.x=sin(stride+leg*PI)*.35*moving
-			actor.arms[leg].rotation.x=-sin(stride+leg*PI)*.28*moving
-		# Occasional small hand gestures while stopped, with planted feet.
-		actor.arms[0].rotation.z=sin(time*.9+actor.index)*.12*(1.0-moving)
+		_animate_dweller_stride(actor,time,moving)
+
+func _animate_road_dweller(actor: Dictionary,time: float,daylight: float):
+	var route: Dictionary=actor.route
+	var duration=route.length/.045 # About 1.1 m/s at the island's world scale.
+	var rest=12.0+float(actor.index%4)*3.0
+	var cycle=fposmod(time+actor.index*7.73,2*(duration+rest))
+	var returning=cycle>=duration+rest
+	var local=cycle-(duration+rest if returning else 0.0)
+	var moving=local<duration
+	var distance=minf(local,duration)*.045
+	if returning:distance=route.length-distance
+	var position=preload("res://scripts/road_travel.gd").sample(route,distance)
+	var ahead=preload("res://scripts/road_travel.gd").sample(route,clampf(distance+(-.015 if returning else .015),0,route.length))
+	var direction=ahead-position
+	if direction.length_squared()>.000001:actor.root.rotation.y=atan2(-direction.x,-direction.z)
+	actor.root.position=position
+	actor.root.visible=daylight>.15 and moving
+	actor.moving=moving and daylight>.15
+	_animate_dweller_stride(actor,time,1.0 if moving else 0.0)
+
+func _animate_dweller_stride(actor: Dictionary,time: float,moving: float):
+	var stride=time*4.6+actor.index*1.7
+	actor.body.position.y=.079+absf(sin(stride))*.003*moving
+	actor.body.rotation.y=sin(time*.5+actor.index)*.10*(1.0-moving)
+	for leg in 2:
+		actor.limbs[leg].rotation.x=sin(stride+leg*PI)*.35*moving
+		actor.arms[leg].rotation.x=-sin(stride+leg*PI)*.28*moving
+	# Occasional small hand gestures while stopped, with planted feet.
+	actor.arms[0].rotation.z=sin(time*.9+actor.index)*.12*(1.0-moving)
 
 func harbor(resource: int) -> Node3D:
 	var root=Node3D.new();root.name="CoastalHarbor";root.set_meta("resource",resource)

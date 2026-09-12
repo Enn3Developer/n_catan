@@ -1729,3 +1729,66 @@ msgstr "Undo"
 
 msgid "Redo"
 msgstr "Redo"
+
+msgid "Coral"
+msgstr "Coral"
+
+msgid "Red"
+msgstr "Red"
+
+msgid "Orange"
+msgstr "Orange"
+
+msgid "Gold"
+msgstr "Gold"
+
+msgid "Yellow"
+msgstr "Yellow"
+
+msgid "Lime"
+msgstr "Lime"
+
+msgid "Green"
+msgstr "Green"
+
+msgid "Forest"
+msgstr "Forest"
+
+msgid "Teal"
+msgstr "Teal"
+
+msgid "Cyan"
+msgstr "Cyan"
+
+msgid "Sky"
+msgstr "Sky"
+
+msgid "Blue"
+msgstr "Blue"
+
+msgid "Indigo"
+msgstr "Indigo"
+
+msgid "Purple"
+msgstr "Purple"
+
+msgid "Lavender"
+msgstr "Lavender"
+
+msgid "Pink"
+msgstr "Pink"
+
+msgid "Sand"
+msgstr "Sand"
+
+msgid "Brown"
+msgstr "Brown"
+
+msgid "Ivory"
+msgstr "Ivory"
+
+msgid "Slate"
+msgstr "Slate"
+
+msgid "Player color: %s"
+msgstr "Player color: %s"

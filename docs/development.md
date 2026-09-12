@@ -137,7 +137,7 @@ English and Italian catalogs live in `locales/en.po` and `locales/it.po`. Use En
 
 Player colors are opaque six-digit RGB values. An empty value uses the seat palette. The host validates changes and includes them in lobby and game snapshots. Players can edit their own appearance; the room controller can also edit bots. Protocol 10 adds the color handshake and structured localized messages.
 
-Run `python3 -m unittest discover -s tests -p 'test_localization.py'`, `tests/localization_appearance_test.gd`, and `tests/cosmetics_network_test.gd` when changing these features. Pass `-- --italian` to `tests/layout_test.gd` to check Italian at all supported window sizes. `tests/ui_localization_test.gd` checks dynamic card, resource, phase and soundtrack text, language switching, and checked-hover theme coverage. Run it with graphics to capture day/night hover states and the Italian color picker. Catalog checks cover translation calls, settings options, soundtrack metadata, tutorial content and development cards, including printf argument compatibility.
+Run `python3 -m unittest discover -s tests -p 'test_localization.py'`, `tests/localization_appearance_test.gd`, and `tests/cosmetics_network_test.gd` when changing these features. Pass `-- --italian` to `tests/layout_test.gd` to check Italian at all supported window sizes. `tests/ui_localization_test.gd` checks dynamic card, resource, phase and soundtrack text, language switching, and checked-hover theme coverage. Run it with graphics to capture day/night hover states and the Italian color swatches. Catalog checks cover translation calls, settings options, soundtrack metadata, tutorial content and development cards, including printf argument compatibility.
 
 ## Scenery and placement
 
@@ -173,3 +173,7 @@ last completed breadcrumb; the logger cannot guarantee a native stack for every 
 Settings → Graphics → Day/night cycle can hold the island and interface in daylight.
 The preference is local and saved independently of graphics presets; the shared
 world clock continues, so enabling it again restores the room's current time.
+
+`tests/appearance_roads_test.gd` checks the 20-color palette, preservation of existing custom colors, Italian labels, and road connections at bends and branches across all four piece styles. GPU runs capture the appearance page at 800×600 in day/night and road close-ups under `/tmp/catan-ui-*.png`. The settings sidebar no longer duplicates the separate appearance page. `tests/notifications_test.gd` also checks five-second automatic dismissal and replacement timers.
+
+Roads use a 30% vertical profile above the terrain; `CatanCosmetics.road_deck_height()` supplies the matching pedestrian surface. `scripts/road_travel.gd` assigns occasional journeys to existing residents along disjoint, same-owner road paths between towns. Visitors stop at town entrances, rest between trips, hide at night, and obey reduced motion. `tests/road_travel_test.gd` checks graph blocking/loops, walking and return direction, height, night/rest behavior, population, and snapshot/reduced-motion continuity; GPU runs save `/tmp/catan-road-travel-style-*.png`.
