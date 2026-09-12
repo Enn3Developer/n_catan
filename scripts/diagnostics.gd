@@ -16,7 +16,7 @@ class Sink extends Logger:
 	func _init(folder: String):
 		directory=folder
 		DirAccess.make_dir_recursive_absolute(directory)
-		redactor.compile("(?i)(?:n-catan://\\S+|(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(?::[0-9]+)?|(?:password|token|invite)\\s*[=:]\\s*\\S+)")
+		redactor.compile("(?i)(?:NC1-[A-Za-z0-9_-]+|n-catan://\\S+|(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(?::[0-9]+)?|(?:password|token|invite)\\s*[=:]\\s*\\S+)")
 		var path=directory+"/diagnostics.log"
 		file=FileAccess.open(path,FileAccess.READ_WRITE if FileAccess.file_exists(path) else FileAccess.WRITE_READ)
 		if file:file.seek_end()

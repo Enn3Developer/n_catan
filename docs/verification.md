@@ -207,3 +207,19 @@ Local Godot 4.7.2 verification:
 Checked switch hover surfaces in day and night themes, selected trade/music buttons, and the color picker panel. Audited scene text, dynamic UI templates, settings choices and help, soundtrack metadata, card descriptions, resource tooltips, tutorial text, network notices and update messages. Added 73 English/Italian catalog entries, including native color-picker and text-menu labels. Player names remain literal.
 
 Validation on Godot 4.7.2: 8 Python tests; UI localization 17 headless / 18 graphical checks; cards 43 checks; localization/appearance 25 checks; trades 9 checks; Italian layout 4,673 checks across seven window sizes. All passed. GPU captures were inspected for checked hover, Italian settings at 800×600, cards, music, and the color picker.
+
+## Compact encrypted invites, protocol 13
+
+Restored authenticated ENet/DTLS with a compact endpoint and certificate fingerprint in the invite. IPv4 invites use 35 characters at the default port and 38 with a custom port. Certificate discovery and encrypted forwarding share public UDP 24567; the ENet listener binds only to loopback. No external invite service or plaintext fallback is used.
+
+Targeted validation on Godot 4.7.2:
+
+- `enet_transport_test.gd`: canonical encoding, endpoint validation, single-character typo rejection, certificate substitution, copied-certificate impersonation without the private key, plaintext rejection, password rejection, encrypted wire records, absence of plaintext credentials in captured traffic, certificate rotation, and client/host disconnects passed.
+- `network_test.gd`: three peers completed setup, private-hand filtering, invalid-action rejection, dice replication and reconnect recovery.
+- `version_network_test.gd` and `diagnostics_test.gd`: incompatible protocol rejection and compact-invite log redaction passed.
+- `run_reconnect_test.py`: fresh processes recovered the saved seat with a live previous client and after abrupt termination, including actions and private cards.
+- `run_online_test.py 6`: a dedicated server and six independent encrypted clients completed setup and five turns each with private-hand filtering.
+- `host_password_test.gd`: all 12 checks passed, including the compact-invite prompt, password admission and the visible reconnect form with its saved invite.
+- Godot editor import completed without errors or warnings. All five Python localization checks and `git diff --check` passed.
+
+The impersonation check deliberately produces native certificate-verification errors. Godot also logged nonfatal DTLS socket errors when the single-process tests closed peers together. Those tests passed their disconnect assertions; the separate reconnect and six-client runs had no such errors in the collected logs. Internet/NAT routing was not exercised locally.

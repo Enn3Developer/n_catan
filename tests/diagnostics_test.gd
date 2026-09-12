@@ -9,9 +9,10 @@ func run():
 	for i in 1000:sink.write("TEST","same repeated message")
 	var content=FileAccess.get_file_as_string(folder+"/diagnostics.log")
 	check(content.count("same repeated message")==1,"repeated errors suppressed")
-	sink.write("TEST","password=hunter2 token=abc 192.0.2.42:123 n-catan://secret")
+	sink.write("TEST","password=hunter2 token=abc 192.0.2.42:123 n-catan://secret NC1-AbcdEf01234_-xyz")
 	content=FileAccess.get_file_as_string(folder+"/diagnostics.log")
 	check(not content.contains("hunter2") and not content.contains("192.0.2.42") and not content.contains("token=abc"),"sensitive diagnostics redacted")
+	check(not content.contains("NC1-AbcdEf01234_-xyz"),"compact invites redacted")
 	check(content.contains("Suppressed 999"),"suppression count reported")
 	sink.window_count=60
 	sink.write("TEST","rate limited unique message")

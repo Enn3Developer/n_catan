@@ -10,6 +10,7 @@ func check(ok: bool,message: String):
 func _initialize():call_deferred("run")
 func run():
 	game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await create_timer(.4).timeout
+	check(game.address_field.placeholder_text=="Paste invite code","join form asks for compact invite")
 	game._node("ShowOnline").button_pressed=true
 	check(game._node("HostOptions").visible and not game._node("JoinOptions").visible,"hosting has its own visible form")
 	game.host_password_field.text="test-host-password"
@@ -34,10 +35,11 @@ func run():
 	check(game.net.room_password.is_empty() and "Open room" in game._node("RoomSummary").text,"blank host password creates open room")
 	client.join_room(game.net.invite("127.0.0.1"),"Guest");await create_timer(1.5).timeout
 	check(game.net.roster.size()==2,"open room permits password-free join")
+	var saved_code=game.net.invite("127.0.0.1")
 	client.leave();game.net.leave()
-	game.net.reconnect_token="saved-test-seat";game.net.reconnect_address="127.0.0.1";game.net.reconnect_password="remembered-in-memory"
+	game.net.reconnect_token="saved-test-seat";game.net.reconnect_address=saved_code;game.net.reconnect_password="remembered-in-memory"
 	game._home()
 	check(game._node("JoinOptions").visible and game._node("OnlineForm").visible,"returning client sees join password form")
-	check(game.password_field.text=="remembered-in-memory" and game.address_field.text=="127.0.0.1","reconnect form restores in-memory connection details")
+	check(game.password_field.text=="remembered-in-memory" and game.address_field.text==saved_code,"reconnect form restores in-memory connection details")
 	game.queue_free();await create_timer(.2).timeout;branch.queue_free();await process_frame;await process_frame
 	print("HOST_PASSWORD_TEST: ",checks," checks, ",failures," failures");quit(1 if failures else 0)

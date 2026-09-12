@@ -6,6 +6,8 @@ signal received(state: Dictionary)
 signal notice(message: String)
 signal applied(player: int, action: Dictionary)
 const PORT=24567
+const SECURE_INVITE=preload("res://scripts/secure_invite.gd")
+var secure_transport=preload("res://scripts/secure_transport.gd").new()
 const PROTOCOL=CatanBuildInfo.PROTOCOL
 const MIN_PLAYERS=3
 const MAX_PLAYERS=6
@@ -20,7 +22,8 @@ var my_style=0
 var my_color=""
 var room_password=""
 func invite(address: String) -> String:
-	return address.strip_edges()
+	if secure_transport.certificate==null:return reconnect_address if online and not solo else ""
+	return SECURE_INVITE.encode(address,SECURE_INVITE.fingerprint(secure_transport.public_certificate))
 
 var last_action={}
 var upnp_thread: Thread
@@ -56,6 +59,8 @@ var music_last_command=-1000
 
 func _ready():
 	multiplayer.server_relay=false
+	secure_transport.connected.connect(_secure_connected)
+	secure_transport.failed.connect(_connection_ended,CONNECT_DEFERRED)
 	_reset_music()
 	_load_session()
 	multiplayer.connected_to_server.connect(_connected)
@@ -71,8 +76,11 @@ func host(pname: String,password: String="",server_only: bool=false) -> Error:
 	CatanDiagnostics.event("network.host","dedicated=%s"%server_only)
 	leave()
 	var peer=ENetMultiplayerPeer.new()
-	var err=peer.create_server(PORT,8)
-	if err!=OK: return err
+	peer.set_bind_ip("127.0.0.1")
+	var err=peer.create_server(0,8)
+	if err==OK:err=secure_transport.start_host(peer,PORT)
+	if err!=OK:
+		peer.close();secure_transport.stop();return err
 	peer.get_host().compress(ENetConnection.COMPRESS_RANGE_CODER)
 	multiplayer.multiplayer_peer=peer
 	online=true
@@ -90,16 +98,10 @@ func host(pname: String,password: String="",server_only: bool=false) -> Error:
 func join_room(address: String,pname: String,password: String="") -> Error:
 	CatanDiagnostics.event("network.join")
 	address=address.strip_edges()
-	if address.contains("#") or address.contains("://"):
-		notice.emit("Enter the host address and optional UDP port.")
+	var endpoint=SECURE_INVITE.decode(address)
+	if endpoint.is_empty():
+		notice.emit("Paste a valid invite code from the host.")
 		return ERR_INVALID_PARAMETER
-	var endpoint=address.split(":")
-	if endpoint.size()>2 or endpoint[0].is_empty():return ERR_INVALID_PARAMETER
-	var port=PORT
-	if endpoint.size()==2:
-		if not endpoint[1].is_valid_int():return ERR_INVALID_PARAMETER
-		port=int(endpoint[1])
-	if port<1 or port>65535:return ERR_INVALID_PARAMETER
 	leave()
 	my_name=pname
 	room_password=password
@@ -108,19 +110,29 @@ func join_room(address: String,pname: String,password: String="") -> Error:
 	reconnect_name=pname
 	reconnect_password=password
 	var peer=ENetMultiplayerPeer.new()
-	var err=peer.create_client(endpoint[0],port)
-	if err!=OK:return err
-	peer.get_host().compress(ENetConnection.COMPRESS_RANGE_CODER)
+	var id=peer.generate_unique_id()
+	var err=peer.create_mesh(id)
+	if err==OK:err=secure_transport.start_client(endpoint,id)
+	if err!=OK:
+		peer.close();secure_transport.stop();return err
 	multiplayer.multiplayer_peer=peer
 	online=true
 	changed.emit()
 	return OK
+
+func _secure_connected(connection: ENetConnection):
+	var err=multiplayer.multiplayer_peer.add_mesh_peer(1,connection)
+	if err!=OK:
+		connection.destroy()
+		_connection_ended.call_deferred("Secure connection failed. Check the invite, host availability and UDP port.")
 
 func leave():
 	CatanDiagnostics.event("network.leave","online=%s started=%s"%[online,started])
 	var continuing_music=music_state() if multiplayer.multiplayer_peer.get_connection_status()!=MultiplayerPeer.CONNECTION_DISCONNECTED else {}
 	if multiplayer.multiplayer_peer: multiplayer.multiplayer_peer.close()
 	multiplayer.multiplayer_peer=OfflineMultiplayerPeer.new()
+	if secure_transport.listener!=null:secure_transport.poll()
+	secure_transport.stop()
 	online=false
 	solo=false
 	tutorial=false
@@ -199,7 +211,7 @@ func _registration_failed(message: String):
 func reconnect():
 	if not reconnect_address.is_empty():
 		var err=join_room(reconnect_address,reconnect_name,reconnect_password)
-		if err!=OK:notice.emit("Could not reconnect: check the saved server address.")
+		if err!=OK:notice.emit("Could not reconnect. Ask the host for a new invite code.")
 
 func _seat_for(id: int) -> int:
 	for i in roster.size():
@@ -314,7 +326,8 @@ func _error(message: String):
 func _disconnected(id: int):
 	CatanDiagnostics.event("network.disconnected","seat=%d"%_seat_for(id))
 	if id==1 and online and not multiplayer.is_server():
-		# server_disconnected performs teardown after ENet finishes polling.
+		# Mesh clients report the host leaving as peer_disconnected.
+		_connection_ended.call_deferred("Connection lost. Use Reconnect to return to your seat if the server is still running.")
 		return
 	if not multiplayer.is_server(): return
 	var p=_seat_for(id)
@@ -351,6 +364,8 @@ func _mapping_done(message: String):
 	notice.emit(message)
 
 func _exit_tree():
+	if multiplayer.multiplayer_peer:multiplayer.multiplayer_peer.close()
+	secure_transport.stop()
 	if upnp_thread: upnp_thread.wait_to_finish()
 
 func host_solo(pname: String):
@@ -416,6 +431,7 @@ func _set_piece_style(sender: int,target: int,style: int):
 	if started:_sync()
 
 func _process(delta: float):
+	secure_transport.poll()
 	_process_music(delta)
 	if online and started and multiplayer.is_server() and not paused and roster.all(func(row):return row.connected):
 		world_seconds=fposmod(world_seconds+delta,600.0)

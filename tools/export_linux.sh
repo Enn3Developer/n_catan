@@ -36,8 +36,8 @@ Launch the updater directly to recover an interrupted installation.
 Start with Learn to play or Play solo. Configure 2-5 bots in a solo lobby.
 Online rooms support 3-6 participants, including bots. The host must make
 UDP port 24567 reachable. Enter the public IP/DNS in the lobby and Copy invite;
-guests enter the host address. Online traffic uses plain ENet (no encryption).
-All players need this game version (network protocol 10).
+guests paste the compact invite code. Online traffic is encrypted with DTLS.
+All players need a version using multiplayer protocol 13.
 
 Right-drag: orbit. Middle-drag: pan. Scroll: zoom. Home: fit board.
 H: inspect board. Esc: return. Settings and Piece cosmetics are on the menu.

@@ -423,8 +423,8 @@ msgstr "Personalizzazione"
 msgid "Could not host on UDP 24567. Another server may be running."
 msgstr "Impossibile aprire la stanza sulla porta UDP 24567. Potrebbe esserci già un altro server attivo."
 
-msgid "Could not reconnect: check the saved server address."
-msgstr "Riconnessione non riuscita. Controlla l’indirizzo del server salvato."
+msgid "Could not reconnect. Ask the host for a new invite code."
+msgstr "Riconnessione non riuscita. Chiedi all’host un nuovo codice invito."
 
 msgid "Could not start the updater. Check free space and folder permissions."
 msgstr "Impossibile avviare l’aggiornamento. Controlla spazio libero e permessi della cartella."
@@ -855,11 +855,11 @@ msgstr "Effetti particellari"
 msgid "Password required to join"
 msgstr "Password richiesta per entrare"
 
-msgid "Host address (optional :port)"
-msgstr "Indirizzo host (:porta facoltativa)"
+msgid "Paste invite code"
+msgstr "Incolla il codice invito"
 
-msgid "Enter the host address and optional UDP port."
-msgstr "Inserisci l’indirizzo dell’host e, se necessario, la porta UDP."
+msgid "Paste a valid invite code from the host."
+msgstr "Incolla un codice invito valido ricevuto dall’host."
 
 msgid "Pause soundtrack"
 msgstr "Metti in pausa la musica"
@@ -1089,8 +1089,8 @@ msgstr "Qualità ombre"
 msgid "Share it with your players. Leave blank for an open room."
 msgstr "Condividila con i giocatori. Lascia vuoto per una stanza senza password."
 
-msgid "Share the host address. Host: open UDP 24567."
-msgstr "Condividi l’indirizzo dell’host. Host: apri la porta UDP 24567."
+msgid "Share the invite code. Host: open UDP 24567."
+msgstr "Condividi il codice invito. Host: apri la porta UDP 24567."
 
 msgid "Shared with the room · "
 msgstr "Musica della stanza · "
@@ -1816,3 +1816,9 @@ msgstr "Nuvole e pioggia"
 
 msgid "Choose changing weather or keep one condition. Rain and thunder use the ambience volume. Reduced motion disables rain and lightning flashes."
 msgstr "Scegli un meteo variabile o una condizione fissa. Pioggia e tuoni usano il volume ambiente. Il movimento ridotto disattiva pioggia e lampi."
+
+msgid "Enter a valid public address and optional UDP port."
+msgstr "Inserisci un indirizzo pubblico valido e, se serve, la porta UDP."
+
+msgid "This invite does not match the host. Ask for a new invite."
+msgstr "Questo invito non corrisponde all’host. Chiedi un nuovo invito."

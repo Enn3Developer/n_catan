@@ -18,7 +18,7 @@ The game uses the Forward+ renderer and requires a Vulkan-capable GPU.
 
 ## Play with friends
 
-Choose **Play online**, create a room and share the lobby's host address. Friends can paste it into the join form. The host needs UDP port 24567 reachable through their router and firewall. There is no hosted relay, so hosting behind carrier-grade NAT requires a public server.
+Choose **Play online** and create a room. Enter your public IP address or hostname in the lobby, or use **Map router** to fill it in. Click **Copy invite** and share the code. Friends can paste it into the join form. Invites are 35 characters for an IPv4 address with the default port. Connections use authenticated DTLS encryption; the certificate exchange happens automatically. The host needs UDP port 24567 reachable through their router and firewall. There is no hosted relay, so hosting behind carrier-grade NAT requires a public server.
 
 Closing the host closes the room. Disconnected players can reconnect while the host remains running.
 
@@ -42,7 +42,7 @@ See the [development guide](docs/development.md) for exports, release publishing
 ./run.sh --server --address=your-public-hostname:24567 --password=your-room-password
 ```
 
-Open UDP 24567 and share the printed `CATAN_SECURE_INVITE` with guests.
+Open UDP 24567 and share the printed `CATAN_INVITE` with guests.
 
 ## Asset credits
 

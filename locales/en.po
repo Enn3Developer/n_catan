@@ -423,8 +423,8 @@ msgstr "Cosmetics"
 msgid "Could not host on UDP 24567. Another server may be running."
 msgstr "Could not host on UDP 24567. Another server may be running."
 
-msgid "Could not reconnect: check the saved server address."
-msgstr "Could not reconnect: check the saved server address."
+msgid "Could not reconnect. Ask the host for a new invite code."
+msgstr "Could not reconnect. Ask the host for a new invite code."
 
 msgid "Could not start the updater. Check free space and folder permissions."
 msgstr "Could not start the updater. Check free space and folder permissions."
@@ -855,11 +855,11 @@ msgstr "Particle effects"
 msgid "Password required to join"
 msgstr "Password required to join"
 
-msgid "Host address (optional :port)"
-msgstr "Host address (optional :port)"
+msgid "Paste invite code"
+msgstr "Paste invite code"
 
-msgid "Enter the host address and optional UDP port."
-msgstr "Enter the host address and optional UDP port."
+msgid "Paste a valid invite code from the host."
+msgstr "Paste a valid invite code from the host."
 
 msgid "Pause soundtrack"
 msgstr "Pause soundtrack"
@@ -1089,8 +1089,8 @@ msgstr "Shadow quality"
 msgid "Share it with your players. Leave blank for an open room."
 msgstr "Share it with your players. Leave blank for an open room."
 
-msgid "Share the host address. Host: open UDP 24567."
-msgstr "Share the host address. Host: open UDP 24567."
+msgid "Share the invite code. Host: open UDP 24567."
+msgstr "Share the invite code. Host: open UDP 24567."
 
 msgid "Shared with the room · "
 msgstr "Shared with the room · "
@@ -1816,3 +1816,9 @@ msgstr "Clouds and rain"
 
 msgid "Choose changing weather or keep one condition. Rain and thunder use the ambience volume. Reduced motion disables rain and lightning flashes."
 msgstr "Choose changing weather or keep one condition. Rain and thunder use the ambience volume. Reduced motion disables rain and lightning flashes."
+
+msgid "Enter a valid public address and optional UDP port."
+msgstr "Enter a valid public address and optional UDP port."
+
+msgid "This invite does not match the host. Ask for a new invite."
+msgstr "This invite does not match the host. Ask for a new invite."

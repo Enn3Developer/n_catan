@@ -242,6 +242,7 @@ func _home():
 		net.reconnect())
 	_node("Reconnect").visible=not net.reconnect_token.is_empty()
 	if not net.reconnect_token.is_empty():
+		_node("ShowOnline").button_pressed=true
 		address_field.text=net.reconnect_address
 		password_field.text=net.reconnect_password
 		_online_mode(false)
@@ -269,7 +270,7 @@ func _join():
 	var err=net.join_room(address,pname,password)
 	if err!=OK:
 		_home()
-		_notice(tr("Enter the host address and optional UDP port."))
+		_notice(tr("Paste a valid invite code from the host."))
 	else: _notice(tr("Connecting to the island…"))
 
 func _network_changed():
@@ -343,13 +344,16 @@ func _lobby():
 	_bind("CopyInvite",func():
 		var address=_node("InviteAddress").text.strip_edges()
 		if address.is_empty(): _notice(tr("Enter your public address first, or use Map router."))
-		else: DisplayServer.clipboard_set(net.invite(address)); _notice(tr("Invite copied. Share it with your guests.")))
+		else:
+			var code=net.invite(address)
+			if code.is_empty():_notice(tr("Enter a valid public address and optional UDP port."))
+			else:DisplayServer.clipboard_set(code);_notice(tr("Invite copied. Share it with your guests.")))
 	_node("InviteAddress").text=invite_address if net.multiplayer.is_server() else net.reconnect_address
 	_node("InviteAddress").editable=net.multiplayer.is_server()
 	_node("InviteAddress").text_changed.connect(func(text):invite_address=text)
 	for node_name in ["InviteHeading","InviteAddress","InviteActions"]: _node(node_name).visible=not net.solo
 	_node("MapRouter").disabled=not net.multiplayer.is_server()
-	_node("ConnectionHelp").text=tr("Choose each bot’s difficulty.") if net.solo else tr("Share the host address. Host: open UDP 24567.")
+	_node("ConnectionHelp").text=tr("Choose each bot’s difficulty.") if net.solo else tr("Share the invite code. Host: open UDP 24567.")
 	if not connection_status.is_empty() and not net.solo: _node("ConnectionHelp").text=CatanI18n.render(connection_status)
 func _received(data: Dictionary):
 	CatanDiagnostics.event("state.received","turn=%s phase=%s"%[data.get("turn",-1),data.get("phase","")])
