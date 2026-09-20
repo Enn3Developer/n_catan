@@ -223,3 +223,14 @@ Targeted validation on Godot 4.7.2:
 - Godot editor import completed without errors or warnings. All five Python localization checks and `git diff --check` passed.
 
 The impersonation check deliberately produces native certificate-verification errors. Godot also logged nonfatal DTLS socket errors when the single-process tests closed peers together. Those tests passed their disconnect assertions; the separate reconnect and six-client runs had no such errors in the collected logs. Internet/NAT routing was not exercised locally.
+
+## 0.3.1 turn timer
+
+Added a 60-second host-authoritative turn limit. One clock covers a whole turn, including the setup settlement with its road and the robber move with its steal, and it restarts when a seven hands the wait to the players who must discard. The clock pauses while the room is paused or a player is reconnecting, and solo games and tutorial lessons have no limit. On expiry the host tells the seat and plays it out along the shortest legal exit: roll if unrolled, then end; the bot only picks the placements the rules demand. Snapshots carry `turn_limit` and `turn_seconds`, and clients run the countdown between snapshots. The protocol stays at 13: clients without the countdown keep working and still receive the expiry notice.
+
+Validation on Godot 4.7.2:
+
+- `turn_timer_test.gd`: three stalling human seats with a shortened limit completed all six setup placements with two settlements and two roads each, received the expiry notice, rolled before their turns ended, cycled play through every seat, and rearmed the clock for discarders on a spent turn. No failures.
+- `rules_test.gd` 1,331 checks, `bot_test.gd` 12 games and 4,117 actions, `cards_ui_test.gd` 43 checks, `ui_localization_test.gd` 18 checks, `localization_appearance_test.gd` 25 checks, `notifications_test.gd` 18 checks and `enet_transport_test.gd` all passed. `solo_match_test.gd` reached a winner in 183 ticks with no rejections, confirming solo play is unaffected.
+- Python suite: 8 tests pass, including the two new English/Italian catalog entries.
+- `network_test.gd` and `host_password_test.gd` each reported failures in this headless environment. Both reproduce on the unchanged v0.3.0 tree, so they are not caused by the turn timer: `network_test.gd` misses its lobby replication inside the fixed 0.8-second handshake wait, and `host_password_test.gd` fails its visible-hosting-form check.

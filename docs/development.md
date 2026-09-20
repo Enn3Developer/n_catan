@@ -81,6 +81,8 @@ Edit the interface in `scenes/ui/`. Its named Controls define the layout, and `a
 
 The server owns dice rolls, the deck, hands, resources and action validation. Clients receive other players' public counts, not private cards.
 
+Each turn has a 60-second limit, held by the host in `CatanNetwork.turn_seconds`. One clock covers the whole turn, including the setup settlement and its road, the robber move and the steal that follows. It restarts when the turn passes to the next seat, and also when a seven hands the wait to the players who must discard, since they have had none of that turn's time. It pauses while the room is paused or a player is reconnecting. Solo games and tutorial lessons have no limit. When the clock runs out, the host plays the stalling seat out along the shortest legal exit: it rolls if the seat has not rolled, places the settlements, roads, robber and steal the rules demand, discards down to the limit, then ends the turn. Every snapshot carries `turn_limit` and `turn_seconds`, and clients run the countdown in the HUD between snapshots.
+
 Online rooms use ENet over authenticated DTLS. The `NC1-` invite carries the endpoint, a 128-bit SHA-256 certificate fingerprint and a two-byte typo checksum, encoded as canonical base64url. IPv4 with the default port takes 35 characters; custom ports and DNS names take more. The host generates a fresh RSA certificate for each room. Clients retrieve that public certificate automatically and check its fingerprint before starting a standard DTLS handshake. Only that certificate is trusted, and room passwords and reconnect tokens are sent after the handshake succeeds. The invite authenticates the host; a room password still controls admission.
 
 A public UDP socket on 24567 serves certificate discovery and forwards encrypted datagrams to an ENet listener bound to loopback on an ephemeral port. This local forwarding needs no extra public port or external lookup service. Certificate responses are no larger than the padded requests, and relay allocations are bounded. Godot/mbedTLS handles encryption and separate session keys for each client. The public certificate and endpoint remain visible on the wire. Share invites through a trusted channel: replacing an invite replaces the host identity the client trusts.
@@ -98,6 +100,7 @@ godot --headless --path . --script res://tests/network_test.gd
 godot --headless --path . --script res://tests/bot_test.gd
 godot --headless --path . --script res://tests/bot_network_test.gd
 godot --headless --path . --script res://tests/solo_match_test.gd
+godot --headless --path . --script res://tests/turn_timer_test.gd
 godot --headless --path . --script res://tests/updater_ui_test.gd
 godot --headless --path . --script res://tests/version_network_test.gd
 GODOT_BIN=/path/to/godot python3 tests/run_online_test.py
@@ -108,7 +111,7 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 
 The rules suite checks setup, resource conservation, legal actions, trades, development cards, privacy, awards and victory. Network tests cover lobby replication, private hands, invalid moves, disconnects and reconnection. The dedicated-server test starts a server and two clients in separate processes. These tests use loopback networking. Internet access still depends on the host's router and firewall.
 
-Bot tests cover every difficulty and mixed opponents. The feature suite checks lobby controls, bot setup, tutorial lessons, settings and audio. A solo match test runs the bot scheduler through to victory.
+The turn timer test stalls three human seats with a shortened limit and checks that the host completes setup, rolls and passes the turn on. Bot tests cover every difficulty and mixed opponents. The feature suite checks lobby controls, bot setup, tutorial lessons, settings and audio. A solo match test runs the bot scheduler through to victory.
 
 Run extension tests with:
 

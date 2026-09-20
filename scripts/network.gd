@@ -42,6 +42,11 @@ var bot_clock=0.0
 var bot_brains={}
 var bot_action_count=0
 var bot_turn=-1
+const TURN_SECONDS=60.0
+var turn_seconds=TURN_SECONDS
+var turn_clock=TURN_SECONDS
+var turn_mark=[]
+var turn_expired=false
 var world_seconds=150.0
 var music_track=0
 var music_paused=false
@@ -140,6 +145,9 @@ func leave():
 	bot_brains={}
 	bot_action_count=0
 	bot_turn=-1
+	turn_clock=TURN_SECONDS
+	turn_mark=[]
+	turn_expired=false
 	started=false
 	roster=[]
 	seat=-1
@@ -264,6 +272,7 @@ func _start(id: int):
 	rules.create(names)
 	world_seconds=150.0
 	started=true
+	_refresh_turn_clock()
 	_broadcast_lobby()
 	_sync()
 
@@ -295,6 +304,7 @@ func _apply(id: int,action: Dictionary):
 	CatanDiagnostics.event("action.complete","accepted=%s"%error.is_empty())
 	if not error.is_empty(): _send_error(id,error)
 	else:
+		_refresh_turn_clock()
 		applied.emit(p,action)
 		_sync()
 
@@ -303,6 +313,8 @@ func _sync():
 		if not roster[p].connected or roster[p].get("bot",false): continue
 		var state=rules.snapshot(p)
 		state["world_seconds"]=world_seconds
+		state["turn_limit"]=turn_limit()
+		state["turn_seconds"]=turn_clock
 		state["player_colors"]=[]
 		for row in roster:state.player_colors.append(str(row.get("color","")))
 		state["piece_styles"]=[]
@@ -438,6 +450,7 @@ func _process(delta: float):
 	if not online or not started or not multiplayer.is_server() or tutorial or paused or rules.s.is_empty() or rules.s.winner!=-1: return
 	for row in roster:
 		if not row.connected: return
+	_advance_turn_clock(delta)
 	bot_clock-=delta
 	if bot_clock>0: return
 	bot_clock=bot_delay
@@ -445,15 +458,58 @@ func _process(delta: float):
 		bot_turn=rules.s.turn
 		bot_action_count=0
 	for p in roster.size():
-		if not roster[p].get("bot",false): continue
+		var forced=_timed_out(p)
+		if not roster[p].get("bot",false) and not forced: continue
 		if not bot_brains.has(p): bot_brains[p]=CatanBot.new()
-		var action=bot_brains[p].choose(rules.snapshot(p),p,int(roster[p].difficulty))
+		var action=_timeout_action(p) if forced else bot_brains[p].choose(rules.snapshot(p),p,int(roster[p].difficulty))
 		if action.is_empty(): continue
 		if p==rules.s.turn:
 			bot_action_count+=1
 			if bot_action_count>30 and rules.s.phase=="play" and rules.s.rolled: action={"type":"end"}
 		_apply(roster[p].id,action)
 		return
+
+## Seconds a seat may hold the game before the host plays the turn out for it.
+func turn_limit() -> float:
+	return 0.0 if solo or tutorial else turn_seconds
+
+# The clock rearms whenever the set of seats the game waits on changes. Setup
+# alternates twice per seat and the extension pairs two seats per turn, so the
+# seat number alone does not identify a turn; a seven hands the wait to whoever
+# has to discard, and they have not had any of this turn's time yet.
+func _turn_mark() -> Array:
+	return [int(rules.s.get("turn",-1)),int(rules.s.get("setup",-1)),bool(rules.s.get("paired",false)),str(rules.s.get("phase",""))=="discard"]
+
+func _refresh_turn_clock():
+	var mark=_turn_mark()
+	if mark==turn_mark: return
+	turn_mark=mark
+	turn_clock=turn_limit()
+	turn_expired=false
+
+func _advance_turn_clock(delta: float):
+	_refresh_turn_clock()
+	if turn_expired or turn_limit()<=0.0: return
+	turn_clock=maxf(0.0,turn_clock-delta)
+	if turn_clock>0.0: return
+	turn_expired=true
+	for p in roster.size():
+		if _timed_out(p) and not roster[p].get("bot",false):
+			_send_error(roster[p].id,"Your turn time ran out.")
+
+# A seat is played out only while it is the one holding the game up.
+func _timed_out(p: int) -> bool:
+	if not turn_expired or p<0 or p>=roster.size(): return false
+	if rules.s.phase=="discard": return rules.s.discards.has(str(p))
+	return p==int(rules.s.turn)
+
+# Time out into the shortest legal exit: the bot only picks the placements the
+# rules demand before the turn can pass on.
+func _timeout_action(p: int) -> Dictionary:
+	match str(rules.s.phase):
+		"play": return {"type":"end"} if rules.s.rolled else {"type":"roll"}
+		"free_roads": return {"type":"finish_roads"}
+	return bot_brains[p].choose(rules.snapshot(p),p,0)
 
 
 func _reset_music():

@@ -1822,3 +1822,9 @@ msgstr "Enter a valid public address and optional UDP port."
 
 msgid "This invite does not match the host. Ask for a new invite."
 msgstr "This invite does not match the host. Ask for a new invite."
+
+msgid "Time left in this turn"
+msgstr "Time left in this turn"
+
+msgid "Your turn time ran out."
+msgstr "Your turn time ran out."

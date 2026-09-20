@@ -44,6 +44,9 @@ var notifications
 var notified_updates={}
 var turn_banner: Label
 var turn_banner_timer: Timer
+var turn_clock_label: Label
+var turn_clock_left=0.0
+var turn_clock_limit=0.0
 var active_language=-1
 var quitting=false
 
@@ -199,6 +202,8 @@ func _home():
 	_clear("res://scenes/ui/home.tscn")
 	_node("Version").text=CatanBuildInfo.VERSION
 	state={}
+	turn_clock_limit=0.0
+	turn_clock_left=0.0
 	guide=null
 	if is_instance_valid(tutorial_panel): tutorial_panel.free()
 	board.set_mode("",-1)
@@ -372,6 +377,8 @@ func _received(data: Dictionary):
 	board.show_labels=not inspection_mode
 	if fresh: board.build(state)
 	else: board.refresh(state)
+	turn_clock_limit=float(state.get("turn_limit",0.0))
+	turn_clock_left=float(state.get("turn_seconds",0.0))
 	board.day_seconds=state.get("world_seconds",board.day_seconds)
 	board.advance_day(0)
 	if produced: board.throw_dice(state.dice)
@@ -404,6 +411,9 @@ func _process(delta):
 		board.advance_day(delta)
 	if not server_only and is_instance_valid(ui_day_night):
 		ui_day_night.advance(board.daylight,delta)
+	if not server_only and turn_clock_limit>0.0 and net.started and not net.paused and net.roster.all(func(player):return player.connected):
+		turn_clock_left=maxf(0.0,turn_clock_left-delta)
+		_refresh_turn_clock()
 
 func _hud():
 	_clear("res://scenes/ui/hud.tscn")
@@ -414,6 +424,13 @@ func _hud():
 	tools_column.size_flags_vertical=Control.SIZE_SHRINK_CENTER
 	tools_column.name="HUDTools"
 	_node("TopBody").add_child(tools_column)
+	turn_clock_label=_label(tools_column,"",18,MUTED,false)
+	turn_clock_label.name="TurnClock"
+	turn_clock_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
+	turn_clock_label.mouse_filter=Control.MOUSE_FILTER_STOP
+	turn_clock_label.tooltip_text=tr("Time left in this turn")
+	turn_clock_label.add_theme_font_override("font",HEADING_FONT)
+	_refresh_turn_clock()
 	var row=HBoxContainer.new()
 	row.alignment=BoxContainer.ALIGNMENT_END
 	tools_column.add_child(row)
@@ -1231,6 +1248,14 @@ func _update_health_ready():
 			var path=OS.get_executable_path().get_base_dir().path_join(".n-catan-health-"+token)
 			var file=FileAccess.open(path,FileAccess.WRITE)
 			if file:file.store_string(token);file.close()
+
+func _refresh_turn_clock():
+	if not is_instance_valid(turn_clock_label): return
+	turn_clock_label.visible=turn_clock_limit>0.0 and state.get("winner",-1)==-1
+	if not turn_clock_label.visible: return
+	var left=ceili(turn_clock_left)
+	turn_clock_label.text="%d:%02d" % [left/60,left%60]
+	turn_clock_label.add_theme_color_override("font_color",Color("a8322a") if left<=10 else MUTED)
 
 func _show_turn_banner():
 	if not is_instance_valid(turn_banner):
