@@ -30,7 +30,7 @@ Export presets exclude authoring textures, old models, tests, generated releases
 
 The game checks [GitHub Releases](https://github.com/Enn3Developer/n_catan/releases) for the latest stable version at startup. Open **Game updates** on the home screen or **Updates** in Settings, choose **Download update**, then **Restart to update**. You can keep playing while it downloads, but must leave the room before installing. Dedicated servers do not update automatically.
 
-The exact Git tag sets the application and manifest version. Multiplayer uses a separate protocol number, currently 13. Releases with the same protocol can play together. A protocol mismatch rejects the join and identifies both versions. If a release changes the protocol, the group should update together.
+The exact Git tag sets the application and manifest version. Multiplayer uses a separate protocol number, currently 14. Releases with the same protocol can play together. A protocol mismatch rejects the join and identifies both versions. If a release changes the protocol, the group should update together.
 
 The updater verifies the manifest's RSA/SHA-256 signature with its embedded public key, then checks the package and executable SHA-256 hashes. It uses a delta patch only when the installed executable matches a published base and the patch is smaller than 85% of the full download. If the delta fails, it downloads the full package.
 
@@ -87,7 +87,7 @@ Online rooms use ENet over authenticated DTLS. The `NC1-` invite carries the end
 
 A public UDP socket on 24567 serves certificate discovery and forwards encrypted datagrams to an ENet listener bound to loopback on an ephemeral port. This local forwarding needs no extra public port or external lookup service. Certificate responses are no larger than the padded requests, and relay allocations are bounded. Godot/mbedTLS handles encryption and separate session keys for each client. The public certificate and endpoint remain visible on the wire. Share invites through a trusted channel: replacing an invite replaces the host identity the client trusts.
 
-Protocol 13 rejects bare addresses and older certificate invites, with no plaintext fallback. Saved reconnect invites remain valid while the original room runs; restarting the host requires a new invite. The certificate is valid for 30 days, so rooms left running longer must restart. Clients must update together. Update downloads retain signature and hash verification.
+Protocol 14 adds the turn timer; protocol 13 rejected bare addresses and older certificate invites, with no plaintext fallback. Saved reconnect invites remain valid while the original room runs; restarting the host requires a new invite. The certificate is valid for 30 days, so rooms left running longer must restart. Clients must update together. Update downloads retain signature and hash verification.
 
 ## Verification
 

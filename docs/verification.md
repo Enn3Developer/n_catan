@@ -226,7 +226,7 @@ The impersonation check deliberately produces native certificate-verification er
 
 ## 0.3.1 turn timer
 
-Added a 60-second host-authoritative turn limit. One clock covers a whole turn, including the setup settlement with its road and the robber move with its steal, and it restarts when a seven hands the wait to the players who must discard. The clock pauses while the room is paused or a player is reconnecting, and solo games and tutorial lessons have no limit. On expiry the host tells the seat and plays it out along the shortest legal exit: roll if unrolled, then end; the bot only picks the placements the rules demand. Snapshots carry `turn_limit` and `turn_seconds`, and clients run the countdown between snapshots. The protocol stays at 13: clients without the countdown keep working and still receive the expiry notice.
+Added a 60-second host-authoritative turn limit. One clock covers a whole turn, including the setup settlement with its road and the robber move with its steal, and it restarts when a seven hands the wait to the players who must discard. The clock pauses while the room is paused or a player is reconnecting, and solo games and tutorial lessons have no limit. On expiry the host tells the seat and plays it out along the shortest legal exit: roll if unrolled, then end; the bot only picks the placements the rules demand. Snapshots carry `turn_limit` and `turn_seconds`, and clients run the countdown between snapshots. The protocol moves to 14 so that nobody plays a timed turn without a visible countdown: a protocol 13 client would keep working and still receive the expiry notice, but would have no warning on screen.
 
 Validation on Godot 4.7.2:
 
