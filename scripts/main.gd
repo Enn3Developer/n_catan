@@ -333,7 +333,8 @@ func _notice(message: String):
 	get_tree().create_timer(5).timeout.connect(func():
 		if is_instance_valid(toast) and toast_generation==generation: toast.hide())
 
-func _present(scene_path: String) -> CatanDialog:
+# Modals are scenes with a close_requested signal; one is shown at a time.
+func _present(scene_path: String) -> Control:
 	if is_instance_valid(modal): modal.free()
 	modal=load(scene_path).instantiate()
 	modals.add_child(modal)
@@ -457,13 +458,8 @@ func _open_settings():
 	_apply_text(modal)
 
 func _open_cosmetics():
-	if is_instance_valid(modal):modal.free()
-	modal=load("res://scenes/ui/cosmetics.tscn").instantiate()
-	modals.add_child(modal)
-	modal.setup(preferences,net)
-	modal.close_requested.connect(_close_modal,CONNECT_DEFERRED)
+	_present("res://scenes/ui/cosmetics.tscn").setup(preferences,net)
 	net.paused=net.solo
-	_apply_text(modal)
 
 func _tutorial_start():
 	var pname=preferences.values.player_name

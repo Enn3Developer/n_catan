@@ -2,7 +2,15 @@
 
 [ext_resource type="Script" uid="uid://dof6mwuetgo0r" path="res://scripts/cosmetics_menu.gd" id="1"]
 
-[node name="Cosmetics" type="Control" unique_id=1273737923]
+[sub_resource type="Environment" id="PreviewEnvironment"]
+background_mode = 1
+background_color = Color(0.0627451, 0.168627, 0.211765, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.72549, 0.847059, 0.87451, 1)
+ambient_light_energy = 0.35
+tonemap_mode = 3
+
+[node name="Cosmetics" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -10,3 +18,178 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
+
+[node name="Shade" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Layout" type="VBoxContainer" parent="Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Heading" type="HBoxContainer" parent="Panel/Margin/Layout"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Panel/Margin/Layout/Heading"]
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 28
+text = "Player appearance"
+size_flags_horizontal = 3
+
+[node name="CosmeticPlayer" type="OptionButton" parent="Panel/Margin/Layout/Heading"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 40)
+layout_mode = 2
+
+[node name="Content" type="HBoxContainer" parent="Panel/Margin/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="PreviewBox" type="VBoxContainer" parent="Panel/Margin/Layout/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PiecePreview" type="SubViewportContainer" parent="Panel/Margin/Layout/Content/PreviewBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+size_flags_vertical = 3
+stretch = true
+
+[node name="Viewport" type="SubViewport" parent="Panel/Margin/Layout/Content/PreviewBox/PiecePreview"]
+own_world_3d = true
+msaa_3d = 2
+size = Vector2i(760, 500)
+render_target_update_mode = 2
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Panel/Margin/Layout/Content/PreviewBox/PiecePreview/Viewport"]
+environment = SubResource("PreviewEnvironment")
+
+[node name="Sun" type="DirectionalLight3D" parent="Panel/Margin/Layout/Content/PreviewBox/PiecePreview/Viewport"]
+transform = Transform3D(0.81915206, 0.4262504, -0.38379753, 0, 0.66913056, 0.74314487, 0.57357645, -0.6087487, 0.54811966, 0, 0, 0)
+light_color = Color(1, 0.905882, 0.760784, 1)
+light_energy = 1.15
+shadow_enabled = true
+
+[node name="Fill" type="DirectionalLight3D" parent="Panel/Margin/Layout/Content/PreviewBox/PiecePreview/Viewport"]
+transform = Transform3D(-0.76604444, -0.32139382, 0.5566704, 0, 0.8660254, 0.5, -0.64278764, 0.38302222, -0.66341394, 0, 0, 0)
+light_color = Color(0.517647, 0.72549, 0.807843, 1)
+light_energy = 0.22
+
+[node name="PreviewCamera" type="Camera3D" parent="Panel/Margin/Layout/Content/PreviewBox/PiecePreview/Viewport"]
+transform = Transform3D(0.95198965, -0.08760607, 0.2933271, 0, 0.95817804, 0.28617275, -0.30613002, -0.2724335, 0.91217566, 0.82, 1.02, 2.55)
+keep_aspect = 0
+projection = 1
+size = 2.25
+
+[node name="Display" type="Node3D" parent="Panel/Margin/Layout/Content/PreviewBox/PiecePreview/Viewport"]
+unique_name_in_owner = true
+
+[node name="PieceNames" type="Label" parent="Panel/Margin/Layout/Content/PreviewBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.54902, 0.321569, 0.176471, 1)
+theme_override_font_sizes/font_size = 14
+text = "Road · Settlement · City"
+horizontal_alignment = 1
+
+[node name="DragHint" type="Label" parent="Panel/Margin/Layout/Content/PreviewBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.47451, 0.388235, 0.278431, 1)
+theme_override_font_sizes/font_size = 14
+text = "Drag the preview to turn the pieces"
+horizontal_alignment = 1
+
+[node name="StyleScroll" type="ScrollContainer" parent="Panel/Margin/Layout/Content"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Styles" type="VBoxContainer" parent="Panel/Margin/Layout/Content/StyleScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="StyleList" type="VBoxContainer" parent="Panel/Margin/Layout/Content/StyleScroll/Styles"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="StyleTemplate" type="Button" parent="Panel/Margin/Layout/Content/StyleScroll/Styles/StyleList"]
+visible = false
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+toggle_mode = true
+alignment = 0
+
+[node name="SelectedColor" type="Label" parent="Panel/Margin/Layout/Content/StyleScroll/Styles"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 3
+
+[node name="PlayerColors" type="GridContainer" parent="Panel/Margin/Layout/Content/StyleScroll/Styles"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 5
+
+[node name="UseSeatColor" type="Button" parent="Panel/Margin/Layout/Content/StyleScroll/Styles"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Use seat color"
+
+[node name="Bottom" type="HBoxContainer" parent="Panel/Margin/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Status" type="Label" parent="Panel/Margin/Layout/Bottom"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.54902, 0.321569, 0.176471, 1)
+theme_override_font_sizes/font_size = 16
+size_flags_horizontal = 3
+
+[node name="EquipSet" type="Button" parent="Panel/Margin/Layout/Bottom"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(130, 42)
+layout_mode = 2
+text = "Apply appearance"
+
+[node name="CloseCosmetics" type="Button" parent="Panel/Margin/Layout/Bottom"]
+custom_minimum_size = Vector2(100, 42)
+layout_mode = 2
+text = "Done"
+
+[connection signal="item_selected" from="Panel/Margin/Layout/Heading/CosmeticPlayer" to="." method="_target_changed"]
+[connection signal="gui_input" from="Panel/Margin/Layout/Content/PreviewBox/PiecePreview" to="." method="_preview_input"]
+[connection signal="pressed" from="Panel/Margin/Layout/Content/StyleScroll/Styles/UseSeatColor" to="." method="_on_use_seat_color_pressed"]
+[connection signal="pressed" from="Panel/Margin/Layout/Bottom/EquipSet" to="." method="_equip"]
+[connection signal="pressed" from="Panel/Margin/Layout/Bottom/CloseCosmetics" to="." method="emit_signal" binds= ["close_requested"]]

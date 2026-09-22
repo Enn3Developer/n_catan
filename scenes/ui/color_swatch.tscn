@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/color_swatch.gd" id="script"]
+
+[sub_resource type="StyleBoxFlat" id="Plain"]
+resource_local_to_scene = true
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="Hover"]
+resource_local_to_scene = true
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="Chosen"]
+resource_local_to_scene = true
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="ColorSwatch" type="Button"]
+custom_minimum_size = Vector2(40, 36)
+theme_override_constants/outline_size = 0
+theme_override_styles/normal = SubResource("Plain")
+theme_override_styles/hover = SubResource("Hover")
+theme_override_styles/pressed = SubResource("Chosen")
+theme_override_styles/hover_pressed = SubResource("Chosen")
+theme_override_styles/focus = SubResource("Chosen")
+toggle_mode = true
+script = ExtResource("script")
