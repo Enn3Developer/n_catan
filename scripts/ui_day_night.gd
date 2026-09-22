@@ -21,9 +21,9 @@ var palette_theme: Theme
 var bindings: Array=[]
 var registered_styles={}
 var textures={}
-var atlas: SubViewport
+@onready var atlas: SubViewport=$Atlas
 var materials: Array[ShaderMaterial]=[]
-var shader: Shader
+const NIGHT_SHADER=preload("res://shaders/ui_night.gdshader")
 var symbol_material: ShaderMaterial
 var pending: Array[WeakRef]=[]
 const OUTLINED_TYPES=["Label","Button","OptionButton","CheckButton","CheckBox","LineEdit","PopupMenu","TooltipLabel"]
@@ -35,30 +35,8 @@ func setup(control: Control):
 	for type in OUTLINED_TYPES:
 		palette_theme.set_constant("outline_size",type,4)
 		palette_theme.set_color("font_outline_color",type,Color(0.04,0.06,0.09,0))
-	atlas=SubViewport.new()
-	atlas.size=Vector2i(512,256)
-	atlas.transparent_bg=true
-	atlas.disable_3d=true
-	atlas.render_target_update_mode=SubViewport.UPDATE_ONCE
-	add_child(atlas)
-	shader=Shader.new()
-	shader.code="""shader_type canvas_item;
-render_mode unshaded;
-uniform float night = 0.0;
-uniform bool accent = false;
-uniform bool icon = false;
-uniform bool symbol = false;
-void fragment() {
-	vec4 day = texture(TEXTURE, UV);
-	float value = dot(day.rgb, vec3(0.299, 0.587, 0.114));
-	vec3 dark = mix(vec3(0.055, 0.085, 0.13), vec3(0.23, 0.30, 0.39), value);
-	if (accent) dark = mix(vec3(0.08, 0.14, 0.11), vec3(0.37, 0.48, 0.31), value);
-	if (icon) dark = mix(vec3(0.51, 0.56, 0.62), vec3(0.90, 0.79, 0.56), value);
-	if (symbol) day.rgb *= vec3(0.286, 0.208, 0.129);
-	COLOR = vec4(mix(day.rgb, dark, night), day.a);
-}"""
 	symbol_material=ShaderMaterial.new()
-	symbol_material.shader=shader
+	symbol_material.shader=NIGHT_SHADER
 	symbol_material.set_shader_parameter("icon",true)
 	symbol_material.set_shader_parameter("symbol",true)
 	materials.append(symbol_material)
@@ -98,7 +76,7 @@ func _texture(source: Texture2D) -> Texture2D:
 	rect.position=position
 	rect.size=source.get_size()
 	var material=ShaderMaterial.new()
-	material.shader=shader
+	material.shader=NIGHT_SHADER
 	material.set_shader_parameter("night",amount)
 	material.set_shader_parameter("accent","primary" in source.resource_path or "pressed" in source.resource_path)
 	material.set_shader_parameter("icon",not "button" in source.resource_path and not "parchment" in source.resource_path)
