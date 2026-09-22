@@ -41,7 +41,7 @@ func setup(settings: CatanSettings,net: CatanNetwork):
 	var layout=VBoxContainer.new();layout.add_theme_constant_override("separation",6);margin.add_child(layout)
 
 	var heading=HBoxContainer.new();layout.add_child(heading)
-	var title=label(heading,tr("Player appearance"),28);title.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	var title=label(heading,tr("Player appearance"),28);title.size_flags_horizontal=Control.SIZE_EXPAND_FILL;title.theme_type_variation=&"HeadingLabel"
 	choices=OptionButton.new();choices.name="CosmeticPlayer";choices.custom_minimum_size=Vector2(180,40);heading.add_child(choices)
 	choices.item_selected.connect(_target_changed)
 

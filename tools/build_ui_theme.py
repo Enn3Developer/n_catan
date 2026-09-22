@@ -32,7 +32,8 @@ def color(h):
  return 'Color('+', '.join(f'{v:.4f}' for v in vals)+', 1)'
 lines=['[gd_resource type="Theme" format=3 uid="uid://cr50xu8k1vr3e"]','',
  '[ext_resource type="FontFile" path="res://assets/fonts/FiraSans-Regular.ttf" id="body"]',
- '[ext_resource type="FontFile" path="res://assets/fonts/FiraSans-Medium.ttf" id="button-font"]']
+ '[ext_resource type="FontFile" path="res://assets/fonts/FiraSans-Medium.ttf" id="button-font"]',
+ '[ext_resource type="FontFile" path="res://assets/fonts/NotoSerif-Medium.ttf" id="heading-font"]']
 for name in ['parchment-panel','button','button-hover','button-pressed','button-primary','button-primary-hover','button-disabled','slider-knob','arrow-down','arrow-up','switch-checked','switch-unchecked']:
  lines.append(f'[ext_resource type="Texture2D" path="res://assets/ui/{name}.svg" id="{name}"]')
 def texture_style(name,texture,margin=10,padx=12,pady=8):
@@ -71,6 +72,8 @@ for state,style in [('normal','button-primary'),('hover','button-primary-hover')
 prop('MusicIconButton/base_type','&"Button"')
 for state,style in [('normal','MusicIcon'),('hover','MusicIconHover'),('pressed','MusicIconHover')]:prop('MusicIconButton/styles/'+state,f'SubResource("{style}")')
 prop('Label/colors/font_color',color('493521'))
+prop('HeadingLabel/base_type','&"Label"')
+prop('HeadingLabel/fonts/font','ExtResource("heading-font")')
 for key,h in [('font_color','493521'),('font_placeholder_color','8a775c'),('caret_color','526747'),('selection_color','b4c696')]:prop('LineEdit/colors/'+key,color(h))
 prop('LineEdit/styles/normal','SubResource("Input")');prop('LineEdit/styles/focus','SubResource("InputFocus")')
 prop('PanelContainer/styles/panel','SubResource("Panel")')

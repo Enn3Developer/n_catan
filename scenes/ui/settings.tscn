@@ -44,6 +44,7 @@ theme_override_constants/separation = 12
 [node name="Title" type="Label" parent="SettingsPanel/Body"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_type_variation = &"HeadingLabel"
 text = "Settings"
 theme_override_font_sizes/font_size = 30
 
@@ -75,6 +76,7 @@ autowrap_mode = 3
 [node name="HelpTitle" type="Label" parent="SettingsPanel/Body/Columns/Help"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_type_variation = &"HeadingLabel"
 text = ""
 theme_override_font_sizes/font_size = 23
 autowrap_mode = 3

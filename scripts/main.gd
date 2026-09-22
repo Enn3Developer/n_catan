@@ -119,7 +119,7 @@ func _label(parent: Node,text: String,size: int=16,color: Color=INK,translate_te
 	node.set_meta("base_font_size",size)
 	node.add_theme_font_size_override("font_size",maxi(size,16 if preferences.values.large_text else 14))
 	node.add_theme_color_override("font_color",color)
-	if size>=20:node.add_theme_font_override("font",HEADING_FONT)
+	if size>=20:node.theme_type_variation=&"HeadingLabel"
 	parent.add_child(node)
 	return node
 
@@ -934,11 +934,11 @@ func _tutorial_step(direction: int):
 	guide.step=clampi(guide.step+direction,0,CatanTutorial.LESSONS.size()-1)
 	guide.load_lesson(net,preferences.values.player_name)
 
+# Larger small text: labels keep their authored size but never render below 16 px (14 px by default).
 func _apply_text(root: Node):
 	for label in root.find_children("*","Label",true,false):
 		if not label.has_meta("base_font_size"): label.set_meta("base_font_size",label.get_theme_font_size("font_size"))
 		label.add_theme_font_size_override("font_size",maxi(int(label.get_meta("base_font_size")),16 if preferences.values.large_text else 14))
-		if int(label.get_meta("base_font_size"))>=20:label.add_theme_font_override("font",HEADING_FONT)
 
 func _toggle_inspection():
 	if state.is_empty():return
