@@ -53,6 +53,38 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 6
+[node name="GraphicsTab" type="Button" parent="SettingsPanel/Body/Navigation"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+toggle_mode = true
+text = "Graphics"
+alignment = 0
+
+[node name="WorldTab" type="Button" parent="SettingsPanel/Body/Navigation"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+toggle_mode = true
+text = "Controls"
+alignment = 0
+
+[node name="AudioTab" type="Button" parent="SettingsPanel/Body/Navigation"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+toggle_mode = true
+text = "Audio"
+alignment = 0
+
+[node name="UpdatesTab" type="Button" parent="SettingsPanel/Body/Navigation" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+text = "Updates"
+
 [node name="Columns" type="HBoxContainer" parent="SettingsPanel/Body"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -62,6 +94,60 @@ theme_override_constants/separation = 20
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+[node name="GraphicsScroll" type="ScrollContainer" parent="SettingsPanel/Body/Columns/SettingsContent"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="GraphicsOptions" type="VBoxContainer" parent="SettingsPanel/Body/Columns/SettingsContent/GraphicsScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="GraphicsHeading" type="Label" parent="SettingsPanel/Body/Columns/SettingsContent/GraphicsScroll/GraphicsOptions"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.54902, 0.321569, 0.176471, 1)
+theme_override_font_sizes/font_size = 17
+text = "GRAPHICS"
+
+[node name="WorldScroll" type="ScrollContainer" parent="SettingsPanel/Body/Columns/SettingsContent"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="WorldOptions" type="VBoxContainer" parent="SettingsPanel/Body/Columns/SettingsContent/WorldScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="WorldHeading" type="Label" parent="SettingsPanel/Body/Columns/SettingsContent/WorldScroll/WorldOptions"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.54902, 0.321569, 0.176471, 1)
+theme_override_font_sizes/font_size = 17
+text = "CONTROLS"
+
+[node name="AudioScroll" type="ScrollContainer" parent="SettingsPanel/Body/Columns/SettingsContent"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="AudioOptions" type="VBoxContainer" parent="SettingsPanel/Body/Columns/SettingsContent/AudioScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="AudioHeading" type="Label" parent="SettingsPanel/Body/Columns/SettingsContent/AudioScroll/AudioOptions"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.54902, 0.321569, 0.176471, 1)
+theme_override_font_sizes/font_size = 17
+text = "AUDIO"
+
 [node name="Help" type="VBoxContainer" parent="SettingsPanel/Body/Columns"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -139,3 +225,12 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Exit to desktop"
 custom_minimum_size = Vector2(0, 40)
+
+[connection signal="resized" from="." to="." method="_layout"]
+[connection signal="pressed" from="SettingsPanel/Body/Navigation/GraphicsTab" to="." method="select_tab" binds= ["Graphics"]]
+[connection signal="pressed" from="SettingsPanel/Body/Navigation/WorldTab" to="." method="select_tab" binds= ["World"]]
+[connection signal="pressed" from="SettingsPanel/Body/Navigation/AudioTab" to="." method="select_tab" binds= ["Audio"]]
+[connection signal="pressed" from="SettingsPanel/Body/Navigation/UpdatesTab" to="." method="emit_signal" binds= ["updates_requested"]]
+[connection signal="pressed" from="SettingsPanel/Body/Buttons/ResetSettings" to="." method="_on_reset_pressed"]
+[connection signal="pressed" from="SettingsPanel/Body/Buttons/CloseSettings" to="." method="emit_signal" binds= ["close_requested"]]
+[connection signal="pressed" from="SettingsPanel/Body/Buttons/ExitDesktop" to="." method="emit_signal" binds= ["exit_requested"]]

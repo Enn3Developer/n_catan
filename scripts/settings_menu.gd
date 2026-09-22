@@ -1,6 +1,8 @@
 extends Control
 signal preferences_changed
 signal close_requested
+signal updates_requested
+signal exit_requested
 const OPTIONS=[
 	["Lighting","DayNightCycle","day_night_cycle","Day/night cycle","toggle",[],"Turn off to keep the island in daylight. This setting is personal.","Negligible"],
 	["World","Language","language","Language","option",["English","Italiano"],"Choose the language used on this computer.","Accessibility"],
@@ -38,112 +40,44 @@ const OPTIONS=[
 	["Audio","Effects","effects","Sound effects","slider",[0,100,1,100],"Volume of interface and gameplay cues.","Audio"],
 	["Audio","Ambience","ambience","Ocean ambience","slider",[0,100,1,100],"Volume of the ocean soundscape.","Audio"]]
 var preferences: CatanSettings
+const ROWS={"option":preload("res://scenes/ui/option_setting.tscn"),"toggle":preload("res://scenes/ui/toggle_setting.tscn"),"slider":preload("res://scenes/ui/slider_setting.tscn")}
 var tabs={}
 var controls={}
+var rows={}
 var updating=false
 var last_tab="Graphics"
 var stats_clock=0.0
 
 func _ready():
-	resized.connect(_layout)
+	%Version.text=CatanBuildInfo.VERSION
+	tabs={"Graphics":%GraphicsScroll,"World":%WorldScroll,"Audio":%AudioScroll}
+	var pages={"Graphics":%GraphicsOptions,"World":%WorldOptions,"Audio":%AudioOptions}
+	for spec in OPTIONS:
+		var group="Graphics" if spec[0] in ["Display","Graphics","Lighting"] or spec[2] in ["water_quality","wind"] else spec[0]
+		_add_control(pages[group],spec)
 	_layout()
 
 func _layout():
-	if is_instance_valid(find_child("Help",true,false)):find_child("Help",true,false).visible=size.x>=1160
+	%Help.visible=size.x>=1160
 
 func setup(settings: CatanSettings):
-	%Version.text=CatanBuildInfo.VERSION
 	preferences=settings
-	for title in ["Graphics","World","Audio"]:
-		var scroll=ScrollContainer.new()
-		scroll.name=title+"Scroll"
-		scroll.size_flags_vertical=Control.SIZE_EXPAND_FILL
-		scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
-		%SettingsContent.add_child(scroll)
-		var box=VBoxContainer.new()
-		box.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-		box.add_theme_constant_override("separation",8)
-		scroll.add_child(box)
-		var heading=Label.new()
-		heading.name=title+"Heading"
-		heading.text={"Graphics":"GRAPHICS","World":"CONTROLS","Audio":"AUDIO"}[title]
-		heading.add_theme_font_size_override("font_size",17)
-		heading.add_theme_color_override("font_color",Color("8c522d"))
-		box.add_child(heading)
-		tabs[title]=scroll
-		var nav=Button.new()
-		nav.name=title+"Tab"
-		nav.text={"Display":"Display","Graphics":"Graphics","Lighting":"Lighting","World":"Controls","Audio":"Audio"}[title]
-		nav.alignment=HORIZONTAL_ALIGNMENT_LEFT
-		nav.custom_minimum_size.y=38
-		nav.toggle_mode=true
-		%Navigation.add_child(nav)
-		nav.pressed.connect(func():select_tab(title))
-		for spec in OPTIONS:
-			var group="Graphics" if spec[0] in ["Display","Graphics","Lighting"] or spec[2] in ["water_quality","wind"] else spec[0]
-			if group==title: _add_control(box,spec)
-	%CloseSettings.pressed.connect(func():close_requested.emit())
-	%ResetSettings.pressed.connect(func():preferences.reset();refresh();preferences_changed.emit())
 	refresh()
 	select_tab(last_tab)
 	_help(OPTIONS[8])
 
 func _add_control(parent: Node,spec: Array):
-	var panel=PanelContainer.new()
-	panel.name=spec[1]+"Row"
-	var style=StyleBoxFlat.new()
-	style.bg_color=Color("eedab0")
-	style.content_margin_left=14
-	style.content_margin_right=14
-	style.content_margin_top=10
-	style.content_margin_bottom=10
-	style.set_corner_radius_all(6)
-	panel.add_theme_stylebox_override("panel",style)
-	parent.add_child(panel)
-	var row=HBoxContainer.new()
-	row.add_theme_constant_override("separation",10)
-	panel.add_child(row)
-	var label=Label.new()
-	label.text=spec[3]
-	label.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	label.custom_minimum_size.x=160
-	label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	label.add_theme_font_size_override("font_size",17)
-	row.add_child(label)
-	var control: Control
-	if spec[4]=="option":
-		var option=OptionButton.new()
-		for text in spec[5]: option.add_item(text)
-		option.item_selected.connect(func(value):_change(spec,value))
-		control=option
-	elif spec[4]=="toggle":
-		var toggle=CheckButton.new()
-		toggle.text=""
-		toggle.toggled.connect(func(value):_change(spec,value))
-		control=toggle
-	else:
-		var slider=HSlider.new()
-		slider.min_value=spec[5][0]
-		slider.max_value=spec[5][1]
-		slider.step=spec[5][2]
-		slider.custom_minimum_size.x=130
-		slider.value_changed.connect(func(value):_change(spec,value/spec[5][3]))
-		control=slider
-	control.name=spec[1]
-	control.custom_minimum_size.x=200
-	control.custom_minimum_size.y=36
-	control.tooltip_text=spec[6]
-	row.add_child(control)
-	control.mouse_entered.connect(func():_help(spec))
-	control.focus_entered.connect(func():_help(spec))
-	panel.mouse_entered.connect(func():_help(spec))
-	controls[spec[2]]=control
-	if spec[4]=="slider":
-		var value=Label.new()
-		value.name=spec[1]+"Value"
-		value.custom_minimum_size.x=55
-		value.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
-		row.add_child(value)
+	var row=ROWS[spec[4]].instantiate()
+	parent.add_child(row)
+	controls[spec[2]]=row.show_spec(spec)
+	rows[spec[2]]=row
+	row.changed.connect(_change)
+	row.hovered.connect(_help)
+
+func _on_reset_pressed():
+	preferences.reset()
+	refresh()
+	preferences_changed.emit()
 
 func _change(spec: Array,value: Variant):
 	if updating:return
@@ -154,15 +88,7 @@ func _change(spec: Array,value: Variant):
 
 func refresh():
 	updating=true
-	for spec in OPTIONS:
-		var control=controls[spec[2]]
-		var value=preferences.values[spec[2]]
-		if control is OptionButton: control.select(value)
-		elif control is CheckButton: control.set_pressed_no_signal(value)
-		else:
-			control.set_value_no_signal(value*spec[5][3])
-			var label=find_child(spec[1]+"Value",true,false)
-			label.text="%.1f×" % value if spec[2]=="camera_speed" else "%d%%" % (value*100)
+	for spec in OPTIONS:rows[spec[2]].show_value(preferences.values[spec[2]])
 	controls.fullscreen.disabled=CatanSettings.embedded_window()
 	controls.window_size.disabled=preferences.values.fullscreen or CatanSettings.embedded_window()
 	var forward=RenderingServer.get_current_rendering_method()=="forward_plus"

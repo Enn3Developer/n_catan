@@ -82,20 +82,6 @@ func _clear(scene_path: String):
 	screen.layout_changed.connect(_queue_layout)
 	_queue_layout()
 
-func _button(parent: Node,text: String,callback: Callable,primary: bool=false) -> Button:
-	var button=Button.new()
-	button.text=tr(text)
-	button.custom_minimum_size.y=38
-	button.size_flags_vertical=Control.SIZE_SHRINK_BEGIN
-	button.mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND
-	if primary:button.theme_type_variation="PrimaryButton"
-	button.pressed.connect(func():
-		audio.play("click")
-		callback.call(),CONNECT_DEFERRED)
-	parent.add_child(button)
-	return button
-
-
 func _home():
 	turn_banner.hide()
 	notifications.dismiss("trade")
@@ -445,17 +431,11 @@ func _apply_preferences():
 	_apply_text(ui)
 
 func _open_settings():
-	if is_instance_valid(modal): modal.free()
-	modal=load("res://scenes/ui/settings.tscn").instantiate()
-	modals.add_child(modal)
-	_apply_text(modal)
+	var settings=_present("res://scenes/ui/settings.tscn")
 	net.paused=net.solo
-	modal.setup(preferences)
-	_button(modal.get_node("%Navigation"),"Updates",_open_updates)
-	modal.find_child("ExitDesktop",true,false).pressed.connect(_exit_desktop)
-	modal.preferences_changed.connect(_apply_preferences)
-	modal.close_requested.connect(_close_modal,CONNECT_DEFERRED)
-	_apply_text(modal)
+	settings.setup(preferences)
+	settings.preferences_changed.connect(_apply_preferences)
+	_route(settings,{"updates_requested":_open_updates,"exit_requested":_exit_desktop})
 
 func _open_cosmetics():
 	_present("res://scenes/ui/cosmetics.tscn").setup(preferences,net)

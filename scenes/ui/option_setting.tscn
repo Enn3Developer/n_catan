@@ -1,0 +1,14 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/setting_row.tscn" id="base"]
+
+[node name="OptionSetting" instance=ExtResource("base")]
+
+[node name="Control" type="OptionButton" parent="Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 36)
+layout_mode = 2
+
+[connection signal="item_selected" from="Row/Control" to="." method="_on_choice"]
+[connection signal="mouse_entered" from="Row/Control" to="." method="_on_hovered"]
+[connection signal="focus_entered" from="Row/Control" to="." method="_on_hovered"]

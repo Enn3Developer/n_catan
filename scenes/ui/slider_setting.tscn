@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/setting_row.tscn" id="base"]
+
+[node name="SliderSetting" instance=ExtResource("base")]
+
+[node name="Control" type="HSlider" parent="Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 36)
+layout_mode = 2
+
+[node name="Value" type="Label" parent="Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
+horizontal_alignment = 2
+
+[connection signal="value_changed" from="Row/Control" to="." method="_on_slide"]
+[connection signal="mouse_entered" from="Row/Control" to="." method="_on_hovered"]
+[connection signal="focus_entered" from="Row/Control" to="." method="_on_hovered"]
