@@ -5,12 +5,21 @@ const MUTED=Color("796347")
 const PAPER=Color("fff1d2")
 const GOLD=Color("8c522d")
 const HEADING_FONT=preload("res://assets/fonts/NotoSerif-Medium.ttf")
-var net: CatanNetwork
-var board: CatanBoard
-var ui: Control
-var ui_day_night
+@onready var net: CatanNetwork=$Network
+@onready var board: CatanBoard=$Board
+@onready var audio: CatanAudio=$Audio
+@onready var updater: CatanUpdater=$Updater
+@onready var ui_day_night=$UIDayNight
+@onready var ui: Control=%Root
+@onready var screens: Control=%Screens
+@onready var tutorial_layer: Control=%Tutorial
+@onready var modals: Control=%Modals
+@onready var toast: Label=%Toast
+@onready var notifications=%Notifications
+@onready var inspection_hint: Label=%InspectionHint
+@onready var turn_banner: Label=%TurnBanner
+@onready var turn_banner_timer: Timer=%TurnBanner/Timer
 var screen: Control
-var toast: Label
 var toast_generation=0
 var modal: Control
 var state={}
@@ -26,12 +35,10 @@ var amount_get: SpinBox
 var server_only=false
 var connection_status=""
 var preferences=CatanSettings.new()
-var audio: CatanAudio
 var guide: CatanTutorial
 var tutorial_panel: Control
 var invite_address=""
 var inspection_mode=false
-var inspection_hint: Label
 var layout_queued=false
 var trade_players=true
 var trade_give=0
@@ -39,11 +46,7 @@ var trade_get=1
 var music_dialog_widgets={}
 var music_ui_clock=0.0
 var music_volume_before_mute=.42
-var updater
-var notifications
 var notified_updates={}
-var turn_banner: Label
-var turn_banner_timer: Timer
 var turn_clock_label: Label
 var turn_clock_left=0.0
 var turn_clock_limit=0.0
@@ -55,14 +58,11 @@ func _ready():
 	get_tree().auto_accept_quit=false
 	CatanI18n.apply(preferences.values.language)
 	active_language=preferences.values.language
-	net=$Network
 	net.my_style=preferences.values.piece_style
 	net.my_color=preferences.values.player_color
-	net.changed.connect(_network_changed)
-	net.received.connect(_received)
-	net.notice.connect(_notice)
 	if "--server" in OS.get_cmdline_user_args():
 		server_only=true
+		set_process(false)
 		var password=""
 		for arg in OS.get_cmdline_user_args():
 			if arg.begins_with("--password="): password=arg.trim_prefix("--password=")
@@ -74,54 +74,10 @@ func _ready():
 				if arg.begins_with("--address="):address=arg.trim_prefix("--address=")
 			print("CATAN_INVITE "+net.invite(address))
 		return
-	board=$Board
-	board.picked.connect(func(kind,id): net.act({"type":kind,"id":id}))
 	var preview=CatanRules.new()
 	board.build(preview.create(["Voyager","Mariner"],8426))
-	audio=$Audio
-	net.applied.connect(_action_applied)
-	var canvas=CanvasLayer.new()
-	canvas.layer=2
-	add_child(canvas)
-	ui=Control.new()
-	ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	ui.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	ui.theme=_theme()
-	canvas.add_child(ui)
-	ui_day_night=preload("res://scripts/ui_day_night.gd").new()
-	add_child(ui_day_night)
 	ui_day_night.setup(ui)
-	toast=Label.new()
-	toast.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
-	toast.offset_left=-470
-	toast.offset_right=470
-	toast.offset_top=-62
-	toast.offset_bottom=-20
-	toast.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-	toast.add_theme_color_override("font_color",GOLD)
-	toast.add_theme_stylebox_override("normal",_style(Color("f3deb4"),12))
-	toast.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	toast.hide()
-	ui.add_child(toast)
-	notifications=preload("res://scripts/notifications.gd").new()
-	notifications.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	ui.add_child(notifications)
-	get_viewport().size_changed.connect(_queue_layout)
-	inspection_hint=Label.new()
-	inspection_hint.text=tr("Right-drag to orbit · Scroll to zoom · H / Esc to return")
-	inspection_hint.add_theme_font_size_override("font_size",15)
-	inspection_hint.add_theme_color_override("font_outline_color",INK)
-	inspection_hint.add_theme_constant_override("outline_size",6)
-	inspection_hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	inspection_hint.offset_top=-40
-	inspection_hint.offset_bottom=-12
-	inspection_hint.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-	inspection_hint.hide()
-	ui.add_child(inspection_hint)
 	_apply_preferences()
-	updater=preload("res://scripts/updater.gd").new()
-	add_child(updater)
-	updater.changed.connect(_updates_changed)
 	_home()
 	if updater.supported:updater.check_updates.call_deferred()
 	_update_health_ready()
@@ -145,24 +101,14 @@ func _style(color: Color,radius: int=10) -> StyleBoxFlat:
 	s.content_margin_bottom=8
 	return s
 
-func _theme() -> Theme:
-	return load("res://assets/ui_theme.tres")
-
-func _clear(scene_path: String=""):
+func _clear(scene_path: String):
 	CatanDiagnostics.event("ui.screen",scene_path)
 	if is_instance_valid(screen): screen.free()
 	var keep_modal=is_instance_valid(modal) and (modal.name in ["Settings","Cosmetics","MusicLibrary","Updates"] or (scene_path=="res://scenes/ui/hud.tscn" and modal.name in ["Guide","GameLog","LeaveConfirm"]))
 	if is_instance_valid(modal) and not keep_modal: modal.free()
-	if scene_path.is_empty():
-		screen=Control.new()
-		screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		screen.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	else: screen=load(scene_path).instantiate()
-	ui.add_child(screen)
+	screen=load(scene_path).instantiate()
+	screens.add_child(screen)
 	_apply_text(screen)
-	ui.move_child(toast,ui.get_child_count()-1)
-	if keep_modal: ui.move_child(modal,ui.get_child_count()-1)
-	if is_instance_valid(notifications):ui.move_child(notifications,ui.get_child_count()-1)
 	_queue_layout()
 
 func _label(parent: Node,text: String,size: int=16,color: Color=INK,translate_text: bool=true) -> Label:
@@ -184,19 +130,18 @@ func _button(parent: Node,text: String,callback: Callable,primary: bool=false) -
 	button.mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND
 	if primary:button.theme_type_variation="PrimaryButton"
 	button.pressed.connect(func():
-		if is_instance_valid(audio): audio.play("click")
+		audio.play("click")
 		callback.call(),CONNECT_DEFERRED)
 	parent.add_child(button)
 	return button
 
 
 func _home():
-	if is_instance_valid(turn_banner):turn_banner.hide()
-	if is_instance_valid(notifications):
-		notifications.dismiss("trade")
-		notifications.dismiss("trade_result")
+	turn_banner.hide()
+	notifications.dismiss("trade")
+	notifications.dismiss("trade_result")
 	inspection_mode=false
-	if is_instance_valid(inspection_hint):inspection_hint.hide()
+	inspection_hint.hide()
 	board.show_labels=true
 	board.reset_camera()
 	_clear("res://scenes/ui/home.tscn")
@@ -278,8 +223,11 @@ func _join():
 		_notice(tr("Paste a valid invite code from the host."))
 	else: _notice(tr("Connecting to the island…"))
 
+func _on_board_picked(kind: String,id: int):
+	net.act({"type":kind,"id":id})
+
 func _network_changed():
-	if server_only or not is_instance_valid(ui): return
+	if server_only or not is_node_ready(): return
 	if not net.online:
 		_home()
 	elif not net.started:
@@ -362,14 +310,14 @@ func _lobby():
 	if not connection_status.is_empty() and not net.solo: _node("ConnectionHelp").text=CatanI18n.render(connection_status)
 func _received(data: Dictionary):
 	CatanDiagnostics.event("state.received","turn=%s phase=%s"%[data.get("turn",-1),data.get("phase","")])
-	if server_only: return
+	if server_only or not is_node_ready(): return
 	var previous_trade=state.get("trade_event",{})
 	var previous_offer=state.get("offer",{})
 	var trading=is_instance_valid(modal) and modal.name=="TradeDialog"
 	var fresh=state.is_empty()
 	var new_turn=fresh or state.get("turn",-1)!=data.turn or state.get("setup",-1)!=data.get("setup",-1) or state.get("paired",false)!=data.get("paired",false)
 	var produced=not fresh and data.rolled and (not state.rolled or state.dice!=data.dice)
-	if is_instance_valid(audio): audio.transition(state,data,net.seat)
+	audio.transition(state,data,net.seat)
 	state=data
 	board.camera.h_offset=0
 	board.camera.v_offset=1.8 if guide!=null else 0.0
@@ -393,25 +341,23 @@ func _received(data: Dictionary):
 	_trade_notifications(previous_trade,previous_offer,fresh)
 	if new_turn and state.turn==net.seat and state.winner==-1:_show_turn_banner()
 	elif state.turn!=net.seat or state.winner!=-1:
-		if is_instance_valid(turn_banner):turn_banner.hide()
+		turn_banner.hide()
 	if trading and state.phase=="play" and state.turn==net.seat and state.winner==-1:
 		if not state.offer.is_empty() and state.offer.from==net.seat:_view_offer()
 		else:_trade(false)
 
 func _process(delta):
-	if not server_only and is_instance_valid(audio):
-		var soundtrack=net.music_state()
-		audio.follow_soundtrack(soundtrack,delta)
-		if is_instance_valid(board.weather):audio.follow_weather(board.weather.current,delta)
-		music_ui_clock-=delta
-		if music_ui_clock<=0:
-			music_ui_clock=.15
-			_refresh_music_widgets(music_dialog_widgets,soundtrack)
-	if not server_only and is_instance_valid(board) and net.started and not net.paused and net.roster.all(func(player):return player.connected):
-		board.advance_day(delta)
-	if not server_only and is_instance_valid(ui_day_night):
-		ui_day_night.advance(board.daylight,delta)
-	if not server_only and turn_clock_limit>0.0 and net.started and not net.paused and net.roster.all(func(player):return player.connected):
+	var soundtrack=net.music_state()
+	audio.follow_soundtrack(soundtrack,delta)
+	if is_instance_valid(board.weather):audio.follow_weather(board.weather.current,delta)
+	music_ui_clock-=delta
+	if music_ui_clock<=0:
+		music_ui_clock=.15
+		_refresh_music_widgets(music_dialog_widgets,soundtrack)
+	var live=net.started and not net.paused and net.roster.all(func(player):return player.connected)
+	if live:board.advance_day(delta)
+	ui_day_night.advance(board.daylight,delta)
+	if live and turn_clock_limit>0.0:
 		turn_clock_left=maxf(0.0,turn_clock_left-delta)
 		_refresh_turn_clock()
 
@@ -638,8 +584,8 @@ func _choose(kind: String):
 
 func _notice(message: String):
 	print(message)
-	if server_only or not is_instance_valid(toast): return
-	if is_instance_valid(audio) and ("failed" in message.to_lower() or "not enough" in message.to_lower()): audio.play("error")
+	if server_only or not is_node_ready(): return
+	if "failed" in message.to_lower() or "not enough" in message.to_lower(): audio.play("error")
 	if message.begins_with("Router") or message.begins_with("Automatic mapping"):
 		if "Invite address: " in message: invite_address=message.get_slice("Invite address: ",1)
 		connection_status=message
@@ -655,7 +601,7 @@ func _dialog(title: String) -> VBoxContainer:
 	if is_instance_valid(modal): modal.free()
 	modal=Control.new()
 	modal.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	ui.add_child(modal)
+	modals.add_child(modal)
 	var shade=ColorRect.new()
 	shade.color=Color(.12,.085,.05,.78)
 	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -974,7 +920,7 @@ func _bind(node_name: String,callback: Callable,primary: bool=false):
 	button.mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND
 	if primary:button.theme_type_variation="PrimaryButton"
 	button.pressed.connect(func():
-		if is_instance_valid(audio): audio.play("click")
+		audio.play("click")
 		callback.call(),CONNECT_DEFERRED)
 
 func _solo():
@@ -993,8 +939,8 @@ func _apply_preferences():
 	CatanI18n.apply(active_language)
 	if language_changed:call_deferred("_refresh_language")
 	preferences.apply_display(get_viewport())
-	if is_instance_valid(board): board.apply_preferences(preferences.values)
-	if is_instance_valid(audio): audio.apply(preferences.values)
+	board.apply_preferences(preferences.values)
+	audio.apply(preferences.values)
 	net.bot_delay=[1.25,0.7,0.2][preferences.values.bot_speed]
 	net.my_style=preferences.values.piece_style
 	net.my_color=preferences.values.player_color
@@ -1002,12 +948,12 @@ func _apply_preferences():
 		net.choose_piece_style(net.my_style)
 	if net.online and net.seat>=0 and net.seat<net.roster.size() and str(net.roster[net.seat].get("color",""))!=net.my_color:
 		net.choose_color(net.my_color)
-	if is_instance_valid(ui): _apply_text(ui)
+	_apply_text(ui)
 
 func _open_settings():
 	if is_instance_valid(modal): modal.free()
 	modal=load("res://scenes/ui/settings.tscn").instantiate()
-	ui.add_child(modal)
+	modals.add_child(modal)
 	_apply_text(modal)
 	net.paused=net.solo
 	modal.setup(preferences)
@@ -1020,7 +966,7 @@ func _open_settings():
 func _open_cosmetics():
 	if is_instance_valid(modal):modal.free()
 	modal=load("res://scenes/ui/cosmetics.tscn").instantiate()
-	ui.add_child(modal)
+	modals.add_child(modal)
 	modal.setup(preferences,net)
 	modal.close_requested.connect(_close_modal,CONNECT_DEFERRED)
 	net.paused=net.solo
@@ -1041,7 +987,7 @@ func _action_applied(_player: int,action: Dictionary):
 func _tutorial_ui():
 	if is_instance_valid(tutorial_panel): tutorial_panel.free()
 	tutorial_panel=load("res://scenes/ui/tutorial.tscn").instantiate()
-	ui.add_child(tutorial_panel)
+	tutorial_layer.add_child(tutorial_panel)
 	tutorial_panel.find_child("Progress",true,false).text=tr("LESSON %d / %d") % [guide.step+1,CatanTutorial.LESSONS.size()]
 	tutorial_panel.find_child("LessonTitle",true,false).text=guide.current().title
 	tutorial_panel.find_child("LessonBody",true,false).text=guide.current().body
@@ -1095,15 +1041,14 @@ func _queue_layout():
 
 func _layout_screen():
 	layout_queued=false
-	if not is_instance_valid(ui) or not is_instance_valid(screen):return
+	if not is_instance_valid(screen):return
 	var width=ui.size.x
 	var height=ui.size.y
 	toast.offset_left=-minf(470,width*.5-20)
 	toast.offset_right=minf(470,width*.5-20)
-	if is_instance_valid(notifications):
-		notifications.offset_left=-minf(420,width-32)
-		notifications.offset_right=-16
-		notifications.offset_top=132 if screen.name=="GameHUD" else 72
+	notifications.offset_left=-minf(420,width-32)
+	notifications.offset_right=-16
+	notifications.offset_top=132 if screen.name=="GameHUD" else 72
 	if screen.name=="MainMenu":
 		var panel=_node("Expedition")
 		panel.offset_right=minf(390,width-90)
@@ -1170,7 +1115,7 @@ func _exit_desktop():
 	net.leave()
 	# Let play commands from this input frame reach the mixer before stopping them.
 	await get_tree().create_timer(.06).timeout
-	if is_instance_valid(audio):audio.shutdown()
+	audio.shutdown()
 	# Let the audio mixer release queued playback references before engine teardown.
 	await get_tree().create_timer(.15).timeout
 	get_tree().quit()
@@ -1190,7 +1135,7 @@ func _open_updates():
 	_updates_changed()
 
 func _updates_changed():
-	if updater==null:return
+	if not is_node_ready():return
 	var data=updater.status
 	var stage=data.get("state","idle")
 	var release_version=str(data.get("version",""))
@@ -1246,27 +1191,9 @@ func _refresh_turn_clock():
 	turn_clock_label.add_theme_color_override("font_color",Color("a8322a") if left<=10 else MUTED)
 
 func _show_turn_banner():
-	if not is_instance_valid(turn_banner):
-		turn_banner=Label.new()
-		turn_banner.name="YourTurnBanner"
-		turn_banner.mouse_filter=Control.MOUSE_FILTER_IGNORE
-		turn_banner.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-		turn_banner.grow_horizontal=Control.GROW_DIRECTION_BOTH
-		turn_banner.grow_vertical=Control.GROW_DIRECTION_BOTH
-		turn_banner.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-		turn_banner.add_theme_font_size_override("font_size",48)
-		turn_banner.add_theme_color_override("font_outline_color",Color("102938"))
-		turn_banner.add_theme_constant_override("outline_size",12)
-		ui.add_child(turn_banner)
-		turn_banner_timer=Timer.new()
-		turn_banner_timer.one_shot=true
-		turn_banner_timer.wait_time=3.0
-		turn_banner.add_child(turn_banner_timer)
-		turn_banner_timer.timeout.connect(turn_banner.hide)
 	turn_banner.text=tr("Your turn")
 	turn_banner.add_theme_color_override("font_color",board.player_color(net.seat))
 	turn_banner.show()
-	ui.move_child(turn_banner,ui.get_child_count()-1)
 	turn_banner_timer.start()
 
 func _refresh_language():
@@ -1276,5 +1203,5 @@ func _refresh_language():
 	else:_home()
 	if is_instance_valid(modal) and modal.name=="Settings":
 		modal.refresh()
-	if is_instance_valid(turn_banner):turn_banner.text=tr("Your turn")
+	turn_banner.text=tr("Your turn")
 	if guide!=null:_tutorial_ui()

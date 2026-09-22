@@ -2,10 +2,6 @@ extends VBoxContainer
 
 var cards={}
 
-func _ready():
-	mouse_filter=Control.MOUSE_FILTER_IGNORE
-	add_theme_constant_override("separation",8)
-
 func dismiss(key: String):
 	if cards.has(key):
 		var card=cards[key]

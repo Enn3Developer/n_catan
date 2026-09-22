@@ -4,6 +4,29 @@
 [ext_resource type="PackedScene" path="res://scenes/network.tscn" id="2_o6xl0"]
 [ext_resource type="PackedScene" uid="uid://e44mmibmk52t" path="res://scenes/board.tscn" id="4_85g3d"]
 [ext_resource type="PackedScene" uid="uid://bwnb462vieqdy" path="res://scenes/audio.tscn" id="6_ya4ey"]
+[ext_resource type="Script" uid="uid://d3cbefpncr3j" path="res://scripts/updater.gd" id="7_updater"]
+[ext_resource type="Script" uid="uid://dd17klaexrnv8" path="res://scripts/ui_day_night.gd" id="8_daynight"]
+[ext_resource type="Theme" uid="uid://cr50xu8k1vr3e" path="res://assets/ui_theme.tres" id="9_theme"]
+[ext_resource type="Script" uid="uid://bctqcju5n26s4" path="res://scripts/notifications.gd" id="10_notices"]
+
+[sub_resource type="StyleBoxFlat" id="ToastPanel"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.952941, 0.870588, 0.705882, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.67451, 0.52549, 0.329412, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0.18, 0.1, 0.04, 0.18)
+shadow_size = 3
+shadow_offset = Vector2(0, 2)
 
 [node name="Catan" type="Node3D" unique_id=1726718215]
 script = ExtResource("1")
@@ -13,3 +36,130 @@ script = ExtResource("1")
 [node name="Board" parent="." unique_id=818072003 instance=ExtResource("4_85g3d")]
 
 [node name="Audio" parent="." unique_id=109466134 instance=ExtResource("6_ya4ey")]
+
+[node name="Updater" type="Node" parent="."]
+script = ExtResource("7_updater")
+
+[node name="UIDayNight" type="Node" parent="."]
+script = ExtResource("8_daynight")
+
+[node name="UI" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="Root" type="Control" parent="UI"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("9_theme")
+
+[node name="Screens" type="Control" parent="UI/Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="InspectionHint" type="Label" parent="UI/Root"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -40.0
+offset_bottom = -12.0
+theme_override_colors/font_outline_color = Color(0.286275, 0.207843, 0.129412, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 15
+text = "Right-drag to orbit · Scroll to zoom · H / Esc to return"
+horizontal_alignment = 1
+
+[node name="Toast" type="Label" parent="UI/Root"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -470.0
+offset_top = -62.0
+offset_right = 470.0
+offset_bottom = -20.0
+theme_override_colors/font_color = Color(0.54902, 0.321569, 0.176471, 1)
+theme_override_styles/normal = SubResource("ToastPanel")
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Tutorial" type="Control" parent="UI/Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Modals" type="Control" parent="UI/Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Notifications" type="VBoxContainer" parent="UI/Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -420.0
+offset_top = 72.0
+offset_right = -16.0
+mouse_filter = 2
+theme_override_constants/separation = 8
+script = ExtResource("10_notices")
+
+[node name="TurnBanner" type="Label" parent="UI/Root"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_outline_color = Color(0.0627451, 0.160784, 0.219608, 1)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 48
+horizontal_alignment = 1
+
+[node name="Timer" type="Timer" parent="UI/Root/TurnBanner"]
+wait_time = 3.0
+one_shot = true
+
+[connection signal="changed" from="Network" to="." method="_network_changed"]
+[connection signal="received" from="Network" to="." method="_received"]
+[connection signal="notice" from="Network" to="." method="_notice"]
+[connection signal="applied" from="Network" to="." method="_action_applied"]
+[connection signal="picked" from="Board" to="." method="_on_board_picked"]
+[connection signal="changed" from="Updater" to="." method="_updates_changed"]
+[connection signal="resized" from="UI/Root" to="." method="_queue_layout"]
+[connection signal="timeout" from="UI/Root/TurnBanner/Timer" to="UI/Root/TurnBanner" method="hide"]
