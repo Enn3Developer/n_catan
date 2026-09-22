@@ -11,9 +11,12 @@ var rng=RandomNumberGenerator.new()
 var noise=FastNoiseLite.new()
 var sectors=[]
 func _init():
-	name="BackgroundLandscape"
 	rng.seed=71249;noise.seed=6153;noise.frequency=.32
 	material=ShaderMaterial.new();material.shader=load("res://shaders/background_landscape.gdshader")
+
+func _ready():
+	# A dedicated server never renders the backdrop, so skip generating it.
+	if "--server" in OS.get_cmdline_user_args():return
 	for sector in SECTORS:
 		var st=SurfaceTool.new();st.begin(Mesh.PRIMITIVE_TRIANGLES)
 		for step in ANGULAR_STEPS:

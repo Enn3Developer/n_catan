@@ -3,10 +3,20 @@ extends Node3D
 signal picked(kind: String,id: int)
 const TILE_SIZE=25.0 # Regular hexes: 50 m tip to tip, 43.3 m across flats.
 const PLAYERS=[Color("ed815d"),Color("65bfcb"),Color("d9b76c"),Color("b697d7"),Color("7dcc83"),Color("d1aa87")]
-var camera: Camera3D
-var terrain: Node3D
-var pieces_root: Node3D
-var markers: Node3D
+const LABEL_FONT=preload("res://assets/fonts/FiraSans-Medium.ttf")
+@onready var camera: Camera3D=$CameraRig/Camera
+@onready var sun: DirectionalLight3D=$Sun
+@onready var environment: Environment=$WorldEnvironment.environment
+@onready var terrain: Node3D=$Terrain
+@onready var pieces_root: Node3D=$Buildings
+@onready var markers: Node3D=$PlacementMarkers
+@onready var scenery: Node3D=$Scenery
+@onready var background_landscape: CatanBackgroundLandscape=$Scenery/BackgroundLandscape
+@onready var ocean: MeshInstance3D=$Ocean
+@onready var sea_material: ShaderMaterial=$Ocean.material_override
+@onready var pollen: CPUParticles3D=$SunlitPollen
+@onready var label_layer: CanvasLayer=$Labels
+@onready var fps_label: Label=%FPS
 var state={}
 var mode=""
 var seat=-1
@@ -16,8 +26,6 @@ var pitch=0.745
 var hover=-1
 var targets=[]
 var marker_nodes=[]
-var scenery: Node3D
-var background_landscape: Node3D
 var boats=[]
 var sea_traffic=preload("res://scripts/sea_traffic.gd").new()
 var beacon: Node3D
@@ -30,22 +38,16 @@ var seagulls=preload("res://scripts/seagulls.gd").new()
 var reduce_motion=false
 var camera_speed=1.0
 var board_labels=[]
-var label_layer: CanvasLayer
-var label_font: Font
-var sea_material: ShaderMaterial
 var quality=2
 var art=CatanTileArt.new()
 var cosmetics=CatanCosmetics.new()
 var render_values=CatanSettings.DEFAULTS.duplicate()
 var tile_nodes=[]
-var ocean: MeshInstance3D
 var water_centers=PackedVector2Array()
 var camera_focus=Vector3(0,0,1.0)
 var camera_zoom=1.0
 var last_water_quality=-1
 var last_shadow_quality=-1
-var pollen: CPUParticles3D
-var fps_label: Label
 var show_labels=true
 var view_region=Rect2()
 var day_seconds=150.0
@@ -64,119 +66,9 @@ func _ready():
 	if "--server" in OS.get_cmdline_user_args():
 		set_process(false)
 		return
-	camera=get_node_or_null("CameraRig/Camera")
-	if camera==null:
-		camera=Camera3D.new()
-		add_child(camera)
-	camera.projection=Camera3D.PROJECTION_PERSPECTIVE
-	camera.fov=35
-	camera.size=12.2
-	camera.far=9000
-	camera.near=.08
+	# The wave table is shared with boat bobbing on the CPU.
+	sea_material.set_shader_parameter("waves",preload("res://scripts/ocean_waves.gd").WAVES)
 	_update_camera()
-	var world=get_node_or_null("WorldEnvironment")
-	if world==null:
-		world=WorldEnvironment.new()
-		add_child(world)
-	var env=Environment.new()
-	env.background_mode=Environment.BG_SKY
-	var sky=Sky.new()
-	var atmosphere=ShaderMaterial.new()
-	atmosphere.shader=preload("res://shaders/weather_sky.gdshader")
-	var cloud_noise=FastNoiseLite.new()
-	cloud_noise.seed=7241;cloud_noise.frequency=.008;cloud_noise.fractal_octaves=5
-	var cloud_texture=NoiseTexture2D.new()
-	cloud_texture.width=512;cloud_texture.height=512;cloud_texture.seamless=true
-	cloud_texture.noise=cloud_noise
-	atmosphere.set_shader_parameter("cloud_noise",cloud_texture)
-	sky.radiance_size=Sky.RADIANCE_SIZE_256
-	sky.process_mode=Sky.PROCESS_MODE_REALTIME
-	sky.sky_material=atmosphere
-	env.sky=sky
-	env.fog_enabled=true
-	env.fog_light_color=Color("b2d0ce")
-	env.fog_density=0.0015*2.2/TILE_SIZE
-	env.background_color=Color("102b3c")
-	env.ambient_light_source=Environment.AMBIENT_SOURCE_SKY
-	env.ambient_light_color=Color("b7d4e0")
-	env.ambient_light_energy=0.55
-	env.tonemap_mode=Environment.TONE_MAPPER_ACES
-	env.tonemap_white=4.0
-	env.reflected_light_source=Environment.REFLECTION_SOURCE_SKY
-	world.environment=env
-	var light=get_node_or_null("Sun")
-	if light==null:
-		light=DirectionalLight3D.new()
-		add_child(light)
-	light.rotation_degrees=Vector3(-38,-34,0)
-	light.light_color=Color("ffe4b9")
-	light.light_energy=1.65
-	light.light_angular_distance=.6
-	light.shadow_bias=.10
-	light.shadow_normal_bias=1.5
-	light.shadow_enabled=true
-	light.directional_shadow_max_distance=85*TILE_SIZE/2.2
-	light.directional_shadow_mode=DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
-	terrain=_branch("Terrain")
-	pieces_root=_branch("Buildings")
-	markers=_branch("PlacementMarkers")
-	scenery=_branch("Scenery")
-	label_layer=CanvasLayer.new()
-	label_layer.layer=0
-	add_child(label_layer)
-	label_font=load("res://assets/fonts/FiraSans-Medium.ttf")
-
-	var water=PlaneMesh.new()
-	water.size=Vector2(7000,7000)
-	water.subdivide_width=150
-	water.subdivide_depth=150
-	ocean=MeshInstance3D.new()
-	ocean.mesh=water
-	ocean.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	var water_material=ShaderMaterial.new()
-	water_material.shader=load("res://shaders/water.gdshader")
-	water_material.set_shader_parameter("waves",preload("res://scripts/ocean_waves.gd").WAVES)
-	ocean.material_override=water_material
-	sea_material=water_material
-	ocean.position.y=-.027*TILE_SIZE
-	ocean.extra_cull_margin=4.0
-	add_child(ocean)
-	for branch in [terrain,pieces_root,markers]:branch.scale=Vector3.ONE*TILE_SIZE
-	var stats=CanvasLayer.new()
-	stats.layer=5
-	add_child(stats)
-	fps_label=Label.new()
-	fps_label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
-	fps_label.offset_left=18
-	fps_label.offset_top=-25
-	fps_label.add_theme_font_size_override("font_size",13)
-	fps_label.add_theme_color_override("font_outline_color",Color("10232b"))
-	fps_label.add_theme_constant_override("outline_size",5)
-	stats.add_child(fps_label)
-	pollen=CPUParticles3D.new()
-	pollen.name="SunlitPollen"
-	pollen.amount=96
-	pollen.lifetime=12
-	pollen.preprocess=4
-	pollen.emission_shape=CPUParticles3D.EMISSION_SHAPE_BOX
-	pollen.emission_box_extents=Vector3(8,1.6,8)
-	pollen.position.y=1.8
-	pollen.direction=Vector3(.2,.1,.1)
-	pollen.gravity=Vector3.ZERO
-	pollen.initial_velocity_min=.03
-	pollen.initial_velocity_max=.09
-	var mote=SphereMesh.new()
-	mote.radius=.007
-	mote.height=.014
-	mote.radial_segments=4
-	mote.rings=2
-	var dust=mat(Color("eadbb7"))
-	dust.emission_enabled=true
-	dust.emission=Color("423b29")
-	mote.material=dust
-	pollen.mesh=mote
-	pollen.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(pollen)
 	_world_props()
 	weather=preload("res://scripts/weather.gd").new();add_child(weather);weather.setup()
 
@@ -204,21 +96,13 @@ func box(size: Vector3,color: Color) -> MeshInstance3D:
 	var shape=CatanMiniature.bevel_box(size)
 	return mesh(shape,color)
 
-func _branch(branch_name: String) -> Node3D:
-	var branch=get_node_or_null(branch_name)
-	if branch==null:
-		branch=Node3D.new()
-		branch.name=branch_name
-		add_child(branch)
-	return branch
-
 func label3(text: String,pos: Vector3,size: int,color: Color=Color("fff1ce"),resource_id: int=-1) -> Node3D:
 	var anchor=Node3D.new()
 	anchor.position=pos
 	var label=Label.new()
 	label.text=text
 	label.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	label.add_theme_font_override("font",label_font)
+	label.add_theme_font_override("font",LABEL_FONT)
 	label.add_theme_font_size_override("font_size",20 if size>30 else 13)
 	label.add_theme_color_override("font_color",color)
 	if text.contains(":"):
@@ -253,54 +137,30 @@ func apply_preferences(values: Dictionary):
 			if node.has_meta("pbr_surface"):
 				node.material_override=art.surface(node.get_meta("pbr_surface"),null,values)
 	art.animate(values)
-	var light=get_node_or_null("Sun")
-	if light:
-		light.shadow_enabled=values.shadow_quality>0
-		if last_shadow_quality!=values.shadow_quality:
-			RenderingServer.directional_shadow_atlas_set_size([1024,1024,2048,4096,8192][values.shadow_quality],true)
-			RenderingServer.directional_soft_shadow_filter_set_quality([0,0,1,3,4][values.shadow_quality])
-			last_shadow_quality=values.shadow_quality
+	sun.shadow_enabled=values.shadow_quality>0
+	if last_shadow_quality!=values.shadow_quality:
+		RenderingServer.directional_shadow_atlas_set_size([1024,1024,2048,4096,8192][values.shadow_quality],true)
+		RenderingServer.directional_soft_shadow_filter_set_quality([0,0,1,3,4][values.shadow_quality])
+		last_shadow_quality=values.shadow_quality
 	var forward=RenderingServer.get_current_rendering_method()=="forward_plus"
-	var world=get_node_or_null("WorldEnvironment")
-	if world:
-		var env=world.environment
-		env.fog_enabled=values.atmosphere
-		env.fog_density=.0018*2.2/TILE_SIZE
-		env.fog_sun_scatter=.25
-		env.tonemap_exposure=values.exposure
-		env.glow_enabled=values.bloom
-		env.glow_intensity=.18
-		env.glow_bloom=.025
-		env.glow_hdr_threshold=1.8
-		env.ssao_enabled=forward and values.ambient_occlusion>0
-		env.ssao_radius=.42
-		env.ssao_intensity=1.05
-		env.ssao_light_affect=.22
-		env.ssao_detail=.8
-		if forward:RenderingServer.environment_set_ssao_quality(1 if values.ambient_occlusion==1 else 3,values.ambient_occlusion==1,.5,2,70,100)
-		env.ssil_enabled=forward and values.global_illumination==1
-		env.ssil_radius=2.2
-		env.ssil_intensity=.45
-		env.sdfgi_enabled=forward and values.global_illumination>=2
-		env.sdfgi_min_cell_size=.4 if values.global_illumination==2 else .2
-		env.sdfgi_use_occlusion=true
-		env.sdfgi_energy=.85
-		env.ssr_enabled=forward and values.reflections>0
-		env.ssr_max_steps=32 if values.reflections==1 else 96
-		env.ssr_depth_tolerance=.25
-		if camera.attributes==null:camera.attributes=CameraAttributesPractical.new()
-		camera.attributes.dof_blur_far_enabled=values.depth_of_field and forward
-		camera.attributes.dof_blur_near_enabled=values.depth_of_field and forward
-		camera.attributes.dof_blur_amount=.065
-		_update_camera_focus()
+	environment.fog_enabled=values.atmosphere
+	environment.tonemap_exposure=values.exposure
+	environment.glow_enabled=values.bloom
+	environment.ssao_enabled=forward and values.ambient_occlusion>0
+	if forward:RenderingServer.environment_set_ssao_quality(1 if values.ambient_occlusion==1 else 3,values.ambient_occlusion==1,.5,2,70,100)
+	environment.ssil_enabled=forward and values.global_illumination==1
+	environment.sdfgi_enabled=forward and values.global_illumination>=2
+	environment.sdfgi_min_cell_size=.4 if values.global_illumination==2 else .2
+	environment.ssr_enabled=forward and values.reflections>0
+	environment.ssr_max_steps=32 if values.reflections==1 else 96
+	camera.attributes.dof_blur_far_enabled=values.depth_of_field and forward
+	camera.attributes.dof_blur_near_enabled=values.depth_of_field and forward
+	_update_camera_focus()
 	sea_material.set_shader_parameter("motion_speed",0.0 if reduce_motion else values.wind)
 	sea_material.set_shader_parameter("water_quality",values.water_quality)
 	if last_water_quality!=values.water_quality:
-		var plane=PlaneMesh.new()
-		plane.size=Vector2(7000,7000)
-		plane.subdivide_width=[64,128,224,320][values.water_quality]
-		plane.subdivide_depth=plane.subdivide_width
-		ocean.mesh=plane
+		ocean.mesh.subdivide_width=[64,128,224,320][values.water_quality]
+		ocean.mesh.subdivide_depth=ocean.mesh.subdivide_width
 		last_water_quality=values.water_quality
 	for smoke in find_children("Smoke","CPUParticles3D",true,false):
 		smoke.emitting=values.particles>0 and not reduce_motion
@@ -517,7 +377,7 @@ func _process(delta):
 	if reduce_motion: delta=0.0
 	elapsed+=delta
 	sea_material.set_shader_parameter("animation_time",elapsed)
-	get_node("WorldEnvironment").environment.sky.sky_material.set_shader_parameter("animation_time",elapsed)
+	environment.sky.sky_material.set_shader_parameter("animation_time",elapsed)
 	living_world.animate(actors,elapsed,art,daylight)
 	living_world.animate(band_actors,elapsed,art,daylight)
 	living_world.animate_dwellers(dwellers,elapsed,daylight)
@@ -643,8 +503,6 @@ func _rock(parent: Node3D,pos: Vector3,size: Vector3,color: Color):
 	parent.add_child(rock)
 
 func _world_props():
-	background_landscape=preload("res://scripts/background_landscape.gd").new()
-	scenery.add_child(background_landscape)
 	var random=RandomNumberGenerator.new()
 	random.seed=822
 	# Offshore rocks and tiny islands extend the scene beyond the board.
@@ -786,12 +644,11 @@ func advance_day(delta: float):
 	day_seconds=fposmod(day_seconds+delta,600.0)
 	var lighting_seconds=day_seconds if render_values.get("day_night_cycle",true) else 150.0
 	daylight=smoothstep(-.15,.35,sin(lighting_seconds/600.0*TAU))
-	var sun=get_node("Sun")
 	sun.rotation_degrees=Vector3(-15-60*absf(sin(lighting_seconds/600.0*TAU)),-34+lighting_seconds*.06,0)
 	sun.light_energy=lerpf(.52,1.65,daylight)
 	var dusk=Color("efa46f").lerp(Color("ffe4b9"),daylight)
 	sun.light_color=Color("92b6ed").lerp(dusk,daylight)
-	var env=get_node("WorldEnvironment").environment
+	var env=environment
 	env.ambient_light_energy=lerpf(.65,.55,daylight)
 	env.ambient_light_sky_contribution=lerpf(.35,1.0,daylight)
 	env.ambient_light_color=Color("7893bf").lerp(Color("b7d4e0"),daylight)

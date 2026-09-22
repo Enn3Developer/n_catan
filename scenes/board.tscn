@@ -1,6 +1,85 @@
 [gd_scene format=3 uid="uid://e44mmibmk52t"]
 
 [ext_resource type="Script" uid="uid://dpjhdsarswr30" path="res://scripts/board.gd" id="1_bw3vb"]
+[ext_resource type="Shader" path="res://shaders/weather_sky.gdshader" id="sky_shader"]
+[ext_resource type="Shader" path="res://shaders/water.gdshader" id="water_shader"]
+[ext_resource type="Script" path="res://scripts/background_landscape.gd" id="landscape"]
+
+[sub_resource type="FastNoiseLite" id="CloudNoise"]
+seed = 7241
+frequency = 0.008
+fractal_octaves = 5
+
+[sub_resource type="NoiseTexture2D" id="CloudTexture"]
+width = 512
+height = 512
+seamless = true
+noise = SubResource("CloudNoise")
+
+[sub_resource type="ShaderMaterial" id="SkyMaterial"]
+resource_local_to_scene = true
+shader = ExtResource("sky_shader")
+shader_parameter/cloud_noise = SubResource("CloudTexture")
+
+[sub_resource type="Sky" id="Sky"]
+resource_local_to_scene = true
+sky_material = SubResource("SkyMaterial")
+process_mode = 3
+
+[sub_resource type="Environment" id="WorldSky"]
+resource_local_to_scene = true
+background_mode = 2
+background_color = Color(0.0627451, 0.168627, 0.235294, 1)
+sky = SubResource("Sky")
+ambient_light_source = 3
+ambient_light_color = Color(0.717647, 0.831373, 0.878431, 1)
+ambient_light_energy = 0.55
+reflected_light_source = 2
+tonemap_mode = 3
+tonemap_white = 4.0
+fog_enabled = true
+fog_light_color = Color(0.698039, 0.815686, 0.807843, 1)
+fog_density = 0.0001584
+fog_sun_scatter = 0.25
+glow_intensity = 0.18
+glow_bloom = 0.025
+glow_hdr_threshold = 1.8
+ssao_radius = 0.42
+ssao_intensity = 1.05
+ssao_detail = 0.8
+ssao_light_affect = 0.22
+ssil_radius = 2.2
+ssil_intensity = 0.45
+sdfgi_use_occlusion = true
+sdfgi_energy = 0.85
+ssr_depth_tolerance = 0.25
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributes"]
+resource_local_to_scene = true
+dof_blur_amount = 0.065
+
+[sub_resource type="PlaneMesh" id="OceanPlane"]
+resource_local_to_scene = true
+size = Vector2(7000, 7000)
+subdivide_width = 150
+subdivide_depth = 150
+
+[sub_resource type="ShaderMaterial" id="Water"]
+resource_local_to_scene = true
+shader = ExtResource("water_shader")
+
+[sub_resource type="StandardMaterial3D" id="Dust"]
+albedo_color = Color(0.917647, 0.858824, 0.717647, 1)
+roughness = 0.85
+emission_enabled = true
+emission = Color(0.258824, 0.231373, 0.160784, 1)
+
+[sub_resource type="SphereMesh" id="Mote"]
+material = SubResource("Dust")
+radius = 0.007
+height = 0.014
+radial_segments = 4
+rings = 2
 
 [node name="Board" type="Node3D" unique_id=818072003]
 script = ExtResource("1_bw3vb")
@@ -8,18 +87,76 @@ script = ExtResource("1_bw3vb")
 [node name="CameraRig" type="Node3D" parent="." unique_id=7073379]
 
 [node name="Camera" type="Camera3D" parent="CameraRig" unique_id=305313148]
+attributes = SubResource("CameraAttributes")
 current = true
 fov = 35.0
-far = 100.0
+size = 12.2
+near = 0.08
+far = 9000.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=704454542]
+environment = SubResource("WorldSky")
 
 [node name="Sun" type="DirectionalLight3D" parent="." unique_id=1573321389]
+transform = Transform3D(0.8290376, 0.34427354, -0.44065002, 0, 0.7880108, 0.6156615, 0.5591929, -0.51040655, 0.65329057, 0, 0, 0)
+light_color = Color(1, 0.894118, 0.72549, 1)
+light_energy = 1.65
+light_angular_distance = 0.6
+shadow_enabled = true
+shadow_bias = 0.1
+shadow_normal_bias = 1.5
+directional_shadow_max_distance = 965.9091
 
 [node name="Terrain" type="Node3D" parent="." unique_id=2024425802]
+transform = Transform3D(25, 0, 0, 0, 25, 0, 0, 0, 25, 0, 0, 0)
 
 [node name="Buildings" type="Node3D" parent="." unique_id=1125902531]
+transform = Transform3D(25, 0, 0, 0, 25, 0, 0, 0, 25, 0, 0, 0)
 
 [node name="PlacementMarkers" type="Node3D" parent="." unique_id=569788605]
+transform = Transform3D(25, 0, 0, 0, 25, 0, 0, 0, 25, 0, 0, 0)
 
 [node name="Scenery" type="Node3D" parent="." unique_id=1276529040]
+transform = Transform3D(25, 0, 0, 0, 25, 0, 0, 0, 25, 0, 0, 0)
+
+[node name="BackgroundLandscape" type="Node3D" parent="Scenery"]
+script = ExtResource("landscape")
+
+[node name="Ocean" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.675, 0)
+material_override = SubResource("Water")
+cast_shadow = 0
+extra_cull_margin = 4.0
+mesh = SubResource("OceanPlane")
+
+[node name="SunlitPollen" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+cast_shadow = 0
+amount = 96
+lifetime = 12.0
+preprocess = 4.0
+mesh = SubResource("Mote")
+emission_shape = 3
+emission_box_extents = Vector3(8, 1.6, 8)
+direction = Vector3(0.2, 0.1, 0.1)
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 0.03
+initial_velocity_max = 0.09
+
+[node name="Labels" type="CanvasLayer" parent="."]
+layer = 0
+
+[node name="Stats" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="FPS" type="Label" parent="Stats"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = -25.0
+theme_override_colors/font_outline_color = Color(0.0627451, 0.137255, 0.168627, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 13
