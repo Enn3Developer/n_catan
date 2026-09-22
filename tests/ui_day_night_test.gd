@@ -1,4 +1,5 @@
 extends SceneTree
+const INK=Color("493521")
 var game
 var failures=0
 var checks=0
@@ -6,6 +7,10 @@ func check(ok,message):
 	checks+=1
 	if not ok:failures+=1;printerr("FAIL: ",message)
 func _initialize():call_deferred("run")
+func probe(text: String,color: Color) -> Label:
+	var label=Label.new();label.text=text;label.add_theme_color_override("font_color",color)
+	game.ui.add_child(label);label.hide()
+	return label
 func shot(label):
 	for i in 5:await process_frame
 	if DisplayServer.get_name()!="headless":
@@ -19,11 +24,10 @@ func run():
 	game.set_process(false)
 	var original=load("res://assets/ui_theme.tres").get_color("font_color","Label")
 	var theme=game.ui_day_night
-	var label=game._label(game.ui,"Palette probe",16,game.INK)
-	label.hide()
+	var label=probe("Palette probe",INK)
 	theme.advance(1,0)
 	var day=label.get_theme_color("font_color")
-	check(day.is_equal_approx(game.INK),"daytime palette preserved")
+	check(day.is_equal_approx(INK),"daytime palette preserved")
 	await shot("day")
 	theme.advance(0,.231049)
 	check(theme.amount>.49 and theme.amount<.51,"abrupt night change fades progressively")
@@ -38,8 +42,8 @@ func run():
 	game._open_settings()
 	theme.advance(0,0)
 	await shot("settings-night")
-	var fresh=game._label(game.ui,"New label",16,game.INK);fresh.hide()
-	var semantic=game._label(game.ui,"Player",16,Color("df6252"));semantic.hide()
+	var fresh=probe("New label",INK)
+	var semantic=probe("Player",Color("df6252"))
 	theme.advance(0,0)
 	check(fresh.get_theme_color("font_color")==label.get_theme_color("font_color"),"new controls inherit active night palette")
 	check(semantic.get_theme_color("font_color").is_equal_approx(Color("df6252")),"semantic colors remain unchanged")

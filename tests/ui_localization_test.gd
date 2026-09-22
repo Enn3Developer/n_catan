@@ -50,9 +50,9 @@ func run():
 	check(card.find_child("CardEffect",true,false).text=="Sposta il brigante","card effect translated")
 	check("City (tu)" in game._node("PlayerChip0").tooltip_text,"player name remains literal")
 	await shot("cards-it")
-	game._open_music();game.net.music_control("toggle");game._refresh_music_widgets(game.music_dialog_widgets,game.net.music_state())
-	check("Il porto all’alba" in game.music_dialog_widgets.title.text,"formatted music title translated")
-	check("Harbor at Dawn" not in game.music_dialog_widgets.title.tooltip_text,"music tooltip title translated")
+	game._open_music();game.net.music_control("toggle");game._refresh_music_library(game.net.music_state())
+	check("Il porto all’alba" in game.modal.now_playing.text,"formatted music title translated")
+	check("Harbor at Dawn" not in game.modal.now_playing.tooltip_text,"music tooltip title translated")
 	await shot("music-it")
 	game._close_modal();game.queue_free();await create_timer(.3).timeout
 	print("UI_LOCALIZATION_TEST: ",checks," checks, ",failures," failures")

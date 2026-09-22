@@ -1,0 +1,134 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/music_dialog.gd" id="script"]
+[ext_resource type="Texture2D" path="res://assets/icons/previous.svg" id="icon_previous"]
+[ext_resource type="Texture2D" path="res://assets/icons/pause.svg" id="icon_pause"]
+[ext_resource type="Texture2D" path="res://assets/icons/next.svg" id="icon_next"]
+[ext_resource type="Texture2D" path="res://assets/icons/volume.svg" id="icon_volume"]
+[ext_resource type="PackedScene" path="res://scenes/ui/dialog.tscn" id="base"]
+
+[node name="MusicLibrary" instance=ExtResource("base")]
+script = ExtResource("script")
+
+[node name="Title" parent="DialogMargin/Panel/DialogScroll/Body"]
+text = "Music"
+
+[node name="NowPlaying" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_colors/font_color = Color(0.54902, 0.321569, 0.176471, 1)
+theme_override_font_sizes/font_size = 20
+autowrap_mode = 3
+
+[node name="Description" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.47451, 0.388235, 0.278431, 1)
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 3
+
+[node name="Timeline" type="HBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body"]
+layout_mode = 2
+
+[node name="Progress" type="ProgressBar" parent="DialogMargin/Panel/DialogScroll/Body/Timeline"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 8)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+show_percentage = false
+
+[node name="Clock" type="Label" parent="DialogMargin/Panel/DialogScroll/Body/Timeline"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.47451, 0.388235, 0.278431, 1)
+theme_override_font_sizes/font_size = 14
+
+[node name="Controls" type="HBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body"]
+layout_mode = 2
+
+[node name="Previous" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/Controls" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(34, 30)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Previous track / restart"
+mouse_default_cursor_shape = 2
+theme_type_variation = &"MusicIconButton"
+theme_override_constants/icon_max_width = 18
+icon = ExtResource("icon_previous")
+
+[node name="Toggle" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/Controls" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(34, 30)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Pause soundtrack"
+mouse_default_cursor_shape = 2
+theme_type_variation = &"MusicIconButton"
+theme_override_constants/icon_max_width = 18
+icon = ExtResource("icon_pause")
+
+[node name="Next" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/Controls" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(34, 30)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Next track"
+mouse_default_cursor_shape = 2
+theme_type_variation = &"MusicIconButton"
+theme_override_constants/icon_max_width = 18
+icon = ExtResource("icon_next")
+
+[node name="Mute" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/Controls" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(34, 30)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Mute music for you"
+mouse_default_cursor_shape = 2
+theme_type_variation = &"MusicIconButton"
+theme_override_constants/icon_max_width = 18
+icon = ExtResource("icon_volume")
+
+[node name="Volume" type="HSlider" parent="DialogMargin/Panel/DialogScroll/Body/Controls"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 24)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Your music volume · does not affect other players"
+max_value = 1.0
+step = 0.01
+
+[node name="Status" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.47451, 0.388235, 0.278431, 1)
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 3
+
+[node name="Tracks" type="VBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Footer" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.47451, 0.388235, 0.278431, 1)
+theme_override_font_sizes/font_size = 14
+text = "Original instrumental music · automatically plays through all five tracks."
+autowrap_mode = 3
+
+[node name="Close" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+text = "Close"
+
+[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/Close" to="." method="close"]
+[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/Controls/Previous" to="." method="emit_signal" binds= ["control_requested", "previous", -1]]
+[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/Controls/Toggle" to="." method="emit_signal" binds= ["control_requested", "toggle", -1]]
+[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/Controls/Next" to="." method="emit_signal" binds= ["control_requested", "next", -1]]
+[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/Controls/Mute" to="." method="emit_signal" binds= ["mute_toggled"]]
+[connection signal="value_changed" from="DialogMargin/Panel/DialogScroll/Body/Controls/Volume" to="." method="_on_volume_value_changed"]

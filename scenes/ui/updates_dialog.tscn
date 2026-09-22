@@ -1,0 +1,70 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/updates_dialog.gd" id="script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/dialog.tscn" id="base"]
+
+[node name="Updates" instance=ExtResource("base")]
+script = ExtResource("script")
+
+[node name="Title" parent="DialogMargin/Panel/DialogScroll/Body"]
+text = "Game updates"
+
+[node name="Installed" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+
+[node name="UpdateMessage" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+autowrap_mode = 3
+
+[node name="UpdateProgress" type="ProgressBar" parent="DialogMargin/Panel/DialogScroll/Body"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="UpdateDetails" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+autowrap_mode = 3
+
+[node name="UpdateCheck" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+text = "Check for updates"
+
+[node name="UpdateDownload" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+theme_type_variation = &"PrimaryButton"
+text = "Download update"
+
+[node name="UpdateInstall" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+theme_type_variation = &"PrimaryButton"
+text = "Restart to update"
+
+[node name="Later" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+text = "Later"
+
+[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/UpdateCheck" to="." method="emit_signal" binds= ["check_requested"]]
+[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/UpdateDownload" to="." method="emit_signal" binds= ["download_requested"]]
+[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/UpdateInstall" to="." method="emit_signal" binds= ["install_requested"]]
+[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/Later" to="." method="close"]

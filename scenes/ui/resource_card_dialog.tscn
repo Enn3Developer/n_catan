@@ -1,0 +1,34 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/resource_card_dialog.gd" id="script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/resource_picker.tscn" id="picker"]
+[ext_resource type="PackedScene" path="res://scenes/ui/dialog.tscn" id="base"]
+
+[node name="ResourceCard" instance=ExtResource("base")]
+script = ExtResource("script")
+
+[node name="First" parent="DialogMargin/Panel/DialogScroll/Body" instance=ExtResource("picker")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Second" parent="DialogMargin/Panel/DialogScroll/Body" instance=ExtResource("picker")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="PlayCard" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+theme_type_variation = &"PrimaryButton"
+text = "Play card"
+
+[node name="Back" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+text = "Back"
+
+[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/Back" to="." method="close"]
+[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/PlayCard" to="." method="_on_play_pressed"]

@@ -1,9 +1,5 @@
 extends Node3D
 
-const INK=Color("493521")
-const MUTED=Color("796347")
-const PAPER=Color("fff1d2")
-const GOLD=Color("8c522d")
 @onready var net: CatanNetwork=$Network
 @onready var board: CatanBoard=$Board
 @onready var audio: CatanAudio=$Audio
@@ -18,7 +14,7 @@ const GOLD=Color("8c522d")
 @onready var inspection_hint: Label=%InspectionHint
 @onready var turn_banner: Label=%TurnBanner
 @onready var turn_banner_timer: Timer=%TurnBanner/Timer
-var screen: Control
+var screen: CatanScreen
 var toast_generation=0
 var modal: Control
 var state={}
@@ -27,10 +23,6 @@ var name_field: LineEdit
 var address_field: LineEdit
 var password_field: LineEdit
 var host_password_field: LineEdit
-var selected_give: OptionButton
-var selected_get: OptionButton
-var amount_give: SpinBox
-var amount_get: SpinBox
 var server_only=false
 var connection_status=""
 var preferences=CatanSettings.new()
@@ -42,7 +34,6 @@ var layout_queued=false
 var trade_players=true
 var trade_give=0
 var trade_get=1
-var music_dialog_widgets={}
 var music_ui_clock=0.0
 var music_volume_before_mute=.42
 var notified_updates={}
@@ -81,24 +72,6 @@ func _ready():
 	_update_health_ready()
 	CatanDiagnostics.event("main.ready.complete")
 
-func _style(color: Color,radius: int=10) -> StyleBoxFlat:
-	var s=StyleBoxFlat.new()
-	s.bg_color=color
-	s.set_border_width_all(1)
-	s.border_color=Color("ac8654")
-	s.shadow_color=Color(0.18,0.10,0.04,.18)
-	s.shadow_size=3
-	s.shadow_offset=Vector2(0,2)
-	s.corner_radius_top_left=radius
-	s.corner_radius_top_right=radius
-	s.corner_radius_bottom_left=radius
-	s.corner_radius_bottom_right=radius
-	s.content_margin_left=16
-	s.content_margin_right=16
-	s.content_margin_top=8
-	s.content_margin_bottom=8
-	return s
-
 func _clear(scene_path: String):
 	CatanDiagnostics.event("ui.screen",scene_path)
 	if is_instance_valid(screen): screen.free()
@@ -106,19 +79,8 @@ func _clear(scene_path: String):
 	if is_instance_valid(modal) and not keep_modal: modal.free()
 	screen=load(scene_path).instantiate()
 	screens.add_child(screen)
-	if screen is CatanScreen: screen.layout_changed.connect(_queue_layout)
+	screen.layout_changed.connect(_queue_layout)
 	_queue_layout()
-
-func _label(parent: Node,text: String,size: int=16,color: Color=INK,translate_text: bool=true) -> Label:
-	var node=Label.new()
-	node.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED if not translate_text else Node.AUTO_TRANSLATE_MODE_INHERIT
-	node.text=CatanI18n.render(text) if translate_text else text
-	node.set_meta("base_font_size",size)
-	node.add_theme_font_size_override("font_size",maxi(size,16 if preferences.values.large_text else 14))
-	node.add_theme_color_override("font_color",color)
-	if size>=20:node.theme_type_variation=&"HeadingLabel"
-	parent.add_child(node)
-	return node
 
 func _button(parent: Node,text: String,callback: Callable,primary: bool=false) -> Button:
 	var button=Button.new()
@@ -285,7 +247,7 @@ func _process(delta):
 	music_ui_clock-=delta
 	if music_ui_clock<=0:
 		music_ui_clock=.15
-		_refresh_music_widgets(music_dialog_widgets,soundtrack)
+		_refresh_music_library(soundtrack)
 	var live=net.started and not net.paused and net.roster.all(func(player):return player.connected)
 	if live:board.advance_day(delta)
 	ui_day_night.advance(board.daylight,delta)
@@ -314,41 +276,13 @@ func _hud():
 	_refresh_turn_clock()
 	_apply_text(screen)
 	if state.winner!=-1:
-		var box=_dialog("Victory")
-		_label(box,tr("%s wins!") % state.players[state.winner].name,30,GOLD)
-		_button(box,tr("Back to menu"),net.leave,true)
+		var victory=_present("res://scenes/ui/victory_dialog.tscn")
+		victory.show_winner(state.players[state.winner].name)
+		_route(victory,{"leave_requested":net.leave})
 	if guide!=null:_tutorial_ui()
 	for row_player in net.roster:
 		if not row_player.connected:_notice(tr("%s disconnected. Waiting to reconnect.") % row_player.name)
 	_queue_layout()
-
-func _music_icon_button(parent: Node,key: String,tip: String,callback: Callable) -> Button:
-	var button=_button(parent,"",callback)
-	for variant in ["normal","hover","pressed"]:
-		var style=_style(Color("e4c18c") if variant=="normal" else Color("f2d4a0"),6)
-		style.content_margin_left=8;style.content_margin_right=8
-		style.content_margin_top=4;style.content_margin_bottom=4
-		button.add_theme_stylebox_override(variant,style)
-	button.custom_minimum_size=Vector2(34,30)
-	button.size_flags_vertical=Control.SIZE_SHRINK_CENTER
-	button.tooltip_text=tr(tip);CatanIcons.button_icon(button,key,18)
-	return button
-
-func _music_buttons(row: Node) -> Dictionary:
-	var widgets={}
-	widgets.previous=_music_icon_button(row,"previous",tr("Previous track / restart"),func():net.music_control("previous"))
-	widgets.toggle=_music_icon_button(row,"pause",tr("Pause soundtrack"),func():net.music_control("toggle"))
-	widgets.next=_music_icon_button(row,"next",tr("Next track"),func():net.music_control("next"))
-	return widgets
-
-func _music_volume(row: Node,widgets: Dictionary):
-	widgets.mute=_music_icon_button(row,"volume",tr("Mute music for you"),_toggle_music_mute)
-	var slider=HSlider.new();slider.min_value=0;slider.max_value=1;slider.step=.01
-	slider.custom_minimum_size=Vector2(72,24);slider.size_flags_vertical=Control.SIZE_SHRINK_CENTER
-	slider.tooltip_text=tr("Your music volume · does not affect other players")
-	slider.value=preferences.values.music;row.add_child(slider)
-	slider.value_changed.connect(_set_music_volume)
-	widgets.volume=slider
 
 func _set_music_volume(value: float):
 	preferences.set_value("music",value)
@@ -360,67 +294,16 @@ func _toggle_music_mute():
 	else:_set_music_volume(maxf(.1,music_volume_before_mute))
 
 func _open_music():
-	var box=_dialog("Music")
-	modal.name="MusicLibrary"
-	var title=_label(box,"",20,GOLD);title.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	var description=_label(box,"",14,MUTED);description.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	var timeline=HBoxContainer.new();box.add_child(timeline)
-	var progress=ProgressBar.new();progress.show_percentage=false
-	progress.custom_minimum_size=Vector2(80,8);progress.size_flags_horizontal=Control.SIZE_EXPAND_FILL;progress.size_flags_vertical=Control.SIZE_SHRINK_CENTER;timeline.add_child(progress)
-	var clock_label=_label(timeline,"0:00 / 0:00",14,MUTED)
-	var controls=HBoxContainer.new();box.add_child(controls)
-	music_dialog_widgets=_music_buttons(controls)
-	_music_volume(controls,music_dialog_widgets)
-	music_dialog_widgets.root=box;music_dialog_widgets.title=title;music_dialog_widgets.description=description;music_dialog_widgets.clock=clock_label;music_dialog_widgets.progress=progress
-	music_dialog_widgets.status=_label(box,"",14,MUTED)
-	music_dialog_widgets.status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	music_dialog_widgets.tracks=[]
-	for i in CatanSoundtrack.TRACKS.size():
-		var track=CatanSoundtrack.TRACKS[i]
-		var row=HBoxContainer.new();box.add_child(row)
-		var button=_button(row,track.title,func():net.music_control("select",i))
-		button.name="MusicTrack%d" % i;button.toggle_mode=true;button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-		var selected_style=_style(Color("ccdbb2"),8)
-		button.add_theme_stylebox_override("pressed",selected_style)
-		button.add_theme_stylebox_override("hover_pressed",selected_style)
-		button.add_theme_color_override("font_pressed_color",INK)
-		button.add_theme_color_override("font_hover_pressed_color",INK)
-		button.tooltip_text=track.mood
-		_label(row,CatanSoundtrack.time_text(track.duration),14,MUTED)
-		music_dialog_widgets.tracks.append(button)
-	_label(box,tr("Original instrumental music · automatically plays through all five tracks."),14,MUTED).autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	_button(box,"Close",_close_modal)
-	_refresh_music_widgets(music_dialog_widgets,net.music_state())
+	var dialog=_present("res://scenes/ui/music_dialog.tscn")
+	_route(dialog,{"control_requested":net.music_control,"volume_changed":_set_music_volume,"mute_toggled":_toggle_music_mute})
+	_refresh_music_library(net.music_state())
 
-func _refresh_music_widgets(widgets: Dictionary,sample: Dictionary):
-	if widgets.is_empty() or not is_instance_valid(widgets.get("root")):return
-	var track=CatanSoundtrack.TRACKS[int(sample.track)]
-	var playback_ready=sample.get("ready",true)
-	widgets.title.text=(tr("Paused · ") if sample.paused else "")+tr(track.title) if playback_ready else tr("Joining room soundtrack…")
-	widgets.title.tooltip_text=tr(track.title)+" · "+tr(track.mood)
-	widgets.clock.text=CatanSoundtrack.time_text(sample.position)+" / "+CatanSoundtrack.time_text(track.duration)
-	var controller=net.can_control_music() and playback_ready
-	for key in ["previous","toggle","next"]:
-		widgets[key].disabled=not controller
-	CatanIcons.button_icon(widgets.toggle,"play" if sample.paused else "pause",18)
-	widgets.toggle.tooltip_text=(tr("Resume soundtrack") if sample.paused else tr("Pause soundtrack")) if controller else tr("The host controls room playback")
-	widgets.volume.set_value_no_signal(preferences.values.music)
-	CatanIcons.button_icon(widgets.mute,"muted" if preferences.values.music<=0 else "volume",18)
-	widgets.mute.tooltip_text=tr("Unmute music for you") if preferences.values.music<=0 else tr("Mute music for you")
-	if widgets.has("progress"):
-		widgets.description.text=track.mood
-		widgets.progress.max_value=track.duration;widgets.progress.value=sample.position
-		widgets.status.text=tr("Shared with the room · ")+(tr("You control playback. Everyone keeps their own volume.") if controller else tr("The host controls playback. Your volume is personal.")) if net.online and not net.solo else tr("Your soundtrack · choose a track or let the playlist continue.")
-		for i in widgets.tracks.size():
-			widgets.tracks[i].set_pressed_no_signal(i==int(sample.track))
-			widgets.tracks[i].disabled=not controller
+func _refresh_music_library(sample: Dictionary):
+	if is_instance_valid(modal) and modal.name=="MusicLibrary":
+		modal.refresh(sample,net.can_control_music(),net.online and not net.solo,preferences.values.music)
 
 func _journal():
-	var box=_dialog(tr("Game log"))
-	modal.name="GameLog"
-	for line in state.log.slice(maxi(0,state.log.size()-30)):
-		_label(box,line,15,MUTED).autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	_button(box,"Close",_close_modal)
+	_present("res://scenes/ui/game_log_dialog.tscn").show_log(state.log)
 
 func _phase_text() -> String:
 	return {"setup_settlement":tr("Setup"),"setup_road":tr("Setup"),"play":tr("Build & trade") if state.rolled else tr("Roll dice"),"discard":tr("Discard"),"robber":tr("Robber"),"steal":tr("Steal"),"free_roads":tr("Free roads")}.get(state.phase,"")
@@ -450,131 +333,25 @@ func _notice(message: String):
 	get_tree().create_timer(5).timeout.connect(func():
 		if is_instance_valid(toast) and toast_generation==generation: toast.hide())
 
-func _dialog(title: String) -> VBoxContainer:
+func _present(scene_path: String) -> CatanDialog:
 	if is_instance_valid(modal): modal.free()
-	modal=Control.new()
-	modal.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	modal=load(scene_path).instantiate()
 	modals.add_child(modal)
-	var shade=ColorRect.new()
-	shade.color=Color(.12,.085,.05,.78)
-	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	modal.add_child(shade)
-	var center=MarginContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for edge in ["left","right"]:center.add_theme_constant_override("margin_"+edge,maxi(20,int((ui.size.x-580)/2)))
-	for edge in ["top","bottom"]:center.add_theme_constant_override("margin_"+edge,32)
-	modal.add_child(center)
-	center.name="DialogMargin"
-	var panel=PanelContainer.new();panel.size_flags_vertical=Control.SIZE_SHRINK_CENTER;center.add_child(panel)
-	var scroll=ScrollContainer.new();scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;panel.add_child(scroll)
-	scroll.name="DialogScroll"
-	var box=VBoxContainer.new();box.size_flags_horizontal=Control.SIZE_EXPAND_FILL;scroll.add_child(box)
-	box.minimum_size_changed.connect(func():
-		if is_instance_valid(scroll):scroll.custom_minimum_size.y=minf(box.get_combined_minimum_size().y,ui.size.y-96))
-	_label(box,title,28,GOLD)
-	_queue_layout()
-	return box
+	modal.close_requested.connect(_close_modal,CONNECT_DEFERRED)
+	_apply_text(modal)
+	return modal
 
 func _close_modal():
 	net.paused=net.solo and inspection_mode
 	if is_instance_valid(modal): modal.free()
 
-func _options(parent: Node) -> OptionButton:
-	var option=OptionButton.new()
-	for r in 5:
-		option.add_icon_item(CatanIcons.resource_icon(r),tr(CatanRules.RES[r]))
-		option.get_popup().set_item_icon_max_width(r,26)
-	option.custom_minimum_size=Vector2(180,44)
-	option.expand_icon=true
-	option.add_theme_constant_override("icon_max_width",28)
-	option.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	parent.add_child(option)
-	return option
-
-func _spin(parent: Node,limit: int=24) -> SpinBox:
-	var spin=SpinBox.new()
-	spin.min_value=1
-	spin.max_value=limit
-	spin.value=1
-	spin.custom_minimum_size=Vector2(84,44)
-	spin.size_flags_vertical=Control.SIZE_SHRINK_CENTER
-	parent.add_child(spin)
-	spin.get_line_edit().add_theme_font_size_override("font_size",20)
-	spin.get_line_edit().add_theme_color_override("font_uneditable_color",INK)
-	spin.get_line_edit().alignment=HORIZONTAL_ALIGNMENT_CENTER
-	return spin
-
 func _trade(reset: bool=true):
 	if reset:trade_players=true
-	var box=_dialog("Trade")
-	modal.name="TradeDialog"
-	_label(box,tr("Your resources"),14,MUTED)
-	CatanIcons.resources(box,state.players[net.seat].hand,24,true)
-	var tabs=HBoxContainer.new();box.add_child(tabs)
-	var group=ButtonGroup.new()
-	var bank_tab=Button.new();bank_tab.text="Bank";bank_tab.toggle_mode=true;bank_tab.button_group=group;bank_tab.button_pressed=not trade_players or state.get("paired",false);tabs.add_child(bank_tab)
-	var player_tab=Button.new();player_tab.text="Players";player_tab.toggle_mode=true;player_tab.button_group=group;player_tab.disabled=state.get("paired",false);player_tab.button_pressed=trade_players and not player_tab.disabled;tabs.add_child(player_tab)
-	player_tab.tooltip_text=tr("Unavailable during a paired turn") if player_tab.disabled else tr("Offer a trade to the other players")
-	_label(box,"Give",14,MUTED)
-	var row=HBoxContainer.new();box.add_child(row)
-	selected_give=_options(row);selected_give.select(trade_give);amount_give=_spin(row)
-	_label(box,"Receive",14,MUTED)
-	var row2=HBoxContainer.new();box.add_child(row2)
-	selected_get=_options(row2);selected_get.select(trade_get);amount_get=_spin(row2)
-	var preview=_label(box,"",18,GOLD)
-	preview.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	var reason=_label(box,"",14,MUTED)
-	reason.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	var rules=CatanRules.new();rules.s=state
-	var give_choices=_trade_choices(row,selected_give,true)
-	var get_choices=_trade_choices(row2,selected_get,false)
-	var bank=_button(box,tr("Bank trade"),func():net.act({"type":"bank_trade","give":selected_give.selected,"receive":selected_get.selected}),true)
-	var offer_button=_button(box,tr("Offer to all players"),func():
-		var give=[0,0,0,0,0];var receive=[0,0,0,0,0]
-		give[selected_give.selected]=int(amount_give.value);receive[selected_get.selected]=int(amount_get.value)
-		net.act({"type":"offer_trade","give":give,"receive":receive}),true)
-	var refresh_trade=func():
-		var banking=bank_tab.button_pressed
-		trade_players=not banking;trade_give=selected_give.selected;trade_get=selected_get.selected
-		for r in 5:
-			give_choices[r].button_pressed=r==trade_give
-			get_choices[r].button_pressed=r==trade_get
-			give_choices[r].tooltip_text=tr("%s · You have %d · Bank rate %d:1") % [tr(CatanRules.RES[r]),state.players[net.seat].hand[r],rules.rate(net.seat,r)]
-			get_choices[r].tooltip_text=tr("%s · Bank has %d") % [tr(CatanRules.RES[r]),state.bank[r]]
-		bank.visible=banking;offer_button.visible=not banking
-		amount_give.editable=not banking;amount_get.editable=not banking
-		if banking:
-			amount_give.set_value_no_signal(rules.rate(net.seat,selected_give.selected));amount_get.set_value_no_signal(1)
-			bank.text=tr("Bank trade · %d:1") % rules.rate(net.seat,selected_give.selected)
-		var available=state.players[net.seat].hand[selected_give.selected]>=int(amount_give.value)
-		var different=selected_give.selected!=selected_get.selected
-		bank.disabled=not available or not different or state.bank[selected_get.selected]<1
-		offer_button.disabled=not available or not different or state.get("paired",false)
-		preview.text="%d %s → %d %s" % [int(amount_give.value),tr(CatanRules.RES[trade_give]),int(amount_get.value),tr(CatanRules.RES[trade_get])]
-		reason.text=tr("Choose different resources.") if not different else (tr("You need %d more %s.") % [int(amount_give.value)-state.players[net.seat].hand[trade_give],tr(CatanRules.RES[trade_give])] if not available else (tr("The bank has none of that resource.") if banking and state.bank[trade_get]==0 else (tr("Your best port rate: %d:1 · Bank stock: %d") % [rules.rate(net.seat,trade_give),state.bank[trade_get]] if banking else tr("Any player who can afford this offer may accept it."))))
-	selected_give.item_selected.connect(func(_value):refresh_trade.call())
-	selected_get.item_selected.connect(func(_value):refresh_trade.call())
-	bank_tab.pressed.connect(refresh_trade)
-	player_tab.pressed.connect(func():
-		amount_give.set_value_no_signal(1);amount_get.set_value_no_signal(1)
-		refresh_trade.call())
-	amount_give.value_changed.connect(func(_value):refresh_trade.call())
-	amount_get.value_changed.connect(func(_value):refresh_trade.call())
-	refresh_trade.call()
-	_button(box,"Close",_close_modal)
-
-func _trade_choices(parent: Node,selection: OptionButton,giving: bool) -> Array:
-	selection.hide()
-	var choices=HBoxContainer.new();choices.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-	parent.add_child(choices);parent.move_child(choices,0)
-	var buttons=[]
-	for r in 5:
-		var b=_button(choices,str(state.players[net.seat].hand[r]) if giving else "",func():
-			selection.select(r);selection.item_selected.emit(r))
-		b.toggle_mode=true;b.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-		CatanIcons.button_icon(b,CatanIcons.RESOURCES[r],24)
-		buttons.append(b)
-	return buttons
+	var dialog=_present("res://scenes/ui/trade_dialog.tscn")
+	dialog.draft_changed.connect(func(with_players,give,receive):
+		trade_players=with_players;trade_give=give;trade_get=receive)
+	dialog.show_trade(state,net.seat,trade_players,trade_give,trade_get)
+	_route(dialog,{"trade_requested":net.act})
 
 func _resource_text(a: Array) -> String:
 	var parts=[]
@@ -610,71 +387,31 @@ func _trade_notifications(previous: Dictionary,previous_offer: Dictionary,fresh:
 
 func _view_offer():
 	if state.get("offer",{}).is_empty():return
-	var box=_dialog(tr("A trade on the table"))
-	_label(box,tr("%s offers:") % state.players[state.offer.from].name,20)
-	CatanIcons.resources(box,state.offer.give,38)
-	_label(box,tr("In return for:"),20)
-	CatanIcons.resources(box,state.offer.receive,38)
-	if state.offer.from!=net.seat:
-		var accept=_button(box,tr("Accept trade"),func(): net.act({"type":"accept_trade"}),true)
-		var rules=CatanRules.new();rules.s=state
-		accept.disabled=not rules.can_pay(net.seat,state.offer.receive)
-		if accept.disabled:_label(box,CatanI18n.message("You need %s more to accept this offer.",[rules._missing(net.seat,state.offer.receive)]),14,MUTED).autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	else: _button(box,tr("Withdraw offer"),func(): net.act({"type":"cancel_trade"}))
-	_button(box,"Close",_close_modal)
+	var dialog=_present("res://scenes/ui/offer_dialog.tscn")
+	dialog.show_offer(state,net.seat)
+	_route(dialog,{"accept_requested":func():net.act({"type":"accept_trade"}),"withdraw_requested":func():net.act({"type":"cancel_trade"})})
 
 func _discard():
-	var box=_dialog(tr("The robber approaches"))
-	var needed=state.discards[str(net.seat)]
-	_label(box,tr("Return exactly %d resources to the bank.") % needed,18)
-	var spins=[]
-	for r in 5:
-		var row=HBoxContainer.new()
-		box.add_child(row)
-		CatanIcons.icon(row,CatanIcons.RESOURCES[r],34)
-		row.tooltip_text=tr(CatanRules.RES[r])
-		var spin=_spin(row,state.players[net.seat].hand[r])
-		spin.min_value=0
-		spin.value=0
-		spins.append(spin)
-	_button(box,tr("Discard selected resources"),func():
-		var cards=[]
-		for spin in spins: cards.append(int(spin.value))
-		net.act({"type":"discard","cards":cards}),true)
-	_button(box,"Close",_close_modal)
+	var dialog=_present("res://scenes/ui/discard_dialog.tscn")
+	dialog.show_discard(state.discards[str(net.seat)],state.players[net.seat].hand)
+	_route(dialog,{"discard_requested":func(cards):net.act({"type":"discard","cards":cards})})
 
 func _cards():
 	# Compatibility for tutorial shortcuts: cards are always present in the HUD.
 	_close_modal()
 
 func _resource_card(id: int):
-	var box=_dialog(tr("Year of plenty") if id==2 else "Monopoly")
-	var first=_options(box)
-	var second: OptionButton
-	if id==2: second=_options(box)
-	_button(box,tr("Play card"),func():
-		var a={"type":"play_card","id":id,"resource":first.selected}
-		if id==2:
-			var cards=[0,0,0,0,0]
-			cards[first.selected]+=1
-			cards[second.selected]+=1
-			a.cards=cards
-		net.act(a),true)
-	_button(box,"Back",_close_modal)
+	var dialog=_present("res://scenes/ui/resource_card_dialog.tscn")
+	dialog.show_card(id)
+	_route(dialog,{"play_requested":net.act})
 
 func _confirm_leave():
-	var box=_dialog(tr("Leave the expedition?"))
-	modal.name="LeaveConfirm"
-	_label(box,tr("Leave this solo expedition?") if net.solo else tr("Leaving pauses this match for the other players.\nIf you host, the room will close."),18)
-	_button(box,"Stay",_close_modal,true)
-	_button(box,tr("Leave game"),net.leave)
+	var dialog=_present("res://scenes/ui/leave_dialog.tscn")
+	dialog.show_leave(net.solo)
+	_route(dialog,{"leave_requested":net.leave})
 
 func _help():
-	var box=_dialog(tr("Your guide to the island"))
-	modal.name="Guide"
-	var text=tr("1. Gather 3–6 players (humans or bots). Everyone readies up.\n2. Place two settlements and roads in snake order.\n3. Roll: neighboring settlements collect 1 resource; cities 2.\n4. Connect roads, build settlements, upgrade to cities.\n5. Trade with players or the bank; coastal ports give better rates.\n6. A seven means discarding half if you have more than seven,\n    then moving the robber and stealing from a neighbor.\n7. Buy development cards; play at most one per turn.\n8. Reach 10 points on your turn to win. Settlements give 1,\n    cities 2, longest road and largest army 2 each.\n\nClick glowing board markers to build. Right-drag to orbit.\nScroll to zoom; middle-drag pans; F focuses a tile.\nH hides the interface; Home fits the board. Hover for costs.\n\n5–6 players: 30 hexes and paired turns. After the main turn,\n the player 3 seats ahead builds, plays cards and trades only\n with the bank. Then the next main player rolls.\n\nOnline hosts need UDP 24567 reachable from the internet.\nUse router mapping, port forwarding, or a dedicated server.")
-	_label(box,text,16).autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	_button(box,tr("Chart a course  →"),_close_modal,true)
+	_present("res://scenes/ui/guide_dialog.tscn")
 
 func _node(node_name: String) -> Node:
 	return screen.find_child(node_name,true,false)
@@ -804,18 +541,12 @@ func _layout_screen():
 	toast.offset_right=minf(470,width*.5-20)
 	notifications.offset_left=-minf(420,width-32)
 	notifications.offset_right=-16
-	if screen is CatanScreen:
-		var overlay_bottom=0.0
-		if guide!=null and is_instance_valid(tutorial_panel):overlay_bottom=tutorial_panel.find_child("LessonPanel",true,false).get_global_rect().end.y
-		board.view_region=screen.arrange(ui.size,overlay_bottom)
-		notifications.offset_top=screen.notifications_top
+	var overlay_bottom=0.0
+	if guide!=null and is_instance_valid(tutorial_panel):overlay_bottom=tutorial_panel.find_child("LessonPanel",true,false).get_global_rect().end.y
+	board.view_region=screen.arrange(ui.size,overlay_bottom)
+	notifications.offset_top=screen.notifications_top
 	if inspection_mode:board.view_region=Rect2(16,16,width-32,height-64)
 	board._update_camera()
-	if is_instance_valid(modal) and modal.has_node("DialogMargin"):
-		var margin=modal.get_node("DialogMargin")
-		for edge in ["left","right"]:margin.add_theme_constant_override("margin_"+edge,maxi(20,int((width-580)/2)))
-		var scroll=modal.find_child("DialogScroll",true,false)
-		scroll.custom_minimum_size.y=minf(scroll.get_child(0).get_combined_minimum_size().y,height-96)
 
 func _exit_tree():
 	CatanIcons.textures.clear()
@@ -838,17 +569,9 @@ func _exit_desktop():
 	get_tree().quit()
 
 func _open_updates():
-	var box=_dialog(tr("Game updates"))
-	modal.name="Updates"
+	var dialog=_present("res://scenes/ui/updates_dialog.tscn")
 	net.paused=net.solo
-	_label(box,tr("Installed: %s · Multiplayer protocol %d") % [CatanBuildInfo.VERSION,CatanBuildInfo.PROTOCOL],16)
-	var message=_label(box,"",18);message.name="UpdateMessage";message.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	var progress=ProgressBar.new();progress.name="UpdateProgress";progress.custom_minimum_size.y=20;box.add_child(progress)
-	var details=_label(box,"",15);details.name="UpdateDetails";details.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	_button(box,tr("Check for updates"),updater.check_updates).name="UpdateCheck"
-	_button(box,tr("Download update"),updater.download_update,true).name="UpdateDownload"
-	_button(box,tr("Restart to update"),_install_update,true).name="UpdateInstall"
-	_button(box,"Later",_close_modal)
+	_route(dialog,{"check_requested":updater.check_updates,"download_requested":updater.download_update,"install_requested":_install_update})
 	_updates_changed()
 
 func _updates_changed():
@@ -864,23 +587,7 @@ func _updates_changed():
 			notifications.show_notice("update",message,tr("View update"),_open_updates)
 
 	if is_instance_valid(screen) and screen.has_method("show_update_stage"):screen.show_update_stage(stage)
-	if not is_instance_valid(modal) or modal.name!="Updates":return
-	modal.find_child("UpdateMessage",true,false).text=CatanI18n.update_message(data)
-	var details=tr("Updates are verified before installation. Downloads can run in the background.")
-	if data.get("total",0)>0:
-		details=tr("%s download · %.1f MiB") % [tr("Delta") if data.get("kind","")=="delta" else tr("Full"),float(data.total)/1048576.0]
-	if data.has("version"):details+=tr("\nRelease %s · Protocol %d") % [data.version,data.get("protocol",CatanBuildInfo.PROTOCOL)]
-	if data.get("protocol",CatanBuildInfo.PROTOCOL)!=CatanBuildInfo.PROTOCOL:details+=tr("\nThis release changes multiplayer compatibility. Your group should update together.")
-	if net.online:details+=tr("\nLeave this room before installing; hosting an update would close it.")
-	modal.find_child("UpdateDetails",true,false).text=details
-	var bar=modal.find_child("UpdateProgress",true,false)
-	bar.visible=stage in ["downloading","preparing"]
-	bar.value=100.0*float(data.get("bytes",0))/maxf(1,float(data.get("total",0)))
-	modal.find_child("UpdateCheck",true,false).disabled=not updater.supported or updater.busy()
-	modal.find_child("UpdateDownload",true,false).visible=stage=="available"
-	modal.find_child("UpdateDownload",true,false).disabled=updater.busy()
-	modal.find_child("UpdateInstall",true,false).visible=stage=="ready"
-	modal.find_child("UpdateInstall",true,false).disabled=net.online or updater.busy()
+	if is_instance_valid(modal) and modal.name=="Updates":modal.show_status(data,updater.supported,updater.busy(),net.online)
 
 func _install_update():
 	if updater.install_update(net.online):

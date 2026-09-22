@@ -21,7 +21,8 @@ class LocalizationTests(unittest.TestCase):
         unchanged={'1 / 10','1 / 6','CATAN','T I D E S  &  T I M B E R','Voyager','×'}
         for path in (ROOT/'scenes/ui').glob('*.tscn'):
             for literal in re.findall(r'^(?:text|tooltip_text|placeholder_text) = ("(?:[^"\\]|\\.)*")',path.read_text(),re.M):
-                text=ast.literal_eval(literal)
+                # The editor saves multi-line strings with raw newlines.
+                text=ast.literal_eval(literal.replace('\n','\\n'))
                 if text and text not in unchanged:self.assertIn(text,translations,str(path))
 
     def test_rules_and_tutorial_are_translated(self):

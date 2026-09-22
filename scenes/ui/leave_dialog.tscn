@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/leave_dialog.gd" id="script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/dialog.tscn" id="base"]
+
+[node name="LeaveConfirm" instance=ExtResource("base")]
+script = ExtResource("script")
+
+[node name="Title" parent="DialogMargin/Panel/DialogScroll/Body"]
+text = "Leave the expedition?"
+
+[node name="Message" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="Stay" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+theme_type_variation = &"PrimaryButton"
+text = "Stay"
+
+[node name="LeaveGame" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+text = "Leave game"
+
+[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/Stay" to="." method="close"]
+[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/LeaveGame" to="." method="emit_signal" binds= ["leave_requested"]]
