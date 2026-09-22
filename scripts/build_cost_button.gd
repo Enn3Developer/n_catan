@@ -17,15 +17,12 @@ func _make_custom_tooltip(_text: String) -> Object:
 	title.text=text
 	box.add_child(title)
 	var resources=CatanIcons.resources(box,cost,28)
-	var badge_index=0
 	for resource in cost.size():
-		if cost[resource]<=0:continue
-		if resource<missing.size() and missing[resource]>0:
+		if cost[resource]>0 and resource<missing.size() and missing[resource]>0:
 			var shortage=Label.new()
 			shortage.text="(%d)" % missing[resource]
 			shortage.add_theme_color_override("font_color",Color("dc4545"))
-			resources.get_child(badge_index).add_child(shortage)
-		badge_index+=1
+			resources.get_child(resource).add_child(shortage)
 	if not unavailable_reason.is_empty():
 		var reason=Label.new()
 		reason.text=unavailable_reason

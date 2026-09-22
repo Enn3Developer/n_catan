@@ -16,25 +16,11 @@ static func icon(parent: Node,key: String,pixels: int=24) -> TextureRect:
 	parent.add_child(image)
 	return image
 static func resources(parent: Node,amounts: Array,pixels: int=24,show_zero: bool=false) -> HBoxContainer:
-	var row=HBoxContainer.new()
-	row.add_theme_constant_override("separation",4 if pixels<=18 else 10)
+	var row=load("res://scenes/ui/resource_row.tscn").instantiate()
+	row.icon_size=pixels
+	row.show_zero=show_zero
 	parent.add_child(row)
-	for i in 5:
-		if not show_zero and amounts[i]<=0:continue
-		var badge=HBoxContainer.new()
-		badge.name=RESOURCES[i].capitalize()+"Badge"
-		badge.tooltip_text="%s: %d" % [TranslationServer.translate(CatanRules.RES[i]),amounts[i]]
-		badge.mouse_filter=Control.MOUSE_FILTER_STOP
-		badge.size_flags_horizontal=Control.SIZE_EXPAND_FILL if show_zero else Control.SIZE_SHRINK_CENTER
-		badge.alignment=BoxContainer.ALIGNMENT_CENTER
-		badge.add_theme_constant_override("separation",4)
-		row.add_child(badge)
-		icon(badge,RESOURCES[i],pixels)
-		if pixels<=18 and amounts[i]==1:continue
-		var count=Label.new()
-		count.text=str(amounts[i])
-		count.add_theme_font_size_override("font_size",24 if pixels>=32 else 14)
-		badge.add_child(count)
+	row.show_amounts(amounts)
 	return row
 static func button_icon(button: Button,key: String,pixels: int=22):
 	button.icon=get_icon(key)

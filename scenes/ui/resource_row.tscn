@@ -1,0 +1,96 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/resource_row.gd" id="script"]
+[ext_resource type="Texture2D" path="res://assets/icons/timber.svg" id="icon_timber"]
+[ext_resource type="Texture2D" path="res://assets/icons/brick.svg" id="icon_brick"]
+[ext_resource type="Texture2D" path="res://assets/icons/wool.svg" id="icon_wool"]
+[ext_resource type="Texture2D" path="res://assets/icons/grain.svg" id="icon_grain"]
+[ext_resource type="Texture2D" path="res://assets/icons/ore.svg" id="icon_ore"]
+
+[node name="ResourceRow" type="HBoxContainer"]
+script = ExtResource("script")
+
+[node name="TimberBadge" type="HBoxContainer" parent="."]
+layout_mode = 2
+mouse_filter = 0
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="TimberBadge"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("icon_timber")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Count" type="Label" parent="TimberBadge"]
+layout_mode = 2
+
+[node name="BrickBadge" type="HBoxContainer" parent="."]
+layout_mode = 2
+mouse_filter = 0
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="BrickBadge"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("icon_brick")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Count" type="Label" parent="BrickBadge"]
+layout_mode = 2
+
+[node name="WoolBadge" type="HBoxContainer" parent="."]
+layout_mode = 2
+mouse_filter = 0
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="WoolBadge"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("icon_wool")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Count" type="Label" parent="WoolBadge"]
+layout_mode = 2
+
+[node name="GrainBadge" type="HBoxContainer" parent="."]
+layout_mode = 2
+mouse_filter = 0
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="GrainBadge"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("icon_grain")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Count" type="Label" parent="GrainBadge"]
+layout_mode = 2
+
+[node name="OreBadge" type="HBoxContainer" parent="."]
+layout_mode = 2
+mouse_filter = 0
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="OreBadge"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("icon_ore")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Count" type="Label" parent="OreBadge"]
+layout_mode = 2
