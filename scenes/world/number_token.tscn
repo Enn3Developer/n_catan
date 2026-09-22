@@ -1,0 +1,75 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/number_token.gd" id="script"]
+
+[sub_resource type="CylinderMesh" id="Rim"]
+top_radius = 0.19
+bottom_radius = 0.19
+height = 0.038
+radial_segments = 64
+
+[sub_resource type="CylinderMesh" id="Disc"]
+top_radius = 0.173
+bottom_radius = 0.173
+height = 0.023
+radial_segments = 64
+
+[sub_resource type="CylinderMesh" id="Pip"]
+top_radius = 0.012
+bottom_radius = 0.012
+height = 0.003
+radial_segments = 12
+
+[sub_resource type="StandardMaterial3D" id="HotPip"]
+albedo_color = Color(0.568627, 0.247059, 0.176471, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="ColdPip"]
+albedo_color = Color(0.388235, 0.305882, 0.207843, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Brass"]
+albedo_color = Color(0.537255, 0.454902, 0.266667, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="Parchment"]
+albedo_color = Color(0.898039, 0.847059, 0.72549, 1)
+roughness = 0.85
+
+[node name="NumberToken" type="Node3D"]
+script = ExtResource("script")
+hot_pip = SubResource("HotPip")
+cold_pip = SubResource("ColdPip")
+
+[node name="Rim" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.224, 0)
+material_override = SubResource("Brass")
+mesh = SubResource("Rim")
+
+[node name="Disc" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.251, 0)
+material_override = SubResource("Parchment")
+mesh = SubResource("Disc")
+
+[node name="Pips" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.265, 0.08)
+
+[node name="Pip0" type="MeshInstance3D" parent="Pips"]
+material_override = SubResource("ColdPip")
+mesh = SubResource("Pip")
+
+[node name="Pip1" type="MeshInstance3D" parent="Pips"]
+material_override = SubResource("ColdPip")
+mesh = SubResource("Pip")
+
+[node name="Pip2" type="MeshInstance3D" parent="Pips"]
+material_override = SubResource("ColdPip")
+mesh = SubResource("Pip")
+
+[node name="Pip3" type="MeshInstance3D" parent="Pips"]
+material_override = SubResource("ColdPip")
+mesh = SubResource("Pip")
+
+[node name="Pip4" type="MeshInstance3D" parent="Pips"]
+material_override = SubResource("ColdPip")
+mesh = SubResource("Pip")

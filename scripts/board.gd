@@ -4,6 +4,11 @@ signal picked(kind: String,id: int)
 const TILE_SIZE=25.0 # Regular hexes: 50 m tip to tip, 43.3 m across flats.
 const PLAYERS=[Color("ed815d"),Color("65bfcb"),Color("d9b76c"),Color("b697d7"),Color("7dcc83"),Color("d1aa87")]
 const LABEL_FONT=preload("res://assets/fonts/FiraSans-Medium.ttf")
+const NUMBER_TOKEN=preload("res://scenes/world/number_token.tscn")
+const PLACEMENT_MARKER=preload("res://scenes/world/placement_marker.tscn")
+const ROBBER_MARKER=preload("res://scenes/world/robber_marker.tscn")
+const PRODUCTION_RING=preload("res://scenes/world/production_ring.tscn")
+const CHIMNEY_SMOKE=preload("res://scenes/world/chimney_smoke.tscn")
 @onready var camera: Camera3D=$CameraRig/Camera
 @onready var sun: DirectionalLight3D=$Sun
 @onready var environment: Environment=$WorldEnvironment.environment
@@ -71,26 +76,6 @@ func _ready():
 	sea_material.set_shader_parameter("waves",preload("res://scripts/ocean_waves.gd").WAVES)
 	_update_camera()
 	_world_props()
-
-func mat(color: Color) -> StandardMaterial3D:
-	var m=StandardMaterial3D.new()
-	m.albedo_color=color
-	m.roughness=0.85
-	return m
-
-func mesh(shape: Mesh,color: Color) -> MeshInstance3D:
-	var node=MeshInstance3D.new()
-	node.mesh=shape
-	node.material_override=mat(color)
-	return node
-
-func cylinder(radius: float,height: float,color: Color,sides: int=6) -> MeshInstance3D:
-	var shape=CylinderMesh.new()
-	shape.top_radius=radius
-	shape.bottom_radius=radius
-	shape.height=height
-	shape.radial_segments=sides
-	return mesh(shape,color)
 
 func label3(text: String,pos: Vector3,size: int,color: Color=Color("fff1ce"),resource_id: int=-1) -> Node3D:
 	var anchor=Node3D.new()
@@ -207,18 +192,11 @@ func build(data: Dictionary):
 		tile_nodes.append({"root":root,"ground":top,"cliff":side,"diorama":diorama,"kind":t.kind,"index":i})
 		if t.number>0:
 			var marker=CatanWorldLayout.point(CatanWorldLayout.data.token)
-			var rim=cylinder(.19,.038,Color("897444"),64)
-			rim.position=Vector3(marker.x,.224,marker.y)
-			root.add_child(rim)
-			var token=cylinder(.173,.023,Color("e5d8b9"),64)
-			token.position=Vector3(marker.x,.251,marker.y)
+			var token=NUMBER_TOKEN.instantiate()
+			token.position=Vector3(marker.x,0,marker.y)
 			root.add_child(token)
-			root.add_child(label3(str(t.number),Vector3(marker.x,.275,marker.y-.05),43,Color("913f2d") if t.number in [6,8] else Color("302d21")))
-			var dot_count=6-absi(7-t.number)
-			for dot in dot_count:
-				var pip=cylinder(.012,.003,Color("913f2d") if t.number in [6,8] else Color("634e35"),12)
-				pip.position=Vector3(marker.x+(dot-(dot_count-1)*.5)*.033,.265,marker.y+.08)
-				root.add_child(pip)
+			token.show_number(t.number)
+			token.add_child(label3(str(t.number),Vector3(0,.275,-.05),43,Color("913f2d") if t.number in [6,8] else Color("302d21")))
 
 	water_centers=centers.duplicate()
 	while centers.size()<30:centers.append(Vector2(10000,10000))
@@ -346,11 +324,7 @@ func set_mode(value: String,player: int):
 			good=i!=state.robber
 			pos=Vector3(source[i].x,0.7,source[i].z)
 		if good:
-			var ring=TorusMesh.new()
-			ring.inner_radius=.065 if mode!="robber" else .14
-			ring.outer_radius=.093 if mode!="robber" else .19
-			ring.rings=24;ring.ring_segments=8
-			var marker=mesh(ring,Color("f9df9c"))
+			var marker=(ROBBER_MARKER if mode=="robber" else PLACEMENT_MARKER).instantiate()
 			marker.position=pos
 			markers.add_child(marker)
 			targets.append({"id":i,"pos":markers.to_global(pos)})
@@ -497,33 +471,7 @@ func _house(parent: Node3D,pos: Vector3,color: Color,city: bool=false,style: int
 	parent.add_child(root)
 	dwellers.append_array(root.get_meta("dwellers",[]))
 	if style!=0:return
-	var smoke=CPUParticles3D.new()
-	smoke.name="Smoke"
-	smoke.amount=8
-	smoke.lifetime=2.6
-	smoke.preprocess=0.7
-	smoke.position=Vector3(.045,.336,-.08)
-	smoke.direction=Vector3.UP
-	smoke.spread=15
-	smoke.gravity=Vector3(0.025,0.04,0)
-	smoke.initial_velocity_min=0.07
-	smoke.initial_velocity_max=0.12
-	smoke.scale_amount_min=0.6
-	smoke.scale_amount_max=1.3
-	var puff=SphereMesh.new()
-	puff.radius=0.025
-	puff.height=0.05
-	puff.radial_segments=8
-	puff.rings=4
-	var puff_material=mat(Color(0.7,0.75,0.72,0.2))
-	puff_material.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA
-	puff_material.vertex_color_use_as_albedo=true
-	puff.material=puff_material
-	smoke.mesh=puff
-	var fade=Gradient.new()
-	fade.set_color(0,Color(1,1,1,0.4))
-	fade.set_color(1,Color(1,1,1,0))
-	smoke.color_ramp=fade
+	var smoke=CHIMNEY_SMOKE.instantiate()
 	smoke.emitting=render_values.particles>0 and not reduce_motion
 	root.add_child(smoke)
 
@@ -532,16 +480,9 @@ func show_production(roll: int):
 	for tid in state.tiles.size():
 		var tile=state.tiles[tid]
 		if tile.number!=roll or tid==state.robber: continue
-		var ring_mesh=TorusMesh.new()
-		ring_mesh.inner_radius=0.74
-		ring_mesh.outer_radius=0.77
-		var ring=mesh(ring_mesh,Color("e9c77c"))
+		var ring=PRODUCTION_RING.instantiate()
 		ring.position=Vector3(tile.x,0.27,tile.z)
 		terrain.add_child(ring)
-		var animation=create_tween()
-		animation.tween_property(ring,"position:y",0.48,0.5)
-		animation.parallel().tween_property(ring,"scale",Vector3.ONE*1.15,0.5)
-		animation.tween_callback(ring.queue_free)
 
 func _animate_beacon():
 	lighthouse.shine(elapsed,1.0-daylight)

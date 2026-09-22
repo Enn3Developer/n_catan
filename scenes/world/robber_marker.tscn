@@ -1,0 +1,12 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/world/placement_marker.tscn" id="base"]
+
+[sub_resource type="TorusMesh" id="WideRing"]
+inner_radius = 0.14
+outer_radius = 0.19
+rings = 24
+ring_segments = 8
+
+[node name="RobberMarker" instance=ExtResource("base")]
+mesh = SubResource("WideRing")
