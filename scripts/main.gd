@@ -626,13 +626,6 @@ func _journal():
 func _phase_text() -> String:
 	return {"setup_settlement":tr("Setup"),"setup_road":tr("Setup"),"play":tr("Build & trade") if state.rolled else tr("Roll dice"),"discard":tr("Discard"),"robber":tr("Robber"),"steal":tr("Steal"),"free_roads":tr("Free roads")}.get(state.phase,"")
 
-func _instruction() -> String:
-	if state.winner!=-1: return tr("The expedition is complete.")
-	if state.phase=="discard" and state.discards.has(str(net.seat)): return tr("Choose half your resources to return to the bank.")
-	if state.turn!=net.seat: return tr("Watch the island grow. Your turn is coming.")
-	if state.get("paired",false) and state.phase=="play": return tr("Build, play a card, or trade with the bank.")
-	return {"setup_settlement":tr("Place a settlement"),"setup_road":tr("Place an adjoining road"),"play":tr("Build, trade or play a card") if state.rolled else tr("Roll to collect resources"),"discard":tr("Waiting for players to discard."),"robber":tr("Move the robber to a hex"),"steal":tr("Choose a player to steal from."),"free_roads":tr("Place up to two connected roads for free.")}.get(state.phase,"")
-
 func _choose(kind: String):
 	var rules=CatanRules.new();rules.s=state
 	if state.phase=="play" and rules.build_sites(net.seat,kind).is_empty():
@@ -943,11 +936,6 @@ func _card_preview(card: Button,expanded: bool):
 func _cards():
 	# Compatibility for tutorial shortcuts: cards are always present in the HUD.
 	_close_modal()
-
-func _sum(a: Array) -> int:
-	var result=0
-	for n in a: result+=n
-	return result
 
 func _resource_card(id: int):
 	var box=_dialog(tr("Year of plenty") if id==2 else "Monopoly")

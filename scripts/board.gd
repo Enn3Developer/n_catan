@@ -2,7 +2,6 @@ class_name CatanBoard
 extends Node3D
 signal picked(kind: String,id: int)
 const TILE_SIZE=25.0 # Regular hexes: 50 m tip to tip, 43.3 m across flats.
-const COLORS=[Color("488963"),Color("bd7250"),Color("8fab60"),Color("c7a456"),Color("7a8b99"),Color("d7bf87")]
 const PLAYERS=[Color("ed815d"),Color("65bfcb"),Color("d9b76c"),Color("b697d7"),Color("7dcc83"),Color("d1aa87")]
 var camera: Camera3D
 var terrain: Node3D
@@ -17,7 +16,6 @@ var pitch=0.745
 var hover=-1
 var targets=[]
 var marker_nodes=[]
-var cache=[]
 var scenery: Node3D
 var background_landscape: Node3D
 var boats=[]
@@ -26,9 +24,7 @@ var beacon: Node3D
 var beacon_lamp: MeshInstance3D
 var beacon_beam: MeshInstance3D
 var beacon_spot: SpotLight3D
-var terrain_noise: NoiseTexture2D
 var elapsed=0.0
-var windmills=[]
 var birds=[]
 var seagulls=preload("res://scripts/seagulls.gd").new()
 var reduce_motion=false
@@ -37,9 +33,7 @@ var board_labels=[]
 var label_layer: CanvasLayer
 var label_font: Font
 var sea_material: ShaderMaterial
-var vegetation=[]
 var quality=2
-var production_rings=[]
 var art=CatanTileArt.new()
 var cosmetics=CatanCosmetics.new()
 var render_values=CatanSettings.DEFAULTS.duplicate()
@@ -132,15 +126,6 @@ func _ready():
 	add_child(label_layer)
 	label_font=load("res://assets/fonts/FiraSans-Medium.ttf")
 
-	terrain_noise=NoiseTexture2D.new()
-	var noise=FastNoiseLite.new()
-	noise.seed=8531
-	noise.frequency=0.045
-	noise.fractal_octaves=4
-	terrain_noise.noise=noise
-	terrain_noise.width=256
-	terrain_noise.height=256
-	terrain_noise.seamless=true
 	var water=PlaneMesh.new()
 	water.size=Vector2(7000,7000)
 	water.subdivide_width=150
@@ -317,7 +302,6 @@ func apply_preferences(values: Dictionary):
 		plane.subdivide_depth=plane.subdivide_width
 		ocean.mesh=plane
 		last_water_quality=values.water_quality
-	for material in vegetation:material.set_shader_parameter("motion_speed",0.0 if reduce_motion else values.wind)
 	for smoke in find_children("Smoke","CPUParticles3D",true,false):
 		smoke.emitting=values.particles>0 and not reduce_motion
 		smoke.visible=smoke.emitting
@@ -341,8 +325,6 @@ func build(data: Dictionary):
 	_update_camera()
 	for entry in board_labels: entry.label.free()
 	board_labels=[]
-	windmills=[]
-	vegetation=[]
 	for n in terrain.get_children(): n.free()
 	tile_nodes=[]
 	actors=[]
@@ -541,7 +523,6 @@ func _process(delta):
 	living_world.animate_dwellers(dwellers,elapsed,daylight)
 	for harbor in harbors:
 		harbor.get_node("MooredBoat").position.y=-.025+sin(elapsed*.7+harbor.position.x)*.003
-	for mill in windmills: mill.rotation.z+=delta*0.4
 	seagulls.animate(delta,elapsed,daylight,weather.current if is_instance_valid(weather) else {},reduce_motion)
 	sea_traffic.animate(delta,elapsed)
 	if delta>0:
@@ -661,57 +642,6 @@ func _rock(parent: Node3D,pos: Vector3,size: Vector3,color: Color):
 	rock.rotation=Vector3(pos.x,0.3+pos.z,pos.x*0.5)
 	parent.add_child(rock)
 
-func _tile_props(parent: Node3D,kind: int,index: int):
-	var random=RandomNumberGenerator.new()
-	random.seed=index*421+33
-	# Low groundcover gives every terrain its own grain and silhouette.
-	for i in 28:
-		var x=random.randf_range(-0.72,0.72)
-		var z=random.randf_range(-0.72,0.72)
-		if Vector2(x,z).length()>0.76 or (absf(x)<0.3 and z>0.24): continue
-		if kind in [0,2]:
-			var grass=CylinderMesh.new()
-			grass.bottom_radius=0.025
-			grass.top_radius=0.0
-			grass.height=random.randf_range(0.045,0.11)
-			grass.radial_segments=3
-			var tuft=mesh(grass,Color("68854a") if i%2==0 else Color("b1bc65"))
-			tuft.position=Vector3(x,0.24,z)
-			tuft.material_override=_foliage(Color("68854a") if i%2==0 else Color("b1bc65"))
-			parent.add_child(tuft)
-		elif kind in [1,4,5]:
-			var size=random.randf_range(0.035,0.10)
-			_rock(parent,Vector3(x,0.22,z),Vector3(size,size*0.6,size),COLORS[kind].darkened(0.15))
-	if kind==0:
-		for i in 3:
-			var x=[-0.57,0.03,0.54][i]
-			var z=[-0.15,-0.5,0.1][i]
-			var trunk=cylinder(0.027,0.26,Color("5e4230"),6)
-			trunk.position=Vector3(x,0.33,z)
-			parent.add_child(trunk)
-			_rock(parent,Vector3(x,0.59,z),Vector3(0.32,0.4,0.3),Color("537647"))
-	if kind==2:
-		for i in 5:
-			var post=box(Vector3(0.032,0.17,0.032),Color("d3bb80"))
-			post.position=Vector3(-0.55+i*0.21,0.29,-0.57)
-			parent.add_child(post)
-		var fence=box(Vector3(0.9,0.027,0.028),Color("cbb176"))
-		fence.position=Vector3(-0.13,0.34,-0.57)
-		parent.add_child(fence)
-	if kind==3:
-		if index%2==0: _windmill(parent,Vector3(0.5,0.22,-0.42))
-		for i in 3:
-			var hay=cylinder(0.072,0.11,Color("d4aa48"),10)
-			hay.rotation.z=PI/2
-			hay.position=Vector3(-0.55+i*0.18,0.29,0.37)
-			parent.add_child(hay)
-	if kind==5:
-		for i in 3:
-			_rock(parent,Vector3(-0.32+i*0.22,0.24,-0.1),Vector3(0.45,0.16,0.35),Color("cdb17a"))
-		var cactus=cylinder(0.044,0.32,Color("728557"),7)
-		cactus.position=Vector3(-0.4,0.38,0.35)
-		parent.add_child(cactus)
-
 func _world_props():
 	background_landscape=preload("res://scripts/background_landscape.gd").new()
 	scenery.add_child(background_landscape)
@@ -779,31 +709,6 @@ func _world_props():
 		boat.add_child(sail)
 	seagulls.setup(self)
 
-func _terrain_mesh(kind: int) -> ArrayMesh:
-	var surface=SurfaceTool.new()
-	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var steps=10
-	for sector in 6:
-		var a=Vector2(cos(deg_to_rad(30+60*sector)),sin(deg_to_rad(30+60*sector)))*0.975
-		var b=Vector2(cos(deg_to_rad(30+60*(sector+1))),sin(deg_to_rad(30+60*(sector+1))))*0.975
-		for i in steps:
-			for j in range(steps-i):
-				var p=a*float(i)/steps+b*float(j)/steps
-				var q=a*float(i+1)/steps+b*float(j)/steps
-				var r=a*float(i)/steps+b*float(j+1)/steps
-				for point in [p,q,r]: surface.add_vertex(_ground_vertex(point,kind))
-				if i+j<steps-1:
-					var t=a*float(i+1)/steps+b*float(j+1)/steps
-					for point in [q,t,r]: surface.add_vertex(_ground_vertex(point,kind))
-	surface.generate_normals()
-	return surface.commit()
-
-func _ground_vertex(p: Vector2,kind: int) -> Vector3:
-	var edge=maxf(absf(p.x)/0.866,maxf(absf(p.x*0.5+p.y*0.866)/0.866,absf(-p.x*0.5+p.y*0.866)/0.866))
-	var height=[0.05,0.14,0.025,0.016,0.15,0.035][kind]
-	var wave=0.5+sin(p.x*6.0+kind)*cos(p.y*5.0)*0.5
-	return Vector3(p.x,0.2+pow(maxf(0,1-edge),1.3)*height*wave,p.y)
-
 func _piece_style(player: int) -> int:
 	var styles=state.get("piece_styles",[])
 	return clampi(int(styles[player]),0,CatanCosmetics.SETS.size()-1) if player>=0 and player<styles.size() else 0
@@ -843,46 +748,6 @@ func _house(parent: Node3D,pos: Vector3,color: Color,city: bool=false,style: int
 	smoke.color_ramp=fade
 	smoke.emitting=render_values.particles>0 and not reduce_motion
 	root.add_child(smoke)
-
-func _windmill(parent: Node3D,pos: Vector3):
-	var root=Node3D.new()
-	root.position=pos
-	parent.add_child(root)
-	var shape=CylinderMesh.new()
-	shape.bottom_radius=0.11
-	shape.top_radius=0.075
-	shape.height=0.38
-	shape.radial_segments=8
-	var tower=mesh(shape,Color("e8d4a7"))
-	tower.position.y=0.19
-	root.add_child(tower)
-	var cap=CylinderMesh.new()
-	cap.bottom_radius=0.13
-	cap.top_radius=0
-	cap.height=0.16
-	cap.radial_segments=8
-	var roof=mesh(cap,Color("796249"))
-	roof.position.y=0.46
-	root.add_child(roof)
-	var rotor=Node3D.new()
-	rotor.position=Vector3(0,0.34,0.095)
-	root.add_child(rotor)
-	windmills.append(rotor)
-	for i in 4:
-		var arm=Node3D.new()
-		arm.rotation.z=i*PI/2
-		rotor.add_child(arm)
-		var blade=box(Vector3(0.055,0.21,0.022),Color("f1dfac"))
-		blade.position.y=0.12
-		arm.add_child(blade)
-
-func _foliage(color: Color) -> ShaderMaterial:
-	var material=ShaderMaterial.new()
-	material.shader=load("res://shaders/foliage.gdshader")
-	material.set_shader_parameter("leaf_color",color)
-	material.set_shader_parameter("motion_speed",0.0 if reduce_motion else 1.0)
-	vegetation.append(material)
-	return material
 
 func show_production(roll: int):
 	if reduce_motion: return
