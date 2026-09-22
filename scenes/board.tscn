@@ -4,6 +4,7 @@
 [ext_resource type="Shader" path="res://shaders/weather_sky.gdshader" id="sky_shader"]
 [ext_resource type="Shader" path="res://shaders/water.gdshader" id="water_shader"]
 [ext_resource type="Script" path="res://scripts/background_landscape.gd" id="landscape"]
+[ext_resource type="PackedScene" path="res://scenes/world/weather.tscn" id="weather"]
 
 [sub_resource type="FastNoiseLite" id="CloudNoise"]
 seed = 7241
@@ -142,6 +143,8 @@ direction = Vector3(0.2, 0.1, 0.1)
 gravity = Vector3(0, 0, 0)
 initial_velocity_min = 0.03
 initial_velocity_max = 0.09
+
+[node name="Weather" parent="." instance=ExtResource("weather")]
 
 [node name="Labels" type="CanvasLayer" parent="."]
 layer = 0

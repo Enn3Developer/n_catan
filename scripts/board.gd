@@ -60,7 +60,7 @@ var dwellers=[]
 var road_travel=preload("res://scripts/road_travel.gd").new()
 var night_lights=[]
 var daylight=1.0
-var weather
+@onready var weather=$Weather
 
 func _ready():
 	if "--server" in OS.get_cmdline_user_args():
@@ -70,7 +70,6 @@ func _ready():
 	sea_material.set_shader_parameter("waves",preload("res://scripts/ocean_waves.gd").WAVES)
 	_update_camera()
 	_world_props()
-	weather=preload("res://scripts/weather.gd").new();add_child(weather);weather.setup()
 
 func mat(color: Color) -> StandardMaterial3D:
 	var m=StandardMaterial3D.new()

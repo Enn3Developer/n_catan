@@ -1,0 +1,107 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/weather.gd" id="script"]
+
+[sub_resource type="StandardMaterial3D" id="RainMaterial"]
+resource_local_to_scene = true
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.65, 0.78, 0.88, 0.38)
+
+[sub_resource type="BoxMesh" id="Raindrop"]
+size = Vector3(0.075, 1.65, 0.075)
+
+[sub_resource type="StandardMaterial3D" id="BoltGlow"]
+shading_mode = 0
+albedo_color = Color(0.7, 0.81, 1, 1)
+emission_enabled = true
+emission = Color(0.6, 0.75, 1, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="CylinderMesh" id="BoltSegment0"]
+top_radius = 0.24
+bottom_radius = 0.36
+height = 20.46949
+radial_segments = 5
+
+[sub_resource type="CylinderMesh" id="BoltSegment1"]
+top_radius = 0.24
+bottom_radius = 0.36
+height = 14.035668
+radial_segments = 5
+
+[sub_resource type="CylinderMesh" id="BoltSegment2"]
+top_radius = 0.24
+bottom_radius = 0.36
+height = 20.615528
+radial_segments = 5
+
+[sub_resource type="CylinderMesh" id="BoltSegment3"]
+top_radius = 0.24
+bottom_radius = 0.36
+height = 11.74734
+radial_segments = 5
+
+[sub_resource type="CylinderMesh" id="BoltSegment4"]
+top_radius = 0.24
+bottom_radius = 0.36
+height = 22.51666
+radial_segments = 5
+
+[node name="Weather" type="Node3D"]
+script = ExtResource("script")
+
+[node name="Rain" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 78, 0)
+material_override = SubResource("RainMaterial")
+cast_shadow = 0
+emitting = false
+lifetime = 2.0
+preprocess = 2.0
+local_coords = false
+mesh = SubResource("Raindrop")
+emission_shape = 3
+emission_box_extents = Vector3(180, 2, 180)
+direction = Vector3(0.13, -1, 0.05)
+spread = 3.0
+gravity = Vector3(0, -12, 0)
+initial_velocity_min = 30.0
+initial_velocity_max = 38.0
+
+[node name="DistantLightning" type="Node3D" parent="."]
+visible = false
+
+[node name="Bolt0" type="MeshInstance3D" parent="DistantLightning"]
+transform = Transform3D(-0.6290058, 0.3419724, -0.6981453, -0.3419724, -0.92821085, -0.1465596, -0.6981453, 0.1465596, 0.70079494, -166.5, 115.5, -143.5)
+material_override = SubResource("BoltGlow")
+cast_shadow = 0
+mesh = SubResource("BoltSegment0")
+
+[node name="Bolt1" type="MeshInstance3D" parent="DistantLightning"]
+transform = Transform3D(-0.71496725, -0.49872932, -0.4899906, 0.49872932, -0.8549645, 0.14249407, -0.4899906, -0.14249407, 0.8600027, -166.5, 100, -143)
+material_override = SubResource("BoltGlow")
+cast_shadow = 0
+mesh = SubResource("BoltSegment1")
+
+[node name="Bolt2" type="MeshInstance3D" parent="DistantLightning"]
+transform = Transform3D(-0.5133753, 0.5820854, -0.63057303, -0.5820854, -0.776114, -0.24253558, -0.63057303, 0.24253558, 0.73726124, -164, 86, -141.5)
+material_override = SubResource("BoltGlow")
+cast_shadow = 0
+mesh = SubResource("BoltSegment2")
+
+[node name="Bolt3" type="MeshInstance3D" parent="DistantLightning"]
+transform = Transform3D(-0.82247734, -0.34050268, -0.45561934, 0.34050268, -0.9363822, 0.08512567, -0.45561934, -0.08512567, 0.88609517, -160, 72.5, -139.5)
+material_override = SubResource("BoltGlow")
+cast_shadow = 0
+mesh = SubResource("BoltSegment3")
+
+[node name="Bolt4" type="MeshInstance3D" parent="DistantLightning"]
+transform = Transform3D(-0.52809715, 0.48852715, -0.6945896, -0.48852715, -0.8438196, -0.22205779, -0.6945896, 0.22205779, 0.6842775, -156.5, 57.5, -137.5)
+material_override = SubResource("BoltGlow")
+cast_shadow = 0
+mesh = SubResource("BoltSegment4")
+
+[node name="LightningGlow" type="OmniLight3D" parent="DistantLightning"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -158, 70, -139)
+light_color = Color(0.64, 0.76, 1, 1)
+omni_range = 180.0
