@@ -56,16 +56,19 @@ You can also dispatch the workflow manually for an existing tag. Publishing defa
 
 ## Source structure
 
-The main scene, `scenes/main.tscn`, contains the Network, Board and Audio scenes. The board scene contains the camera, sun, environment, terrain, buildings and scenery nodes. The game generates terrain at runtime.
+The main scene, `scenes/main.tscn`, contains the Network, Board and Audio scenes, the updater, the interface day/night driver and the interface layer. `scripts/main.gd` shows one screen at a time, presents dialogs and routes their signals to the network and board.
 
-Edit the interface in `scenes/ui/`. Its named Controls define the layout, and `assets/ui_theme.tres` supplies the shared theme. The game does not run `tools/create_ui_scenes.py`. Rerunning that generator can overwrite manual scene edits.
+The interface lives in `scenes/ui/`. The home, lobby and in-game screens extend `CatanScreen`, every dialog inherits `dialog.tscn`, and repeated widgets such as player chips, development cards, preference rows and resource rows are scenes of their own. Screens and dialogs report intent through signals. Buttons that should click join the `ui_click` group. `assets/ui_theme.tres` supplies the shared theme, including the `PrimaryButton`, `MusicIconButton` and `HeadingLabel` variations. Regenerate it with `tools/build_ui_theme.py`.
+
+The board scene contains the camera, sun, sky environment, ocean, terrain, buildings and scenery, including the lighthouse, sailboats and offshore rocks. Number tokens, placement markers, production rings, chimney smoke, dice and weather are scenes in `scenes/world/`. The game still generates tiles, pieces, towns, harbors, actors and the background landscape at runtime. Scenery that uses texture-tier materials carries `pbr_surface` metadata. `BevelBoxMesh`, `HullMesh` and `SailMesh` are procedural meshes that scenes use directly. Audio buses are defined in `default_bus_layout.tres`.
 
 | Path | Purpose |
 | --- | --- |
 | `scripts/rules.gd` | Board topology, rules, resources, scoring and private snapshots |
 | `scripts/network.gd` | ENet host, lobby, passwords, replication, reconnection and UPnP |
 | `scripts/board.gd` | Terrain, buildings, picking, camera and animations |
-| `scripts/main.gd` | Scene connections and game interface |
+| `scripts/main.gd` | Screen and dialog routing, preferences and session flow |
+| `scripts/*_screen.gd`, `scripts/*_dialog.gd` | Home, lobby and HUD screens; dialogs |
 | `scripts/bot.gd` | Bot decisions and difficulty settings |
 | `scripts/tutorial.gd` | Guided practice scenarios |
 | `scripts/settings.gd`, `scripts/audio.gd` | Preferences and audio buses |

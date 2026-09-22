@@ -88,7 +88,7 @@ Validation on Godot 4.7.2, Forward+, NVIDIA RTX 4060:
 
 Current previews: `sculpted-board.png`, `sculpted-world.png`, `sculpted-forest.png`, `sculpted-trade.png`, `responsive-hud-800.png`, `responsive-settings-800.png` and `responsive-cosmetics-800.png`.
 
-Authoring sources: `assets/source/sculpted-tiles.blend`, `tools/build_premium_tiles.py`, `tools/create_ui_scenes.py`, `scripts/miniature_mesh.gd` and `scripts/ui_icons.gd`. Older `.blend` sources remain as archives; the runtime uses the new GLB exports.
+Authoring sources: `assets/source/sculpted-tiles.blend`, `tools/build_premium_tiles.py`, `scripts/miniature_mesh.gd` and `scripts/ui_icons.gd`. Older `.blend` sources remain as archives; the runtime uses the new GLB exports.
 
 
 ## Linux package optimization — September 9, 2026
