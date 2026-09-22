@@ -9,6 +9,7 @@ const PLACEMENT_MARKER=preload("res://scenes/world/placement_marker.tscn")
 const ROBBER_MARKER=preload("res://scenes/world/robber_marker.tscn")
 const PRODUCTION_RING=preload("res://scenes/world/production_ring.tscn")
 const CHIMNEY_SMOKE=preload("res://scenes/world/chimney_smoke.tscn")
+const DICE_THROW=preload("res://scenes/world/dice_throw.tscn")
 @onready var camera: Camera3D=$CameraRig/Camera
 @onready var sun: DirectionalLight3D=$Sun
 @onready var environment: Environment=$WorldEnvironment.environment
@@ -553,7 +554,7 @@ func throw_dice(values: Array):
 	var tile=state.tiles[0]
 	for candidate in state.tiles:
 		if candidate.kind==5:tile=candidate;break
-	active_dice=CatanDiceThrow.new();active_dice.name="ThrownDice";add_child(active_dice)
+	active_dice=DICE_THROW.instantiate();add_child(active_dice)
 	active_dice.scale=Vector3.ONE*(TILE_SIZE/2.2)
 	active_dice.setup(values,Vector3(tile.x*2.2,.9,(tile.z+.64)*2.2),reduce_motion)
 	active_dice.settled.connect(show_production)

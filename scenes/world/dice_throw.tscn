@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/dice_throw.gd" id="script"]
+[ext_resource type="PackedScene" path="res://scenes/world/die.tscn" id="die"]
+
+[sub_resource type="StandardMaterial3D" id="Terracotta"]
+albedo_color = Color(0.85098, 0.529412, 0.376471, 1)
+roughness = 0.32
+
+[node name="ThrownDice" type="Node3D"]
+script = ExtResource("script")
+
+[node name="Die0" parent="." instance=ExtResource("die")]
+
+[node name="Die1" parent="." instance=ExtResource("die")]
+
+[node name="Body" parent="Die1"]
+material_override = SubResource("Terracotta")
+
+[editable path="Die1"]
