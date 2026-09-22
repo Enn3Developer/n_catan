@@ -1,6 +1,14 @@
 [gd_scene format=3]
+
 [ext_resource type="Theme" path="res://assets/ui_theme.tres" id="1"]
 [ext_resource type="Texture2D" path="res://assets/ui/game-logo.png" id="logo"]
+[ext_resource type="Script" path="res://scripts/home_screen.gd" id="script"]
+[ext_resource type="Texture2D" path="res://assets/icons/music.svg" id="icon_music"]
+[ext_resource type="Texture2D" path="res://assets/icons/settings.svg" id="icon_settings"]
+
+[sub_resource type="ButtonGroup" id="OnlineModeGroup"]
+resource_local_to_scene = true
+
 [node name="MainMenu" type="Control"]
 layout_mode = 1
 anchors_preset = 15
@@ -10,6 +18,8 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("1")
+script = ExtResource("script")
+
 [node name="Expedition" type="PanelContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
@@ -19,149 +29,218 @@ offset_left = 24.0
 offset_top = -240.0
 offset_right = 390.0
 offset_bottom = 240.0
+
 [node name="ExpeditionBody" type="VBoxContainer" parent="Expedition"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
+
 [node name="Brand" type="Label" parent="Expedition/ExpeditionBody"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_font_sizes/font_size = 13
 text = "3–6 players · Solo & online"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 13
 
 [node name="Title" type="TextureRect" parent="Expedition/ExpeditionBody"]
 unique_name_in_owner = true
-layout_mode = 2
 custom_minimum_size = Vector2(0, 144)
+layout_mode = 2
+mouse_filter = 2
 texture = ExtResource("logo")
 expand_mode = 1
 stretch_mode = 5
-mouse_filter = 2
 
 [node name="MenuScroll" type="ScrollContainer" parent="Expedition/ExpeditionBody"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
+
 [node name="MenuItems" type="VBoxContainer" parent="Expedition/ExpeditionBody/MenuScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
+
 [node name="PlayerName" type="LineEdit" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 placeholder_text = "Your name"
 max_length = 20
-custom_minimum_size = Vector2(0, 40)
-[node name="ShowOnline" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
+
+[node name="ShowOnline" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems" groups=["ui_click"]]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-text = "Play online"
-custom_minimum_size = Vector2(0, 40)
+mouse_default_cursor_shape = 2
+theme_type_variation = &"PrimaryButton"
 toggle_mode = true
+text = "Play online"
+
 [node name="OnlineForm" type="VBoxContainer" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
 unique_name_in_owner = true
-layout_mode = 2
 visible = false
+layout_mode = 2
+
 [node name="OnlineModes" type="HBoxContainer" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm"]
 layout_mode = 2
+
 [node name="HostTab" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/OnlineModes"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-text = "Host"
+size_flags_horizontal = 3
 toggle_mode = true
 button_pressed = true
-size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 36)
+button_group = SubResource("OnlineModeGroup")
+text = "Host"
+
 [node name="JoinTab" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/OnlineModes"]
 unique_name_in_owner = true
-layout_mode = 2
-text = "Join"
-toggle_mode = true
-size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = SubResource("OnlineModeGroup")
+text = "Join"
+
 [node name="HostOptions" type="VBoxContainer" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm"]
 unique_name_in_owner = true
 layout_mode = 2
+
 [node name="HostPasswordLabel" type="Label" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/HostOptions"]
 layout_mode = 2
-text = "Set a room password (optional)"
 theme_override_font_sizes/font_size = 14
+text = "Set a room password (optional)"
+
 [node name="HostPassword" type="LineEdit" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/HostOptions"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 placeholder_text = "Choose a password for your room"
 max_length = 64
 secret = true
-custom_minimum_size = Vector2(0, 40)
+
 [node name="HostPasswordHelp" type="Label" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/HostOptions"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 14
 text = "Share it with your players. Leave blank for an open room."
 autowrap_mode = 3
-theme_override_font_sizes/font_size = 14
-[node name="HostOnline" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/HostOptions"]
+
+[node name="HostOnline" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/HostOptions" groups=["ui_click"]]
 unique_name_in_owner = true
-layout_mode = 2
-text = "Create room"
 custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "Create room"
+
 [node name="JoinOptions" type="VBoxContainer" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm"]
 unique_name_in_owner = true
-layout_mode = 2
 visible = false
+layout_mode = 2
+
 [node name="ServerAddress" type="LineEdit" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 placeholder_text = "Paste invite code"
-custom_minimum_size = Vector2(0, 40)
+
 [node name="RoomPassword" type="LineEdit" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 placeholder_text = "Room password (if required)"
 max_length = 64
 secret = true
-custom_minimum_size = Vector2(0, 40)
-[node name="JoinOnline" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions"]
+
+[node name="JoinOnline" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions" groups=["ui_click"]]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
+mouse_default_cursor_shape = 2
 text = "Join room"
-custom_minimum_size = Vector2(0, 40)
-[node name="Reconnect" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
+
+[node name="Reconnect" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems" groups=["ui_click"]]
 unique_name_in_owner = true
-layout_mode = 2
-text = "Reconnect"
-custom_minimum_size = Vector2(0, 40)
 visible = false
-[node name="Singleplayer" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
-unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "Reconnect"
+
+[node name="Singleplayer" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
 text = "Play solo"
-custom_minimum_size = Vector2(0, 40)
 
-[node name="Learn" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
+[node name="Learn" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems" groups=["ui_click"]]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
+mouse_default_cursor_shape = 2
 text = "Learn to play"
-custom_minimum_size = Vector2(0, 40)
 
-[node name="OpenCosmetics" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
+[node name="MenuUtilities" type="GridContainer" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Player appearance"
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 2
+
+[node name="OpenCosmetics" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/MenuUtilities" groups=["ui_click"]]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
 tooltip_text = "Preview and equip your roads, settlements and cities"
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+text = "Player appearance"
+
+[node name="OpenMusic" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/MenuUtilities" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/icon_max_width = 22
+theme_override_font_sizes/font_size = 14
+text = "Music"
+icon = ExtResource("icon_music")
+
+[node name="CheckUpdates" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/MenuUtilities" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+text = "Game updates"
+
+[node name="ExitDesktop" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/MenuUtilities" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+text = "Exit to desktop"
+
 [node name="MenuNote" type="Label" parent="Expedition/ExpeditionBody"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_font_sizes/font_size = 13
 text = "Build, trade and make yourself at home."
 horizontal_alignment = 1
 autowrap_mode = 3
-theme_override_font_sizes/font_size = 13
 
-[node name="OpenSettings" type="Button" parent="."]
+[node name="OpenSettings" type="Button" parent="." groups=["ui_click"]]
 unique_name_in_owner = true
-text = ""
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 1
 anchor_left = 1.0
@@ -171,18 +250,9 @@ offset_top = 24.0
 offset_right = -24.0
 offset_bottom = 64.0
 tooltip_text = "Settings"
-
-[node name="ExitDesktop" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Exit to desktop"
-custom_minimum_size = Vector2(0, 40)
-
-[node name="CheckUpdates" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Game updates"
-custom_minimum_size = Vector2(0, 40)
+mouse_default_cursor_shape = 2
+theme_override_constants/icon_max_width = 22
+icon = ExtResource("icon_settings")
 
 [node name="Version" type="Label" parent="."]
 unique_name_in_owner = true
@@ -203,3 +273,18 @@ theme_override_colors/font_outline_color = Color(0.04, 0.08, 0.1, 0.9)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 14
 horizontal_alignment = 2
+
+[connection signal="minimum_size_changed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems" to="." method="emit_signal" binds= ["layout_changed"]]
+[connection signal="toggled" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/ShowOnline" to="." method="_on_show_online_toggled"]
+[connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/OnlineModes/HostTab" to="." method="show_online_mode" binds= [true]]
+[connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/OnlineModes/JoinTab" to="." method="show_online_mode" binds= [false]]
+[connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/HostOptions/HostOnline" to="." method="emit_signal" binds= ["host_requested"]]
+[connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions/JoinOnline" to="." method="emit_signal" binds= ["join_requested"]]
+[connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/Reconnect" to="." method="emit_signal" binds= ["reconnect_requested"]]
+[connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/Singleplayer" to="." method="emit_signal" binds= ["solo_requested"]]
+[connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/Learn" to="." method="emit_signal" binds= ["tutorial_requested"]]
+[connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/MenuUtilities/OpenCosmetics" to="." method="emit_signal" binds= ["cosmetics_requested"]]
+[connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/MenuUtilities/OpenMusic" to="." method="emit_signal" binds= ["music_requested"]]
+[connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/MenuUtilities/CheckUpdates" to="." method="emit_signal" binds= ["updates_requested"]]
+[connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/MenuUtilities/ExitDesktop" to="." method="emit_signal" binds= ["exit_requested"]]
+[connection signal="pressed" from="OpenSettings" to="." method="emit_signal" binds= ["settings_requested"]]

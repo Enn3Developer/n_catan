@@ -1,5 +1,10 @@
 [gd_scene format=3]
+
 [ext_resource type="Theme" path="res://assets/ui_theme.tres" id="1"]
+[ext_resource type="Script" path="res://scripts/lobby_screen.gd" id="script"]
+[ext_resource type="Texture2D" path="res://assets/icons/music.svg" id="icon_music"]
+[ext_resource type="Texture2D" path="res://assets/icons/settings.svg" id="icon_settings"]
+
 [node name="Lobby" type="Control"]
 layout_mode = 1
 anchors_preset = 15
@@ -9,19 +14,22 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("1")
+script = ExtResource("script")
+
 [node name="Frame" type="VBoxContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
 offset_left = 24.0
 offset_top = 24.0
 offset_right = -24.0
 offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/separation = 16
+
 [node name="Header" type="HBoxContainer" parent="Frame"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -29,30 +37,51 @@ layout_mode = 2
 [node name="LobbyTitle" type="Label" parent="Frame/Header"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Your room"
-theme_override_font_sizes/font_size = 30
 size_flags_horizontal = 3
-[node name="LobbyCosmetics" type="Button" parent="Frame/Header"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Player appearance"
-custom_minimum_size = Vector2(0, 40)
+theme_override_colors/font_color = Color(1, 0.945098, 0.823529, 1)
+theme_override_colors/font_outline_color = Color(0.286275, 0.207843, 0.129412, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 30
+text = "Your room"
 
-[node name="LobbySettings" type="Button" parent="Frame/Header"]
+[node name="LobbyCosmetics" type="Button" parent="Frame/Header" groups=["ui_click"]]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
-text = ""
+mouse_default_cursor_shape = 2
+text = "Player appearance"
+
+[node name="LobbySettings" type="Button" parent="Frame/Header" groups=["ui_click"]]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
 tooltip_text = "Settings"
+mouse_default_cursor_shape = 2
+theme_override_constants/icon_max_width = 22
+icon = ExtResource("icon_settings")
+
+[node name="OpenMusic" type="Button" parent="Frame/Header" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(34, 30)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Music"
+mouse_default_cursor_shape = 2
+theme_type_variation = &"MusicIconButton"
+theme_override_constants/icon_max_width = 18
+icon = ExtResource("icon_music")
+
 [node name="Columns" type="HBoxContainer" parent="Frame"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 18
+
 [node name="Crew" type="PanelContainer" parent="Frame/Columns"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+
 [node name="CrewBody" type="VBoxContainer" parent="Frame/Columns/Crew"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -64,45 +93,53 @@ layout_mode = 2
 [node name="CrewTitle" type="Label" parent="Frame/Columns/Crew/CrewBody/CrewHeader"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Players"
-theme_override_font_sizes/font_size = 18
 size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Players"
+
 [node name="PlayerCount" type="Label" parent="Frame/Columns/Crew/CrewBody/CrewHeader"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "1 / 6"
 theme_override_font_sizes/font_size = 16
+text = "1 / 6"
 
 [node name="CrewScroll" type="ScrollContainer" parent="Frame/Columns/Crew/CrewBody"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
+
 [node name="PlayerSlots" type="VBoxContainer" parent="Frame/Columns/Crew/CrewBody/CrewScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
+
 [node name="CrewActions" type="HBoxContainer" parent="Frame/Columns/Crew/CrewBody"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="AddBot" type="Button" parent="Frame/Columns/Crew/CrewBody/CrewActions"]
+[node name="AddBot" type="Button" parent="Frame/Columns/Crew/CrewBody/CrewActions" groups=["ui_click"]]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
 text = "+ Add bot"
-custom_minimum_size = Vector2(0, 40)
-size_flags_horizontal = 3
-[node name="ReadyButton" type="Button" parent="Frame/Columns/Crew/CrewBody/CrewActions"]
+
+[node name="ReadyButton" type="Button" parent="Frame/Columns/Crew/CrewBody/CrewActions" groups=["ui_click"]]
 unique_name_in_owner = true
-layout_mode = 2
-text = "I'm ready"
 custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
 size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+text = "I'm ready"
+
 [node name="Voyage" type="PanelContainer" parent="Frame/Columns"]
 unique_name_in_owner = true
-layout_mode = 2
 custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+
 [node name="VoyageBody" type="VBoxContainer" parent="Frame/Columns/Voyage"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -110,66 +147,87 @@ layout_mode = 2
 [node name="RoomType" type="Label" parent="Frame/Columns/Voyage/VoyageBody"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Online"
 theme_override_font_sizes/font_size = 14
+text = "Online"
 
 [node name="RoomSummary" type="Label" parent="Frame/Columns/Voyage/VoyageBody"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Classic · 19 hexes"
 theme_override_font_sizes/font_size = 22
+text = "Classic · 19 hexes"
 autowrap_mode = 3
+
 [node name="InviteHeading" type="Label" parent="Frame/Columns/Voyage/VoyageBody"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Invite friends"
 theme_override_font_sizes/font_size = 16
+text = "Invite friends"
 
 [node name="InviteAddress" type="LineEdit" parent="Frame/Columns/Voyage/VoyageBody"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 placeholder_text = "Public address:24567"
-custom_minimum_size = Vector2(0, 40)
+
 [node name="InviteActions" type="HBoxContainer" parent="Frame/Columns/Voyage/VoyageBody"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="CopyInvite" type="Button" parent="Frame/Columns/Voyage/VoyageBody/InviteActions"]
+[node name="CopyInvite" type="Button" parent="Frame/Columns/Voyage/VoyageBody/InviteActions" groups=["ui_click"]]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
 text = "Copy invite"
-custom_minimum_size = Vector2(0, 40)
-size_flags_horizontal = 3
-[node name="MapRouter" type="Button" parent="Frame/Columns/Voyage/VoyageBody/InviteActions"]
+
+[node name="MapRouter" type="Button" parent="Frame/Columns/Voyage/VoyageBody/InviteActions" groups=["ui_click"]]
 unique_name_in_owner = true
-layout_mode = 2
-text = "Map router"
 custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
 size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+text = "Map router"
+
 [node name="ConnectionHelp" type="Label" parent="Frame/Columns/Voyage/VoyageBody"]
 unique_name_in_owner = true
 layout_mode = 2
-text = ""
 theme_override_font_sizes/font_size = 14
 autowrap_mode = 3
+
 [node name="FlexibleSpace" type="Control" parent="Frame/Columns/Voyage/VoyageBody"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
+
 [node name="LobbyStatus" type="Label" parent="Frame/Columns/Voyage/VoyageBody"]
 unique_name_in_owner = true
 layout_mode = 2
-text = ""
 theme_override_font_sizes/font_size = 15
 autowrap_mode = 3
-[node name="StartGame" type="Button" parent="Frame/Columns/Voyage/VoyageBody"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Start game"
-custom_minimum_size = Vector2(0, 40)
 
-[node name="LeaveRoom" type="Button" parent="Frame/Columns/Voyage/VoyageBody"]
+[node name="StartGame" type="Button" parent="Frame/Columns/Voyage/VoyageBody" groups=["ui_click"]]
 unique_name_in_owner = true
-layout_mode = 2
-text = "Back"
 custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_type_variation = &"PrimaryButton"
+text = "Start game"
+
+[node name="LeaveRoom" type="Button" parent="Frame/Columns/Voyage/VoyageBody" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "Back"
+
+[connection signal="pressed" from="Frame/Header/LobbyCosmetics" to="." method="emit_signal" binds= ["cosmetics_requested"]]
+[connection signal="pressed" from="Frame/Header/LobbySettings" to="." method="emit_signal" binds= ["settings_requested"]]
+[connection signal="pressed" from="Frame/Header/OpenMusic" to="." method="emit_signal" binds= ["music_requested"]]
+[connection signal="pressed" from="Frame/Columns/Crew/CrewBody/CrewActions/AddBot" to="." method="emit_signal" binds= ["add_bot_requested"]]
+[connection signal="pressed" from="Frame/Columns/Crew/CrewBody/CrewActions/ReadyButton" to="." method="emit_signal" binds= ["ready_requested"]]
+[connection signal="text_changed" from="Frame/Columns/Voyage/VoyageBody/InviteAddress" to="." method="_on_invite_address_text_changed"]
+[connection signal="pressed" from="Frame/Columns/Voyage/VoyageBody/InviteActions/CopyInvite" to="." method="_on_copy_invite_pressed"]
+[connection signal="pressed" from="Frame/Columns/Voyage/VoyageBody/InviteActions/MapRouter" to="." method="emit_signal" binds= ["map_router_requested"]]
+[connection signal="pressed" from="Frame/Columns/Voyage/VoyageBody/StartGame" to="." method="emit_signal" binds= ["start_requested"]]
+[connection signal="pressed" from="Frame/Columns/Voyage/VoyageBody/LeaveRoom" to="." method="emit_signal" binds= ["leave_requested"]]

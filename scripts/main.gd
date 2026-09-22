@@ -108,6 +108,7 @@ func _clear(scene_path: String):
 	if is_instance_valid(modal) and not keep_modal: modal.free()
 	screen=load(scene_path).instantiate()
 	screens.add_child(screen)
+	if screen is CatanScreen: screen.layout_changed.connect(_queue_layout)
 	_apply_text(screen)
 	_queue_layout()
 
@@ -145,7 +146,6 @@ func _home():
 	board.show_labels=true
 	board.reset_camera()
 	_clear("res://scenes/ui/home.tscn")
-	_node("Version").text=CatanBuildInfo.VERSION
 	state={}
 	turn_clock_limit=0.0
 	turn_clock_left=0.0
@@ -156,53 +156,29 @@ func _home():
 	board.show_labels=false
 	board.camera.v_offset=0
 	board.camera.fov=35
-	name_field=_node("PlayerName")
-	name_field.text=preferences.values.player_name
-	address_field=_node("ServerAddress")
-	password_field=_node("RoomPassword")
-	host_password_field=_node("HostPassword")
-	var online_group=ButtonGroup.new()
-	_node("HostTab").button_group=online_group;_node("JoinTab").button_group=online_group
-	_node("HostTab").pressed.connect(func():_online_mode(true))
-	_node("JoinTab").pressed.connect(func():_online_mode(false))
-	_bind("Singleplayer",_solo)
-	_bind("ShowOnline",func():pass,true)
-	_bind("Learn",_tutorial_start)
-	_bind("HostOnline",_host)
-	_bind("JoinOnline",_join)
-	_bind("OpenSettings",_open_settings)
-	_bind("ExitDesktop",_exit_desktop)
-	_bind("CheckUpdates",_open_updates)
+	name_field=screen.name_field
+	address_field=screen.address_field
+	password_field=screen.password_field
+	host_password_field=screen.host_password_field
+	screen.setup(preferences.values.player_name,net.reconnect_address,net.reconnect_password,not net.reconnect_token.is_empty())
+	_route(screen,{
+		"solo_requested":_solo,
+		"tutorial_requested":_tutorial_start,
+		"host_requested":_host,
+		"join_requested":_join,
+		"reconnect_requested":_reconnect,
+		"settings_requested":_open_settings,
+		"cosmetics_requested":_open_cosmetics,
+		"music_requested":_open_music,
+		"updates_requested":_open_updates,
+		"exit_requested":_exit_desktop,
+	})
 	_updates_changed()
-	CatanIcons.button_icon(_node("OpenSettings"),"settings")
-	_node("ShowOnline").toggled.connect(func(value):_node("OnlineForm").visible=value;_queue_layout())
-	_node("MenuItems").minimum_size_changed.connect(_queue_layout)
-	_bind("OpenCosmetics",_open_cosmetics)
-	var music_button=_button(_node("MenuItems"),"Music",_open_music)
-	music_button.name="OpenMusic";CatanIcons.button_icon(music_button,"music")
-	var utilities=GridContainer.new();utilities.name="MenuUtilities";utilities.columns=2
-	utilities.add_theme_constant_override("h_separation",8);utilities.add_theme_constant_override("v_separation",8)
-	_node("MenuItems").add_child(utilities)
-	for entry in ["OpenCosmetics","OpenMusic","CheckUpdates","ExitDesktop"]:
-		var utility=_node(entry);utility.reparent(utilities)
-		utility.size_flags_horizontal=Control.SIZE_EXPAND_FILL;utility.add_theme_font_size_override("font_size",14)
-	_node("ShowOnline").custom_minimum_size.y=48
-	_bind("Reconnect",func():
-		net.reconnect_password=password_field.text
-		net.reconnect())
-	_node("Reconnect").visible=not net.reconnect_token.is_empty()
-	if not net.reconnect_token.is_empty():
-		_node("ShowOnline").button_pressed=true
-		address_field.text=net.reconnect_address
-		password_field.text=net.reconnect_password
-		_online_mode(false)
 
-func _online_mode(hosting: bool):
-	_node("HostOptions").visible=hosting
-	_node("JoinOptions").visible=not hosting
-	_node("HostTab").set_pressed_no_signal(hosting)
-	_node("JoinTab").set_pressed_no_signal(not hosting)
-	_queue_layout()
+# Screens and dialogs report intent through signals. Handlers run deferred so
+# they may replace the screen or dialog that emitted them.
+func _route(source: Object,routes: Dictionary):
+	for signal_name in routes: source.connect(signal_name,routes[signal_name],CONNECT_DEFERRED)
 
 func _host():
 	var pname=name_field.text.strip_edges()
@@ -223,6 +199,10 @@ func _join():
 		_notice(tr("Paste a valid invite code from the host."))
 	else: _notice(tr("Connecting to the island…"))
 
+func _reconnect():
+	net.reconnect_password=password_field.text
+	net.reconnect()
+
 func _on_board_picked(kind: String,id: int):
 	net.act({"type":kind,"id":id})
 
@@ -237,77 +217,30 @@ func _network_changed():
 
 func _lobby():
 	_clear("res://scenes/ui/lobby.tscn")
-	var music_button=_music_icon_button(_node("LobbySettings").get_parent(),"music","Music",_open_music)
-	music_button.name="OpenMusic"
 	board.camera.h_offset=0
-	_node("LobbyTitle").add_theme_color_override("font_color",PAPER)
-	_node("LobbyTitle").add_theme_color_override("font_outline_color",INK)
-	_node("LobbyTitle").add_theme_constant_override("outline_size",3)
-	_node("LobbyTitle").text=tr("Solo game") if net.solo else tr("Online room")
-	_node("PlayerCount").text="%d / 6" % net.roster.size()
-	_node("RoomType").text="SOLO" if net.solo else "ONLINE"
-	var controller=net.is_controller()
-	var slots=_node("PlayerSlots")
-	_node("RoomSummary").text=tr("30 hexes · Paired turns") if net.roster.size()>4 else tr("19 hexes · Classic")
-	if not net.solo:_node("RoomSummary").text+="\n"+(tr("Password required to join") if not net.room_password.is_empty() else tr("Open room · no password"))
-	for i in CatanNetwork.MAX_PLAYERS:
-		var slot=load("res://scenes/ui/player_slot.tscn").instantiate()
-		slots.add_child(slot)
-		slot.add_theme_stylebox_override("panel",_style(Color("f6e4be"),12))
-		var occupied=i<net.roster.size()
-		var bot=occupied and net.roster[i].get("bot",false)
-		slot.get_node("Row/Accent").color=net.player_color(i) if occupied else Color("c3aa80")
-		slot.get_node("Row/Details/PlayerName").auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED
-		slot.get_node("Row/Details/PlayerName").text=net.roster[i].name if occupied else tr("Open seat")
-		var info=""
-		if occupied: info=tr("Bot") if bot else tr("You") if i==net.seat else tr("Player")
-		if occupied:info+=" · "+tr(CatanCosmetics.SETS[clampi(int(net.roster[i].get("piece_style",0)),0,3)])
-		slot.get_node("Row/Details/PlayerInfo").text=info
-		var status=slot.get_node("Row/Controls/Status")
-		status.text=tr("Ready") if occupied and net.roster[i].ready else tr("Waiting") if occupied else ""
-		status.visible=occupied and not bot
-		status.add_theme_font_size_override("font_size",13)
-		status.add_theme_color_override("font_color",GOLD if occupied and net.roster[i].ready else MUTED)
-		var difficulty=slot.get_node("Row/Controls/Difficulty")
-		difficulty.visible=bot
-		if bot:
-			for level in CatanBot.LEVELS: difficulty.add_item(level)
-			difficulty.select(net.roster[i].difficulty)
-			difficulty.disabled=not controller
-			difficulty.item_selected.connect(func(value):net.configure_bot("difficulty",i,value),CONNECT_DEFERRED)
-		var remove=slot.get_node("Row/Controls/Remove")
-		remove.visible=bot and controller
-		remove.pressed.connect(func():net.configure_bot("remove",i),CONNECT_DEFERRED)
-	_bind("AddBot",func():net.configure_bot("add"))
-	_node("AddBot").disabled=not controller or net.roster.size()>=CatanNetwork.MAX_PLAYERS
-	_bind("ReadyButton",net.ready_up)
-	_node("ReadyButton").text=tr("Not ready") if net.seat>=0 and net.roster[net.seat].ready else tr("I'm ready")
-	_node("ReadyButton").disabled=net.seat<0
-	_bind("StartGame",net.start_game,true)
-	var all_ready=net.roster.size()>=CatanNetwork.MIN_PLAYERS and net.roster.size()<=CatanNetwork.MAX_PLAYERS
-	for row in net.roster:
-		if not row.ready: all_ready=false
-	_node("StartGame").disabled=not controller or not all_ready
-	_node("LobbyStatus").text=tr("Ready to play") if all_ready else tr("Add %d more player(s)") % (CatanNetwork.MIN_PLAYERS-net.roster.size()) if net.roster.size()<CatanNetwork.MIN_PLAYERS else tr("Waiting for players")
-	_bind("LeaveRoom",net.leave)
-	_bind("LobbySettings",_open_settings)
-	CatanIcons.button_icon(_node("LobbySettings"),"settings")
-	_bind("LobbyCosmetics",_open_cosmetics)
-	_bind("MapRouter",net.map_router)
-	_bind("CopyInvite",func():
-		var address=_node("InviteAddress").text.strip_edges()
-		if address.is_empty(): _notice(tr("Enter your public address first, or use Map router."))
-		else:
-			var code=net.invite(address)
-			if code.is_empty():_notice(tr("Enter a valid public address and optional UDP port."))
-			else:DisplayServer.clipboard_set(code);_notice(tr("Invite copied. Share it with your guests.")))
-	_node("InviteAddress").text=invite_address if net.multiplayer.is_server() else net.reconnect_address
-	_node("InviteAddress").editable=net.multiplayer.is_server()
-	_node("InviteAddress").text_changed.connect(func(text):invite_address=text)
-	for node_name in ["InviteHeading","InviteAddress","InviteActions"]: _node(node_name).visible=not net.solo
-	_node("MapRouter").disabled=not net.multiplayer.is_server()
-	_node("ConnectionHelp").text=tr("Choose each bot’s difficulty.") if net.solo else tr("Share the invite code. Host: open UDP 24567.")
-	if not connection_status.is_empty() and not net.solo: _node("ConnectionHelp").text=CatanI18n.render(connection_status)
+	screen.show_room(net,invite_address,connection_status)
+	_route(screen,{
+		"add_bot_requested":net.configure_bot.bind("add"),
+		"ready_requested":net.ready_up,
+		"start_requested":net.start_game,
+		"leave_requested":net.leave,
+		"settings_requested":_open_settings,
+		"cosmetics_requested":_open_cosmetics,
+		"music_requested":_open_music,
+		"map_router_requested":net.map_router,
+		"invite_requested":_copy_invite,
+		"bot_difficulty_changed":func(seat,level):net.configure_bot("difficulty",seat,level),
+		"bot_remove_requested":func(seat):net.configure_bot("remove",seat),
+	})
+	screen.invite_address_edited.connect(func(text):invite_address=text)
+
+func _copy_invite(address: String):
+	if address.is_empty(): _notice(tr("Enter your public address first, or use Map router."))
+	else:
+		var code=net.invite(address)
+		if code.is_empty():_notice(tr("Enter a valid public address and optional UDP port."))
+		else:DisplayServer.clipboard_set(code);_notice(tr("Invite copied. Share it with your guests."))
+
 func _received(data: Dictionary):
 	CatanDiagnostics.event("state.received","turn=%s phase=%s"%[data.get("turn",-1),data.get("phase","")])
 	if server_only or not is_node_ready(): return
@@ -915,14 +848,6 @@ func _help():
 func _node(node_name: String) -> Node:
 	return screen.find_child(node_name,true,false)
 
-func _bind(node_name: String,callback: Callable,primary: bool=false):
-	var button=_node(node_name) as Button
-	button.mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND
-	if primary:button.theme_type_variation="PrimaryButton"
-	button.pressed.connect(func():
-		audio.play("click")
-		callback.call(),CONNECT_DEFERRED)
-
 func _solo():
 	var pname=preferences.values.player_name
 	if is_instance_valid(name_field): pname=name_field.text.strip_edges()
@@ -1048,18 +973,13 @@ func _layout_screen():
 	toast.offset_right=minf(470,width*.5-20)
 	notifications.offset_left=-minf(420,width-32)
 	notifications.offset_right=-16
-	notifications.offset_top=132 if screen.name=="GameHUD" else 72
-	if screen.name=="MainMenu":
-		var panel=_node("Expedition")
-		panel.offset_right=minf(390,width-90)
-		var fixed_height=panel.get_theme_stylebox("panel").get_minimum_size().y+30
-		for header_name in ["Brand","Title","MenuNote"]:fixed_height+=_node(header_name).get_combined_minimum_size().y
-		var scroll_height=minf(_node("MenuItems").get_combined_minimum_size().y,height-48-fixed_height)
-		_node("MenuScroll").custom_minimum_size.y=maxf(0,scroll_height)
-		panel.offset_top=-(fixed_height+scroll_height)*.5
-		panel.offset_bottom=(fixed_height+scroll_height)*.5
-		board.view_region=Rect2(minf(410,width*.42),24,maxf(300,width-430),height-48)
+	if screen is CatanScreen:
+		var overlay_bottom=0.0
+		if guide!=null and is_instance_valid(tutorial_panel):overlay_bottom=tutorial_panel.find_child("LessonPanel",true,false).get_global_rect().end.y
+		board.view_region=screen.arrange(ui.size,overlay_bottom)
+		notifications.offset_top=screen.notifications_top
 	elif screen.name=="GameHUD":
+		notifications.offset_top=132
 		var top_body=_node("TopBody")
 		top_body.vertical=width<1100
 		var tools_box=_node("HUDTools")
@@ -1089,9 +1009,6 @@ func _layout_screen():
 		notifications.offset_top=top
 		_layout_cards(top,height-bottom_height-26)
 		board.view_region=Rect2(20,top,width-236,maxf(100,height-top-bottom_height-30))
-	elif screen.name=="Lobby":
-		_node("Voyage").custom_minimum_size.x=280 if width<1100 else 340
-		board.view_region=Rect2(0,0,width,height)
 	if inspection_mode:board.view_region=Rect2(16,16,width-32,height-64)
 	board._update_camera()
 	if is_instance_valid(modal) and modal.has_node("DialogMargin"):
@@ -1146,9 +1063,7 @@ func _updates_changed():
 			var message=tr("Update %s is available.") % release_version if stage=="available" else tr("Update %s is ready to install.") % release_version
 			notifications.show_notice("update",message,tr("View update"),_open_updates)
 
-	if is_instance_valid(screen):
-		var button=screen.find_child("CheckUpdates",true,false)
-		if button:button.text=tr("Update available") if stage=="available" else tr("Update ready") if stage=="ready" else tr("Game updates")
+	if is_instance_valid(screen) and screen.has_method("show_update_stage"):screen.show_update_stage(stage)
 	if not is_instance_valid(modal) or modal.name!="Updates":return
 	modal.find_child("UpdateMessage",true,false).text=CatanI18n.update_message(data)
 	var details=tr("Updates are verified before installation. Downloads can run in the background.")

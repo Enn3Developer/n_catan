@@ -40,8 +40,8 @@ func run():
 		inspect_layout(game.screen,"home "+str(dimensions))
 		game._node("ShowOnline").button_pressed=true;await settle()
 		inspect_layout(game.screen,"host form "+str(dimensions))
-		game._online_mode(false);await settle();inspect_layout(game.screen,"join form "+str(dimensions))
-		game._online_mode(true);await settle()
+		game.screen.show_online_mode(false);await settle();inspect_layout(game.screen,"join form "+str(dimensions))
+		game.screen.show_online_mode(true);await settle()
 		if dimensions.x in [800,1440]:await shot("home-%d" % dimensions.x)
 		game._node("ShowOnline").button_pressed=false
 	game._solo()

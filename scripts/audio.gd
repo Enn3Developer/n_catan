@@ -19,6 +19,7 @@ var music_bus_names=[]
 
 func _ready():
 	if "--server" in OS.get_cmdline_user_args(): return
+	get_tree().node_added.connect(_on_node_added)
 	for bus_name in ["Music","Effects","Ambience"]:
 		if AudioServer.get_bus_index(bus_name)<0:
 			AudioServer.add_bus()
@@ -54,6 +55,14 @@ func apply(values: Dictionary):
 		if index<0: continue
 		AudioServer.set_bus_mute(index,float(values[pair[1]])<=0.001)
 		AudioServer.set_bus_volume_db(index,linear_to_db(maxf(0.001,float(values[pair[1]]))))
+# Buttons opt into the interface click by joining the ui_click group in their scene.
+func _on_node_added(node: Node):
+	if node is BaseButton and node.is_in_group(&"ui_click") and not node.pressed.is_connected(_click):
+		node.pressed.connect(_click)
+
+func _click():
+	play("click")
+
 func play(effect: String):
 	if shutting_down or not sounds.has(effect) or voices.is_empty(): return
 	var voice=voices[voice_index%voices.size()]

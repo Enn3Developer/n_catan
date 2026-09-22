@@ -54,6 +54,10 @@ flat('Track','b5a07b','91734d',1,3,2,2)
 flat('Fill','6d8958','496340',1,3,2,2)
 flat('Focus','f2c870','b77633',2,9,0,0)
 lines[lines.index('[sub_resource type="StyleBoxFlat" id="Focus"]')+1]='bg_color = Color(0, 0, 0, 0)'
+# Compact soundtrack buttons share a small raised parchment tile.
+for name,fill in [('MusicIcon','e4c18c'),('MusicIconHover','f2d4a0')]:
+ flat(name,fill,'ac8654',1,6,8,4)
+ lines.extend(['shadow_color = Color(0.18, 0.1, 0.04, 0.18)','shadow_size = 3','shadow_offset = Vector2(0, 2)'])
 lines.extend(['','[resource]','default_font = ExtResource("body")','default_font_size = 16'])
 def prop(key,value):lines.append(key+' = '+value)
 for typ in ['Button','OptionButton','CheckButton','CheckBox']:
@@ -64,6 +68,8 @@ for typ in ['Button','OptionButton','CheckButton','CheckBox']:
 prop('PrimaryButton/base_type','&"Button"')
 for key in ['font_color','font_hover_color','font_pressed_color','icon_normal_color','icon_hover_color']:prop('PrimaryButton/colors/'+key,color('fff1d2'))
 for state,style in [('normal','button-primary'),('hover','button-primary-hover'),('pressed','button-pressed')]:prop('PrimaryButton/styles/'+state,f'SubResource("{style}")')
+prop('MusicIconButton/base_type','&"Button"')
+for state,style in [('normal','MusicIcon'),('hover','MusicIconHover'),('pressed','MusicIconHover')]:prop('MusicIconButton/styles/'+state,f'SubResource("{style}")')
 prop('Label/colors/font_color',color('493521'))
 for key,h in [('font_color','493521'),('font_placeholder_color','8a775c'),('caret_color','526747'),('selection_color','b4c696')]:prop('LineEdit/colors/'+key,color(h))
 prop('LineEdit/styles/normal','SubResource("Input")');prop('LineEdit/styles/focus','SubResource("InputFocus")')

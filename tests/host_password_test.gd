@@ -15,9 +15,9 @@ func run():
 	check(game._node("HostOptions").visible and not game._node("JoinOptions").visible,"hosting has its own visible form")
 	game.host_password_field.text="test-host-password"
 	game.password_field.text="different-join-password"
-	game._online_mode(false)
+	game.screen.show_online_mode(false)
 	check(game._node("JoinOptions").visible and not game._node("HostOptions").visible,"join form is separate")
-	game._online_mode(true)
+	game.screen.show_online_mode(true)
 	check(game.host_password_field.text=="test-host-password","switching tabs preserves host password")
 	game._node("HostOnline").pressed.emit();await create_timer(.2).timeout
 	check(game.net.online and game.net.room_password=="test-host-password","create room uses host password, not join password")
