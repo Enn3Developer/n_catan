@@ -1,5 +1,6 @@
 [gd_scene format=3]
 [ext_resource type="Theme" path="res://assets/ui_theme.tres" id="1"]
+[ext_resource type="Script" path="res://scripts/tutorial_panel.gd" id="2"]
 [node name="Tutorial" type="Control"]
 layout_mode = 1
 anchors_preset = 15
@@ -9,6 +10,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("1")
+script = ExtResource("2")
 [node name="LessonPanel" type="PanelContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
@@ -80,3 +82,8 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Continue"
 custom_minimum_size = Vector2(0, 40)
+
+[connection signal="pressed" from="LessonPanel/LessonPanelBody/LessonButtons/PreviousLesson" to="." method="emit_signal" binds= ["step_requested", -1]]
+[connection signal="pressed" from="LessonPanel/LessonPanelBody/LessonButtons/RestartLesson" to="." method="emit_signal" binds= ["restart_requested"]]
+[connection signal="pressed" from="LessonPanel/LessonPanelBody/LessonButtons/SkipLesson" to="." method="emit_signal" binds= ["step_requested", 1]]
+[connection signal="pressed" from="LessonPanel/LessonPanelBody/LessonButtons/NextLesson" to="." method="emit_signal" binds= ["step_requested", 1]]

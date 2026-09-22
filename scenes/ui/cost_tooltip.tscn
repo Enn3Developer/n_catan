@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/cost_tooltip.gd" id="script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/resource_row.tscn" id="resource_row"]
+
+[node name="CostTooltip" type="VBoxContainer"]
+script = ExtResource("script")
+
+[node name="Title" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Cost" parent="." instance=ExtResource("resource_row")]
+unique_name_in_owner = true
+layout_mode = 2
+icon_size = 28
+
+[node name="Reason" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+autowrap_mode = 3

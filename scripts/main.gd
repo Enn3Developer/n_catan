@@ -457,19 +457,8 @@ func _tutorial_ui():
 	if is_instance_valid(tutorial_panel): tutorial_panel.free()
 	tutorial_panel=load("res://scenes/ui/tutorial.tscn").instantiate()
 	tutorial_layer.add_child(tutorial_panel)
-	tutorial_panel.find_child("Progress",true,false).text=tr("LESSON %d / %d") % [guide.step+1,CatanTutorial.LESSONS.size()]
-	tutorial_panel.find_child("LessonTitle",true,false).text=guide.current().title
-	tutorial_panel.find_child("LessonBody",true,false).text=guide.current().body
-	tutorial_panel.find_child("LessonStatus",true,false).text=tr("WELL DONE") if guide.completed and not guide.current().action.is_empty() else tr("GUIDED PRACTICE")
-	var next=tutorial_panel.find_child("NextLesson",true,false)
-	next.disabled=not guide.completed
-	next.text=tr("Play solo  →") if guide.step==CatanTutorial.LESSONS.size()-1 else tr("Continue  →")
-	next.pressed.connect(func():_tutorial_step(1),CONNECT_DEFERRED)
-	var previous=tutorial_panel.find_child("PreviousLesson",true,false)
-	previous.disabled=guide.step==0
-	previous.pressed.connect(func():_tutorial_step(-1),CONNECT_DEFERRED)
-	tutorial_panel.find_child("RestartLesson",true,false).pressed.connect(func():guide.load_lesson(net,preferences.values.player_name),CONNECT_DEFERRED)
-	tutorial_panel.find_child("SkipLesson",true,false).pressed.connect(func():_tutorial_step(1),CONNECT_DEFERRED)
+	tutorial_panel.show_lesson(guide)
+	_route(tutorial_panel,{"step_requested":_tutorial_step,"restart_requested":func():guide.load_lesson(net,preferences.values.player_name)})
 
 func _tutorial_step(direction: int):
 	if guide.step+direction>=CatanTutorial.LESSONS.size():

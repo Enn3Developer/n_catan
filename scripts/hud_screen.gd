@@ -88,13 +88,9 @@ func _show_cost(button: Button,cost: Array,hand: Array):
 	for resource in 5:button.missing.append(maxi(0,cost[resource]-hand[resource]))
 
 func _add_steal_action(victim: int,victim_name: String):
-	var button=Button.new()
+	var button: Button=%ActionsBody.get_node("StealTemplate").duplicate()
 	button.text=tr("Steal from %s") % victim_name
-	button.custom_minimum_size.y=38
-	button.size_flags_vertical=Control.SIZE_SHRINK_BEGIN
-	button.mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND
-	button.theme_type_variation=&"PrimaryButton"
-	button.add_to_group(&"ui_click")
+	button.show()
 	button.pressed.connect(func():action_requested.emit({"type":"steal","id":victim}))
 	%ActionsBody.add_child(button)
 	%ActionsBody.move_child(button,%ViewOffer.get_index())
