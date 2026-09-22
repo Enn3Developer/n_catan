@@ -26,12 +26,13 @@ var pitch=0.745
 var hover=-1
 var targets=[]
 var marker_nodes=[]
-var boats=[]
+@onready var boats: Array[Node3D]=[$Scenery/Boat0,$Scenery/Boat1,$Scenery/Boat2]
 var sea_traffic=preload("res://scripts/sea_traffic.gd").new()
-var beacon: Node3D
-var beacon_lamp: MeshInstance3D
-var beacon_beam: MeshInstance3D
-var beacon_spot: SpotLight3D
+@onready var lighthouse=$Scenery/Lighthouse
+@onready var beacon: Node3D=lighthouse.beacon
+@onready var beacon_lamp: MeshInstance3D=lighthouse.lamp
+@onready var beacon_beam: MeshInstance3D=lighthouse.beam
+@onready var beacon_spot: SpotLight3D=lighthouse.spot
 var elapsed=0.0
 var birds=[]
 var seagulls=preload("res://scripts/seagulls.gd").new()
@@ -91,10 +92,6 @@ func cylinder(radius: float,height: float,color: Color,sides: int=6) -> MeshInst
 	shape.radial_segments=sides
 	return mesh(shape,color)
 
-func box(size: Vector3,color: Color) -> MeshInstance3D:
-	var shape=CatanMiniature.bevel_box(size)
-	return mesh(shape,color)
-
 func label3(text: String,pos: Vector3,size: int,color: Color=Color("fff1ce"),resource_id: int=-1) -> Node3D:
 	var anchor=Node3D.new()
 	anchor.position=pos
@@ -131,10 +128,7 @@ func apply_preferences(values: Dictionary):
 			tile.ground.material_override=art.ground(tile.kind,tile.index)
 			tile.cliff.material_override=art.cliff()
 			art.apply_instance(tile.diorama,values)
-	if old.texture_quality!=values.texture_quality:
-		for node in find_children("*","MeshInstance3D",true,false):
-			if node.has_meta("pbr_surface"):
-				node.material_override=art.surface(node.get_meta("pbr_surface"),null,values)
+	if old.texture_quality!=values.texture_quality:_apply_surfaces(self)
 	art.animate(values)
 	sun.shadow_enabled=values.shadow_quality>0
 	if last_shadow_quality!=values.shadow_quality:
@@ -484,86 +478,13 @@ func _update_camera_focus():
 		camera.attributes.dof_blur_near_distance=maxf(.1,distance-.3*TILE_SIZE)
 		camera.attributes.dof_blur_near_transition=.3*TILE_SIZE
 
-func _apply_surface(node: MeshInstance3D,surface_name: String):
-	node.set_meta("pbr_surface",surface_name)
-	node.material_override=art.surface(surface_name,null,render_values)
-
-func _rock(parent: Node3D,pos: Vector3,size: Vector3,color: Color):
-	var sphere=SphereMesh.new()
-	sphere.radius=0.5
-	sphere.height=1.0
-	sphere.radial_segments=20
-	sphere.rings=10
-	var rock=mesh(sphere,color)
-	_apply_surface(rock,"PBR_Wood" if parent in boats else "PBR_Rock")
-	rock.position=pos
-	rock.scale=size
-	rock.rotation=Vector3(pos.x,0.3+pos.z,pos.x*0.5)
-	parent.add_child(rock)
+# Scenery nodes name the surface they use; the texture tier decides which maps it gets.
+func _apply_surfaces(root: Node):
+	for node in root.find_children("*","MeshInstance3D",true,false):
+		if node.has_meta("pbr_surface"):node.material_override=art.surface(node.get_meta("pbr_surface"),null,render_values)
 
 func _world_props():
-	var random=RandomNumberGenerator.new()
-	random.seed=822
-	# Offshore rocks and tiny islands extend the scene beyond the board.
-	for i in 22:
-		var angle=i*TAU/22.0
-		var radius=random.randf_range(5.4,7.6)
-		var pos=Vector3(cos(angle)*radius,-0.27,sin(angle)*radius)
-		if absf(pos.x)<4.4 and pos.z>0: continue
-		var size=random.randf_range(0.18,0.55)
-		_rock(scenery,pos,Vector3(size*1.4,size,size),Color("637b7a"))
-	# A lighthouse on a small outcrop, with warm bands and a lantern.
-	var island=Node3D.new()
-	island.position=Vector3(-5.0,-0.2,-2.4)
-	scenery.add_child(island)
-	_rock(island,Vector3.ZERO,Vector3(1.25,0.5,0.85),Color("7a8878"))
-	for i in 5:
-		var band=cylinder(0.16-i*0.012,0.16,Color("e9dcc0") if i%2==0 else Color("ae6650"),32)
-		band.mesh.top_radius=.16-(i+1)*.012
-		band.position.y=0.2+i*0.16
-		island.add_child(band)
-	beacon_lamp=cylinder(0.12,0.16,Color("e9b85e"),32)
-	beacon_lamp.position.y=1.0
-	beacon_lamp.material_override.emission_enabled=true
-	beacon_lamp.material_override.emission=Color("ffc86b")
-	island.add_child(beacon_lamp)
-	beacon_lamp.set_meta("night_light",living_world.add_night_light(island,Vector3(0,1.0,0),1.3,2.0))
-	beacon=Node3D.new();beacon.name="LighthouseBeacon";beacon.position.y=1.0;island.add_child(beacon)
-	beacon_spot=SpotLight3D.new();beacon.add_child(beacon_spot)
-	beacon_spot.light_color=Color("ffdc95");beacon_spot.spot_range=7.0;beacon_spot.spot_angle=12
-	beacon_spot.rotation.x=deg_to_rad(-8);beacon_spot.shadow_enabled=true
-	var cone=CylinderMesh.new();cone.top_radius=.025;cone.bottom_radius=.60;cone.height=5.5;cone.radial_segments=48;cone.cap_top=false;cone.cap_bottom=false
-	beacon_beam=MeshInstance3D.new();beacon_beam.mesh=cone
-	beacon_beam.rotation.x=PI/2-deg_to_rad(8);beacon_beam.position=Vector3(0,-sin(deg_to_rad(8))*2.75,-cos(deg_to_rad(8))*2.75)
-	beacon_beam.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	var beam_material=ShaderMaterial.new();beam_material.shader=load("res://shaders/lighthouse_beam.gdshader")
-	beacon_beam.material_override=beam_material;beacon.add_child(beacon_beam)
-	var cap=CylinderMesh.new()
-	cap.top_radius=0
-	cap.bottom_radius=0.2
-	cap.height=0.17
-	var roof=mesh(cap,Color("354854"))
-	roof.position.y=1.16
-	island.add_child(roof)
-	for i in 3:
-		var boat=Node3D.new()
-		boat.position=Vector3([4.8,-4.8,2.8][i],-0.18,[2.6,1.9,-5.2][i])
-		boat.rotation.y=[-0.4,0.8,1.3][i]
-		scenery.add_child(boat)
-		boats.append(boat)
-		var hull=mesh(CatanMiniature.hull(),Color("946d4f"))
-		boat.add_child(hull)
-		var deck=box(Vector3(0.21,0.025,0.57),Color("bd9762"))
-		deck.position.y=0.108
-		_apply_surface(deck,"PBR_Wood")
-		boat.add_child(deck)
-		var mast=cylinder(0.016,0.8,Color("6c4e35"),6)
-		mast.position.y=0.44
-		_apply_surface(mast,"PBR_Wood")
-		boat.add_child(mast)
-		var sail=mesh(CatanMiniature.sail(),Color("ebdbad"))
-		sail.material_override.cull_mode=BaseMaterial3D.CULL_DISABLED
-		boat.add_child(sail)
+	_apply_surfaces(scenery)
 	seagulls.setup(self)
 
 func _piece_style(player: int) -> int:
@@ -623,14 +544,7 @@ func show_production(roll: int):
 		animation.tween_callback(ring.queue_free)
 
 func _animate_beacon():
-	if not is_instance_valid(beacon):return
-	var night=1.0-daylight
-	beacon.rotation.y=fposmod(elapsed*.38,TAU)
-	beacon.visible=night>.01
-	beacon_spot.light_energy=night*5.0
-	beacon_spot.spot_range=7.0*scenery.scale.y
-	beacon_lamp.material_override.emission_energy_multiplier=night*1.4
-	beacon_beam.material_override.set_shader_parameter("strength",night)
+	lighthouse.shine(elapsed,1.0-daylight)
 
 func _float_boat(boat: Node3D):
 	var p=Vector2(boat.global_position.x,boat.global_position.z)

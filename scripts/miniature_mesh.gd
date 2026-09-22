@@ -1,9 +1,20 @@
+@tool
 class_name CatanMiniature
 extends RefCounted
+# Procedural miniature geometry. Scenes use it through the BevelBoxMesh, HullMesh
+# and SailMesh primitives; code that builds models uses the cached ArrayMeshes.
 static var boxes={}
 static func bevel_box(size: Vector3) -> ArrayMesh:
 	var key=str(size)
-	if boxes.has(key):return boxes[key]
+	if not boxes.has(key):boxes[key]=_array_mesh(bevel_box_arrays(size))
+	return boxes[key]
+
+static func _array_mesh(arrays: Array) -> ArrayMesh:
+	var mesh=ArrayMesh.new()
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays)
+	return mesh
+
+static func bevel_box_arrays(size: Vector3) -> Array:
 	var half=size*.5
 	var radius=minf(.014,minf(half.x,minf(half.y,half.z))*.28)
 	var core=half-Vector3.ONE*radius
@@ -31,8 +42,7 @@ static func bevel_box(size: Vector3) -> ArrayMesh:
 					var p=signs*core;p[axis]=signs[axis]*half[axis];points.append(p)
 				_face(st,points)
 	st.generate_normals()
-	boxes[key]=st.commit()
-	return boxes[key]
+	return st.commit_to_arrays()
 
 static func _face(st: SurfaceTool,points: Array):
 	var center=Vector3.ZERO
@@ -42,6 +52,9 @@ static func _face(st: SurfaceTool,points: Array):
 		for p in [points[0],points[i],points[i+1]]:st.add_vertex(p)
 
 static func hull() -> ArrayMesh:
+	return _array_mesh(hull_arrays())
+
+static func hull_arrays() -> Array:
 	var st=SurfaceTool.new();st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var rings=[]
 	for j in 5:
@@ -57,9 +70,12 @@ static func hull() -> ArrayMesh:
 			var next=(i+1)%40
 			_face(st,[rings[j][i],rings[j+1][i],rings[j+1][next],rings[j][next]])
 	_face(st,rings[4])
-	st.generate_normals();return st.commit()
+	st.generate_normals();return st.commit_to_arrays()
 
 static func sail() -> ArrayMesh:
+	return _array_mesh(sail_arrays())
+
+static func sail_arrays() -> Array:
 	var st=SurfaceTool.new();st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for row in 12:
 		for col in range(12-row):
@@ -68,6 +84,6 @@ static func sail() -> ArrayMesh:
 			for p in points:st.add_vertex(p)
 			if row+col<11:
 				for ij in [Vector2(row+1,col),Vector2(row+1,col+1),Vector2(row,col+1)]:st.add_vertex(_sail_vertex(ij/12.0))
-	st.generate_normals();return st.commit()
+	st.generate_normals();return st.commit_to_arrays()
 static func _sail_vertex(uv: Vector2) -> Vector3:
 	return Vector3(sin(uv.x*PI)*sin(uv.y*PI)*.085,.24+uv.x*.56,.02+uv.y*.37)
