@@ -1,5 +1,23 @@
 [gd_scene format=3]
+
 [ext_resource type="Theme" path="res://assets/ui_theme.tres" id="1"]
+[ext_resource type="Script" path="res://scripts/hud_screen.gd" id="script"]
+[ext_resource type="Script" path="res://scripts/build_cost_button.gd" id="cost_button"]
+[ext_resource type="PackedScene" path="res://scenes/ui/resource_row.tscn" id="resource_row"]
+[ext_resource type="Texture2D" path="res://assets/icons/inspect.svg" id="icon_inspect"]
+[ext_resource type="Texture2D" path="res://assets/icons/journal.svg" id="icon_journal"]
+[ext_resource type="Texture2D" path="res://assets/icons/help.svg" id="icon_help"]
+[ext_resource type="Texture2D" path="res://assets/icons/music.svg" id="icon_music"]
+[ext_resource type="Texture2D" path="res://assets/icons/settings.svg" id="icon_settings"]
+[ext_resource type="Texture2D" path="res://assets/icons/leave.svg" id="icon_leave"]
+[ext_resource type="Texture2D" path="res://assets/icons/dice.svg" id="icon_dice"]
+[ext_resource type="Texture2D" path="res://assets/icons/road.svg" id="icon_road"]
+[ext_resource type="Texture2D" path="res://assets/icons/settlement.svg" id="icon_settlement"]
+[ext_resource type="Texture2D" path="res://assets/icons/city.svg" id="icon_city"]
+[ext_resource type="Texture2D" path="res://assets/icons/trade.svg" id="icon_trade"]
+[ext_resource type="Texture2D" path="res://assets/icons/arrow.svg" id="icon_arrow"]
+[ext_resource type="Texture2D" path="res://assets/icons/cards.svg" id="icon_cards"]
+
 [node name="GameHUD" type="Control"]
 layout_mode = 1
 anchors_preset = 15
@@ -9,6 +27,8 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("1")
+script = ExtResource("script")
+
 [node name="Top" type="PanelContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
@@ -17,6 +37,7 @@ offset_left = 16.0
 offset_top = 12.0
 offset_right = -16.0
 offset_bottom = 66.0
+
 [node name="TopBody" type="BoxContainer" parent="Top"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -27,29 +48,123 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/h_separation = 6
 theme_override_constants/v_separation = 6
+
+[node name="HUDTools" type="BoxContainer" parent="Top/TopBody"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+alignment = 1
+vertical = true
+
+[node name="TurnClock" type="Label" parent="Top/TopBody/HUDTools"]
+unique_name_in_owner = true
+auto_translate_mode = 2
+layout_mode = 2
+mouse_filter = 0
+tooltip_text = "Time left in this turn"
+theme_type_variation = &"HeadingLabel"
+theme_override_colors/font_color = Color(0.47451, 0.388235, 0.278431, 1)
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 2
+
+[node name="ToolButtons" type="HBoxContainer" parent="Top/TopBody/HUDTools"]
+layout_mode = 2
+alignment = 2
+
+[node name="InspectBoard" type="Button" parent="Top/TopBody/HUDTools/ToolButtons" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(44, 40)
+layout_mode = 2
+size_flags_vertical = 0
+tooltip_text = "Inspect board (H)"
+mouse_default_cursor_shape = 2
+theme_override_constants/icon_max_width = 20
+icon = ExtResource("icon_inspect")
+
+[node name="OpenLog" type="Button" parent="Top/TopBody/HUDTools/ToolButtons" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(44, 40)
+layout_mode = 2
+size_flags_vertical = 0
+tooltip_text = "Game log"
+mouse_default_cursor_shape = 2
+theme_override_constants/icon_max_width = 20
+icon = ExtResource("icon_journal")
+
+[node name="OpenGuide" type="Button" parent="Top/TopBody/HUDTools/ToolButtons" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(44, 40)
+layout_mode = 2
+size_flags_vertical = 0
+tooltip_text = "Guide"
+mouse_default_cursor_shape = 2
+theme_override_constants/icon_max_width = 20
+icon = ExtResource("icon_help")
+
+[node name="OpenMusic" type="Button" parent="Top/TopBody/HUDTools/ToolButtons" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(44, 40)
+layout_mode = 2
+size_flags_vertical = 0
+tooltip_text = "Music"
+mouse_default_cursor_shape = 2
+theme_override_constants/icon_max_width = 20
+icon = ExtResource("icon_music")
+
+[node name="OpenSettings" type="Button" parent="Top/TopBody/HUDTools/ToolButtons" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(44, 40)
+layout_mode = 2
+size_flags_vertical = 0
+tooltip_text = "Settings"
+mouse_default_cursor_shape = 2
+theme_override_constants/icon_max_width = 20
+icon = ExtResource("icon_settings")
+
+[node name="LeaveGame" type="Button" parent="Top/TopBody/HUDTools/ToolButtons" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(44, 40)
+layout_mode = 2
+size_flags_vertical = 0
+tooltip_text = "Leave game"
+mouse_default_cursor_shape = 2
+theme_override_constants/icon_max_width = 20
+icon = ExtResource("icon_leave")
+
 [node name="Bottom" type="PanelContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
 anchor_top = 1.0
-anchor_bottom = 1.0
 anchor_right = 1.0
+anchor_bottom = 1.0
 offset_left = 16.0
 offset_top = -152.0
 offset_right = -16.0
 offset_bottom = -12.0
 grow_vertical = 0
+
 [node name="BottomBody" type="VBoxContainer" parent="Bottom"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 8
+
 [node name="Hand" type="VBoxContainer" parent="Bottom/BottomBody"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 4
+
 [node name="HandBody" type="VBoxContainer" parent="Bottom/BottomBody/Hand"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="HandResources" parent="Bottom/BottomBody/Hand/HandBody" instance=ExtResource("resource_row")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+icon_size = 38
+show_zero = true
+
 [node name="ActionsBody" type="HFlowContainer" parent="Bottom/BottomBody"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -57,24 +172,185 @@ theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 6
 alignment = 1
 
+[node name="RollDice" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+theme_type_variation = &"PrimaryButton"
+theme_override_constants/h_separation = 6
+theme_override_constants/icon_max_width = 22
+text = "Roll"
+icon = ExtResource("icon_dice")
+
+[node name="RoadAction" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+tooltip_text = "Road"
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/icon_max_width = 20
+toggle_mode = true
+text = "Road"
+icon = ExtResource("icon_road")
+script = ExtResource("cost_button")
+
+[node name="SettlementAction" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+tooltip_text = "Settlement"
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/icon_max_width = 20
+toggle_mode = true
+text = "Settlement"
+icon = ExtResource("icon_settlement")
+script = ExtResource("cost_button")
+
+[node name="CityAction" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+tooltip_text = "City"
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/icon_max_width = 20
+toggle_mode = true
+text = "City"
+icon = ExtResource("icon_city")
+script = ExtResource("cost_button")
+
+[node name="TradeAction" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/icon_max_width = 22
+text = "Trade"
+icon = ExtResource("icon_trade")
+
+[node name="EndTurn" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+theme_type_variation = &"PrimaryButton"
+theme_override_constants/h_separation = 6
+theme_override_constants/icon_max_width = 22
+text = "End"
+icon = ExtResource("icon_arrow")
+
+[node name="FinishRoads" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+text = "Finish roads"
+
+[node name="DiscardAction" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+theme_type_variation = &"PrimaryButton"
+
+[node name="ViewOffer" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+theme_type_variation = &"PrimaryButton"
+text = "Trade offer"
+
 [node name="CardsRail" type="Control" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
 anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -192.0
-offset_right = -16.0
 offset_top = 142.0
+offset_right = -16.0
 offset_bottom = 600.0
 mouse_filter = 2
+
 [node name="CardShop" type="VBoxContainer" parent="CardsRail"]
 unique_name_in_owner = true
 layout_mode = 0
 anchor_right = 1.0
+
+[node name="CardHeading" type="Label" parent="CardsRail/CardShop"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.945098, 0.823529, 1)
+theme_override_font_sizes/font_size = 16
+text = "Development cards"
+
+[node name="BuyCard" type="Button" parent="CardsRail/CardShop" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_vertical = 0
+tooltip_text = "Buy card"
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/icon_max_width = 18
+text = "Buy card"
+icon = ExtResource("icon_cards")
+script = ExtResource("cost_button")
+
 [node name="CardsBody" type="Control" parent="CardsRail"]
 unique_name_in_owner = true
 layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = 80.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
+
+[node name="EmptyCards" type="Label" parent="CardsRail/CardsBody"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+theme_override_colors/font_color = Color(1, 0.945098, 0.823529, 1)
+theme_override_font_sizes/font_size = 14
+text = "No development cards"
+autowrap_mode = 3
+
+[connection signal="pressed" from="Top/TopBody/HUDTools/ToolButtons/InspectBoard" to="." method="emit_signal" binds= ["inspect_requested"]]
+[connection signal="pressed" from="Top/TopBody/HUDTools/ToolButtons/OpenLog" to="." method="emit_signal" binds= ["log_requested"]]
+[connection signal="pressed" from="Top/TopBody/HUDTools/ToolButtons/OpenGuide" to="." method="emit_signal" binds= ["guide_requested"]]
+[connection signal="pressed" from="Top/TopBody/HUDTools/ToolButtons/OpenMusic" to="." method="emit_signal" binds= ["music_requested"]]
+[connection signal="pressed" from="Top/TopBody/HUDTools/ToolButtons/OpenSettings" to="." method="emit_signal" binds= ["settings_requested"]]
+[connection signal="pressed" from="Top/TopBody/HUDTools/ToolButtons/LeaveGame" to="." method="emit_signal" binds= ["leave_requested"]]
+[connection signal="pressed" from="Bottom/BottomBody/ActionsBody/RoadAction" to="." method="emit_signal" binds= ["build_requested", "road"]]
+[connection signal="pressed" from="Bottom/BottomBody/ActionsBody/SettlementAction" to="." method="emit_signal" binds= ["build_requested", "settlement"]]
+[connection signal="pressed" from="Bottom/BottomBody/ActionsBody/CityAction" to="." method="emit_signal" binds= ["build_requested", "city"]]
+[connection signal="pressed" from="Bottom/BottomBody/ActionsBody/RollDice" to="." method="_request" binds= ["roll"]]
+[connection signal="pressed" from="Bottom/BottomBody/ActionsBody/TradeAction" to="." method="emit_signal" binds= ["trade_requested"]]
+[connection signal="pressed" from="Bottom/BottomBody/ActionsBody/EndTurn" to="." method="_request" binds= ["end"]]
+[connection signal="pressed" from="Bottom/BottomBody/ActionsBody/FinishRoads" to="." method="_request" binds= ["finish_roads"]]
+[connection signal="pressed" from="Bottom/BottomBody/ActionsBody/DiscardAction" to="." method="emit_signal" binds= ["discard_requested"]]
+[connection signal="pressed" from="Bottom/BottomBody/ActionsBody/ViewOffer" to="." method="emit_signal" binds= ["offer_requested"]]
+[connection signal="pressed" from="CardsRail/CardShop/BuyCard" to="." method="_request" binds= ["buy_card"]]
+[connection signal="minimum_size_changed" from="Top" to="." method="emit_signal" binds= ["layout_changed"]]
+[connection signal="minimum_size_changed" from="Top/TopBody/PlayersBody" to="." method="emit_signal" binds= ["layout_changed"]]
+[connection signal="minimum_size_changed" from="Bottom" to="." method="emit_signal" binds= ["layout_changed"]]

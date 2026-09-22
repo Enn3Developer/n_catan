@@ -57,10 +57,9 @@ class LocalizationTests(unittest.TestCase):
             source=(ROOT/'scripts'/filename).read_text()
             for field in fields:
                 keys.extend(ast.literal_eval(raw) for raw in re.findall(r'"'+field+r'":("(?:[^"\\]|\\.)*")',source))
-        main=(ROOT/'scripts/main.gd').read_text()
-        for variable in ['names','effects']:
-            for raw in re.findall(r'var '+variable+r'=([^\n]+)',main):
-                keys.extend(ast.literal_eval(raw))
+        cards=(ROOT/'scripts/dev_card.gd').read_text()
+        for constant in ['TITLES','EFFECTS','TIPS']:
+            keys.extend(ast.literal_eval(re.search(r'^const '+constant+r'=([^\n]+)',cards,re.M)[1]))
         cosmetics=(ROOT/'scripts/cosmetics_menu.gd').read_text()
         swatches=ast.literal_eval(cosmetics.split('const COLOR_SWATCHES=',1)[1].split('\nvar color_buttons',1)[0])
         keys.extend(swatch[0] for swatch in swatches)

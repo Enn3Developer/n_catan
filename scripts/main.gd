@@ -4,7 +4,6 @@ const INK=Color("493521")
 const MUTED=Color("796347")
 const PAPER=Color("fff1d2")
 const GOLD=Color("8c522d")
-const HEADING_FONT=preload("res://assets/fonts/NotoSerif-Medium.ttf")
 @onready var net: CatanNetwork=$Network
 @onready var board: CatanBoard=$Board
 @onready var audio: CatanAudio=$Audio
@@ -47,7 +46,6 @@ var music_dialog_widgets={}
 var music_ui_clock=0.0
 var music_volume_before_mute=.42
 var notified_updates={}
-var turn_clock_label: Label
 var turn_clock_left=0.0
 var turn_clock_limit=0.0
 var active_language=-1
@@ -109,7 +107,6 @@ func _clear(scene_path: String):
 	screen=load(scene_path).instantiate()
 	screens.add_child(screen)
 	if screen is CatanScreen: screen.layout_changed.connect(_queue_layout)
-	_apply_text(screen)
 	_queue_layout()
 
 func _label(parent: Node,text: String,size: int=16,color: Color=INK,translate_text: bool=true) -> Label:
@@ -174,6 +171,7 @@ func _home():
 		"exit_requested":_exit_desktop,
 	})
 	_updates_changed()
+	_apply_text(screen)
 
 # Screens and dialogs report intent through signals. Handlers run deferred so
 # they may replace the screen or dialog that emitted them.
@@ -233,6 +231,7 @@ func _lobby():
 		"bot_remove_requested":func(seat):net.configure_bot("remove",seat),
 	})
 	screen.invite_address_edited.connect(func(text):invite_address=text)
+	_apply_text(screen)
 
 func _copy_invite(address: String):
 	if address.is_empty(): _notice(tr("Enter your public address first, or use Map router."))
@@ -297,102 +296,23 @@ func _process(delta):
 func _hud():
 	_clear("res://scenes/ui/hud.tscn")
 	screen.visible=not inspection_mode
-	var tools_column=BoxContainer.new()
-	tools_column.vertical=true
-	tools_column.alignment=BoxContainer.ALIGNMENT_CENTER
-	tools_column.size_flags_vertical=Control.SIZE_SHRINK_CENTER
-	tools_column.name="HUDTools"
-	_node("TopBody").add_child(tools_column)
-	turn_clock_label=_label(tools_column,"",18,MUTED,false)
-	turn_clock_label.name="TurnClock"
-	turn_clock_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT
-	turn_clock_label.mouse_filter=Control.MOUSE_FILTER_STOP
-	turn_clock_label.tooltip_text=tr("Time left in this turn")
-	turn_clock_label.add_theme_font_override("font",HEADING_FONT)
+	screen.show_game(net,state,mode)
+	_route(screen,{
+		"action_requested":net.act,
+		"build_requested":_choose,
+		"trade_requested":_trade,
+		"discard_requested":_discard,
+		"offer_requested":_view_offer,
+		"resource_card_requested":_resource_card,
+		"inspect_requested":_toggle_inspection,
+		"log_requested":_journal,
+		"guide_requested":_help,
+		"music_requested":_open_music,
+		"settings_requested":_open_settings,
+		"leave_requested":_confirm_leave,
+	})
 	_refresh_turn_clock()
-	var row=HBoxContainer.new()
-	row.alignment=BoxContainer.ALIGNMENT_END
-	tools_column.add_child(row)
-	for action in [["inspect",tr("Inspect board (H)"),_toggle_inspection],["journal",tr("Game log"),_journal],["help","Guide",_help],["music","Music",_open_music],["settings","Settings",_open_settings],["leave",tr("Leave game"),_confirm_leave]]:
-		var button=_button(row,"",action[2])
-		button.custom_minimum_size=Vector2(44,40)
-		if action[0]=="music":button.name="OpenMusic"
-		button.tooltip_text=tr(action[1])
-		CatanIcons.button_icon(button,action[0],20)
-	var players=_node("PlayersBody")
-	for i in state.players.size():
-		var player=state.players[i]
-		var scoring=CatanRules.new();scoring.s=state
-		var score=scoring.visible_points(i)
-		var chip=PanelContainer.new()
-		chip.name="PlayerChip%d" % i
-		var style=_style(Color("8c522d",0.07) if i==state.turn else Color.TRANSPARENT,0)
-		style.content_margin_left=10;style.content_margin_right=10
-		style.content_margin_top=6;style.content_margin_bottom=6
-		style.shadow_size=0
-		style.set_border_width_all(0)
-		if i==state.turn:style.border_width_bottom=2
-		elif i<state.players.size()-1:style.border_width_right=1
-		style.border_color=net.player_color(i) if i==state.turn else Color("ac8654",0.35)
-		chip.add_theme_stylebox_override("panel",style)
-		chip.tooltip_text=tr("%s%s\n%d points · %d resources · %d development cards\nRoad length %d · %d knights%s%s") % [player.name,tr(" (you)") if i==net.seat else "",score,player.resource_count,player.card_count,player.road_length,player.knights,tr("\nLongest road +2") if state.longest==i else "",tr("\nLargest army +2") if state.army==i else ""]
-		players.add_child(chip)
-		var column=BoxContainer.new();column.name="PlayerContent";column.vertical=true;chip.add_child(column)
-		var line=BoxContainer.new();line.name="PlayerName";line.add_theme_constant_override("separation",5);column.add_child(line)
-		var name_label=_label(line,player.name,16,net.player_color(i),false)
-		name_label.add_theme_font_override("font",HEADING_FONT)
-		name_label.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-		name_label.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
-		name_label.mouse_filter=Control.MOUSE_FILTER_IGNORE
-		name_label.add_theme_color_override("font_outline_color",INK)
-		name_label.add_theme_constant_override("outline_size",0)
-		if i==state.turn:_label(line,tr("Your turn") if i==net.seat else tr("Playing"),14,MUTED)
-		var hidden_points=player.cards[4]+player.new_cards[4] if player.cards.size()==5 else 0
-		chip.tooltip_text+=tr("\n%d public points + %d victory-point cards = %d total") % [player.points,hidden_points,score] if player.cards.size()==5 else tr("\nVictory-point cards stay private until game end.")
-		var stats=HBoxContainer.new();stats.name="PlayerStats";stats.add_theme_constant_override("separation",10);column.add_child(stats)
-		for stat in [["star",score,tr("Victory points")],["hand",player.resource_count,"Resources"],["cards",player.card_count,tr("Development cards")],["road",player.road_length,tr("Longest road length")],["knight",player.knights,tr("Played knights")]]:
-			var badge=HBoxContainer.new();badge.add_theme_constant_override("separation",4);badge.tooltip_text=tr(stat[2])+": "+str(stat[1]);stats.add_child(badge)
-			if stat[0]=="star":badge.tooltip_text=chip.tooltip_text
-			CatanIcons.icon(badge,stat[0],24)
-			_label(badge,str(stat[1]),16).mouse_filter=Control.MOUSE_FILTER_IGNORE
-	var right=_node("ActionsBody")
-	var mine=state.turn==net.seat and state.winner==-1
-	var play=mine and state.phase=="play"
-	var roll=_button(right,tr("Roll") if state.dice[0]==0 else "%d + %d" % state.dice,func():net.act({"type":"roll"}),true)
-	roll.name="RollDice"
-	roll.tooltip_text=tr("Roll dice") if state.dice[0]==0 else tr("Last roll: %d") % (state.dice[0]+state.dice[1])
-	roll.disabled=not play or state.rolled
-	CatanIcons.button_icon(roll,"dice")
-	var rules=CatanRules.new();rules.s=state
-	for kind in ["road","settlement","city"]:
-		var button=_button(right,kind.capitalize(),func():_choose(kind))
-		button.set_script(preload("res://scripts/build_cost_button.gd"))
-		button.cost=CatanRules.COST[kind].duplicate()
-		for resource in 5:button.missing.append(maxi(0,button.cost[resource]-state.players[net.seat].hand[resource]))
-		button.name=kind.capitalize()+"Action"
-		button.toggle_mode=true;button.button_pressed=mode==kind
-		button.tooltip_text=tr(kind.capitalize())
-		CatanIcons.button_icon(button,kind,20)
-		var sites=rules.build_sites(net.seat,kind)
-		button.disabled=not play or not state.rolled or not rules.can_pay(net.seat,CatanRules.COST[kind]) or sites.is_empty()
-		if rules.pieces(net.seat,kind)>={"road":15,"settlement":5,"city":4}[kind]:
-			button.unavailable_reason=tr({"road":"All 15 of your roads are on the board. You have none left to place.","settlement":"All 5 of your settlements are on the board. Upgrade one to a city to free a settlement piece.","city":"All 4 of your cities are on the board. You have none left to place."}[kind])
-		elif rules.can_pay(net.seat,CatanRules.COST[kind]) and sites.is_empty():button.unavailable_reason=tr("No legal space to build a %s.") % tr(kind)
-	var trade=_button(right,"Trade",_trade);trade.name="TradeAction";CatanIcons.button_icon(trade,"trade")
-	trade.disabled=not play or not state.rolled
-	_card_section(play)
-	var end=_button(right,tr("End"),func():net.act({"type":"end"}),true)
-	end.name="EndTurn";CatanIcons.button_icon(end,"arrow");end.disabled=not play or not state.rolled
-	if state.phase=="free_roads" and mine:_button(right,tr("Finish roads"),func():net.act({"type":"finish_roads"}))
-	if state.phase=="discard" and state.discards.has(str(net.seat)):_button(right,tr("Discard %d") % state.discards[str(net.seat)],_discard,true)
-	if state.phase=="steal" and mine:
-		for p in state.victims:_button(right,tr("Steal from %s") % state.players[p].name,func():net.act({"type":"steal","id":p}),true)
-	if not state.offer.is_empty():_button(right,tr("Trade offer"),_view_offer,true)
-	var resources=CatanIcons.resources(_node("HandBody"),state.players[net.seat].hand,38,true)
-	resources.size_flags_horizontal=Control.SIZE_SHRINK_CENTER
-	_node("Bottom").minimum_size_changed.connect(_queue_layout)
-	players.minimum_size_changed.connect(_queue_layout)
-	_node("Top").minimum_size_changed.connect(_queue_layout)
+	_apply_text(screen)
 	if state.winner!=-1:
 		var box=_dialog("Victory")
 		_label(box,tr("%s wins!") % state.players[state.winner].name,30,GOLD)
@@ -723,95 +643,6 @@ func _discard():
 		net.act({"type":"discard","cards":cards}),true)
 	_button(box,"Close",_close_modal)
 
-func _card_section(play: bool):
-	var box=_node("CardsBody")
-	var player=state.players[net.seat]
-	_label(_node("CardShop"),tr("Development cards"),16,PAPER).name="CardHeading"
-	var buy=_button(_node("CardShop"),tr("Buy card"),func():net.act({"type":"buy_card"}))
-	buy.name="BuyCard";CatanIcons.button_icon(buy,"cards",18)
-	var rules=CatanRules.new();rules.s=state
-	buy.disabled=not play or not state.rolled or not rules.can_pay(net.seat,CatanRules.COST.buy_card) or state.deck_count==0
-	buy.set_script(preload("res://scripts/build_cost_button.gd"))
-	buy.cost=CatanRules.COST.buy_card.duplicate()
-	for resource in 5:buy.missing.append(maxi(0,buy.cost[resource]-player.hand[resource]))
-	buy.tooltip_text=tr("Buy card")
-	buy.unavailable_reason=tr("No development cards remain.") if state.deck_count==0 else tr("%d cards left in deck.") % state.deck_count
-	var names=["Knight","Roads","Plenty","Monopoly","Victory"]
-	var tips=[tr("Move the robber and steal a resource."),tr("Build two roads for free."),tr("Take two resources from the bank."),tr("Take one resource type from every player."),tr("Already included in your score; never needs to be played.")]
-	for i in 5:
-		var count=player.cards[i]+player.new_cards[i]
-		if count==0:continue
-		var b=_button(box,"",func():
-			if i<2:net.act({"type":"play_card","id":i})
-			elif i<4:_resource_card(i))
-		b.name="Card%d" % i
-		b.custom_minimum_size=Vector2.ZERO
-		b.mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND
-		var accent=[Color("97654b"),Color("527e72"),Color("72904e"),Color("54768e"),Color("b28a36")][i]
-		for variant in ["normal","hover","pressed","disabled","focus"]:
-			var paper=_style(Color("eee1bb") if variant!="hover" else Color("fff1ce"),10)
-			paper.set_border_width_all(2);paper.border_color=accent
-			paper.shadow_color=Color(0,0,0,.32);paper.shadow_size=5;paper.shadow_offset=Vector2(-2,3)
-			b.add_theme_stylebox_override(variant,paper)
-		var face=VBoxContainer.new();face.name="CardFace"
-		face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		face.offset_left=10;face.offset_right=-10;face.offset_top=8;face.offset_bottom=-8
-		face.mouse_filter=Control.MOUSE_FILTER_IGNORE;b.add_child(face)
-		var header=HBoxContainer.new();face.add_child(header)
-		var title=_label(header,tr(names[i]),16,Color("263c36"));title.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-		title.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
-		_label(header,"×%d" % count,16,accent)
-		var picture=CenterContainer.new();picture.name="CardPicture";face.add_child(picture)
-		var art=CatanIcons.icon(picture,["knight","road","hand","trade","star"][i],48)
-		art.modulate=accent
-		var effects=["Move the robber", "Build two free roads", "Take two resources", "Claim one resource type", "+1 victory point"]
-		var effect=_label(face,tr(effects[i]),13,Color("44574b"));effect.name="CardEffect"
-		effect.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;effect.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-		var space=Control.new();space.size_flags_vertical=Control.SIZE_EXPAND_FILL;face.add_child(space)
-		var card_ready=player.cards[i]>0 and not state.card_played and play
-		var status=tr("Victory points") if i==4 else (tr("Ready") if card_ready else (tr("Next turn") if player.cards[i]==0 else tr("Waiting")))
-		var caption=_label(face,status,14,Color("44574b"));caption.name="CardStatus";caption.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-		for child in face.find_children("*","Control",true,false):child.mouse_filter=Control.MOUSE_FILTER_IGNORE
-		b.mouse_entered.connect(func():_card_preview(b,true))
-		b.mouse_exited.connect(func():_card_preview(b,false))
-		b.focus_entered.connect(func():_card_preview(b,true))
-		b.focus_exited.connect(func():_card_preview(b,false))
-		b.tooltip_text=tips[i]+tr("\n%d ready · %d bought this turn") % [player.cards[i],player.new_cards[i]]
-		b.disabled=i==4 or not play or player.cards[i]==0 or state.card_played
-		if i<4 and player.new_cards[i]>0:b.tooltip_text+=tr("\nNew action cards become playable next turn.")
-		if i<4 and state.card_played:b.tooltip_text+=tr("\nYou have already played an action card this turn.")
-	if box.get_child_count()==0:
-		var empty=_label(box,tr("No development cards"),14,PAPER)
-		empty.name="EmptyCards";empty.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-		empty.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-
-func _layout_cards(top: float,bottom: float):
-	var rail=_node("CardsRail")
-	rail.offset_top=top;rail.offset_bottom=bottom
-	_node("CardHeading").visible=ui.size.x>=1000
-	var body=_node("CardsBody")
-	body.offset_top=_node("CardShop").get_combined_minimum_size().y+12
-	var cards=body.get_children().filter(func(child):return child is Button)
-	var available=maxf(100,rail.size.y-body.offset_top)
-	var card_height=minf(180,maxf(76,available-32*maxi(0,cards.size()-1)))
-	var step=minf(92,maxf(0,(available-card_height)/maxi(1,cards.size()-1)))
-	for i in cards.size():
-		cards[i].position=Vector2(0,i*step)
-		cards[i].size=Vector2(rail.size.x,card_height)
-		cards[i].set_meta("hand_rect",Rect2(cards[i].position,cards[i].size))
-		_card_preview(cards[i],false)
-
-func _card_preview(card: Button,expanded: bool):
-	if not card.has_meta("hand_rect"):return
-	var rest: Rect2=card.get_meta("hand_rect")
-	card.z_index=2 if expanded else 0
-	card.position=rest.position+Vector2(-12 if expanded else 0,0)
-	card.size=Vector2(rest.size.x,180.0 if expanded else rest.size.y)
-	if expanded:card.position.y=minf(card.position.y,card.get_parent().size.y-card.size.y)
-	card.find_child("CardEffect",true,false).visible=card.size.y>=140
-	card.find_child("CardStatus",true,false).visible=card.size.y>=110
-	card.find_child("CardPicture",true,false).get_child(0).custom_minimum_size=Vector2.ONE*(48 if card.size.y>=140 else 32)
-
 func _cards():
 	# Compatibility for tutorial shortcuts: cards are always present in the HUD.
 	_close_modal()
@@ -978,37 +809,6 @@ func _layout_screen():
 		if guide!=null and is_instance_valid(tutorial_panel):overlay_bottom=tutorial_panel.find_child("LessonPanel",true,false).get_global_rect().end.y
 		board.view_region=screen.arrange(ui.size,overlay_bottom)
 		notifications.offset_top=screen.notifications_top
-	elif screen.name=="GameHUD":
-		notifications.offset_top=132
-		var top_body=_node("TopBody")
-		top_body.vertical=width<1100
-		var tools_box=_node("HUDTools")
-		tools_box.vertical=not top_body.vertical
-		var players=_node("PlayersBody")
-		for chip in players.get_children():
-			var content=chip.get_node("PlayerContent")
-			content.vertical=not top_body.vertical
-			var player_name=content.get_node("PlayerName")
-			player_name.vertical=top_body.vertical
-			player_name.custom_minimum_size.x=80 if top_body.vertical else 0
-			player_name.size_flags_horizontal=Control.SIZE_EXPAND_FILL
-			content.get_node("PlayerStats").add_theme_constant_override("separation",6 if top_body.vertical else 10)
-		var available=width-64
-		if not top_body.vertical:available-=_node("HUDTools").get_combined_minimum_size().x+8
-		var columns=maxi(1,mini(state.players.size(),int((available+6)/286)))
-		for chip in players.get_children():chip.custom_minimum_size.x=floorf((available-(columns-1)*6)/columns)
-		var bottom=_node("Bottom")
-		bottom.offset_left=16
-		bottom.offset_right=-16
-		var bottom_height=bottom.get_combined_minimum_size().y
-		bottom.offset_top=-12-bottom_height
-		_node("Top").offset_bottom=12+_node("Top").get_combined_minimum_size().y
-		var top=_node("Top").offset_bottom+10
-		if guide!=null and is_instance_valid(tutorial_panel):
-			top=tutorial_panel.find_child("LessonPanel",true,false).get_global_rect().end.y+10
-		notifications.offset_top=top
-		_layout_cards(top,height-bottom_height-26)
-		board.view_region=Rect2(20,top,width-236,maxf(100,height-top-bottom_height-30))
 	if inspection_mode:board.view_region=Rect2(16,16,width-32,height-64)
 	board._update_camera()
 	if is_instance_valid(modal) and modal.has_node("DialogMargin"):
@@ -1098,12 +898,8 @@ func _update_health_ready():
 			if file:file.store_string(token);file.close()
 
 func _refresh_turn_clock():
-	if not is_instance_valid(turn_clock_label): return
-	turn_clock_label.visible=turn_clock_limit>0.0 and state.get("winner",-1)==-1
-	if not turn_clock_label.visible: return
-	var left=ceili(turn_clock_left)
-	turn_clock_label.text="%d:%02d" % [left/60,left%60]
-	turn_clock_label.add_theme_color_override("font_color",Color("a8322a") if left<=10 else MUTED)
+	if is_instance_valid(screen) and screen.has_method("show_turn_clock"):
+		screen.show_turn_clock(turn_clock_left,turn_clock_limit,state.get("winner",-1)!=-1)
 
 func _show_turn_banner():
 	turn_banner.text=tr("Your turn")

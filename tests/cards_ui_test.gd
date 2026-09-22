@@ -17,7 +17,7 @@ func run():
 	game.net._sync();await settle()
 	game.turn_banner.hide()
 	check(not game._node("Bottom").is_ancestor_of(game._node("CardsBody")),"cards are outside bottom panel")
-	check(game._node("CardsBody").get_child_count()==5,"all owned card types visible")
+	check(game._node("CardsBody").get_children().filter(func(child):return child is Button).size()==5,"all owned card types visible")
 	check(game._node("Card4").disabled,"victory card cannot be played")
 	for dimensions in [Vector2i(800,600),Vector2i(1440,900)]:
 		root.size=dimensions;game._queue_layout();await settle()

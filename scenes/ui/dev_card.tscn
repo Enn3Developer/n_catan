@@ -1,0 +1,123 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/dev_card.gd" id="script"]
+[ext_resource type="Texture2D" path="res://assets/icons/knight.svg" id="icon_knight"]
+
+[sub_resource type="StyleBoxFlat" id="Paper"]
+resource_local_to_scene = true
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.933333, 0.882353, 0.733333, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.592157, 0.396078, 0.294118, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.32)
+shadow_size = 5
+shadow_offset = Vector2(-2, 3)
+
+[sub_resource type="StyleBoxFlat" id="PaperHover"]
+resource_local_to_scene = true
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 0.945098, 0.807843, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.592157, 0.396078, 0.294118, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.32)
+shadow_size = 5
+shadow_offset = Vector2(-2, 3)
+
+[node name="DevCard" type="Button" groups=["ui_click"]]
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("Paper")
+theme_override_styles/hover = SubResource("PaperHover")
+theme_override_styles/pressed = SubResource("Paper")
+theme_override_styles/disabled = SubResource("Paper")
+theme_override_styles/focus = SubResource("Paper")
+script = ExtResource("script")
+
+[node name="CardFace" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Header" type="HBoxContainer" parent="CardFace"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="CardFace/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.14902, 0.235294, 0.211765, 1)
+theme_override_font_sizes/font_size = 16
+text_overrun_behavior = 3
+
+[node name="Count" type="Label" parent="CardFace/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+
+[node name="CardPicture" type="CenterContainer" parent="CardFace"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Art" type="TextureRect" parent="CardFace/CardPicture"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("icon_knight")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CardEffect" type="Label" parent="CardFace"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.266667, 0.341176, 0.294118, 1)
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Space" type="Control" parent="CardFace"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="CardStatus" type="Label" parent="CardFace"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.266667, 0.341176, 0.294118, 1)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+
+[connection signal="pressed" from="." to="." method="_on_pressed"]
+[connection signal="mouse_entered" from="." to="." method="preview" binds= [true]]
+[connection signal="mouse_exited" from="." to="." method="preview" binds= [false]]
+[connection signal="focus_entered" from="." to="." method="preview" binds= [true]]
+[connection signal="focus_exited" from="." to="." method="preview" binds= [false]]
