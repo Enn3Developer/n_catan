@@ -1,12 +1,13 @@
 class_name CatanAudio
 extends Node
+## Interface and gameplay effects by name.
+@export var effects: Dictionary={}
 var music: AudioStreamPlayer
-var ambience: AudioStreamPlayer
-var rain_ambience: AudioStreamPlayer
-var thunder_ambience: AudioStreamPlayer
+@onready var ambience: AudioStreamPlayer=$Ambience
+@onready var rain_ambience: AudioStreamPlayer=$RainAmbience
+@onready var thunder_ambience: AudioStreamPlayer=$ThunderAmbience
 var weather_last_thunder=-1
-var voices=[]
-var sounds={}
+@onready var voices: Array[Node]=$Voices.get_children()
 var voice_index=0
 var music_spare: AudioStreamPlayer
 var track_streams={}
@@ -20,31 +21,15 @@ var music_bus_names=[]
 func _ready():
 	if "--server" in OS.get_cmdline_user_args(): return
 	get_tree().node_added.connect(_on_node_added)
-	for bus_name in ["Music","Effects","Ambience"]:
-		if AudioServer.get_bus_index(bus_name)<0:
-			AudioServer.add_bus()
-			AudioServer.set_bus_name(AudioServer.bus_count-1,bus_name)
-	$Music.queue_free()
-	ambience=$Ambience
-	ambience.bus="Ambience"
 	for index in CatanSoundtrack.TRACKS.size():track_stream(index)
-	ambience.stream=_loop("sea")
-	for effect in ["click","build","trade","card","turn","error","dice","win"]:
-		sounds[effect]=load("res://assets/audio/%s.wav" % effect)
-	for i in 8:
-		var voice=AudioStreamPlayer.new()
-		voice.bus="Effects"
-		add_child(voice)
-		voices.append(voice)
+	ambience.stream=_loop(ambience.stream)
+	rain_ambience.stream=_loop(rain_ambience.stream)
 	apply(CatanSettings.new().values)
 	follow_soundtrack({"track":0,"position":0.0,"paused":false,"generation":0},.016)
 	ambience.play()
-	rain_ambience=AudioStreamPlayer.new();rain_ambience.name="RainAmbience";rain_ambience.bus="Ambience";add_child(rain_ambience)
-	rain_ambience.stream=_loop("rain");rain_ambience.volume_db=-60
-	thunder_ambience=AudioStreamPlayer.new();thunder_ambience.name="ThunderAmbience";thunder_ambience.bus="Ambience";add_child(thunder_ambience)
-	thunder_ambience.stream=load("res://assets/audio/thunder.wav")
-func _loop(name_value: String) -> AudioStreamWAV:
-	var stream=load("res://assets/audio/%s.wav" % name_value).duplicate() as AudioStreamWAV
+# Import-time looping stops one frame short of the end; loop the complete source.
+func _loop(source: AudioStreamWAV) -> AudioStreamWAV:
+	var stream=source.duplicate() as AudioStreamWAV
 	stream.loop_mode=AudioStreamWAV.LOOP_FORWARD
 	stream.loop_begin=0
 	stream.loop_end=roundi(stream.get_length()*stream.mix_rate)
@@ -64,10 +49,10 @@ func _click():
 	play("click")
 
 func play(effect: String):
-	if shutting_down or not sounds.has(effect) or voices.is_empty(): return
+	if shutting_down or not effects.has(effect) or voices.is_empty(): return
 	var voice=voices[voice_index%voices.size()]
 	voice_index+=1
-	voice.stream=sounds[effect]
+	voice.stream=effects[effect]
 	voice.play()
 func transition(previous: Dictionary,current: Dictionary,seat: int):
 	if previous.is_empty(): play("turn"); return
@@ -197,7 +182,8 @@ func shutdown():
 	for key in music_voices.keys():_remove_music_voice(key)
 	for player in [ambience,rain_ambience,thunder_ambience]+voices:
 		if is_instance_valid(player):player.stop();player.stream=null;player.queue_free()
-	track_streams.clear();sounds.clear();voices.clear();fading_tracks.clear()
+	# The effect table may be shared with the cached scene, so drop it instead of clearing it.
+	track_streams.clear();effects={};voices.clear();fading_tracks.clear()
 
 func _exit_tree():
 	shutdown()

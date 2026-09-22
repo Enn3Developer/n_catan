@@ -1,10 +1,66 @@
 [gd_scene format=3 uid="uid://bwnb462vieqdy"]
 
 [ext_resource type="Script" uid="uid://ct80ifil1wfv2" path="res://scripts/audio.gd" id="1"]
+[ext_resource type="AudioStream" path="res://assets/audio/sea.wav" id="sea"]
+[ext_resource type="AudioStream" path="res://assets/audio/rain.wav" id="rain"]
+[ext_resource type="AudioStream" path="res://assets/audio/thunder.wav" id="thunder"]
+[ext_resource type="AudioStream" path="res://assets/audio/click.wav" id="fx_click"]
+[ext_resource type="AudioStream" path="res://assets/audio/build.wav" id="fx_build"]
+[ext_resource type="AudioStream" path="res://assets/audio/trade.wav" id="fx_trade"]
+[ext_resource type="AudioStream" path="res://assets/audio/card.wav" id="fx_card"]
+[ext_resource type="AudioStream" path="res://assets/audio/turn.wav" id="fx_turn"]
+[ext_resource type="AudioStream" path="res://assets/audio/error.wav" id="fx_error"]
+[ext_resource type="AudioStream" path="res://assets/audio/dice.wav" id="fx_dice"]
+[ext_resource type="AudioStream" path="res://assets/audio/win.wav" id="fx_win"]
 
 [node name="Audio" type="Node" unique_id=634904134]
 script = ExtResource("1")
-
-[node name="Music" type="AudioStreamPlayer" parent="." unique_id=1433458661]
+effects = {
+"click": ExtResource("fx_click"),
+"build": ExtResource("fx_build"),
+"trade": ExtResource("fx_trade"),
+"card": ExtResource("fx_card"),
+"turn": ExtResource("fx_turn"),
+"error": ExtResource("fx_error"),
+"dice": ExtResource("fx_dice"),
+"win": ExtResource("fx_win")
+}
 
 [node name="Ambience" type="AudioStreamPlayer" parent="." unique_id=1501779267]
+stream = ExtResource("sea")
+bus = &"Ambience"
+
+[node name="RainAmbience" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("rain")
+volume_db = -60.0
+bus = &"Ambience"
+
+[node name="ThunderAmbience" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("thunder")
+bus = &"Ambience"
+
+[node name="Voices" type="Node" parent="."]
+
+[node name="Voice0" type="AudioStreamPlayer" parent="Voices"]
+bus = &"Effects"
+
+[node name="Voice1" type="AudioStreamPlayer" parent="Voices"]
+bus = &"Effects"
+
+[node name="Voice2" type="AudioStreamPlayer" parent="Voices"]
+bus = &"Effects"
+
+[node name="Voice3" type="AudioStreamPlayer" parent="Voices"]
+bus = &"Effects"
+
+[node name="Voice4" type="AudioStreamPlayer" parent="Voices"]
+bus = &"Effects"
+
+[node name="Voice5" type="AudioStreamPlayer" parent="Voices"]
+bus = &"Effects"
+
+[node name="Voice6" type="AudioStreamPlayer" parent="Voices"]
+bus = &"Effects"
+
+[node name="Voice7" type="AudioStreamPlayer" parent="Voices"]
+bus = &"Effects"
