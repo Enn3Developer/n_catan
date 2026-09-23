@@ -3,7 +3,7 @@ extends Node3D
 const CONDITIONS=[Vector3(.18,0,0),Vector3(.72,0,0),Vector3(.93,.65,0),Vector3(1,1,1)]
 const KEYFRAMES=[0.0,100.0,190.0,240.0,290.0,340.0,390.0,440.0,500.0,560.0,600.0]
 const STATES=[1,0,0,1,2,3,3,2,1,0,1]
-@onready var rain: CPUParticles3D=$Rain
+@onready var rain: GPUParticles3D=$Rain
 @onready var rain_material: StandardMaterial3D=$Rain.material_override
 @onready var lightning: Node3D=$DistantLightning
 @onready var lightning_light: OmniLight3D=$DistantLightning/LightningGlow
@@ -30,7 +30,10 @@ func update_weather(seconds: float,daylight: float,values: Dictionary,board_scal
 	var particle_level=int(values.get("particles",2))
 	var amount=[1,400,1300][clampi(particle_level,0,2)]
 	if amount!=_last_amount:rain.amount=amount;_last_amount=amount
-	rain.emission_box_extents=Vector3(180*board_scale,2,180*board_scale)
+	if not is_equal_approx(rain.process_material.emission_box_extents.x,180*board_scale):
+		rain.process_material.emission_box_extents=Vector3(180*board_scale,2,180*board_scale)
+		# Drops fall about 100 units from the emitter before they expire.
+		rain.visibility_aabb=AABB(Vector3(-200*board_scale,-100,-200*board_scale),Vector3(400*board_scale,104,400*board_scale))
 	rain.emitting=current.rain>.02 and particle_level>0 and not reduced
 	rain.visible=rain.emitting
 	rain_material.albedo_color=Color(.65,.78,.88,current.rain*lerpf(.25,.43,daylight))

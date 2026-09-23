@@ -92,6 +92,14 @@ height = 0.014
 radial_segments = 4
 rings = 2
 
+[sub_resource type="ParticleProcessMaterial" id="MoteDrift"]
+emission_shape = 3
+emission_box_extents = Vector3(8, 1.6, 8)
+direction = Vector3(0.2, 0.1, 0.1)
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 0.03
+initial_velocity_max = 0.09
+
 [node name="Board" type="Node3D" unique_id=818072003]
 script = ExtResource("1_bw3vb")
 
@@ -203,19 +211,15 @@ cast_shadow = 0
 extra_cull_margin = 4.0
 mesh = SubResource("OceanPlane")
 
-[node name="SunlitPollen" type="CPUParticles3D" parent="."]
+[node name="SunlitPollen" type="GPUParticles3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
 cast_shadow = 0
 amount = 96
 lifetime = 12.0
 preprocess = 4.0
-mesh = SubResource("Mote")
-emission_shape = 3
-emission_box_extents = Vector3(8, 1.6, 8)
-direction = Vector3(0.2, 0.1, 0.1)
-gravity = Vector3(0, 0, 0)
-initial_velocity_min = 0.03
-initial_velocity_max = 0.09
+visibility_aabb = AABB(-9.5, -2.5, -9.5, 19, 5, 19)
+process_material = SubResource("MoteDrift")
+draw_pass_1 = SubResource("Mote")
 
 [node name="Weather" parent="." instance=ExtResource("weather")]
 

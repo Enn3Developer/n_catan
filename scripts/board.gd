@@ -20,7 +20,7 @@ const DICE_THROW=preload("res://scenes/world/dice_throw.tscn")
 @onready var background_landscape: CatanBackgroundLandscape=$Scenery/BackgroundLandscape
 @onready var ocean: MeshInstance3D=$Ocean
 @onready var sea_material: ShaderMaterial=$Ocean.material_override
-@onready var pollen: CPUParticles3D=$SunlitPollen
+@onready var pollen: GPUParticles3D=$SunlitPollen
 @onready var label_layer: CanvasLayer=$Labels
 @onready var fps_label: Label=%FPS
 var state={}
@@ -142,7 +142,7 @@ func apply_preferences(values: Dictionary):
 		ocean.mesh.subdivide_width=[64,128,224,320][values.water_quality]
 		ocean.mesh.subdivide_depth=ocean.mesh.subdivide_width
 		last_water_quality=values.water_quality
-	for smoke in find_children("Smoke","CPUParticles3D",true,false):
+	for smoke in find_children("Smoke","GPUParticles3D",true,false):
 		smoke.emitting=values.particles>0 and not reduce_motion
 		smoke.visible=smoke.emitting
 		var amount=4 if values.particles==1 else 12
