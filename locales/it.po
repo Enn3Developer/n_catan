@@ -309,8 +309,6 @@ msgstr "Scegli un %s illuminato sul tabellone."
 msgid "Choose a neighboring player to steal from."
 msgstr "Scegli un giocatore vicino al brigante a cui rubare una risorsa."
 
-msgid "Choose a password for your room"
-msgstr "Scegli una password per la stanza"
 
 msgid "Choose a player to steal from."
 msgstr "Scegli un giocatore a cui rubare una risorsa."
@@ -606,8 +604,6 @@ msgstr "Alta · 2048 px"
 msgid "High · 4K"
 msgstr "Alta · 4K"
 
-msgid "Host"
-msgstr "Ospita"
 
 msgid "I'm ready"
 msgstr "Sono pronto"
@@ -855,8 +851,6 @@ msgstr "Effetti particellari"
 msgid "Password required to join"
 msgstr "Password richiesta per entrare"
 
-msgid "Paste invite code"
-msgstr "Incolla il codice invito"
 
 msgid "Paste a valid invite code from the host."
 msgstr "Incolla un codice invito valido ricevuto dall’host."
@@ -894,8 +888,6 @@ msgstr "Gioca una carta sviluppo"
 msgid "Play card"
 msgstr "Gioca carta"
 
-msgid "Play online"
-msgstr "Gioca online"
 
 msgid "Play solo"
 msgstr "Gioca da solo"
@@ -1029,8 +1021,6 @@ msgstr "Prima tira i dadi."
 msgid "Roll to collect resources"
 msgstr "Tira i dadi per raccogliere risorse"
 
-msgid "Room password (if required)"
-msgstr "Password della stanza (se richiesta)"
 
 msgid "Router mapped for 1 hour. Invite address: %s:%d"
 msgstr "Router configurato per un’ora. Indirizzo da condividere: %s:%d"
@@ -1068,8 +1058,6 @@ msgstr "Connessione sicura non riuscita. Controlla l’invito, che l’host sia 
 msgid "Invite copied. Share it with your guests."
 msgstr "Invito copiato. Condividilo con i tuoi ospiti."
 
-msgid "Set a room password (optional)"
-msgstr "Password della stanza (facoltativa)"
 
 msgid "Settings"
 msgstr "Impostazioni"
@@ -1086,8 +1074,6 @@ msgstr "Preparazione"
 msgid "Shadow quality"
 msgstr "Qualità ombre"
 
-msgid "Share it with your players. Leave blank for an open room."
-msgstr "Condividila con i giocatori. Lascia vuoto per una stanza senza password."
 
 msgid "Share the invite code. Host: open UDP 24567."
 msgstr "Condividi il codice invito. Host: apri la porta UDP 24567."
@@ -1715,8 +1701,6 @@ msgstr "Taglia"
 msgid "Copy"
 msgstr "Copia"
 
-msgid "Paste"
-msgstr "Incolla"
 
 msgid "Select All"
 msgstr "Seleziona tutto"
@@ -1829,20 +1813,12 @@ msgstr "Tempo rimasto in questo turno"
 msgid "Your turn time ran out."
 msgstr "Il tempo del tuo turno è scaduto."
 
-msgid "Invite code"
-msgstr "Codice invito"
 
-msgid "Paste the invite code from your clipboard"
-msgstr "Incolla il codice invito dagli appunti"
 
-msgid "Ask the host to copy the invite from their room."
-msgstr "Chiedi all’host di copiare l’invito dalla sua stanza."
 
 msgid "Room password"
 msgstr "Password della stanza"
 
-msgid "Leave blank for an open room"
-msgstr "Lascia vuoto per una stanza aperta"
 
 msgid "Cancel"
 msgstr "Annulla"
@@ -1853,11 +1829,24 @@ msgstr "Connessione…"
 msgid "Reaching the host. This can take up to 10 seconds."
 msgstr "Contatto l’host in corso. Può richiedere fino a 10 secondi."
 
-msgid "Invite code ready. Add the password if the host set one."
-msgstr "Codice invito pronto. Aggiungi la password se l’host ne ha impostata una."
 
 msgid "Invite codes start with NC1-. Copy the whole code from the host's room."
 msgstr "I codici invito iniziano con NC1-. Copia il codice completo dalla stanza dell’host."
 
 msgid "This invite code is incomplete or mistyped. Copy it again from the host."
 msgstr "Questo codice invito è incompleto o errato. Copialo di nuovo dall’host."
+
+msgid "Host a room"
+msgstr "Ospita una stanza"
+
+msgid "Paste an invite code"
+msgstr "Incolla un codice invito"
+
+msgid "Room password (optional)"
+msgstr "Password della stanza (facoltativa)"
+
+msgid "Paste the invite code a host shared with you"
+msgstr "Incolla il codice invito condiviso dall’host"
+
+msgid "This room needs a password. Enter it and press Enter."
+msgstr "Questa stanza richiede una password. Inseriscila e premi Invio."

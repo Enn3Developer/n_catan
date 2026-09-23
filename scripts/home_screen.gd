@@ -1,5 +1,5 @@
 extends CatanScreen
-## Main menu: the player name, online host/join forms and the solo, tutorial
+## Main menu: the player name, the invite field, hosting and the solo, tutorial
 ## and utility entries. Buttons only report intent; main.gd acts on it.
 
 signal solo_requested
@@ -20,69 +20,80 @@ signal exit_requested
 @onready var host_password_field: LineEdit=%HostPassword
 
 const SECURE_INVITE=preload("res://scripts/secure_invite.gd")
-const INVITE_HELP="Ask the host to copy the invite from their room."
 var connecting=false
 
 func _ready():
 	%Version.text=CatanBuildInfo.VERSION
 
-## Fills the form; a saved seat opens the join form with its connection details.
+func _notification(what: int):
+	# Copying an invite elsewhere and switching back fills it in.
+	if what==NOTIFICATION_APPLICATION_FOCUS_IN and is_node_ready():_take_clipboard_invite()
+
+## Fills the menu; a saved seat offers Reconnect and keeps its invite ready.
 func setup(player_name: String,reconnect_address: String,reconnect_password: String,can_reconnect: bool):
 	name_field.text=player_name
 	%Reconnect.visible=can_reconnect
 	if can_reconnect:
-		%ShowOnline.button_pressed=true
 		address_field.text=reconnect_address
 		password_field.text=reconnect_password
-		show_online_mode(false)
-	_on_invite_changed(address_field.text)
+	_take_clipboard_invite()
+	_refresh()
 
-## Opens the join form with the details of the last attempt.
+## Restores the details of the last attempt.
 func open_join(address: String,password: String):
-	%ShowOnline.button_pressed=true
-	show_online_mode(false)
 	address_field.text=address
 	password_field.text=password
-	_on_invite_changed(address)
+	_refresh()
 
-## While connecting the form is locked and offers Cancel instead of Join.
+## While connecting the form is locked and offers Cancel instead.
 func show_connecting(active: bool):
 	connecting=active
 	for field: LineEdit in [name_field,address_field,password_field]:field.editable=not active
-	for button: Button in [%PasteInvite,%HostTab,%JoinTab,%ShowOnline,%Reconnect,%Singleplayer,%Learn]:button.disabled=active
+	for button: Button in [%ShowOnline,%HostOnline,%Reconnect,%Singleplayer,%Learn]:button.disabled=active
 	%CancelJoin.visible=active
-	%JoinOnline.disabled=active
-	%JoinOnline.text=tr("Connecting…") if active else tr("Join room")
+	%JoinOnline.text=tr("Connecting…") if active else tr("Join")
+	_refresh()
 	if active:_status(tr("Reaching the host. This can take up to 10 seconds."))
-	else:_on_invite_changed(address_field.text)
-	layout_changed.emit()
 
-## Keeps a failed join visible next to the form instead of in a passing toast.
+## Keeps a failed join next to the form instead of in a passing toast.
 func show_join_error(message: String):
 	show_connecting(false)
-	_status(CatanI18n.render(message),true)
 	if "password" in message.to_lower():
+		# The password field only appears once a room asks for one.
+		var missing=password_field.text.is_empty()
 		password_field.clear()
+		password_field.show()
 		password_field.grab_focus.call_deferred()
+		_status(tr("This room needs a password. Enter it and press Enter.") if missing else CatanI18n.render(message),true)
+	else:_status(CatanI18n.render(message),true)
+	layout_changed.emit()
 
 func _status(text: String,error: bool=false):
 	%JoinStatus.text=text
+	%JoinStatus.visible=not text.is_empty()
 	%JoinStatus.theme_type_variation=&"ErrorLabel" if error else &""
+	layout_changed.emit()
 
 func _invite_valid(code: String) -> bool:
 	return not SECURE_INVITE.decode(code).is_empty()
 
-func show_online_mode(hosting: bool):
-	if not hosting and address_field.text.strip_edges().is_empty():
-		var clipboard=DisplayServer.clipboard_get().strip_edges()
-		if _invite_valid(clipboard):
-			address_field.text=clipboard
-			_on_invite_changed(clipboard)
-	%HostOptions.visible=hosting
-	%JoinOptions.visible=not hosting
-	%HostTab.set_pressed_no_signal(hosting)
-	%JoinTab.set_pressed_no_signal(not hosting)
-	layout_changed.emit()
+func _take_clipboard_invite():
+	if connecting:return
+	var clipboard=DisplayServer.clipboard_get().strip_edges()
+	if clipboard==address_field.text.strip_edges() or not _invite_valid(clipboard):return
+	address_field.text=clipboard
+	password_field.clear()
+	password_field.hide()
+	_refresh()
+
+func _refresh():
+	if not password_field.text.is_empty():password_field.show()
+	var code=address_field.text.strip_edges()
+	%JoinOnline.disabled=connecting or not _invite_valid(code)
+	if connecting:return
+	if code.is_empty() or _invite_valid(code):_status("")
+	elif not code.begins_with(SECURE_INVITE.PREFIX):_status(tr("Invite codes start with NC1-. Copy the whole code from the host's room."),true)
+	else:_status(tr("This invite code is incomplete or mistyped. Copy it again from the host."),true)
 
 func show_update_stage(stage: String):
 	%CheckUpdates.text=tr("Update available") if stage=="available" else tr("Update ready") if stage=="ready" else tr("Game updates")
@@ -104,21 +115,11 @@ func _on_show_online_toggled(shown: bool):
 
 func _on_invite_changed(code: String):
 	if connecting:return
-	code=code.strip_edges()
-	var valid=_invite_valid(code)
-	%JoinOnline.disabled=not valid
-	if code.is_empty():_status(tr(INVITE_HELP))
-	elif valid:_status(tr("Invite code ready. Add the password if the host set one."))
-	elif not code.begins_with(SECURE_INVITE.PREFIX):_status(tr("Invite codes start with NC1-. Copy the whole code from the host's room."),true)
-	else:_status(tr("This invite code is incomplete or mistyped. Copy it again from the host."),true)
-
-func _on_paste_invite_pressed():
-	address_field.text=DisplayServer.clipboard_get().strip_edges()
-	_on_invite_changed(address_field.text)
-	if _invite_valid(address_field.text):password_field.grab_focus()
-
-func _on_invite_submitted(_code: String):
-	password_field.grab_focus()
+	password_field.clear()
+	password_field.hide()
+	_refresh()
+	# A pasted or completely typed invite joins without another click.
+	if _invite_valid(code):_on_join_pressed()
 
 func _on_join_pressed():
 	if connecting or not _invite_valid(address_field.text):return
