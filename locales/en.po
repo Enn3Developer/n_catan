@@ -54,11 +54,7 @@ msgstr " wins!"
 msgid " · Bot"
 msgstr " · Bot"
 
-msgid " · Equipped"
-msgstr " · Equipped"
 
-msgid " · Preview"
-msgstr " · Preview"
 
 msgid "%d FPS · %.1f ms / frame · %.0f MB VRAM"
 msgstr "%d FPS · %.1f ms / frame · %.0f MB VRAM"
@@ -198,8 +194,6 @@ msgstr "Appearance"
 msgid "Apply a coordinated set of model, texture, lighting, water and anti-aliasing settings. Individual changes switch this to Custom. Display and audio preferences are preserved."
 msgstr "Apply a coordinated set of model, texture, lighting, water and anti-aliasing settings. Individual changes switch this to Custom. Display and audio preferences are preserved."
 
-msgid "Apply appearance"
-msgstr "Apply appearance"
 
 msgid "Atmospheric haze"
 msgstr "Atmospheric haze"
@@ -276,8 +270,6 @@ msgstr "Can add input latency"
 msgid "Cannot write the update cache."
 msgstr "Cannot write the update cache."
 
-msgid "Carved stone, battlements and heraldic shields. An island stronghold."
-msgstr "Carved stone, battlements and heraldic shields. An island stronghold."
 
 msgid "Change the actual albedo, normal and occlusion/roughness textures used by terrain, stone and wood. Higher settings retain detail during close inspection."
 msgstr "Change the actual albedo, normal and occlusion/roughness textures used by terrain, stone and wood. Higher settings retain detail during close inspection."
@@ -469,8 +461,6 @@ msgstr "Download update"
 msgid "Downloading update…"
 msgstr "Downloading update…"
 
-msgid "Drag the preview to turn the pieces"
-msgstr "Drag the preview to turn the pieces"
 
 msgid "During a paired turn, trades are only available with the bank."
 msgstr "During a paired turn, trades are only available with the bank."
@@ -487,8 +477,6 @@ msgstr "English"
 msgid "Enter your public address first, or use Map router."
 msgstr "Enter your public address first, or use Map router."
 
-msgid "Equipped"
-msgstr "Equipped"
 
 msgid "Exit to desktop"
 msgstr "Exit to desktop"
@@ -695,8 +683,6 @@ msgstr "Lighting"
 msgid "Limit rendering to reduce GPU load and power use. Does not change game rules or bot speed."
 msgstr "Limit rendering to reduce GPU load and power use. Does not change game rules or bot speed."
 
-msgid "Log cabins, leafy roofs and a treehouse tower. A home among the trees."
-msgstr "Log cabins, leafy roofs and a treehouse tower. A home among the trees."
 
 msgid "Longest road length"
 msgstr "Longest road length"
@@ -898,8 +884,6 @@ msgstr "Play solo  →"
 msgid "Played knights"
 msgstr "Played knights"
 
-msgid "Player appearance"
-msgstr "Player appearance"
 
 msgid "Player color"
 msgstr "Player color"
@@ -931,8 +915,6 @@ msgstr "Practice resources are provided. Click City, then one of your settlement
 msgid "Preparing update…"
 msgstr "Preparing update…"
 
-msgid "Preview and equip your roads, settlements and cities"
-msgstr "Preview and equip your roads, settlements and cities"
 
 msgid "Previous"
 msgstr "Previous"
@@ -1000,8 +982,6 @@ msgstr "Right-drag to orbit · Scroll to zoom · H / Esc to return"
 msgid "Road"
 msgstr "Road"
 
-msgid "Road · Settlement · City"
-msgstr "Road · Settlement · City"
 
 msgid "Roads"
 msgstr "Roads"
@@ -1120,8 +1100,6 @@ msgstr "Steal"
 msgid "Steal: "
 msgstr "Steal: "
 
-msgid "Stilt houses, dock roads and a lantern tower. Built for life beside the sea."
-msgstr "Stilt houses, dock roads and a lantern tower. Built for life beside the sea."
 
 msgid "Stop wind, waves, scenery movement, particles and construction animations while retaining all gameplay actions."
 msgstr "Stop wind, waves, scenery movement, particles and construction animations while retaining all gameplay actions."
@@ -1207,8 +1185,6 @@ msgstr "This room is full. Ask the host to free a seat."
 msgid "Timber"
 msgstr "Timber"
 
-msgid "Timber framing, tiled roofs and brass details. A classic island expedition."
-msgstr "Timber framing, tiled roofs and brass details. A classic island expedition."
 
 msgid "To build or buy this, you still need %s."
 msgstr "To build or buy this, you still need %s."
@@ -1774,8 +1750,6 @@ msgstr "Ivory"
 msgid "Slate"
 msgstr "Slate"
 
-msgid "Player color: %s"
-msgstr "Player color: %s"
 
 msgid "Weather"
 msgstr "Weather"
@@ -1850,3 +1824,429 @@ msgstr "Paste the invite code a host shared with you"
 
 msgid "This room needs a password. Enter it and press Enter."
 msgstr "This room needs a password. Enter it and press Enter."
+
+msgid "House width"
+msgstr "House width"
+
+msgid "House depth"
+msgstr "House depth"
+
+msgid "Stories"
+msgstr "Stories"
+
+msgid "Story height"
+msgstr "Story height"
+
+msgid "Foundation"
+msgstr "Foundation"
+
+msgid "Foundation height"
+msgstr "Foundation height"
+
+msgid "Walls"
+msgstr "Walls"
+
+msgid "Timber framing"
+msgstr "Timber framing"
+
+msgid "Windows per wall"
+msgstr "Windows per wall"
+
+msgid "Window shape"
+msgstr "Window shape"
+
+msgid "Shutters"
+msgstr "Shutters"
+
+msgid "Flower boxes"
+msgstr "Flower boxes"
+
+msgid "Door"
+msgstr "Door"
+
+msgid "Chimneys"
+msgstr "Chimneys"
+
+msgid "Dormers"
+msgstr "Dormers"
+
+msgid "Hand-built wobble"
+msgstr "Hand-built wobble"
+
+msgid "Variety between houses"
+msgstr "Variety between houses"
+
+msgid "Variation seed"
+msgstr "Variation seed"
+
+msgid "Roof shape"
+msgstr "Roof shape"
+
+msgid "Roofing"
+msgstr "Roofing"
+
+msgid "Roof pitch"
+msgstr "Roof pitch"
+
+msgid "Eaves overhang"
+msgstr "Eaves overhang"
+
+msgid "Ridge cap"
+msgstr "Ridge cap"
+
+msgid "Town square"
+msgstr "Town square"
+
+msgid "Centerpiece"
+msgstr "Centerpiece"
+
+msgid "Lanterns"
+msgstr "Lanterns"
+
+msgid "Town edge"
+msgstr "Town edge"
+
+msgid "Banner"
+msgstr "Banner"
+
+msgid "Emblem"
+msgstr "Emblem"
+
+msgid "Flagpole height"
+msgstr "Flagpole height"
+
+msgid "City wall"
+msgstr "City wall"
+
+msgid "Wall height"
+msgstr "Wall height"
+
+msgid "Battlements"
+msgstr "Battlements"
+
+msgid "Towers"
+msgstr "Towers"
+
+msgid "Tower tops"
+msgstr "Tower tops"
+
+msgid "Tower height"
+msgstr "Tower height"
+
+msgid "Landmark"
+msgstr "Landmark"
+
+msgid "Landmark height"
+msgstr "Landmark height"
+
+msgid "Road surface"
+msgstr "Road surface"
+
+msgid "Road width"
+msgstr "Road width"
+
+msgid "Road edges"
+msgstr "Road edges"
+
+msgid "Road lamps"
+msgstr "Road lamps"
+
+msgid "Roof"
+msgstr "Roof"
+
+msgid "Timber and trim"
+msgstr "Timber and trim"
+
+msgid "Stonework"
+msgstr "Stonework"
+
+msgid "Doors and shutters"
+msgstr "Doors and shutters"
+
+msgid "Plants"
+msgstr "Plants"
+
+msgid "Stone plinth"
+msgstr "Stone plinth"
+
+msgid "Stilts"
+msgstr "Stilts"
+
+msgid "Timber deck"
+msgstr "Timber deck"
+
+msgid "On the ground"
+msgstr "On the ground"
+
+msgid "Plaster"
+msgstr "Plaster"
+
+msgid "Stone"
+msgstr "Stone"
+
+msgid "Planks"
+msgstr "Planks"
+
+msgid "Logs"
+msgstr "Logs"
+
+msgid "No framing"
+msgstr "No framing"
+
+msgid "Posts"
+msgstr "Posts"
+
+msgid "Braced"
+msgstr "Braced"
+
+msgid "Crossed"
+msgstr "Crossed"
+
+msgid "Square"
+msgstr "Square"
+
+msgid "Arched"
+msgstr "Arched"
+
+msgid "Round"
+msgstr "Round"
+
+msgid "Tall"
+msgstr "Tall"
+
+msgid "Plank"
+msgstr "Plank"
+
+msgid "Double"
+msgstr "Double"
+
+msgid "Gable"
+msgstr "Gable"
+
+msgid "Hipped"
+msgstr "Hipped"
+
+msgid "Half-hipped"
+msgstr "Half-hipped"
+
+msgid "Mansard"
+msgstr "Mansard"
+
+msgid "Saltbox"
+msgstr "Saltbox"
+
+msgid "Flat"
+msgstr "Flat"
+
+msgid "Clay tiles"
+msgstr "Clay tiles"
+
+msgid "Wood shingles"
+msgstr "Wood shingles"
+
+msgid "Thatch"
+msgstr "Thatch"
+
+msgid "Leaves"
+msgstr "Leaves"
+
+msgid "Cobbles"
+msgstr "Cobbles"
+
+msgid "Flagstones"
+msgstr "Flagstones"
+
+msgid "Grass"
+msgstr "Grass"
+
+msgid "Well"
+msgstr "Well"
+
+msgid "Fountain"
+msgstr "Fountain"
+
+msgid "Tree"
+msgstr "Tree"
+
+msgid "Statue"
+msgstr "Statue"
+
+msgid "Bonfire"
+msgstr "Bonfire"
+
+msgid "Market stall"
+msgstr "Market stall"
+
+msgid "Open"
+msgstr "Open"
+
+msgid "Picket fence"
+msgstr "Picket fence"
+
+msgid "Hedge"
+msgstr "Hedge"
+
+msgid "Low stone wall"
+msgstr "Low stone wall"
+
+msgid "Pennant"
+msgstr "Pennant"
+
+msgid "Swallowtail"
+msgstr "Swallowtail"
+
+msgid "Square flag"
+msgstr "Square flag"
+
+msgid "Hanging banner"
+msgstr "Hanging banner"
+
+msgid "Plain"
+msgstr "Plain"
+
+msgid "Stripe"
+msgstr "Stripe"
+
+msgid "Cross"
+msgstr "Cross"
+
+msgid "Disc"
+msgstr "Disc"
+
+msgid "Chevron"
+msgstr "Chevron"
+
+msgid "Quartered"
+msgstr "Quartered"
+
+msgid "Stone curtain"
+msgstr "Stone curtain"
+
+msgid "Timber palisade"
+msgstr "Timber palisade"
+
+msgid "Hedge rampart"
+msgstr "Hedge rampart"
+
+msgid "No wall"
+msgstr "No wall"
+
+msgid "Cone"
+msgstr "Cone"
+
+msgid "Dome"
+msgstr "Dome"
+
+msgid "Round tower"
+msgstr "Round tower"
+
+msgid "Square keep"
+msgstr "Square keep"
+
+msgid "Great hall"
+msgstr "Great hall"
+
+msgid "Lighthouse"
+msgstr "Lighthouse"
+
+msgid "Windmill"
+msgstr "Windmill"
+
+msgid "Great tree"
+msgstr "Great tree"
+
+msgid "Dirt"
+msgstr "Dirt"
+
+msgid "Gravel"
+msgstr "Gravel"
+
+msgid "No edging"
+msgstr "No edging"
+
+msgid "Curbs"
+msgstr "Curbs"
+
+msgid "Fence"
+msgstr "Fence"
+
+msgid "Posts and rope"
+msgstr "Posts and rope"
+
+msgid "Timber framing, clay tiles and a village well. A classic island expedition."
+msgstr "Timber framing, clay tiles and a village well. A classic island expedition."
+
+msgid "Stilt houses, plank roads and a lighthouse. Built for life beside the sea."
+msgstr "Stilt houses, plank roads and a lighthouse. Built for life beside the sea."
+
+msgid "Carved stone, battlements and a square keep. An island stronghold."
+msgstr "Carved stone, battlements and a square keep. An island stronghold."
+
+msgid "Log cabins, leafy roofs and a great tree. A home among the forest."
+msgstr "Log cabins, leafy roofs and a great tree. A home among the forest."
+
+msgid "Homes"
+msgstr "Homes"
+
+msgid "Roofs"
+msgstr "Roofs"
+
+msgid "Town"
+msgstr "Town"
+
+msgid "Colors"
+msgstr "Colors"
+
+msgid "Workshop"
+msgstr "Workshop"
+
+msgid "Shape every house, roof and road. Banners and road edges always carry the player color, so everyone can still tell whose town is whose."
+msgstr "Shape every house, roof and road. Banners and road edges always carry the player color, so everyone can still tell whose town is whose."
+
+msgid "Choose whose pieces to edit"
+msgstr "Choose whose pieces to edit"
+
+msgid "Night"
+msgstr "Night"
+
+msgid "See the windows and lanterns after dark"
+msgstr "See the windows and lanterns after dark"
+
+msgid "Drag to turn · Scroll to zoom"
+msgstr "Drag to turn · Scroll to zoom"
+
+msgid "START FROM"
+msgstr "START FROM"
+
+msgid "Surprise me"
+msgstr "Surprise me"
+
+msgid "Roll a random, matching look"
+msgstr "Roll a random, matching look"
+
+msgid "Revert"
+msgstr "Revert"
+
+msgid "Go back to the pieces currently in use"
+msgstr "Go back to the pieces currently in use"
+
+msgid "Apply"
+msgstr "Apply"
+
+msgid "Applied"
+msgstr "Applied"
+
+msgid "Player color: %s. Banners, the town rim and road edges use it."
+msgstr "Player color: %s. Banners, the town rim and road edges use it."
+
+msgid "Custom pieces"
+msgstr "Custom pieces"
+
+msgid " · In use"
+msgstr " · In use"
+
+msgid " · Not applied yet"
+msgstr " · Not applied yet"
+
+msgid "Design your own roads, settlements and cities"
+msgstr "Design your own roads, settlements and cities"

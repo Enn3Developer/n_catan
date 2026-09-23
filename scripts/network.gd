@@ -18,7 +18,7 @@ var started=false
 var dedicated=false
 var online=false
 var my_name="Voyager"
-var my_style=0
+var my_look: PackedByteArray=CatanAppearance.default_bytes()
 var my_color=""
 var room_password=""
 func invite(address: String) -> String:
@@ -95,7 +95,7 @@ func host(pname: String,password: String="",server_only: bool=false) -> Error:
 	seat_tokens={}
 	reconnect_token=""
 	if not dedicated:
-		roster=[{"id":1,"name":pname,"ready":false,"connected":true,"bot":false,"piece_style":my_style,"color":my_color}]
+		roster=[{"id":1,"name":pname,"ready":false,"connected":true,"bot":false,"look":CatanAppearance.sanitize(my_look),"color":my_color}]
 		seat=0
 	changed.emit()
 	return OK
@@ -162,10 +162,10 @@ func leave():
 
 func _connected():
 	CatanDiagnostics.event("network.connected")
-	_register.rpc_id(1,my_name,room_password,PROTOCOL,reconnect_token,my_style,CatanBuildInfo.VERSION,my_color)
+	_register.rpc_id(1,my_name,room_password,PROTOCOL,reconnect_token,my_look,CatanBuildInfo.VERSION,my_color)
 
 @rpc("any_peer","call_remote","reliable")
-func _register(pname: String,password: String,version: int,token: String="",piece_style: int=0,client_version: String="unknown",requested_color: String=""):
+func _register(pname: String,password: String,version: int,token: String="",look: PackedByteArray=PackedByteArray(),client_version: String="unknown",requested_color: String=""):
 	if not online or not multiplayer.is_server(): return
 	var id=multiplayer.get_remote_sender_id()
 	if version!=PROTOCOL:
@@ -189,7 +189,7 @@ func _register(pname: String,password: String,version: int,token: String="",piec
 		return
 	pname=pname.strip_edges().replace("\n"," ").substr(0,20)
 	if pname.is_empty(): pname="Voyager"
-	roster.append({"id":id,"name":pname,"ready":false,"connected":true,"bot":false,"piece_style":piece_style if CatanCosmetics.valid_set(piece_style) else 0,"color":requested_color if valid_color(requested_color) else ""})
+	roster.append({"id":id,"name":pname,"ready":false,"connected":true,"bot":false,"look":CatanAppearance.sanitize(look),"color":requested_color if valid_color(requested_color) else ""})
 	var session_token=Crypto.new().generate_random_bytes(24).hex_encode()
 	seat_tokens[roster.size()-1]=session_token
 	_session.rpc_id(id,session_token)
@@ -317,8 +317,8 @@ func _sync():
 		state["turn_seconds"]=turn_clock
 		state["player_colors"]=[]
 		for row in roster:state.player_colors.append(str(row.get("color","")))
-		state["piece_styles"]=[]
-		for row in roster:state.piece_styles.append(int(row.get("piece_style",0)))
+		state["piece_looks"]=[]
+		for row in roster:state.piece_looks.append(row.get("look",CatanAppearance.default_bytes()))
 		if roster[p].id==1: received.emit(state)
 		else: _state.rpc_id(roster[p].id,state)
 
@@ -386,7 +386,7 @@ func host_solo(pname: String):
 	solo=true
 	dedicated=false
 	seat=0
-	roster=[{"id":1,"name":pname,"ready":true,"connected":true,"bot":false,"piece_style":my_style,"color":my_color}]
+	roster=[{"id":1,"name":pname,"ready":true,"connected":true,"bot":false,"look":CatanAppearance.sanitize(my_look),"color":my_color}]
 	changed.emit()
 
 func is_controller() -> bool:
@@ -407,7 +407,7 @@ func _edit_bot(sender: int,operation: String,index: int,difficulty: int):
 		var id=-1
 		while _seat_for(id)>=0: id-=1
 		var bot_name=["Juniper","Flint","Coral","Atlas","Willow","Slate"][(-id-1)%6]
-		roster.append({"id":id,"name":bot_name,"ready":true,"connected":true,"bot":true,"difficulty":difficulty,"piece_style":(-id)%CatanCosmetics.SETS.size()})
+		roster.append({"id":id,"name":bot_name,"ready":true,"connected":true,"bot":true,"difficulty":difficulty,"look":_bot_look(id)})
 	elif index>=0 and index<roster.size() and roster[index].get("bot",false):
 		if operation=="difficulty": roster[index].difficulty=difficulty
 		elif operation=="remove":
@@ -419,28 +419,41 @@ func _edit_bot(sender: int,operation: String,index: int,difficulty: int):
 			seat_tokens=remapped
 	_broadcast_lobby()
 
-func choose_piece_style(style: int,target: int=-1):
-	if not CatanCosmetics.valid_set(style):return
+## Bots wear a preset with their own variation seed, so two Harbor bots still differ.
+func _bot_look(id: int) -> PackedByteArray:
+	var values=CatanAppearance.preset((-id)%CatanAppearance.PRESETS.size())
+	values.seed=(-id*37)%256
+	return CatanAppearance.encode(values)
+
+func choose_look(look: PackedByteArray,target: int=-1):
+	look=CatanAppearance.sanitize(look)
 	if target<0:target=seat
 	if not online or target<0:
-		my_style=style
+		my_look=look
 		return
-	if multiplayer.is_server():_set_piece_style(1,target,style)
-	else:_piece_style_request.rpc_id(1,target,style)
+	if multiplayer.is_server():_set_look(1,target,look)
+	else:_look_request.rpc_id(1,target,look)
 
 @rpc("any_peer","call_remote","reliable")
-func _piece_style_request(target: int,style: int):
-	if online and multiplayer.is_server():_set_piece_style(multiplayer.get_remote_sender_id(),target,style)
+func _look_request(target: int,look: PackedByteArray):
+	if online and multiplayer.is_server():_set_look(multiplayer.get_remote_sender_id(),target,look)
 
-func _set_piece_style(sender: int,target: int,style: int):
-	if target<0 or target>=roster.size() or not CatanCosmetics.valid_set(style):return
+func _set_look(sender: int,target: int,look: PackedByteArray):
+	if target<0 or target>=roster.size():return
 	var own=_seat_for(sender)
 	var controller=sender==1 or (dedicated and own==0)
 	if target!=own and not (controller and roster[target].get("bot",false)):return
-	roster[target].piece_style=style
-	if target==seat:my_style=style
+	# Re-encoding clamps every field, whatever the client sent.
+	look=CatanAppearance.sanitize(look)
+	if roster[target].get("look",PackedByteArray())==look:return
+	roster[target].look=look
+	if target==seat:my_look=look
 	_broadcast_lobby()
 	if started:_sync()
+
+func player_look(player: int) -> PackedByteArray:
+	if player>=0 and player<roster.size():return roster[player].get("look",CatanAppearance.default_bytes())
+	return my_look
 
 func _process(delta: float):
 	secure_transport.poll()

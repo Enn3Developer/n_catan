@@ -50,7 +50,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-text = "Player appearance"
+text = "Workshop"
 
 [node name="LobbySettings" type="Button" parent="Frame/Header" groups=["ui_click"]]
 unique_name_in_owner = true

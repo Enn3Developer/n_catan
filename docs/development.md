@@ -72,7 +72,8 @@ The board scene contains the camera, sun, sky environment, ocean, terrain, build
 | `scripts/bot.gd` | Bot decisions and difficulty settings |
 | `scripts/tutorial.gd` | Guided practice scenarios |
 | `scripts/settings.gd`, `scripts/audio.gd` | Preferences and audio buses |
-| `scripts/cosmetics.gd`, `scripts/cosmetics_menu.gd` | Piece models and cosmetics screen |
+| `scripts/piece_appearance.gd`, `scripts/piece_builder.gd`, `scripts/mesh_kit.gd` | Player piece looks and the procedural towns and roads built from them |
+| `scripts/cosmetics_menu.gd`, `scripts/appearance_row.gd` | The Workshop, where players design their pieces |
 | `scripts/tile_art.gd` | Terrain materials, model detail and texture tiers |
 | `assets/premium/` | Twelve Blender biome variants |
 | `assets/materials/` | Texture sources and runtime maps |
@@ -108,15 +109,22 @@ English and Italian catalogs live in `locales/en.po` and `locales/it.po`. Use En
 Player colors are opaque six-digit RGB values. An empty value uses the seat palette. The host validates changes and includes them in lobby and game snapshots. Players can edit their own appearance; the room controller can also edit bots. Protocol 10 adds the color handshake and structured localized messages.
 
 
+## Player pieces
+
+Roads, settlements and cities are not models. Each player designs them in the Workshop (Home or lobby → Workshop), and `scripts/piece_builder.gd` builds the geometry from that design: houses with their walls, framing, windows, doors, chimneys and roofs, the town square and its centerpiece, the city wall, towers and landmark, and the roads. Everything is flat-shaded, vertex-colored triangles from `CatanMeshKit`, one draw call for the body and one for the windows that glow at night. Results are cached per design, so the board builds each look once. Model Detail set to Low drops the individual tiles, stones and cobbles.
+
+A design is a `CatanAppearance`: about fifty fields, each packed into one byte and colors into three, 70 bytes in all. Any byte string decodes to a valid design, so the host re-encodes whatever a client sends before storing it in the roster and replicating it with the game state. Adding, removing or reordering fields changes the encoding: bump `CatanAppearance.VERSION` and the multiplayer protocol together.
+
+Ownership stays readable whatever players choose. Banners, the town rim and the edge strips of every road always use the seat's player color; only the banner's shape and emblem are up to the player. The four presets (Voyager, Harbor, Citadel, Wildwood) are ordinary designs that fill the sliders. Bots wear a preset with their own variation seed.
+
 ## Models
 
-Every mesh in the game is modeled in Blender. Only shader and particle carriers stay Godot primitives: the ocean plane, rain, lightning, pollen and chimney smoke. The lighthouse beam is its spot light scattering in a night-only `FogVolume` of sea haze; it needs Forward+ with Atmosphere enabled, and other renderers still get the sweeping light on the water. Each group has an editable source in `assets/source/` and one `.glb` per model in `assets/models/<group>/`:
+Every mesh in the game is modeled in Blender except the player pieces, which are generated (see [Player pieces](#player-pieces)). Shader and particle carriers also stay Godot primitives: the ocean plane, rain, lightning, pollen and chimney smoke. The lighthouse beam is its spot light scattering in a night-only `FogVolume` of sea haze; it needs Forward+ with Atmosphere enabled, and other renderers still get the sweeping light on the water. Each group has an editable source in `assets/source/` and one `.glb` per model in `assets/models/<group>/`:
 
 | Source | Models |
 | --- | --- |
-| `pieces.blend` | Road, road joint, settlement and city for each piece set; the cosmetics pedestal |
 | `actors.blend` | Sheep, woodcutter, quarry worker, farmer, outlaw and town dweller |
-| `settlements.blend` | Village, city, cottage, harbor, robber camp and worksites |
+| `settlements.blend` | Cottage, harbor, robber camp and worksites |
 | `props.blend` | Sailboat, lighthouse, number token, die, markers, production halo and offshore rocks |
 | `terrain.blend` | The ground of each biome and the cliff skirt |
 | `mainland.blend` | The backdrop mainland |
@@ -124,7 +132,7 @@ Every mesh in the game is modeled in Blender. Only shader and particle carriers 
 Export each model's collection with the glTF exporter, using **+Y Up**, **Apply Modifiers**, **Custom Properties** and, for models with lamps, **Punctual Lights**. The code relies on these conventions:
 
 - **Pivots.** Animated parts hang from empties with an identity rest rotation, such as `Body/Leg0/Knee0` on the sheep and `Torso/UpperArm0/Forearm0` or `Torso/Tool` on workers. `scripts/living_world.gd` drives them by name.
-- **Recolored surfaces.** A material named after a role, optionally with a signed percentage, takes its color at runtime: `Player`, `Player-16` (darkened 16%), `Player+07` (lightened 7%). Roles are `Player` (owner color), `Wall` (piece-set wall color), `Shirt` and `Skin`. `CatanCosmetics.paint()` applies them.
+- **Recolored surfaces.** A material named after a role, optionally with a signed percentage, takes its color at runtime: `Shirt`, `Shirt-16` (darkened 16%), `Shirt+07` (lightened 7%). Roles are `Shirt` and `Skin`. `CatanModelTint.paint()` applies them.
 - **Textured surfaces.** Materials named `PBR_Rock`, `PBR_Wood` and similar take that surface's texture tier from `CatanTileArt.surface()`.
 - **Night lights.** Meshes named `NightWindow`, `NightLantern` or `Campfire` glow at night, lit by the `NightLight` point light that shares their pivot. Each light's `local_range` and `night_energy` custom properties become Godot metadata.
 - **Ground.** Workers, cottages and the robber camp stand on `CatanTileArt.height_at()`, which samples the exported ground mesh. Sculpt it freely, but keep the rim at 0.20 units so tiles meet the cliffs. Godot generates the ground's LODs; Model Detail sets their `lod_bias`.
@@ -166,7 +174,7 @@ to the night palette when daylight drops below 0.4 and back above 0.6, crossing
 in a 0.6-second fade. The two palettes invert light and dark, so an interface
 parked between them would put lettering and surfaces on the same grey.
 
-Roads use a 30% vertical profile above the terrain; `CatanCosmetics.road_deck_height()` supplies the matching pedestrian surface. `scripts/road_travel.gd` assigns occasional journeys to existing residents along disjoint, same-owner road paths between towns. Visitors stop at town entrances, rest between trips, hide at night, and obey reduced motion.
+Roads sit on the terrain surface; `CatanPieceBuilder.road_deck()` supplies the matching pedestrian surface for each road style. `scripts/road_travel.gd` assigns occasional journeys to existing residents along disjoint, same-owner road paths between towns. Visitors stop at town entrances, rest between trips, hide at night, and obey reduced motion.
 
 Weather follows the synchronized 600-second world clock. `scripts/weather.gd` blends clear, cloudy, rainy and stormy conditions; the local Weather setting can hold any one condition. Clouds drift through a procedural sky shader and affect ambient lighting. Clear weather retains a few scattered clouds and sunlight. Cloudy, rainy and stormy weather disable direct sunlight and directional shadows, with bounded rain particles and an offshore lightning effect. Rain/thunder audio goes through the Ambience bus. Reduced motion stops moving clouds and suppresses rain particles, water ripples and lightning flashes. Water uses four Gerstner swells, shore attenuation, filtered surface ripples and a narrow sun glitter reflection. The mesh concentrates vertices around the island. Boats sample the same wave parameters as the shader. See NVIDIA’s [water model](https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-1-effective-water-simulation-physical-models) and Godot’s [sky shader documentation](https://docs.godotengine.org/en/stable/tutorials/shaders/shader_reference/sky_shader.html). Original weather audio can be regenerated with `python3 tools/generate_weather_audio.py`.
 

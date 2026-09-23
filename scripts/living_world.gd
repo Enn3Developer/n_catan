@@ -2,7 +2,7 @@ extends RefCounted
 # All dimensions are in normalized tile units; the board maps each unit to 25 m.
 # Models come from assets/source/actors.blend and settlements.blend. Pivot nodes
 # keep identity rest rotations, so the animation below drives them directly.
-var tint=CatanCosmetics.new()
+var tint=CatanModelTint.new()
 var night_glow: StandardMaterial3D
 const TILE_ACTOR_SCALE=.4
 const SHEEP=preload("res://assets/models/actors/sheep.glb")
@@ -11,14 +11,10 @@ const DWELLER=preload("res://assets/models/actors/dweller.glb")
 const WORKERS={0:preload("res://assets/models/actors/woodcutter.glb"),1:preload("res://assets/models/actors/quarry_worker.glb"),3:preload("res://assets/models/actors/farmer.glb"),4:preload("res://assets/models/actors/quarry_worker.glb")}
 const WORKSITES={0:preload("res://assets/models/settlements/worksite_stump.glb"),1:preload("res://assets/models/settlements/worksite_clay.glb"),4:preload("res://assets/models/settlements/worksite_stone.glb")}
 const COTTAGE=preload("res://assets/models/settlements/cottage.glb")
-const VILLAGE=preload("res://assets/models/settlements/village.glb")
-const CITY=preload("res://assets/models/settlements/city.glb")
 const HARBOR=preload("res://assets/models/settlements/harbor.glb")
 const CAMP=preload("res://assets/models/settlements/robber_camp.glb")
 const SHIRTS=[Color("728568"),Color("b77453"),Color("c6b48b"),Color("b39a65"),Color("6d8190")]
 const OUTLAW_SHIRT=Color("444c49")
-# Cottage walls per piece set: plaster, limewash, stone and timber.
-const WALLS=[Color("e3cfaa"),Color("d9cdb5"),Color("949487"),Color("a8875f")]
 
 func sheep() -> Dictionary:
 	var root: Node3D=SHEEP.instantiate();root.name="GrazingSheep"
@@ -197,15 +193,32 @@ func strike_pose(actor: Dictionary,cycle: float,working: float):
 	var pose=Transform3D(Basis(Vector3.RIGHT,lerpf(ready_angle,angle,working)),ready.lerp(origin,working))
 	actor.tool.transform=actor.body.transform.affine_inverse()*pose
 
-func town(style: int,color: Color,city: bool) -> Node3D:
-	var root: Node3D=(CITY if city else VILLAGE).instantiate()
-	root.name="MedievalCity" if city else "MedievalVillage";root.set_meta("cosmetic",style)
-	root.scale.y=1.20
-	tint.paint(root,color)
-	tint.paint(root,WALLS[clampi(style,0,WALLS.size()-1)],"Wall")
+func town(look: PackedByteArray,color: Color,city: bool,parity: int=0,full_detail: bool=true) -> Node3D:
+	var root: Node3D=CatanPieceBuilder.town(look,color,city,parity,full_detail)
+	root.name="MedievalCity" if city else "MedievalVillage"
 	wire_lights(root)
 	root.set_meta("dwellers",populate_town(root,city,color))
 	return root
+
+static var dweller_sole=NAN
+const TOWN_DWELLER_HEIGHT=.29
+const ROAD_DWELLER_HEIGHT=.348
+## Height of the dweller's soles above its origin, before scaling, measured from
+## the mesh itself. Bounding boxes are padded, so only the vertices are trusted.
+static func sole_height() -> float:
+	if is_nan(dweller_sole):
+		var person: Node3D=DWELLER.instantiate()
+		dweller_sole=INF
+		for mesh: MeshInstance3D in person.find_children("*","MeshInstance3D",true,false):
+			var to_root=Transform3D.IDENTITY
+			var node: Node=mesh
+			while node!=person:
+				to_root=node.transform*to_root
+				node=node.get_parent()
+			for vertex in mesh.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]:
+				dweller_sole=minf(dweller_sole,(to_root*vertex).y)
+		person.free()
+	return dweller_sole
 
 const SETTLEMENT_POPULATION=6
 const CITY_POPULATION=16
@@ -216,7 +229,7 @@ func populate_town(town_root: Node3D,city: bool,color: Color) -> Array:
 	for i in count:
 		var person: Node3D=DWELLER.instantiate();person.name="Dweller%02d"%i;town_root.add_child(person)
 		# Adult height is roughly 1.8 m at the new world scale.
-		person.scale=Vector3(.34,.29,.34)
+		person.scale=Vector3(.34,TOWN_DWELLER_HEIGHT,.34)
 		tint.paint(person,[color,Color("b58a58"),Color("778868"),Color("b57865"),Color("718998")][i%5],"Shirt")
 		tint.paint(person,[Color("d2a37e"),Color("b68160"),Color("916449")][i%3],"Skin")
 		var body=person.get_node("Torso")
@@ -259,7 +272,7 @@ func animate_dwellers(residents: Array,time: float,daylight: float):
 			var travel=(cycle-wait_home-duration-wait_away)/duration
 			progress=1.0-smoothstep(0,1,travel);moving=sin(PI*travel);yaw=backward_yaw
 		var position=actor.origin.lerp(actor.destination,progress)
-		actor.root.position=Vector3(position.x,.034,position.y)
+		actor.root.position=Vector3(position.x,CatanPieceBuilder.GROUND_TOP-sole_height()*TOWN_DWELLER_HEIGHT,position.y)
 		actor.root.rotation.y=yaw
 		actor.root.visible=daylight>.15
 		actor.moving=moving>.08

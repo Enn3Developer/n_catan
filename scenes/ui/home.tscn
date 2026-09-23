@@ -180,10 +180,10 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
-tooltip_text = "Preview and equip your roads, settlements and cities"
+tooltip_text = "Design your own roads, settlements and cities"
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
-text = "Player appearance"
+text = "Workshop"
 
 [node name="OpenMusic" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/MenuUtilities" groups=["ui_click"]]
 unique_name_in_owner = true

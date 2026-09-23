@@ -9,6 +9,8 @@ const PLACEMENT_MARKER=preload("res://scenes/world/placement_marker.tscn")
 const ROBBER_MARKER=preload("res://scenes/world/robber_marker.tscn")
 const PRODUCTION_RING=preload("res://scenes/world/production_ring.tscn")
 const CHIMNEY_SMOKE=preload("res://scenes/world/chimney_smoke.tscn")
+# Roads sit directly on the terrain surface around each vertex.
+const ROAD_BASE=.201
 const DICE_THROW=preload("res://scenes/world/dice_throw.tscn")
 @onready var camera: Camera3D=$CameraRig/Camera
 @onready var sun: DirectionalLight3D=$Sun
@@ -46,7 +48,6 @@ var camera_speed=1.0
 var board_labels=[]
 var quality=2
 var art=CatanTileArt.new()
-var cosmetics=CatanCosmetics.new()
 var render_values=CatanSettings.DEFAULTS.duplicate()
 var tile_nodes=[]
 var water_centers=PackedVector2Array()
@@ -254,24 +255,23 @@ func refresh(data: Dictionary):
 		if e.owner<0: continue
 		var a=state.vertices[e.a]
 		var b=state.vertices[e.b]
-		var road=cosmetics.road(_piece_style(e.owner),player_color(e.owner))
+		var road=CatanPieceBuilder.road(_look(e.owner),player_color(e.owner),_full_detail())
 		var start=Vector3(a.x,0,a.z)
 		var end=Vector3(b.x,0,b.z)
 		var direction=(end-start).normalized()
 		var gap=maxf(0,(start.distance_to(end)-.77)*.5)
 		if joins.get(Vector2i(e.a,e.owner),0)<2:start+=direction*gap
 		if joins.get(Vector2i(e.b,e.owner),0)<2:end-=direction*gap
-		road.scale.z=start.distance_to(end)/.77
-		road.scale.y=CatanCosmetics.ROAD_HEIGHT_SCALE
-		road.position=(start+end)*.5+Vector3.UP*CatanCosmetics.road_base_height(_piece_style(e.owner))
+		road.scale.z=start.distance_to(end)/CatanPieceBuilder.ROAD_LENGTH
+		road.position=(start+end)*.5+Vector3.UP*ROAD_BASE
 		road.rotation.y=atan2(b.x-a.x,b.z-a.z)
+		if road.has_node("NightWindows"):living_world.wire_lights(road)
 		pieces_root.add_child(road)
 	for key in joins:
 		if joins[key]<2:continue
 		var v=state.vertices[key.x]
-		var join=cosmetics.road_joint(_piece_style(key.y),player_color(key.y))
-		join.position=Vector3(v.x,CatanCosmetics.road_base_height(_piece_style(key.y)),v.z)
-		join.scale.y=CatanCosmetics.ROAD_HEIGHT_SCALE
+		var join=CatanPieceBuilder.road_joint(_look(key.y),player_color(key.y),_full_detail())
+		join.position=Vector3(v.x,ROAD_BASE,v.z)
 		pieces_root.add_child(join)
 	var town_residents={}
 	for vid in state.vertices.size():
@@ -281,7 +281,7 @@ func refresh(data: Dictionary):
 		village.position=Vector3(v.x,0.22,v.z)
 		pieces_root.add_child(village)
 		var first_resident=dwellers.size()
-		_house(village,Vector3.ZERO,player_color(v.owner),v.level==2,_piece_style(v.owner))
+		_house(village,player_color(v.owner),v.level==2,_look(v.owner),_gate_parity(vid))
 		town_residents[vid]=dwellers[first_resident]
 		if not reduce_motion and not old.is_empty() and (old.vertices[vid].owner!=v.owner or old.vertices[vid].level!=v.level):
 			village.scale=Vector3.ONE*0.1
@@ -466,17 +466,29 @@ func _world_props():
 	_apply_surfaces(scenery)
 	seagulls.setup(self)
 
-func _piece_style(player: int) -> int:
-	var styles=state.get("piece_styles",[])
-	return clampi(int(styles[player]),0,CatanCosmetics.SETS.size()-1) if player>=0 and player<styles.size() else 0
+func _look(player: int) -> PackedByteArray:
+	var looks=state.get("piece_looks",[])
+	return looks[player] if player>=0 and player<looks.size() and looks[player] is PackedByteArray else CatanAppearance.default_bytes()
 
-func _house(parent: Node3D,pos: Vector3,color: Color,city: bool=false,style: int=0):
-	var root=living_world.town(style,color,city)
-	root.position=pos
+func _full_detail() -> bool:
+	return render_values.model_quality>0
+
+## 0 when one of the vertex's roads can leave towards +z, 1 when one leaves towards -z.
+func _gate_parity(vid: int) -> int:
+	var v=state.vertices[vid]
+	var e=state.edges[v.edges[0]]
+	var other=state.vertices[e.b if e.a==vid else e.a]
+	var rise=float(other.z)-float(v.z)
+	return 0 if rise>.7 or (rise<0 and rise>-.7) else 1
+
+func _house(parent: Node3D,color: Color,city: bool,look: PackedByteArray,parity: int):
+	var root=living_world.town(look,color,city,parity,_full_detail())
 	parent.add_child(root)
 	dwellers.append_array(root.get_meta("dwellers",[]))
-	if style!=0:return
+	var chimneys: Array=root.get_meta("chimneys",[])
+	if chimneys.is_empty():return
 	var smoke=CHIMNEY_SMOKE.instantiate()
+	smoke.position=chimneys[0]
 	smoke.emitting=render_values.particles>0 and not reduce_motion
 	root.add_child(smoke)
 

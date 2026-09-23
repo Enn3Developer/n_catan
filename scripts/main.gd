@@ -50,7 +50,7 @@ func _ready():
 	get_tree().auto_accept_quit=false
 	CatanI18n.apply(preferences.values.language)
 	active_language=preferences.values.language
-	net.my_style=preferences.values.piece_style
+	net.my_look=preferences.look()
 	net.my_color=preferences.values.player_color
 	if "--server" in OS.get_cmdline_user_args():
 		server_only=true
@@ -448,10 +448,10 @@ func _apply_preferences():
 	board.apply_preferences(preferences.values)
 	audio.apply(preferences.values)
 	net.bot_delay=[1.25,0.7,0.2][preferences.values.bot_speed]
-	net.my_style=preferences.values.piece_style
+	net.my_look=preferences.look()
 	net.my_color=preferences.values.player_color
-	if net.online and net.seat>=0 and net.seat<net.roster.size() and int(net.roster[net.seat].get("piece_style",0))!=net.my_style:
-		net.choose_piece_style(net.my_style)
+	if net.online and net.seat>=0 and net.seat<net.roster.size() and net.roster[net.seat].get("look",PackedByteArray())!=net.my_look:
+		net.choose_look(net.my_look)
 	if net.online and net.seat>=0 and net.seat<net.roster.size() and str(net.roster[net.seat].get("color",""))!=net.my_color:
 		net.choose_color(net.my_color)
 	_apply_text(ui)

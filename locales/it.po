@@ -54,11 +54,7 @@ msgstr " vince!"
 msgid " · Bot"
 msgstr " · Bot"
 
-msgid " · Equipped"
-msgstr " · In uso"
 
-msgid " · Preview"
-msgstr " · Anteprima"
 
 msgid "%d FPS · %.1f ms / frame · %.0f MB VRAM"
 msgstr "%d FPS · %.1f ms / fotogramma · %.0f MB VRAM"
@@ -198,8 +194,6 @@ msgstr "Aspetto"
 msgid "Apply a coordinated set of model, texture, lighting, water and anti-aliasing settings. Individual changes switch this to Custom. Display and audio preferences are preserved."
 msgstr "Applica un insieme di impostazioni per modelli, texture, luci, acqua e anti-aliasing. Le modifiche singole passano a Personalizzata. Le preferenze di schermo e audio restano invariate."
 
-msgid "Apply appearance"
-msgstr "Applica aspetto"
 
 msgid "Atmospheric haze"
 msgstr "Foschia atmosferica"
@@ -276,8 +270,6 @@ msgstr "Può aumentare il ritardo dei comandi"
 msgid "Cannot write the update cache."
 msgstr "Impossibile salvare i file dell’aggiornamento. Controlla spazio libero e permessi della cartella."
 
-msgid "Carved stone, battlements and heraldic shields. An island stronghold."
-msgstr "Pietra scolpita, merli e scudi araldici. Una fortezza sull’isola."
 
 msgid "Change the actual albedo, normal and occlusion/roughness textures used by terrain, stone and wood. Higher settings retain detail during close inspection."
 msgstr "Cambia la risoluzione delle texture di colore, rilievo e superficie per terreno, pietra e legno. I valori alti mantengono i dettagli da vicino."
@@ -469,8 +461,6 @@ msgstr "Scarica aggiornamento"
 msgid "Downloading update…"
 msgstr "Download aggiornamento…"
 
-msgid "Drag the preview to turn the pieces"
-msgstr "Trascina l’anteprima per ruotare le pedine"
 
 msgid "During a paired turn, trades are only available with the bank."
 msgstr "Durante un turno abbinato puoi scambiare solo con la banca."
@@ -487,8 +477,6 @@ msgstr "English"
 msgid "Enter your public address first, or use Map router."
 msgstr "Inserisci prima il tuo indirizzo pubblico, oppure usa Configura router."
 
-msgid "Equipped"
-msgstr "In uso"
 
 msgid "Exit to desktop"
 msgstr "Esci dal gioco"
@@ -695,8 +683,6 @@ msgstr "Illuminazione"
 msgid "Limit rendering to reduce GPU load and power use. Does not change game rules or bot speed."
 msgstr "Limita i fotogrammi per ridurre il carico sulla GPU e i consumi. Non modifica le regole o la velocità dei bot."
 
-msgid "Log cabins, leafy roofs and a treehouse tower. A home among the trees."
-msgstr "Capanne di tronchi, tetti di foglie e una torre sull’albero. Una casa tra gli alberi."
 
 msgid "Longest road length"
 msgstr "Lunghezza strada più lunga"
@@ -898,8 +884,6 @@ msgstr "Gioca da solo  →"
 msgid "Played knights"
 msgstr "Cavalieri giocati"
 
-msgid "Player appearance"
-msgstr "Aspetto del giocatore"
 
 msgid "Player color"
 msgstr "Colore del giocatore"
@@ -931,8 +915,6 @@ msgstr "Hai già le risorse per esercitarti. Clicca su Città, poi su una tua co
 msgid "Preparing update…"
 msgstr "Preparazione aggiornamento…"
 
-msgid "Preview and equip your roads, settlements and cities"
-msgstr "Scegli colore e aspetto di strade, colonie e città"
 
 msgid "Previous"
 msgstr "Precedente"
@@ -1000,8 +982,6 @@ msgstr "Trascina col destro per ruotare · Rotella per lo zoom · H / Esc per to
 msgid "Road"
 msgstr "Strada"
 
-msgid "Road · Settlement · City"
-msgstr "Strada · Colonia · Città"
 
 msgid "Roads"
 msgstr "Strade"
@@ -1120,8 +1100,6 @@ msgstr "Ruba"
 msgid "Steal: "
 msgstr "Ruba a: "
 
-msgid "Stilt houses, dock roads and a lantern tower. Built for life beside the sea."
-msgstr "Palafitte, strade sul molo e una torre con lanterna. Per vivere vicino al mare."
 
 msgid "Stop wind, waves, scenery movement, particles and construction animations while retaining all gameplay actions."
 msgstr "Ferma vento, onde, paesaggio, particelle e animazioni di costruzione. Tutte le azioni di gioco restano disponibili."
@@ -1207,8 +1185,6 @@ msgstr "La stanza è piena. Chiedi all’host di liberare un posto."
 msgid "Timber"
 msgstr "Legno"
 
-msgid "Timber framing, tiled roofs and brass details. A classic island expedition."
-msgstr "Strutture in legno, tetti di tegole e dettagli in ottone. Lo stile classico dell’isola."
 
 msgid "To build or buy this, you still need %s."
 msgstr "Per questa costruzione o acquisto ti servono ancora %s."
@@ -1774,8 +1750,6 @@ msgstr "Avorio"
 msgid "Slate"
 msgstr "Ardesia"
 
-msgid "Player color: %s"
-msgstr "Colore giocatore: %s"
 
 msgid "Weather"
 msgstr "Meteo"
@@ -1850,3 +1824,429 @@ msgstr "Incolla il codice invito condiviso dall’host"
 
 msgid "This room needs a password. Enter it and press Enter."
 msgstr "Questa stanza richiede una password. Inseriscila e premi Invio."
+
+msgid "House width"
+msgstr "Larghezza delle case"
+
+msgid "House depth"
+msgstr "Profondità delle case"
+
+msgid "Stories"
+msgstr "Piani"
+
+msgid "Story height"
+msgstr "Altezza dei piani"
+
+msgid "Foundation"
+msgstr "Fondamenta"
+
+msgid "Foundation height"
+msgstr "Altezza delle fondamenta"
+
+msgid "Walls"
+msgstr "Muri"
+
+msgid "Timber framing"
+msgstr "Travi a vista"
+
+msgid "Windows per wall"
+msgstr "Finestre per parete"
+
+msgid "Window shape"
+msgstr "Forma delle finestre"
+
+msgid "Shutters"
+msgstr "Persiane"
+
+msgid "Flower boxes"
+msgstr "Fioriere"
+
+msgid "Door"
+msgstr "Porta"
+
+msgid "Chimneys"
+msgstr "Comignoli"
+
+msgid "Dormers"
+msgstr "Abbaini"
+
+msgid "Hand-built wobble"
+msgstr "Imperfezioni fatte a mano"
+
+msgid "Variety between houses"
+msgstr "Varietà tra le case"
+
+msgid "Variation seed"
+msgstr "Variante"
+
+msgid "Roof shape"
+msgstr "Forma del tetto"
+
+msgid "Roofing"
+msgstr "Copertura"
+
+msgid "Roof pitch"
+msgstr "Pendenza del tetto"
+
+msgid "Eaves overhang"
+msgstr "Sporgenza della gronda"
+
+msgid "Ridge cap"
+msgstr "Colmo"
+
+msgid "Town square"
+msgstr "Piazza"
+
+msgid "Centerpiece"
+msgstr "Elemento centrale"
+
+msgid "Lanterns"
+msgstr "Lanterne"
+
+msgid "Town edge"
+msgstr "Bordo del paese"
+
+msgid "Banner"
+msgstr "Stendardo"
+
+msgid "Emblem"
+msgstr "Stemma"
+
+msgid "Flagpole height"
+msgstr "Altezza del pennone"
+
+msgid "City wall"
+msgstr "Mura della città"
+
+msgid "Wall height"
+msgstr "Altezza delle mura"
+
+msgid "Battlements"
+msgstr "Merli"
+
+msgid "Towers"
+msgstr "Torri"
+
+msgid "Tower tops"
+msgstr "Cime delle torri"
+
+msgid "Tower height"
+msgstr "Altezza delle torri"
+
+msgid "Landmark"
+msgstr "Monumento"
+
+msgid "Landmark height"
+msgstr "Altezza del monumento"
+
+msgid "Road surface"
+msgstr "Fondo stradale"
+
+msgid "Road width"
+msgstr "Larghezza delle strade"
+
+msgid "Road edges"
+msgstr "Bordi delle strade"
+
+msgid "Road lamps"
+msgstr "Lampioni"
+
+msgid "Roof"
+msgstr "Tetto"
+
+msgid "Timber and trim"
+msgstr "Legno e rifiniture"
+
+msgid "Stonework"
+msgstr "Pietra lavorata"
+
+msgid "Doors and shutters"
+msgstr "Porte e persiane"
+
+msgid "Plants"
+msgstr "Piante"
+
+msgid "Stone plinth"
+msgstr "Zoccolo in pietra"
+
+msgid "Stilts"
+msgstr "Palafitte"
+
+msgid "Timber deck"
+msgstr "Pedana di legno"
+
+msgid "On the ground"
+msgstr "A terra"
+
+msgid "Plaster"
+msgstr "Intonaco"
+
+msgid "Stone"
+msgstr "Pietra"
+
+msgid "Planks"
+msgstr "Assi"
+
+msgid "Logs"
+msgstr "Tronchi"
+
+msgid "No framing"
+msgstr "Senza travi"
+
+msgid "Posts"
+msgstr "Pali"
+
+msgid "Braced"
+msgstr "Controventate"
+
+msgid "Crossed"
+msgstr "Incrociate"
+
+msgid "Square"
+msgstr "Quadrata"
+
+msgid "Arched"
+msgstr "Ad arco"
+
+msgid "Round"
+msgstr "Rotonda"
+
+msgid "Tall"
+msgstr "Alta"
+
+msgid "Plank"
+msgstr "Ad assi"
+
+msgid "Double"
+msgstr "Doppia"
+
+msgid "Gable"
+msgstr "A capanna"
+
+msgid "Hipped"
+msgstr "A padiglione"
+
+msgid "Half-hipped"
+msgstr "A mezzo padiglione"
+
+msgid "Mansard"
+msgstr "Mansarda"
+
+msgid "Saltbox"
+msgstr "Asimmetrico"
+
+msgid "Flat"
+msgstr "Piatto"
+
+msgid "Clay tiles"
+msgstr "Coppi"
+
+msgid "Wood shingles"
+msgstr "Scandole di legno"
+
+msgid "Thatch"
+msgstr "Paglia"
+
+msgid "Leaves"
+msgstr "Foglie"
+
+msgid "Cobbles"
+msgstr "Ciottoli"
+
+msgid "Flagstones"
+msgstr "Lastricato"
+
+msgid "Grass"
+msgstr "Erba"
+
+msgid "Well"
+msgstr "Pozzo"
+
+msgid "Fountain"
+msgstr "Fontana"
+
+msgid "Tree"
+msgstr "Albero"
+
+msgid "Statue"
+msgstr "Statua"
+
+msgid "Bonfire"
+msgstr "Falò"
+
+msgid "Market stall"
+msgstr "Bancarella"
+
+msgid "Open"
+msgstr "Aperto"
+
+msgid "Picket fence"
+msgstr "Staccionata"
+
+msgid "Hedge"
+msgstr "Siepe"
+
+msgid "Low stone wall"
+msgstr "Muretto in pietra"
+
+msgid "Pennant"
+msgstr "Gagliardetto"
+
+msgid "Swallowtail"
+msgstr "A coda di rondine"
+
+msgid "Square flag"
+msgstr "Bandiera quadrata"
+
+msgid "Hanging banner"
+msgstr "Stendardo appeso"
+
+msgid "Plain"
+msgstr "Tinta unita"
+
+msgid "Stripe"
+msgstr "Fascia"
+
+msgid "Cross"
+msgstr "Croce"
+
+msgid "Disc"
+msgstr "Disco"
+
+msgid "Chevron"
+msgstr "Scaglione"
+
+msgid "Quartered"
+msgstr "Inquartato"
+
+msgid "Stone curtain"
+msgstr "Mura in pietra"
+
+msgid "Timber palisade"
+msgstr "Palizzata"
+
+msgid "Hedge rampart"
+msgstr "Terrapieno con siepe"
+
+msgid "No wall"
+msgstr "Senza mura"
+
+msgid "Cone"
+msgstr "Cono"
+
+msgid "Dome"
+msgstr "Cupola"
+
+msgid "Round tower"
+msgstr "Torre rotonda"
+
+msgid "Square keep"
+msgstr "Mastio quadrato"
+
+msgid "Great hall"
+msgstr "Salone"
+
+msgid "Lighthouse"
+msgstr "Faro"
+
+msgid "Windmill"
+msgstr "Mulino a vento"
+
+msgid "Great tree"
+msgstr "Grande albero"
+
+msgid "Dirt"
+msgstr "Terra battuta"
+
+msgid "Gravel"
+msgstr "Ghiaia"
+
+msgid "No edging"
+msgstr "Senza bordi"
+
+msgid "Curbs"
+msgstr "Cordoli"
+
+msgid "Fence"
+msgstr "Recinzione"
+
+msgid "Posts and rope"
+msgstr "Pali e corda"
+
+msgid "Timber framing, clay tiles and a village well. A classic island expedition."
+msgstr "Travi a vista, coppi e un pozzo in piazza. La classica spedizione sull’isola."
+
+msgid "Stilt houses, plank roads and a lighthouse. Built for life beside the sea."
+msgstr "Case su palafitte, strade di assi e un faro. Fatte per vivere accanto al mare."
+
+msgid "Carved stone, battlements and a square keep. An island stronghold."
+msgstr "Pietra scolpita, merli e un mastio quadrato. Una roccaforte sull’isola."
+
+msgid "Log cabins, leafy roofs and a great tree. A home among the forest."
+msgstr "Capanne di tronchi, tetti di foglie e un grande albero. Una casa nel bosco."
+
+msgid "Homes"
+msgstr "Case"
+
+msgid "Roofs"
+msgstr "Tetti"
+
+msgid "Town"
+msgstr "Paese"
+
+msgid "Colors"
+msgstr "Colori"
+
+msgid "Workshop"
+msgstr "Laboratorio"
+
+msgid "Shape every house, roof and road. Banners and road edges always carry the player color, so everyone can still tell whose town is whose."
+msgstr "Dai forma a ogni casa, tetto e strada. Stendardi e bordi delle strade usano sempre il colore del giocatore, così tutti capiscono di chi è ogni paese."
+
+msgid "Choose whose pieces to edit"
+msgstr "Scegli di chi modificare le pedine"
+
+msgid "Night"
+msgstr "Notte"
+
+msgid "See the windows and lanterns after dark"
+msgstr "Guarda finestre e lanterne dopo il tramonto"
+
+msgid "Drag to turn · Scroll to zoom"
+msgstr "Trascina per ruotare · Scorri per lo zoom"
+
+msgid "START FROM"
+msgstr "PARTI DA"
+
+msgid "Surprise me"
+msgstr "Sorprendimi"
+
+msgid "Roll a random, matching look"
+msgstr "Genera un aspetto casuale ma coerente"
+
+msgid "Revert"
+msgstr "Ripristina"
+
+msgid "Go back to the pieces currently in use"
+msgstr "Torna alle pedine in uso"
+
+msgid "Apply"
+msgstr "Applica"
+
+msgid "Applied"
+msgstr "Applicato"
+
+msgid "Player color: %s. Banners, the town rim and road edges use it."
+msgstr "Colore del giocatore: %s. Lo usano stendardi, bordo del paese e bordi delle strade."
+
+msgid "Custom pieces"
+msgstr "Pedine personalizzate"
+
+msgid " · In use"
+msgstr " · In uso"
+
+msgid " · Not applied yet"
+msgstr " · Non ancora applicato"
+
+msgid "Design your own roads, settlements and cities"
+msgstr "Progetta a modo tuo strade, insediamenti e città"

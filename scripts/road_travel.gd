@@ -36,9 +36,10 @@ func routes(state: Dictionary) -> Array:
 func assign(state: Dictionary,residents: Dictionary,parent: Node3D):
 	for route in routes(state):
 		var path: Array=route.vertices
-		var styles=state.get("piece_styles",[])
-		var style=int(styles[route.owner]) if route.owner<styles.size() else 0
-		var deck=CatanCosmetics.road_deck_height(style)
+		var looks=state.get("piece_looks",[])
+		var look: PackedByteArray=looks[route.owner] if route.owner<looks.size() else CatanAppearance.default_bytes()
+		var world=preload("res://scripts/living_world.gd")
+		var deck=CatanBoard.ROAD_BASE+CatanPieceBuilder.road_deck(look)-world.sole_height()*world.ROAD_DWELLER_HEIGHT
 		var points=PackedVector3Array()
 		for vid in path:
 			var vertex=state.vertices[vid]
@@ -54,7 +55,7 @@ func assign(state: Dictionary,residents: Dictionary,parent: Node3D):
 			var length=points[i-1].distance_to(points[i]);lengths.append(length);total+=length
 		var actor: Dictionary=residents[path[0]]
 		actor.root.reparent(parent)
-		actor.root.scale=Vector3(.34,.348,.34)
+		actor.root.scale=Vector3(.34,world.ROAD_DWELLER_HEIGHT,.34)
 		actor.root.name="RoadDweller"+str(path[0])
 		actor["route"]={"points":points,"lengths":lengths,"length":total,"vertices":path}
 		actor.index=path[0]
