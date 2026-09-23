@@ -1,10 +1,13 @@
 extends Node3D
 ## Offshore lighthouse whose lantern and sweeping beam come on at night.
+## The beam is the spot light itself, scattering in the sea haze around the tower.
+
+const HAZE_DENSITY=.012
 
 @onready var lamp: MeshInstance3D=$Lamp
 @onready var beacon: Node3D=$LighthouseBeacon
 @onready var spot: SpotLight3D=$LighthouseBeacon/Spot
-@onready var beam: MeshInstance3D=$LighthouseBeacon/Beam
+@onready var haze: FogVolume=$SeaHaze
 
 func _ready():
 	# Like the towns' lanterns, the glowing lamp records the light it casts.
@@ -13,7 +16,8 @@ func _ready():
 func shine(time: float,night: float):
 	beacon.rotation.y=fposmod(time*.38,TAU)
 	beacon.visible=night>.01
-	spot.light_energy=night*5.0
+	spot.light_energy=night*18.0
 	spot.spot_range=7.0*global_basis.get_scale().y
 	lamp.material_override.emission_energy_multiplier=night*1.4
-	beam.material_override.set_shader_parameter("strength",night)
+	# Evening haze gathers over the water, so the beam only shows after dusk.
+	haze.material.density=HAZE_DENSITY*night

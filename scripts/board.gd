@@ -37,7 +37,6 @@ var sea_traffic=preload("res://scripts/sea_traffic.gd").new()
 @onready var lighthouse=$Scenery/Lighthouse
 @onready var beacon: Node3D=lighthouse.beacon
 @onready var beacon_lamp: MeshInstance3D=lighthouse.lamp
-@onready var beacon_beam: MeshInstance3D=lighthouse.beam
 @onready var beacon_spot: SpotLight3D=lighthouse.spot
 var elapsed=0.0
 var birds=[]
@@ -123,6 +122,8 @@ func apply_preferences(values: Dictionary):
 		last_shadow_quality=values.shadow_quality
 	var forward=RenderingServer.get_current_rendering_method()=="forward_plus"
 	environment.fog_enabled=values.atmosphere
+	# Volumetric fog renders the lighthouse beam in its sea haze; only Forward+ supports it.
+	environment.volumetric_fog_enabled=forward and values.atmosphere
 	environment.tonemap_exposure=values.exposure
 	environment.glow_enabled=values.bloom
 	environment.ssao_enabled=forward and values.ambient_occlusion>0

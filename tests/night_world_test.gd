@@ -28,7 +28,8 @@ func run():
 	check(board.night_lights.all(func(light):return light.visible and light.light_energy>0),"lights on at midnight")
 	check(board.night_lights.all(func(light):return is_equal_approx(light.omni_range,float(light.get_meta("local_range",.38))*light.get_parent().global_basis.get_scale().y)),"lamp reach uses parent world scale")
 	check(board.night_lights.all(func(light):return light.omni_range>light.position.y*light.get_parent().global_basis.get_scale().y),"lamp light reaches surrounding ground")
-	check("blend_mix" in board.beacon_beam.material_override.shader.code,"beam avoids additive bloom")
+	check(board.beacon.find_children("*","MeshInstance3D",true,false).is_empty(),"beam is the spot light, not beam geometry")
+	check(board.beacon_spot.light_volumetric_fog_energy>0 and board.lighthouse.haze.material.density>0,"beam scatters in the night sea haze")
 	check(board.beacon_lamp.material_override.emission_energy_multiplier<1.8,"lighthouse lantern emission stays controlled")
 	var emitters=board.find_children("NightLantern*","MeshInstance3D",true,false)+board.find_children("NightWindow*","MeshInstance3D",true,false)+[board.beacon_lamp]
 	check(emitters.all(func(emitter):return is_instance_valid(emitter.get_meta("night_light",null))),"every glowing lantern and window has a real light")

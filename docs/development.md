@@ -152,7 +152,7 @@ Run `python3 -m unittest discover -s tests -p 'test_localization.py'`, `tests/lo
 
 ## Models
 
-Every mesh in the game is modeled in Blender. Only shader and particle carriers stay Godot primitives: the ocean plane, the lighthouse beam, rain, lightning, pollen and chimney smoke. Each group has an editable source in `assets/source/` and one `.glb` per model in `assets/models/<group>/`:
+Every mesh in the game is modeled in Blender. Only shader and particle carriers stay Godot primitives: the ocean plane, rain, lightning, pollen and chimney smoke. The lighthouse beam is its spot light scattering in a night-only `FogVolume` of sea haze; it needs Forward+ with Atmosphere enabled, and other renderers still get the sweeping light on the water. Each group has an editable source in `assets/source/` and one `.glb` per model in `assets/models/<group>/`:
 
 | Source | Models |
 | --- | --- |

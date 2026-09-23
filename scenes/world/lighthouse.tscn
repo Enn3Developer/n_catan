@@ -2,7 +2,6 @@
 
 [ext_resource type="PackedScene" path="res://assets/models/props/lighthouse.glb" id="model"]
 [ext_resource type="Script" path="res://scripts/lighthouse.gd" id="script"]
-[ext_resource type="Shader" path="res://shaders/lighthouse_beam.gdshader" id="beam_shader"]
 
 [sub_resource type="StandardMaterial3D" id="LanternGlass"]
 albedo_color = Color(0.913725, 0.721569, 0.368627, 1)
@@ -11,23 +10,18 @@ resource_local_to_scene = true
 emission_enabled = true
 emission = Color(1, 0.784314, 0.419608, 1)
 
-[sub_resource type="CylinderMesh" id="BeamCone"]
-top_radius = 0.025
-bottom_radius = 0.6
-height = 5.5
-radial_segments = 48
-cap_top = false
-cap_bottom = false
-
-[sub_resource type="ShaderMaterial" id="Beam"]
+[sub_resource type="FogMaterial" id="SeaHaze"]
 resource_local_to_scene = true
-shader = ExtResource("beam_shader")
+density = 0.0
+albedo = Color(0.85, 0.88, 0.9, 1)
+edge_fade = 0.5
 
 [node name="Lighthouse" instance=ExtResource("model")]
 script = ExtResource("script")
 
 [node name="Lamp" parent="."]
 material_override = SubResource("LanternGlass")
+cast_shadow = 0
 
 [node name="NightLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
@@ -44,11 +38,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 transform = Transform3D(1, 0, 0, 0, 0.99026805, 0.1391731, 0, -0.1391731, 0.99026805, 0, 0, 0)
 light_color = Color(1, 0.862745, 0.584314, 1)
 shadow_enabled = true
+light_volumetric_fog_energy = 4.0
 spot_range = 7.0
 spot_angle = 12.0
 
-[node name="Beam" type="MeshInstance3D" parent="LighthouseBeacon"]
-transform = Transform3D(1, 0, 0, 0, 0.1391731, -0.99026805, 0, 0.99026805, 0.1391731, 0, -0.382726, -2.7232373)
-material_override = SubResource("Beam")
-cast_shadow = 0
-mesh = SubResource("BeamCone")
+[node name="SeaHaze" type="FogVolume" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+size = Vector3(15, 1.5, 15)
+shape = 0
+material = SubResource("SeaHaze")
