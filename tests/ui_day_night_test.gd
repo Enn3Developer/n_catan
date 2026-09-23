@@ -29,7 +29,7 @@ func run():
 	var day=label.get_theme_color("font_color")
 	check(day.is_equal_approx(INK),"daytime palette preserved")
 	await shot("day")
-	theme.advance(0,.231049)
+	theme.advance(0,theme.FADE_SECONDS*.5)
 	check(theme.amount>.49 and theme.amount<.51,"abrupt night change fades progressively")
 	check(label.get_theme_color("font_color")!=day,"custom labels fade with theme")
 	await shot("dusk")
@@ -57,11 +57,22 @@ func run():
 	check(game.board.daylight==0,"enabling cycle returns to current world time")
 	theme.advance(game.board.daylight,5)
 	game._close_modal()
-	theme.advance(1,.231049)
+	theme.advance(1,theme.FADE_SECONDS*.5)
 	check(theme.amount>.49 and theme.amount<.51,"dawn also fades progressively")
 	theme.advance(1,5)
 	check(label.get_theme_color("font_color").is_equal_approx(day),"dawn restores exact day palette")
 	check(load("res://assets/ui_theme.tres").get_color("font_color","Label").is_equal_approx(original),"source theme stays immutable")
+	# A slow sunset never leaves the interface parked between its two palettes.
+	var parked=[]
+	for step in 101:
+		theme.advance(1.0-step/100.0,1.0)
+		if theme.amount>0 and theme.amount<1:parked.append(1.0-step/100.0)
+	check(parked.is_empty(),"dusk switches palettes instead of tracking the sun: "+str(parked))
+	check(theme.amount==1,"dusk ends on the night palette")
+	theme.advance(.5,5)
+	check(theme.amount==1,"twilight near the switch keeps the current palette")
+	theme.advance(.7,5)
+	check(theme.amount==0,"dawn restores the day palette")
 	game.queue_free();await process_frame
 	print("UI_DAY_NIGHT_TEST: ",checks," checks, ",failures," failures")
 	quit(1 if failures else 0)

@@ -1,5 +1,14 @@
 extends Node
-## Keeps the interface on the same clock as the island, without rebuilding UI.
+## Switches the interface between its day and night palettes with the island's
+## dusk and dawn, without rebuilding UI. The palettes are inverses of each other,
+## so the interface never follows the sun into the mid-tones between them, where
+## lettering and surfaces share one grey; it crosses them in one short fade.
+
+# Daylight below DUSK turns the interface to night and above DAWN back to day.
+# The gap keeps clock corrections near a threshold from flickering the palette.
+const DUSK=.4
+const DAWN=.6
+const FADE_SECONDS=.6
 
 const PALETTE={
 	"493521":"eee5d2", "392818":"fff3dc", "796347":"b8bec6",
@@ -12,10 +21,11 @@ const PALETTE={
 	"ac8654":"657387", "b49668":"657387", "6b834f":"8ba57a",
 	"795635":"748197", "b5a07b":"1c2938", "91734d":"526276",
 	"6d8958":"789568", "496340":"566e4f", "b77633":"d6b878",
-	"526747":"9fbb8d", "b4c696":"506944",
+	"526747":"9fbb8d", "b4c696":"506944", "a8402f":"f0907c",
 }
 
 var amount=0.0
+var night=false
 var root: Control
 var palette_theme: Theme
 var bindings: Array=[]
@@ -63,8 +73,9 @@ func _night_color(day: Color) -> Color:
 	return result
 
 func _text_amount() -> float:
-	# Bring up the light lettering before the surfaces finish darkening.
-	return smoothstep(0.0,0.6,amount)
+	# Lettering flips while the surfaces pass the middle of the fade, so it stays
+	# dark on light surfaces and light on dark ones for as long as possible.
+	return smoothstep(.35,.65,amount)
 
 func _texture(source: Texture2D) -> Texture2D:
 	var key=source.get_instance_id()
@@ -133,9 +144,9 @@ func _register_control(control: Control):
 			if style is StyleBox:_register_style(style)
 
 func advance(daylight: float,delta: float):
-	# Also soften abrupt clock corrections from a network snapshot or a new game.
-	var next=lerpf(amount,1.0-clampf(daylight,0.0,1.0),1.0-exp(-delta*3.0))
-	if absf(next-(1.0-daylight))<0.0001:next=1.0-daylight
+	if night and daylight>DAWN:night=false
+	elif not night and daylight<DUSK:night=true
+	var next=move_toward(amount,1.0 if night else 0.0,delta/FADE_SECONDS)
 	var added=pending
 	pending=[]
 	for ref in added:
