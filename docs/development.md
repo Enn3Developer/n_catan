@@ -1,6 +1,6 @@
 # Development
 
-Build, release and test reference for contributors.
+Build and release reference for contributors.
 
 ## Build standalone executables
 
@@ -24,7 +24,7 @@ The scripts also write size reports and checksums under `build/`. Windows has a 
 python3 tools/audit_build_size.py 'build/linux/N Catan.x86_64' --verify
 ```
 
-Export presets exclude authoring textures, old models, tests, generated releases and unused material maps. They retain the game's texture tiers, audio, font license and texture source information. The original assets and Blender sources remain in the repository. See [build size measurements](build-size.md) for the earlier size reduction and validation results.
+Export presets exclude authoring textures, old models, generated releases and unused material maps. They retain the game's texture tiers, audio, font license and texture source information. The original assets and Blender sources remain in the repository. See [build size measurements](build-size.md) for the earlier size reduction and validation results.
 
 ## Releases and updates
 
@@ -95,52 +95,11 @@ Protocol 14 adds the turn timer; protocol 13 rejected bare addresses and older c
 
 ## Verification
 
-CI runs updater tests, Go race checks, patch producer tests, Windows updater compilation, game rules, update interface checks and multiplayer version checks. To run game tests locally:
+CI runs the updater's Go tests with the race detector, vets it, compiles the Windows updater and imports the Godot project.
 
 ```bash
-# Replace godot with your Godot executable as needed.
-godot --headless --path . --script res://tests/rules_test.gd
-godot --headless --path . --script res://tests/network_test.gd
-godot --headless --path . --script res://tests/bot_test.gd
-godot --headless --path . --script res://tests/bot_network_test.gd
-godot --headless --path . --script res://tests/solo_match_test.gd
-godot --headless --path . --script res://tests/turn_timer_test.gd
-godot --headless --path . --script res://tests/updater_ui_test.gd
-godot --headless --path . --script res://tests/version_network_test.gd
-GODOT_BIN=/path/to/godot python3 tests/run_online_test.py
-
 go -C updater test -race ./...
-python3 -m unittest discover -s tests -p 'test_*.py'
 ```
-
-The rules suite checks setup, resource conservation, legal actions, trades, development cards, privacy, awards and victory. Network tests cover lobby replication, private hands, invalid moves, disconnects and reconnection. The dedicated-server test starts a server and two clients in separate processes. These tests use loopback networking. Internet access still depends on the host's router and firewall.
-
-The turn timer test stalls three human seats with a shortened limit and checks that the host completes setup, rolls and passes the turn on. Bot tests cover every difficulty and mixed opponents. The feature suite checks lobby controls, bot setup, tutorial lessons, settings and audio. A solo match test runs the bot scheduler through to victory.
-
-Run extension tests with:
-
-```bash
-godot --headless --path . --script res://tests/extension_test.gd
-godot --headless --path . --script res://tests/extension_bot_test.gd
-godot --headless --path . --script res://tests/extension_solo_test.gd
-godot --path . --script res://tests/extension_ui_test.gd
-python3 tests/run_online_test.py 6
-```
-
-Music tests are in `tests/music_test.gd`, `tests/music_network_test.gd` and `tests/music_ui_test.gd`. The script `tests/run_music_process_test.py` checks playback across separate processes.
-
-Visual tests need a graphical session. They write captures under `/tmp`:
-
-```bash
-godot --path . --script res://tests/capture.gd
-godot --path . --script res://tests/ui_test.gd
-godot --path . --script res://tests/feature_test.gd
-godot --path . --script res://tests/features_capture.gd
-godot --path . --script res://tests/style_capture.gd
-```
-
-Layout, graphics and cosmetics checks are in `tests/layout_test.gd`, `tests/graphics_test.gd` and `tests/cosmetics_test.gd`. See [verification results](verification.md) for recorded test runs and visual checks.
-
 
 ## Localization and player appearance
 
@@ -148,7 +107,6 @@ English and Italian catalogs live in `locales/en.po` and `locales/it.po`. Use En
 
 Player colors are opaque six-digit RGB values. An empty value uses the seat palette. The host validates changes and includes them in lobby and game snapshots. Players can edit their own appearance; the room controller can also edit bots. Protocol 10 adds the color handshake and structured localized messages.
 
-Run `python3 -m unittest discover -s tests -p 'test_localization.py'`, `tests/localization_appearance_test.gd`, and `tests/cosmetics_network_test.gd` when changing these features. Pass `-- --italian` to `tests/layout_test.gd` to check Italian at all supported window sizes. `tests/ui_localization_test.gd` checks dynamic card, resource, phase and soundtrack text, language switching, and checked-hover theme coverage. Run it with graphics to capture day/night hover states and the Italian color swatches. Catalog checks cover translation calls, settings options, soundtrack metadata, tutorial content and development cards, including printf argument compatibility.
 
 ## Models
 
@@ -169,7 +127,7 @@ Export each model's collection with the glTF exporter, using **+Y Up**, **Apply 
 - **Recolored surfaces.** A material named after a role, optionally with a signed percentage, takes its color at runtime: `Player`, `Player-16` (darkened 16%), `Player+07` (lightened 7%). Roles are `Player` (owner color), `Wall` (piece-set wall color), `Shirt` and `Skin`. `CatanCosmetics.paint()` applies them.
 - **Textured surfaces.** Materials named `PBR_Rock`, `PBR_Wood` and similar take that surface's texture tier from `CatanTileArt.surface()`.
 - **Night lights.** Meshes named `NightWindow`, `NightLantern` or `Campfire` glow at night, lit by the `NightLight` point light that shares their pivot. Each light's `local_range` and `night_energy` custom properties become Godot metadata.
-- **Ground.** Workers, cottages and the robber camp stand on `CatanTileArt.height_at()`, which samples the exported ground mesh. Sculpt it freely, but keep the rim at 0.20 units so tiles meet the cliffs, and re-check diorama props with `tests/world_placement_test.gd`. Godot generates the ground's LODs; Model Detail sets their `lod_bias`.
+- **Ground.** Workers, cottages and the robber camp stand on `CatanTileArt.height_at()`, which samples the exported ground mesh. Sculpt it freely, but keep the rim at 0.20 units so tiles meet the cliffs. Godot generates the ground's LODs; Model Detail sets their `lod_bias`.
 
 ## Scenery and placement
 
@@ -177,9 +135,7 @@ Export each model's collection with the glTF exporter, using **+Y Up**, **Apply 
 
 Rebuild scenery with `blender --background --factory-startup --python tools/build_premium_tiles.py`, then import the project in Godot. The generator writes twelve biome models and `assets/source/sculpted-tiles.blend`. Plants and small props avoid occupied areas. Extra saplings, flowers, log piles, brick drying racks, hay feeders, cargo wagons and broken columns fill clear pockets in each biome. Sheep are created only at runtime.
 
-Run `tests/world_placement_test.gd` headlessly to check the imported meshes against worker routes, token positions, city footprints and harbors. Run `tests/world_capture.gd` with graphics to capture each biome from both sides, night pasture and the board at low detail. Captures are saved under `/tmp/catan-world-*.png`.
-
-The surrounding mainland is `assets/models/world/mainland.glb`, twelve vertex-colored sectors that `scripts/background_landscape.gd` loads on clients. Keep all its geometry beyond 9.5 scenery units so boat routes remain open. `shaders/background_landscape.gdshader` adds distance haze. Run `tests/background_landscape_test.gd` and `tests/sea_traffic_test.gd` when changing it.
+The surrounding mainland is `assets/models/world/mainland.glb`, twelve vertex-colored sectors that `scripts/background_landscape.gd` loads on clients. Keep all its geometry beyond 9.5 scenery units so boat routes remain open. `shaders/background_landscape.gdshader` adds distance haze.
 
 Audio shutdown drains pending playback commands before releasing players, then allows the mixer to finish cleanup. Test scenes that free live audio wait briefly before quitting for the same reason. Fullscreen and window-size preferences apply only to standalone windows; embedded editor sessions retain their host window.
 
@@ -209,13 +165,9 @@ The interface does not follow the sun gradually. `scripts/ui_day_night.gd` switc
 to the night palette when daylight drops below 0.4 and back above 0.6, crossing
 in a 0.6-second fade. The two palettes invert light and dark, so an interface
 parked between them would put lettering and surfaces on the same grey.
-`tests/ui_day_night_test.gd` sweeps a sunset to check the palette never settles
-between them.
 
-`tests/appearance_roads_test.gd` checks the 20-color palette, preservation of existing custom colors, Italian labels, and road connections at bends and branches across all four piece styles. GPU runs capture the appearance page at 800×600 in day/night and road close-ups under `/tmp/catan-ui-*.png`. The settings sidebar no longer duplicates the separate appearance page. `tests/notifications_test.gd` also checks five-second automatic dismissal and replacement timers.
+Roads use a 30% vertical profile above the terrain; `CatanCosmetics.road_deck_height()` supplies the matching pedestrian surface. `scripts/road_travel.gd` assigns occasional journeys to existing residents along disjoint, same-owner road paths between towns. Visitors stop at town entrances, rest between trips, hide at night, and obey reduced motion.
 
-Roads use a 30% vertical profile above the terrain; `CatanCosmetics.road_deck_height()` supplies the matching pedestrian surface. `scripts/road_travel.gd` assigns occasional journeys to existing residents along disjoint, same-owner road paths between towns. Visitors stop at town entrances, rest between trips, hide at night, and obey reduced motion. `tests/road_travel_test.gd` checks graph blocking/loops, walking and return direction, height, night/rest behavior, population, and snapshot/reduced-motion continuity; GPU runs save `/tmp/catan-road-travel-style-*.png`.
+Weather follows the synchronized 600-second world clock. `scripts/weather.gd` blends clear, cloudy, rainy and stormy conditions; the local Weather setting can hold any one condition. Clouds drift through a procedural sky shader and affect ambient lighting. Clear weather retains a few scattered clouds and sunlight. Cloudy, rainy and stormy weather disable direct sunlight and directional shadows, with bounded rain particles and an offshore lightning effect. Rain/thunder audio goes through the Ambience bus. Reduced motion stops moving clouds and suppresses rain particles, water ripples and lightning flashes. Water uses four Gerstner swells, shore attenuation, filtered surface ripples and a narrow sun glitter reflection. The mesh concentrates vertices around the island. Boats sample the same wave parameters as the shader. See NVIDIA’s [water model](https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-1-effective-water-simulation-physical-models) and Godot’s [sky shader documentation](https://docs.godotengine.org/en/stable/tutorials/shaders/shader_reference/sky_shader.html). Original weather audio can be regenerated with `python3 tools/generate_weather_audio.py`.
 
-Weather follows the synchronized 600-second world clock. `scripts/weather.gd` blends clear, cloudy, rainy and stormy conditions; the local Weather setting can hold any one condition. Clouds drift through a procedural sky shader and affect ambient lighting. Clear weather retains a few scattered clouds and sunlight. Cloudy, rainy and stormy weather disable direct sunlight and directional shadows, with bounded rain particles and an offshore lightning effect. Rain/thunder audio goes through the Ambience bus. Reduced motion stops moving clouds and suppresses rain particles, water ripples and lightning flashes. Water uses four Gerstner swells, shore attenuation, filtered surface ripples and a narrow sun glitter reflection. The mesh concentrates vertices around the island. Boats sample the same wave parameters as the shader. See NVIDIA’s [water model](https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-1-effective-water-simulation-physical-models) and Godot’s [sky shader documentation](https://docs.godotengine.org/en/stable/tutorials/shaders/shader_reference/sky_shader.html). `tests/weather_test.gd` checks transitions, clock wrap, options, graphics limits, audio and night behavior, with GPU screenshots under `/tmp/catan-weather-*.png`. Original weather audio can be regenerated with `python3 tools/generate_weather_audio.py`.
-
-Seagulls use the original Blender model in `assets/premium/seagull.glb`, with its editable source in `assets/source/seagull.blend`. `tools/build_seagull.py` builds a separate scene through Blender MCP or Blender Python in a fresh session. Seven meshes share a matte palette, shoulder/wrist pivots animate wingbeats, and four folded morph targets tuck the feathers against the body on landing. `scripts/seagulls.gd` reuses six visitors, with at most five active in fair weather, independent offshore arrivals, gliding and flapping, skimming, reserved harbour posts, rests and departures. Night and storms trigger a retreat; reduced motion shows static perched gulls. Perch positions refresh when the board is rebuilt, including six-player scale. `tests/seagulls_test.gd` exercises these behaviours and the imported model.
+Seagulls use the original Blender model in `assets/premium/seagull.glb`, with its editable source in `assets/source/seagull.blend`. `tools/build_seagull.py` builds a separate scene through Blender MCP or Blender Python in a fresh session. Seven meshes share a matte palette, shoulder/wrist pivots animate wingbeats, and four folded morph targets tuck the feathers against the body on landing. `scripts/seagulls.gd` reuses six visitors, with at most five active in fair weather, independent offshore arrivals, gliding and flapping, skimming, reserved harbour posts, rests and departures. Night and storms trigger a retreat; reduced motion shows static perched gulls. Perch positions refresh when the board is rebuilt, including six-player scale.

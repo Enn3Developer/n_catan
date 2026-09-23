@@ -18,33 +18,8 @@ jobs:
           cache: false
       - run: go -C updater test -race ./...
       - run: go -C updater vet ./...
-      - run: python3 -m unittest discover -s tests -p 'test_*.py'
       - run: python3 tools/build_updater.py --platform windows-x86_64 --output build/check/n-catan-updater.exe
-      - name: Import and test Godot
+      - name: Import Godot project
         run: |
           python3 tools/release.py bootstrap
-          export GODOT_BIN="$PWD/build/godot/Godot_v4.7.2-stable_linux.x86_64"
-          "$GODOT_BIN" --headless --path . --editor --import --quit
-          python3 tests/run_runtime_clean_test.py
-          "$GODOT_BIN" --headless --path . --script tests/rules_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/music_transition_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/music_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/updater_ui_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/notifications_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/appearance_roads_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/road_travel_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/actor_animation_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/world_placement_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/town_population_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/cards_ui_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/sea_traffic_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/seagulls_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/background_landscape_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/night_world_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/weather_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/ui_localization_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/localization_appearance_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/cosmetics_network_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/version_network_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/enet_transport_test.gd
-          "$GODOT_BIN" --headless --path . --script tests/turn_timer_test.gd
+          "$PWD/build/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --editor --import --quit

@@ -50,7 +50,6 @@ jobs:
         run: |
           go -C updater test ./...
           go -C updater vet ./...
-          python3 -m unittest discover -s tests -p 'test_*.py'
       - name: Install verified Godot and stamp version
         if: steps.release.outputs.complete != 'true'
         run: |

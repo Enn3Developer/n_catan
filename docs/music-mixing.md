@@ -33,13 +33,6 @@ as the previous volume-only fade.
 NumPy and FFmpeg. It reads recordings and writes metadata only. The generated
 GDScript resource is included in exports without a runtime analysis dependency.
 
-The targeted checks are `music_transition_test.gd`, `music_test.gd`,
-`music_network_test.gd`, `music_ui_test.gd`, and `run_music_process_test.py`.
-`music_mix_capture.gd -- /tmp/mix.wav` records manual transitions through the
-real Godot mixer; add `--automatic` for the last-to-first playlist transition.
-These checks establish timing, continuity, and synchronization, not a guarantee
-that every pair of distinct musical arrangements will sound indistinguishable.
-
 References informing the implementation:
 
 - [Mixxx: beatmatching, cue points, and Auto DJ](https://manual.mixxx.org/2.6/en/chapters/djing_with_mixxx)

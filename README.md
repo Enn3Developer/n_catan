@@ -38,7 +38,7 @@ git lfs pull
 
 Open `project.godot`, let Godot import the assets, then press F5. You can also launch with `./run.sh`. Set `GODOT_BIN` if the launcher cannot find your Godot executable.
 
-See the [development guide](docs/development.md) for exports, release publishing, source layout and tests. To run a dedicated server:
+See the [development guide](docs/development.md) for exports, release publishing, and source layout. To run a dedicated server:
 
 ```bash
 ./run.sh --server --address=your-public-hostname:24567 --password=your-room-password

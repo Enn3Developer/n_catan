@@ -75,8 +75,6 @@ def audit(path, verify=False):
                 category = 'Biome models'
             elif source.startswith('assets/audio/'):
                 category = 'Audio'
-            elif source.startswith('tests/'):
-                category = 'Tests'
             else:
                 category = 'Other resources'
             groups[category] += entry['bytes']
