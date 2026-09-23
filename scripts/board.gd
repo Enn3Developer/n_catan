@@ -110,7 +110,7 @@ func apply_preferences(values: Dictionary):
 	var geometry_changed=tile_nodes.size()>0 and (old.model_quality!=values.model_quality or old.texture_quality!=values.texture_quality or old.foliage_quality!=values.foliage_quality)
 	if geometry_changed:
 		for tile in tile_nodes:
-			tile.ground.mesh=art.terrain(tile.kind,values.model_quality)
+			tile.ground.lod_bias=CatanTileArt.lod_bias(values)
 			tile.ground.material_override=art.ground(tile.kind,tile.index)
 			tile.cliff.material_override=art.cliff()
 			art.apply_instance(tile.diorama,values)
@@ -179,12 +179,13 @@ func build(data: Dictionary):
 		terrain.add_child(root)
 		var side=MeshInstance3D.new()
 		side.name="StratifiedCliff"
-		side.mesh=art.cliff_mesh(i)
+		side.mesh=art.cliff_mesh()
 		side.material_override=art.cliff()
 		root.add_child(side)
 		var top=MeshInstance3D.new()
 		top.name="SculptedGround"
-		top.mesh=art.terrain(t.kind,render_values.model_quality)
+		top.mesh=art.ground_mesh(t.kind)
+		top.lod_bias=CatanTileArt.lod_bias(render_values)
 		top.material_override=art.ground(t.kind,i)
 		root.add_child(top)
 		var diorama=art.instantiate(t.kind,i,render_values)
@@ -453,10 +454,12 @@ func _update_camera_focus():
 		camera.attributes.dof_blur_near_distance=maxf(.1,distance-.3*TILE_SIZE)
 		camera.attributes.dof_blur_near_transition=.3*TILE_SIZE
 
-# Scenery nodes name the surface they use; the texture tier decides which maps it gets.
+# Scenery models name their textured surfaces PBR_*; the texture tier decides which maps they get.
 func _apply_surfaces(root: Node):
 	for node in root.find_children("*","MeshInstance3D",true,false):
-		if node.has_meta("pbr_surface"):node.material_override=art.surface(node.get_meta("pbr_surface"),null,render_values)
+		for i in node.mesh.get_surface_count():
+			var base=node.mesh.surface_get_material(i)
+			if base and base.resource_name.begins_with("PBR_"):node.set_surface_override_material(i,art.surface(base.resource_name,null,render_values))
 
 func _world_props():
 	_apply_surfaces(scenery)

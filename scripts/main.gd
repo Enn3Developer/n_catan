@@ -515,7 +515,6 @@ func _layout_screen():
 
 func _exit_tree():
 	CatanIcons.textures.clear()
-	CatanMiniature.boxes.clear()
 
 func _notification(what: int):
 	if what==NOTIFICATION_WM_CLOSE_REQUEST:_exit_desktop()

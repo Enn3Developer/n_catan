@@ -28,7 +28,7 @@ func run():
 	for detail in 4:
 		change("model_quality",detail)
 		change("foliage_quality",detail)
-		vertices.append(board.tile_nodes[0].ground.mesh.surface_get_array_len(0))
+		vertices.append(board.tile_nodes[0].ground.lod_bias)
 		var visible=0
 		for tile in board.tile_nodes:
 			for node in tile.diorama.find_children("GroundCover*","MeshInstance3D",true,false):
@@ -37,14 +37,20 @@ func run():
 	for i in 3:
 		check(vertices[i+1]>vertices[i],"terrain detail increases at level "+str(i+1))
 		check(cover[i+1]>cover[i],"vegetation density increases at level "+str(i+1))
+	check(board.tile_nodes[0].ground.mesh.get_surface_count()==1 and board.tile_nodes[0].ground.mesh.surface_get_array_len(0)>5000,"sculpted ground keeps its full-detail mesh")
 	for tier in 3:
 		change("texture_quality",tier)
 		var texture=board.tile_nodes[0].ground.material_override.get_shader_parameter("albedo_map")
 		check(texture.get_width()==[512,1024,2048][tier],"actual texture resolution tier "+str(tier))
 		check(texture.get_image().has_mipmaps(),"texture mipmaps tier "+str(tier))
+		var textured=0
 		for node in board.scenery.find_children("*","MeshInstance3D",true,false):
-			if node.has_meta("pbr_surface"):
-				check(node.material_override.get_shader_parameter("albedo_map").get_width()==texture.get_width(),"scenery texture tier updates")
+			for i in node.mesh.get_surface_count():
+				var base=node.mesh.surface_get_material(i)
+				if base==null or not base.resource_name.begins_with("PBR_"):continue
+				textured+=1
+				check(node.get_surface_override_material(i).get_shader_parameter("albedo_map").get_width()==texture.get_width(),"scenery texture tier updates")
+		check(textured>0,"scenery has textured surfaces")
 	for aa in 6:
 		change("anti_aliasing",aa)
 		check(root.msaa_3d==[0,0,1,2,3,0][aa],"MSAA level "+str(aa))

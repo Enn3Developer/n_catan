@@ -15,6 +15,6 @@ script = ExtResource("script")
 [node name="Die1" parent="." instance=ExtResource("die")]
 
 [node name="Body" parent="Die1"]
-material_override = SubResource("Terracotta")
+surface_material_override/0 = SubResource("Terracotta")
 
 [editable path="Die1"]

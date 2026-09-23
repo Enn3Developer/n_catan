@@ -1,59 +1,8 @@
 [gd_scene format=3]
 
+[ext_resource type="PackedScene" path="res://assets/models/props/lighthouse.glb" id="model"]
 [ext_resource type="Script" path="res://scripts/lighthouse.gd" id="script"]
 [ext_resource type="Shader" path="res://shaders/lighthouse_beam.gdshader" id="beam_shader"]
-
-[sub_resource type="SphereMesh" id="Outcrop"]
-radial_segments = 20
-rings = 10
-
-[sub_resource type="StandardMaterial3D" id="OutcropPaint"]
-albedo_color = Color(0.478431, 0.533333, 0.470588, 1)
-roughness = 0.85
-
-[sub_resource type="StandardMaterial3D" id="Cream"]
-albedo_color = Color(0.913725, 0.862745, 0.752941, 1)
-roughness = 0.85
-
-[sub_resource type="StandardMaterial3D" id="Brick"]
-albedo_color = Color(0.682353, 0.4, 0.313725, 1)
-roughness = 0.85
-
-[sub_resource type="CylinderMesh" id="Band0"]
-top_radius = 0.148
-bottom_radius = 0.160
-height = 0.16
-radial_segments = 32
-
-[sub_resource type="CylinderMesh" id="Band1"]
-top_radius = 0.136
-bottom_radius = 0.148
-height = 0.16
-radial_segments = 32
-
-[sub_resource type="CylinderMesh" id="Band2"]
-top_radius = 0.124
-bottom_radius = 0.136
-height = 0.16
-radial_segments = 32
-
-[sub_resource type="CylinderMesh" id="Band3"]
-top_radius = 0.112
-bottom_radius = 0.124
-height = 0.16
-radial_segments = 32
-
-[sub_resource type="CylinderMesh" id="Band4"]
-top_radius = 0.100
-bottom_radius = 0.112
-height = 0.16
-radial_segments = 32
-
-[sub_resource type="CylinderMesh" id="Lantern"]
-top_radius = 0.12
-bottom_radius = 0.12
-height = 0.16
-radial_segments = 32
 
 [sub_resource type="StandardMaterial3D" id="LanternGlass"]
 albedo_color = Color(0.913725, 0.721569, 0.368627, 1)
@@ -74,53 +23,11 @@ cap_bottom = false
 resource_local_to_scene = true
 shader = ExtResource("beam_shader")
 
-[sub_resource type="CylinderMesh" id="Cap"]
-top_radius = 0.0
-bottom_radius = 0.2
-height = 0.17
-
-[sub_resource type="StandardMaterial3D" id="Slate"]
-albedo_color = Color(0.207843, 0.282353, 0.329412, 1)
-roughness = 0.85
-
-[node name="Lighthouse" type="Node3D"]
+[node name="Lighthouse" instance=ExtResource("model")]
 script = ExtResource("script")
 
-[node name="Outcrop" type="MeshInstance3D" parent="."]
-transform = Transform3D(1.1941706, 0, 0.25119218, 0, 0.5, 0, -0.36940026, 0, 0.81203604, 0, 0, 0)
-material_override = SubResource("OutcropPaint")
-mesh = SubResource("Outcrop")
-metadata/pbr_surface = "PBR_Rock"
-
-[node name="Band0" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.20, 0)
-material_override = SubResource("Cream")
-mesh = SubResource("Band0")
-
-[node name="Band1" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.36, 0)
-material_override = SubResource("Brick")
-mesh = SubResource("Band1")
-
-[node name="Band2" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.52, 0)
-material_override = SubResource("Cream")
-mesh = SubResource("Band2")
-
-[node name="Band3" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68, 0)
-material_override = SubResource("Brick")
-mesh = SubResource("Band3")
-
-[node name="Band4" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.84, 0)
-material_override = SubResource("Cream")
-mesh = SubResource("Band4")
-
-[node name="Lamp" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="Lamp" parent="."]
 material_override = SubResource("LanternGlass")
-mesh = SubResource("Lantern")
 
 [node name="NightLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
@@ -145,8 +52,3 @@ transform = Transform3D(1, 0, 0, 0, 0.1391731, -0.99026805, 0, 0.99026805, 0.139
 material_override = SubResource("Beam")
 cast_shadow = 0
 mesh = SubResource("BeamCone")
-
-[node name="Roof" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.16, 0)
-material_override = SubResource("Slate")
-mesh = SubResource("Cap")

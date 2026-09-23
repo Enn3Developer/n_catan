@@ -7,10 +7,18 @@ const TINTS=[Color("768b62"),Color("be8b69"),Color("9cab71"),Color("bba276"),Col
 const LEAVES={"PineNeedles":Color("426e57"),"PineTips":Color("588568"),"OakLeaves":Color("749455"),"OakLight":Color("8ba766"),"Grass":Color("417638"),"DryGrass":Color("84603c"),"Wheat":Color("dab15e"),"Fern":Color("476b3e"),"Moss":Color("6b8660")}
 const SURFACES={"PBR_Rock":Color("83939d"),"PBR_Wood":Color("b39162"),"PBR_Bark":Color("74543c"),"PBR_Clay":Color("bd7655"),"Brick":Color("ba7555"),"Sandstone":Color("d0ac79"),"Plaster":Color("dfcba3"),"Roof":Color("657a85")}
 
+# Ground and cliff meshes are authored in assets/source/terrain.blend.
+const GROUNDS=[preload("res://assets/models/terrain/ground_forest.glb"),preload("res://assets/models/terrain/ground_hills.glb"),preload("res://assets/models/terrain/ground_pasture.glb"),preload("res://assets/models/terrain/ground_fields.glb"),preload("res://assets/models/terrain/ground_mountains.glb"),preload("res://assets/models/terrain/ground_desert.glb")]
+const CLIFF=preload("res://assets/models/terrain/cliff.glb")
+# Ground heights are sampled from the mesh on a grid spanning the tile's [-1,1] square.
+const HEIGHT_GRID=128
+const RIM_HEIGHT=.20
+
 var scenes={}
 var materials={}
 var maps={}
-var terrain_meshes={}
+var meshes={}
+var height_fields={}
 var texture_quality=2
 
 func configure(values: Dictionary):
@@ -98,7 +106,7 @@ func instantiate(kind: int,index: int,values: Dictionary) -> Node3D:
 
 func apply_instance(root: Node,values: Dictionary):
 	for node in root.find_children("*","MeshInstance3D",true,false):
-		node.lod_bias=[.20,.5,1.0,2.0][values.model_quality]
+		node.lod_bias=lod_bias(values)
 		node.gi_mode=GeometryInstance3D.GI_MODE_STATIC
 		var layer=str(node.name)
 		node.visible=true
@@ -119,52 +127,52 @@ func animate(values: Dictionary):
 	for key in LEAVES:
 		if materials.has(key):materials[key].set_shader_parameter("motion_speed",0.0 if values.reduce_motion else values.wind)
 
+static func lod_bias(values: Dictionary) -> float:
+	return [.20,.5,1.0,2.0][values.model_quality]
+
+func ground_mesh(kind: int) -> Mesh:
+	if not meshes.has(kind):meshes[kind]=_model_mesh(GROUNDS[kind])
+	return meshes[kind]
+
+func cliff_mesh() -> Mesh:
+	if not meshes.has("cliff"):meshes.cliff=_model_mesh(CLIFF)
+	return meshes.cliff
+
+static func _model_mesh(model: PackedScene) -> Mesh:
+	var root=model.instantiate()
+	var mesh: Mesh=root.find_children("*","MeshInstance3D",true,false)[0].mesh
+	root.free()
+	return mesh
+
+# Height of the authored ground under a point in tile space.
 func height_at(p: Vector2,kind: int) -> float:
-	var edge=maxf(absf(p.x)/.866,maxf(absf(p.x*.5+p.y*.866)/.866,absf(-p.x*.5+p.y*.866)/.866))
-	var height=[.045,.07,.04,.018,.10,.065][kind]
-	var wave=.5+sin(p.x*6.0+kind)*cos(p.y*5.0)*.5
-	var h=.20+pow(maxf(0,1-edge),1.3)*height*wave
-	if kind==5:
-		# Wind-shaped ripples grow into low dunes, fading into the clear tile boundary.
-		h+=pow(maxf(0,1-edge),1.5)*(.018*sin(p.x*26+p.y*5)+.035*sin(p.x*8-p.y*6))
-	return h
+	var field: PackedFloat32Array=_height_field(kind)
+	var cell=((p+Vector2.ONE)*.5*(HEIGHT_GRID-1)).clamp(Vector2.ZERO,Vector2.ONE*(HEIGHT_GRID-1))
+	var x=mini(int(cell.x),HEIGHT_GRID-2);var y=mini(int(cell.y),HEIGHT_GRID-2)
+	var t=cell-Vector2(x,y)
+	var near=lerpf(field[y*HEIGHT_GRID+x],field[y*HEIGHT_GRID+x+1],t.x)
+	var far=lerpf(field[(y+1)*HEIGHT_GRID+x],field[(y+1)*HEIGHT_GRID+x+1],t.x)
+	return lerpf(near,far,t.y)
 
-func terrain(kind: int,detail: int) -> ArrayMesh:
-	var key="%d/%d" % [kind,detail]
-	if terrain_meshes.has(key):return terrain_meshes[key]
-	var steps=[12,20,32,48][detail]
-	var st=SurfaceTool.new()
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for sector in 6:
-		var a=Vector2(cos(deg_to_rad(30+60*sector)),sin(deg_to_rad(30+60*sector)))*.993
-		var b=Vector2(cos(deg_to_rad(90+60*sector)),sin(deg_to_rad(90+60*sector)))*.993
-		for i in steps:
-			for j in range(steps-i):
-				var p=a*float(i)/steps+b*float(j)/steps
-				var q=a*float(i+1)/steps+b*float(j)/steps
-				var r=a*float(i)/steps+b*float(j+1)/steps
-				_ground_face(st,[p,q,r],kind)
-				if i+j<steps-1:
-					var t=a*float(i+1)/steps+b*float(j+1)/steps
-					_ground_face(st,[q,t,r],kind)
-	st.generate_normals()
-	st.generate_tangents()
-	terrain_meshes[key]=st.commit()
-	return terrain_meshes[key]
-
-func _ground_face(st: SurfaceTool,points: Array,kind: int):
-	for p in points:
-		st.set_uv(p*.5+Vector2(.5,.5))
-		st.add_vertex(Vector3(p.x,height_at(p,kind),p.y))
-
-func cliff_mesh(_index: int) -> ArrayMesh:
-	var st=SurfaceTool.new();st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var rings=[Vector2(.993,.20),Vector2(.993,.16),Vector2(.988,-.40),Vector2(.955,-.44)]
-	for sector in 6:
-		var a=Vector2(cos(deg_to_rad(30+60*sector)),sin(deg_to_rad(30+60*sector)))
-		var b=Vector2(cos(deg_to_rad(90+60*sector)),sin(deg_to_rad(90+60*sector)))
-		for row in 3:
-			var points=[Vector3(a.x*rings[row].x,rings[row].y,a.y*rings[row].x),Vector3(b.x*rings[row].x,rings[row].y,b.y*rings[row].x),Vector3(b.x*rings[row+1].x,rings[row+1].y,b.y*rings[row+1].x),Vector3(a.x*rings[row+1].x,rings[row+1].y,a.y*rings[row+1].x)]
-			for i in [0,2,1,0,3,2]:
-				st.set_uv(Vector2(points[i].x+points[i].z,points[i].y));st.add_vertex(points[i])
-	st.generate_normals();st.generate_tangents();return st.commit()
+# Rasterizes the ground triangles once per biome; points off the tile keep the rim height.
+func _height_field(kind: int) -> PackedFloat32Array:
+	if height_fields.has(kind):return height_fields[kind]
+	var field=PackedFloat32Array();field.resize(HEIGHT_GRID*HEIGHT_GRID);field.fill(RIM_HEIGHT)
+	var arrays=ground_mesh(kind).surface_get_arrays(0)
+	var vertices: PackedVector3Array=arrays[Mesh.ARRAY_VERTEX]
+	var indices: PackedInt32Array=arrays[Mesh.ARRAY_INDEX]
+	var to_grid=.5*(HEIGHT_GRID-1)
+	for i in range(0,indices.size(),3):
+		var a=vertices[indices[i]];var b=vertices[indices[i+1]];var c=vertices[indices[i+2]]
+		var pa=(Vector2(a.x,a.z)+Vector2.ONE)*to_grid;var pb=(Vector2(b.x,b.z)+Vector2.ONE)*to_grid;var pc=(Vector2(c.x,c.z)+Vector2.ONE)*to_grid
+		var area=(pb-pa).cross(pc-pa)
+		if absf(area)<1e-9:continue
+		for gy in range(maxi(ceili(minf(pa.y,minf(pb.y,pc.y))),0),mini(floori(maxf(pa.y,maxf(pb.y,pc.y))),HEIGHT_GRID-1)+1):
+			for gx in range(maxi(ceili(minf(pa.x,minf(pb.x,pc.x))),0),mini(floori(maxf(pa.x,maxf(pb.x,pc.x))),HEIGHT_GRID-1)+1):
+				var g=Vector2(gx,gy)
+				var wa=(pb-g).cross(pc-g)/area;var wb=(pc-g).cross(pa-g)/area
+				var wc=1.0-wa-wb
+				if wa<-1e-4 or wb<-1e-4 or wc<-1e-4:continue
+				field[gy*HEIGHT_GRID+gx]=a.y*wa+b.y*wb+c.y*wc
+	height_fields[kind]=field
+	return field
