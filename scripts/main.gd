@@ -108,7 +108,7 @@ func _home():
 	address_field=screen.address_field
 	password_field=screen.password_field
 	host_password_field=screen.host_password_field
-	screen.setup(preferences.values.player_name,net.reconnect_address,net.reconnect_password,not net.reconnect_token.is_empty())
+	screen.setup(preferences.values.player_name,not net.reconnect_token.is_empty())
 	_route(screen,{
 		"solo_requested":_solo,
 		"tutorial_requested":_tutorial_start,
@@ -148,8 +148,7 @@ func _join():
 
 func _reconnect():
 	if net.reconnect_address.is_empty():return
-	net.reconnect_password=password_field.text
-	join_draft={"address":net.reconnect_address,"password":password_field.text}
+	join_draft={"address":net.reconnect_address,"password":net.reconnect_password}
 	joining=true
 	net.reconnect()
 

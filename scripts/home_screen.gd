@@ -25,18 +25,10 @@ var connecting=false
 func _ready():
 	%Version.text=CatanBuildInfo.VERSION
 
-func _notification(what: int):
-	# Copying an invite elsewhere and switching back fills it in.
-	if what==NOTIFICATION_APPLICATION_FOCUS_IN and is_node_ready():_take_clipboard_invite()
-
-## Fills the menu; a saved seat offers Reconnect and keeps its invite ready.
-func setup(player_name: String,reconnect_address: String,reconnect_password: String,can_reconnect: bool):
+## Fills the menu. The invite field starts empty; Reconnect keeps its own details.
+func setup(player_name: String,can_reconnect: bool):
 	name_field.text=player_name
 	%Reconnect.visible=can_reconnect
-	if can_reconnect:
-		address_field.text=reconnect_address
-		password_field.text=reconnect_password
-	_take_clipboard_invite()
 	_refresh()
 
 ## Restores the details of the last attempt.
@@ -76,15 +68,6 @@ func _status(text: String,error: bool=false):
 
 func _invite_valid(code: String) -> bool:
 	return not SECURE_INVITE.decode(code).is_empty()
-
-func _take_clipboard_invite():
-	if connecting:return
-	var clipboard=DisplayServer.clipboard_get().strip_edges()
-	if clipboard==address_field.text.strip_edges() or not _invite_valid(clipboard):return
-	address_field.text=clipboard
-	password_field.clear()
-	password_field.hide()
-	_refresh()
 
 func _refresh():
 	if not password_field.text.is_empty():password_field.show()
