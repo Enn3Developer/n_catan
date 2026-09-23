@@ -2,6 +2,7 @@ extends Control
 signal close_requested
 var preferences: CatanSettings
 var network: CatanNetwork
+const PEDESTAL=preload("res://assets/models/pieces/pedestal.glb")
 var catalog=CatanCosmetics.new()
 var selected=0
 var target=-1
@@ -89,7 +90,7 @@ func select_style(index: int):
 	for child in display_root.get_children():child.free()
 	for i in 3:
 		var pedestal=Node3D.new();pedestal.position.x=(i-1)*.67;pedestal.rotation.y=turn;display_root.add_child(pedestal)
-		catalog.round_part(pedestal,Vector3(0,-.065,0),.285,.08,Color("29434b"),-1,64)
+		var stand=PEDESTAL.instantiate();stand.position.y=-.065;pedestal.add_child(stand)
 		var piece=catalog.road(selected,preview_color) if i==0 else catalog.settlement(selected,preview_color,i==2)
 		piece.name="Preview"+["Road","Settlement","City"][i]
 		if i==0:piece.rotation.y=PI*.28;piece.scale=Vector3.ONE*.75
