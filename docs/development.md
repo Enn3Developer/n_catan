@@ -58,7 +58,7 @@ You can also dispatch the workflow manually for an existing tag. Publishing defa
 
 The main scene, `scenes/main.tscn`, contains the Network, Board and Audio scenes, the updater, the interface day/night driver and the interface layer. `scripts/main.gd` shows one screen at a time, presents dialogs and routes their signals to the network and board.
 
-The interface lives in `scenes/ui/`. The home, lobby and in-game screens extend `CatanScreen`, every dialog inherits `dialog.tscn`, and repeated widgets such as player chips, development cards, preference rows and resource rows are scenes of their own. Screens and dialogs report intent through signals. Buttons that should click join the `ui_click` group. `assets/ui_theme.tres` supplies the shared theme, including the `PrimaryButton`, `MusicIconButton` and `HeadingLabel` variations. Regenerate it with `tools/build_ui_theme.py`.
+The interface lives in `scenes/ui/`. The home, lobby and in-game screens extend `CatanScreen`, every dialog inherits `dialog.tscn`, and repeated widgets such as player chips, development cards, preference rows and resource rows are scenes of their own. Screens and dialogs report intent through signals. Buttons that should click join the `ui_click` group. `assets/ui_theme.tres` supplies the shared theme, including the `PrimaryButton`, `MusicIconButton`, `HeadingLabel` and `ErrorLabel` variations. Regenerate it with `tools/build_ui_theme.py`.
 
 The board scene contains the camera, sun, sky environment, ocean, terrain, buildings and scenery, including the lighthouse, sailboats and offshore rocks. Number tokens, placement markers, production rings, chimney smoke, dice and weather are scenes in `scenes/world/`; the model-backed ones inherit their Blender model. The board still arranges tiles, pieces, towns, harbors and actors at runtime, but every model comes from Blender (see [Models](#models)). Audio buses are defined in `default_bus_layout.tres`.
 
@@ -205,6 +205,12 @@ last completed breadcrumb; the logger cannot guarantee a native stack for every 
 Settings → Graphics → Day/night cycle can hold the island and interface in daylight.
 The preference is local and saved independently of graphics presets; the shared
 world clock continues, so enabling it again restores the room's current time.
+The interface does not follow the sun gradually. `scripts/ui_day_night.gd` switches
+to the night palette when daylight drops below 0.4 and back above 0.6, crossing
+in a 0.6-second fade. The two palettes invert light and dark, so an interface
+parked between them would put lettering and surfaces on the same grey.
+`tests/ui_day_night_test.gd` sweeps a sunset to check the palette never settles
+between them.
 
 `tests/appearance_roads_test.gd` checks the 20-color palette, preservation of existing custom colors, Italian labels, and road connections at bends and branches across all four piece styles. GPU runs capture the appearance page at 800×600 in day/night and road close-ups under `/tmp/catan-ui-*.png`. The settings sidebar no longer duplicates the separate appearance page. `tests/notifications_test.gd` also checks five-second automatic dismissal and replacement timers.
 

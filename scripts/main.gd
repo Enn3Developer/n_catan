@@ -29,6 +29,9 @@ var preferences=CatanSettings.new()
 var guide: CatanTutorial
 var tutorial_panel: Control
 var invite_address=""
+# A join in flight keeps the guest on the join form until the host seats them.
+var joining=false
+var join_draft={"address":"","password":""}
 var inspection_mode=false
 var layout_queued=false
 var trade_players=true
@@ -111,6 +114,7 @@ func _home():
 		"tutorial_requested":_tutorial_start,
 		"host_requested":_host,
 		"join_requested":_join,
+		"join_cancel_requested":_cancel_join,
 		"reconnect_requested":_reconnect,
 		"settings_requested":_open_settings,
 		"cosmetics_requested":_open_cosmetics,
@@ -137,24 +141,43 @@ func _join():
 	var pname=name_field.text.strip_edges()
 	if pname.is_empty(): pname="Voyager"
 	preferences.set_value("player_name",pname)
-	var address=address_field.text
-	var password=password_field.text
-	var err=net.join_room(address,pname,password)
-	if err!=OK:
-		_home()
-		_notice(tr("Paste a valid invite code from the host."))
-	else: _notice(tr("Connecting to the island…"))
+	join_draft={"address":address_field.text.strip_edges(),"password":password_field.text}
+	joining=true
+	var err=net.join_room(join_draft.address,pname,join_draft.password)
+	if err!=OK and joining:_join_failed("Paste a valid invite code from the host.")
 
 func _reconnect():
+	if net.reconnect_address.is_empty():return
 	net.reconnect_password=password_field.text
+	join_draft={"address":net.reconnect_address,"password":password_field.text}
+	joining=true
 	net.reconnect()
+
+func _cancel_join():
+	joining=false
+	net.leave()
+	_show_join_form(false)
+
+func _join_failed(message: String):
+	joining=false
+	_show_join_form(false)
+	screen.show_join_error(message)
+
+func _show_join_form(connecting: bool):
+	if not (is_instance_valid(screen) and screen.scene_file_path=="res://scenes/ui/home.tscn"):_home()
+	screen.open_join(join_draft.address,join_draft.password)
+	screen.show_connecting(connecting)
 
 func _on_board_picked(kind: String,id: int):
 	net.act({"type":kind,"id":id})
 
 func _network_changed():
 	if server_only or not is_node_ready(): return
-	if not net.online:
+	if joining and not net.roster.is_empty():joining=false
+	if joining:
+		# Failures arrive as a notice right after the connection closes.
+		_show_join_form(net.online)
+	elif not net.online:
 		_home()
 	elif not net.started:
 		_lobby()
@@ -307,6 +330,10 @@ func _choose(kind: String):
 func _notice(message: String):
 	print(message)
 	if server_only or not is_node_ready(): return
+	if joining and not net.online:
+		audio.play("error")
+		_join_failed(message)
+		return
 	if "failed" in message.to_lower() or "not enough" in message.to_lower(): audio.play("error")
 	if message.begins_with("Router") or message.begins_with("Automatic mapping"):
 		if "Invite address: " in message: invite_address=message.get_slice("Invite address: ",1)
@@ -581,6 +608,7 @@ func _show_turn_banner():
 func _refresh_language():
 	if server_only:return
 	if net.started and not state.is_empty():_hud()
+	elif joining:_show_join_form(net.online)
 	elif net.online:_lobby()
 	else:_home()
 	if is_instance_valid(modal) and modal.name=="Settings":

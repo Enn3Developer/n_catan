@@ -1828,3 +1828,36 @@ msgstr "Time left in this turn"
 
 msgid "Your turn time ran out."
 msgstr "Your turn time ran out."
+
+msgid "Invite code"
+msgstr "Invite code"
+
+msgid "Paste the invite code from your clipboard"
+msgstr "Paste the invite code from your clipboard"
+
+msgid "Ask the host to copy the invite from their room."
+msgstr "Ask the host to copy the invite from their room."
+
+msgid "Room password"
+msgstr "Room password"
+
+msgid "Leave blank for an open room"
+msgstr "Leave blank for an open room"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Connecting…"
+msgstr "Connecting…"
+
+msgid "Reaching the host. This can take up to 10 seconds."
+msgstr "Reaching the host. This can take up to 10 seconds."
+
+msgid "Invite code ready. Add the password if the host set one."
+msgstr "Invite code ready. Add the password if the host set one."
+
+msgid "Invite codes start with NC1-. Copy the whole code from the host's room."
+msgstr "Invite codes start with NC1-. Copy the whole code from the host's room."
+
+msgid "This invite code is incomplete or mistyped. Copy it again from the host."
+msgstr "This invite code is incomplete or mistyped. Copy it again from the host."

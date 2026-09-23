@@ -10,6 +10,8 @@ func check(ok: bool,message: String):
 func _initialize():call_deferred("run")
 func run():
 	game=load("res://scenes/main.tscn").instantiate();root.add_child(game);await create_timer(.4).timeout
+	# A seat saved by an earlier run would open the join form instead.
+	game.net.reconnect_token="";game._home()
 	check(game.address_field.placeholder_text=="Paste invite code","join form asks for compact invite")
 	game._node("ShowOnline").button_pressed=true
 	check(game._node("HostOptions").visible and not game._node("JoinOptions").visible,"hosting has its own visible form")

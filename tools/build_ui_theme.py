@@ -74,6 +74,7 @@ for state,style in [('normal','MusicIcon'),('hover','MusicIconHover'),('pressed'
 prop('Label/colors/font_color',color('493521'))
 prop('HeadingLabel/base_type','&"Label"')
 prop('HeadingLabel/fonts/font','ExtResource("heading-font")')
+prop('ErrorLabel/base_type','&"Label"');prop('ErrorLabel/colors/font_color',color('a8402f'))
 for key,h in [('font_color','493521'),('font_placeholder_color','8a775c'),('caret_color','526747'),('selection_color','b4c696')]:prop('LineEdit/colors/'+key,color(h))
 prop('LineEdit/styles/normal','SubResource("Input")');prop('LineEdit/styles/focus','SubResource("InputFocus")')
 prop('PanelContainer/styles/panel','SubResource("Panel")')

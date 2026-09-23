@@ -141,17 +141,49 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="ServerAddress" type="LineEdit" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions"]
+[node name="InviteLabel" type="Label" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Invite code"
+
+[node name="InviteRow" type="HBoxContainer" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions"]
+layout_mode = 2
+
+[node name="ServerAddress" type="LineEdit" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions/InviteRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
+size_flags_horizontal = 3
 placeholder_text = "Paste invite code"
+max_length = 96
+clear_button_enabled = true
+
+[node name="PasteInvite" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions/InviteRow" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+tooltip_text = "Paste the invite code from your clipboard"
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 14
+text = "Paste"
+
+[node name="JoinStatus" type="Label" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Ask the host to copy the invite from their room."
+autowrap_mode = 3
+
+[node name="RoomPasswordLabel" type="Label" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Room password"
 
 [node name="RoomPassword" type="LineEdit" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
-placeholder_text = "Room password (if required)"
+placeholder_text = "Leave blank for an open room"
 max_length = 64
 secret = true
 
@@ -160,7 +192,16 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
+disabled = true
 text = "Join room"
+
+[node name="CancelJoin" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions" groups=["ui_click"]]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "Cancel"
 
 [node name="Reconnect" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems" groups=["ui_click"]]
 unique_name_in_owner = true
@@ -279,7 +320,12 @@ horizontal_alignment = 2
 [connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/OnlineModes/HostTab" to="." method="show_online_mode" binds= [true]]
 [connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/OnlineModes/JoinTab" to="." method="show_online_mode" binds= [false]]
 [connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/HostOptions/HostOnline" to="." method="emit_signal" binds= ["host_requested"]]
-[connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions/JoinOnline" to="." method="emit_signal" binds= ["join_requested"]]
+[connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions/JoinOnline" to="." method="_on_join_pressed"]
+[connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions/CancelJoin" to="." method="emit_signal" binds= ["join_cancel_requested"]]
+[connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions/InviteRow/PasteInvite" to="." method="_on_paste_invite_pressed"]
+[connection signal="text_changed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions/InviteRow/ServerAddress" to="." method="_on_invite_changed"]
+[connection signal="text_submitted" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions/InviteRow/ServerAddress" to="." method="_on_invite_submitted"]
+[connection signal="text_submitted" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/OnlineForm/JoinOptions/RoomPassword" to="." method="_on_join_pressed" unbinds=1]
 [connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/Reconnect" to="." method="emit_signal" binds= ["reconnect_requested"]]
 [connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/Singleplayer" to="." method="emit_signal" binds= ["solo_requested"]]
 [connection signal="pressed" from="Expedition/ExpeditionBody/MenuScroll/MenuItems/Learn" to="." method="emit_signal" binds= ["tutorial_requested"]]

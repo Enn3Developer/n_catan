@@ -16,6 +16,8 @@ func run():
 	var game=load("res://scenes/main.tscn").instantiate()
 	root.add_child(game)
 	await create_timer(0.5).timeout
+	# A seat saved by an earlier run would open the online form already.
+	game.net.reconnect_token="";game._home()
 	game.name_field.text="Host"
 	await click(game._node("ShowOnline"))
 	await click(game.screen.find_child("HostOnline",true,false))
