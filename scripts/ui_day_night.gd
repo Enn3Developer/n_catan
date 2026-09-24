@@ -82,6 +82,9 @@ func _texture(source: Texture2D) -> Texture2D:
 	if textures.has(key):return textures[key]
 	var slot=textures.size()
 	var position=Vector2((slot%5)*100,(slot/5)*100)
+	# Grow the atlas with the theme; a texture drawn outside it would come out blank.
+	var needed=Vector2i((position+source.get_size()).ceil())
+	atlas.size=Vector2i(maxi(atlas.size.x,needed.x),maxi(atlas.size.y,needed.y))
 	var rect=TextureRect.new()
 	rect.texture=source
 	rect.position=position
@@ -89,7 +92,8 @@ func _texture(source: Texture2D) -> Texture2D:
 	var material=ShaderMaterial.new()
 	material.shader=NIGHT_SHADER
 	material.set_shader_parameter("night",amount)
-	material.set_shader_parameter("accent","primary" in source.resource_path or "pressed" in source.resource_path)
+	material.set_shader_parameter("accent","primary" in source.resource_path)
+	material.set_shader_parameter("selected","selected" in source.resource_path)
 	material.set_shader_parameter("icon",not "button" in source.resource_path and not "parchment" in source.resource_path)
 	rect.material=material
 	atlas.add_child(rect)

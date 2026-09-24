@@ -55,21 +55,20 @@ text = "Workshop"
 [node name="LobbySettings" type="Button" parent="Frame/Header" groups=["ui_click"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 40)
+theme_type_variation = &"IconButton"
 layout_mode = 2
 tooltip_text = "Settings"
 mouse_default_cursor_shape = 2
-theme_override_constants/icon_max_width = 22
 icon = ExtResource("icon_settings")
 
 [node name="OpenMusic" type="Button" parent="Frame/Header" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(34, 30)
+custom_minimum_size = Vector2(40, 40)
+theme_type_variation = &"IconButton"
 layout_mode = 2
 size_flags_vertical = 4
 tooltip_text = "Music"
 mouse_default_cursor_shape = 2
-theme_type_variation = &"MusicIconButton"
-theme_override_constants/icon_max_width = 18
 icon = ExtResource("icon_music")
 
 [node name="Columns" type="HBoxContainer" parent="Frame"]
@@ -100,13 +99,15 @@ layout_mode = 2
 [node name="CrewTitle" type="Label" parent="Frame/Columns/Left/Crew/CrewBody/CrewHeader"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_type_variation = &"SectionLabel"
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
 text = "Players"
+uppercase = true
 
 [node name="PlayerCount" type="Label" parent="Frame/Columns/Left/Crew/CrewBody/CrewHeader"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_type_variation = &"MutedLabel"
 theme_override_font_sizes/font_size = 16
 text = "1 / 6"
 
@@ -142,108 +143,6 @@ size_flags_horizontal = 3
 mouse_default_cursor_shape = 2
 text = "I'm ready"
 
-[node name="RoomRules" type="PanelContainer" parent="Frame/Columns/Left"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="RulesBody" type="VBoxContainer" parent="Frame/Columns/Left/RoomRules"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="RulesHeader" type="HBoxContainer" parent="Frame/Columns/Left/RoomRules/RulesBody"]
-layout_mode = 2
-
-[node name="RulesTitle" type="Label" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesHeader"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
-text = "Room rules"
-
-[node name="RulesGrid" type="GridContainer" parent="Frame/Columns/Left/RoomRules/RulesBody"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/h_separation = 12
-theme_override_constants/v_separation = 8
-columns = 4
-
-[node name="SeedLabel" type="Label" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "Map seed"
-
-[node name="SeedRow" type="HBoxContainer" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="SeedField" type="LineEdit" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/SeedRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(96, 38)
-layout_mode = 2
-size_flags_horizontal = 3
-tooltip_text = "The same seed and player count always build the same island. Share it to replay a map."
-max_length = 9
-virtual_keyboard_type = 2
-
-[node name="NewSeed" type="Button" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/SeedRow" groups=["ui_click"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-tooltip_text = "Pick a new random seed"
-mouse_default_cursor_shape = 2
-text = "New"
-
-[node name="IslandLabel" type="Label" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "Island"
-
-[node name="IslandPicker" type="OptionButton" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_default_cursor_shape = 2
-
-[node name="TimerLabel" type="Label" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "Turn timer"
-
-[node name="TimerPicker" type="OptionButton" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_horizontal = 3
-tooltip_text = "When a turn runs out, the host finishes it with the shortest legal moves."
-mouse_default_cursor_shape = 2
-
-[node name="PointsLabel" type="Label" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "Points to win"
-
-[node name="PointsPicker" type="OptionButton" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_default_cursor_shape = 2
-
-[node name="RobberLabel" type="Label" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "Friendly robber"
-
-[node name="FriendlyRobber" type="CheckButton" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_horizontal = 3
-tooltip_text = "The robber cannot be placed next to a player with 2 points or fewer."
-mouse_default_cursor_shape = 2
-
 [node name="Voyage" type="PanelContainer" parent="Frame/Columns"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 0)
@@ -253,7 +152,18 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="RoomSummary" type="Label" parent="Frame/Columns/Voyage/VoyageBody"]
+[node name="VoyageScroll" type="ScrollContainer" parent="Frame/Columns/Voyage/VoyageBody"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="VoyageContent" type="VBoxContainer" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RoomSummary" type="Label" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"HeadingLabel"
@@ -261,23 +171,30 @@ theme_override_font_sizes/font_size = 22
 text = "Classic · 19 hexes"
 autowrap_mode = 3
 
-[node name="InviteHeading" type="Label" parent="Frame/Columns/Voyage/VoyageBody"]
+[node name="RoomAccess" type="Label" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "Invite friends"
+theme_type_variation = &"MutedLabel"
+autowrap_mode = 3
 
-[node name="InviteAddress" type="LineEdit" parent="Frame/Columns/Voyage/VoyageBody"]
+[node name="InviteHeading" type="Label" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "Invite friends"
+uppercase = true
+
+[node name="InviteAddress" type="LineEdit" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 placeholder_text = "Public address:24567"
 
-[node name="InviteActions" type="HBoxContainer" parent="Frame/Columns/Voyage/VoyageBody"]
+[node name="InviteActions" type="HBoxContainer" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="CopyInvite" type="Button" parent="Frame/Columns/Voyage/VoyageBody/InviteActions" groups=["ui_click"]]
+[node name="CopyInvite" type="Button" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/InviteActions" groups=["ui_click"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
@@ -285,7 +202,7 @@ size_flags_horizontal = 3
 mouse_default_cursor_shape = 2
 text = "Copy invite"
 
-[node name="MapRouter" type="Button" parent="Frame/Columns/Voyage/VoyageBody/InviteActions" groups=["ui_click"]]
+[node name="MapRouter" type="Button" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/InviteActions" groups=["ui_click"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
@@ -293,21 +210,112 @@ size_flags_horizontal = 3
 mouse_default_cursor_shape = 2
 text = "Map router"
 
-[node name="ConnectionHelp" type="Label" parent="Frame/Columns/Voyage/VoyageBody"]
+[node name="ConnectionHelp" type="Label" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_type_variation = &"MutedLabel"
 autowrap_mode = 3
 
-[node name="FlexibleSpace" type="Control" parent="Frame/Columns/Voyage/VoyageBody"]
+[node name="RulesGap" type="Control" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="RulesTitle" type="Label" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+size_flags_horizontal = 3
+text = "Room rules"
+uppercase = true
+
+[node name="RulesGrid" type="GridContainer" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 8
+columns = 2
+
+[node name="SeedLabel" type="Label" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Map seed"
+
+[node name="SeedRow" type="HBoxContainer" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SeedField" type="LineEdit" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid/SeedRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "The same seed and player count always build the same island. Share it to replay a map."
+max_length = 9
+virtual_keyboard_type = 2
+
+[node name="NewSeed" type="Button" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid/SeedRow" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+tooltip_text = "Pick a new random seed"
+mouse_default_cursor_shape = 2
+text = "New"
+
+[node name="IslandLabel" type="Label" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Island"
+
+[node name="IslandPicker" type="OptionButton" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+
+[node name="TimerLabel" type="Label" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Turn timer"
+
+[node name="TimerPicker" type="OptionButton" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "When a turn runs out, the host finishes it with the shortest legal moves."
+mouse_default_cursor_shape = 2
+
+[node name="PointsLabel" type="Label" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Points to win"
+
+[node name="PointsPicker" type="OptionButton" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+
+[node name="RobberLabel" type="Label" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Friendly robber"
+
+[node name="FriendlyRobber" type="CheckButton" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "The robber cannot be placed next to a player with 2 points or fewer."
+mouse_default_cursor_shape = 2
 
 [node name="LobbyStatus" type="Label" parent="Frame/Columns/Voyage/VoyageBody"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 15
+theme_type_variation = &"MutedLabel"
 autowrap_mode = 3
 
 [node name="StartGame" type="Button" parent="Frame/Columns/Voyage/VoyageBody" groups=["ui_click"]]
@@ -330,15 +338,15 @@ text = "Back"
 [connection signal="pressed" from="Frame/Header/OpenMusic" to="." method="emit_signal" binds= ["music_requested"]]
 [connection signal="pressed" from="Frame/Columns/Left/Crew/CrewBody/CrewActions/AddBot" to="." method="emit_signal" binds= ["add_bot_requested"]]
 [connection signal="pressed" from="Frame/Columns/Left/Crew/CrewBody/CrewActions/ReadyButton" to="." method="emit_signal" binds= ["ready_requested"]]
-[connection signal="text_changed" from="Frame/Columns/Voyage/VoyageBody/InviteAddress" to="." method="_on_invite_address_text_changed"]
-[connection signal="pressed" from="Frame/Columns/Voyage/VoyageBody/InviteActions/CopyInvite" to="." method="_on_copy_invite_pressed"]
-[connection signal="pressed" from="Frame/Columns/Voyage/VoyageBody/InviteActions/MapRouter" to="." method="emit_signal" binds= ["map_router_requested"]]
+[connection signal="text_changed" from="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/InviteAddress" to="." method="_on_invite_address_text_changed"]
+[connection signal="pressed" from="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/InviteActions/CopyInvite" to="." method="_on_copy_invite_pressed"]
+[connection signal="pressed" from="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/InviteActions/MapRouter" to="." method="emit_signal" binds= ["map_router_requested"]]
 [connection signal="pressed" from="Frame/Columns/Voyage/VoyageBody/StartGame" to="." method="emit_signal" binds= ["start_requested"]]
 [connection signal="pressed" from="Frame/Columns/Voyage/VoyageBody/LeaveRoom" to="." method="emit_signal" binds= ["leave_requested"]]
-[connection signal="text_submitted" from="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/SeedRow/SeedField" to="." method="_on_seed_submitted"]
-[connection signal="focus_exited" from="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/SeedRow/SeedField" to="." method="_on_seed_focus_exited"]
-[connection signal="pressed" from="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/SeedRow/NewSeed" to="." method="_on_new_seed_pressed"]
-[connection signal="item_selected" from="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/IslandPicker" to="." method="_on_island_selected"]
-[connection signal="item_selected" from="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/TimerPicker" to="." method="_on_timer_selected"]
-[connection signal="item_selected" from="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/PointsPicker" to="." method="_on_points_selected"]
-[connection signal="toggled" from="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/FriendlyRobber" to="." method="_on_friendly_robber_toggled"]
+[connection signal="text_submitted" from="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid/SeedRow/SeedField" to="." method="_on_seed_submitted"]
+[connection signal="focus_exited" from="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid/SeedRow/SeedField" to="." method="_on_seed_focus_exited"]
+[connection signal="pressed" from="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid/SeedRow/NewSeed" to="." method="_on_new_seed_pressed"]
+[connection signal="item_selected" from="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid/IslandPicker" to="." method="_on_island_selected"]
+[connection signal="item_selected" from="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid/TimerPicker" to="." method="_on_timer_selected"]
+[connection signal="item_selected" from="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid/PointsPicker" to="." method="_on_points_selected"]
+[connection signal="toggled" from="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid/FriendlyRobber" to="." method="_on_friendly_robber_toggled"]

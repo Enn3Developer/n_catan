@@ -24,8 +24,7 @@ autowrap_mode = 3
 [node name="Description" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.47451, 0.388235, 0.278431, 1)
-theme_override_font_sizes/font_size = 14
+theme_type_variation = &"MutedLabel"
 autowrap_mode = 3
 
 [node name="Timeline" type="HBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body"]
@@ -42,60 +41,56 @@ show_percentage = false
 [node name="Clock" type="Label" parent="DialogMargin/Panel/DialogScroll/Body/Timeline"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.47451, 0.388235, 0.278431, 1)
-theme_override_font_sizes/font_size = 14
+theme_type_variation = &"MutedLabel"
 
 [node name="Controls" type="HBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body"]
 layout_mode = 2
 
 [node name="Previous" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/Controls" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(34, 30)
+custom_minimum_size = Vector2(40, 40)
+theme_type_variation = &"IconButton"
 layout_mode = 2
 size_flags_vertical = 4
 tooltip_text = "Previous track / restart"
 mouse_default_cursor_shape = 2
-theme_type_variation = &"MusicIconButton"
-theme_override_constants/icon_max_width = 18
 icon = ExtResource("icon_previous")
 
 [node name="Toggle" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/Controls" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(34, 30)
+custom_minimum_size = Vector2(40, 40)
+theme_type_variation = &"IconButton"
 layout_mode = 2
 size_flags_vertical = 4
 tooltip_text = "Pause soundtrack"
 mouse_default_cursor_shape = 2
-theme_type_variation = &"MusicIconButton"
-theme_override_constants/icon_max_width = 18
 icon = ExtResource("icon_pause")
 
 [node name="Next" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/Controls" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(34, 30)
+custom_minimum_size = Vector2(40, 40)
+theme_type_variation = &"IconButton"
 layout_mode = 2
 size_flags_vertical = 4
 tooltip_text = "Next track"
 mouse_default_cursor_shape = 2
-theme_type_variation = &"MusicIconButton"
-theme_override_constants/icon_max_width = 18
 icon = ExtResource("icon_next")
 
 [node name="Mute" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/Controls" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(34, 30)
+custom_minimum_size = Vector2(40, 40)
+theme_type_variation = &"IconButton"
 layout_mode = 2
 size_flags_vertical = 4
 tooltip_text = "Mute music for you"
 mouse_default_cursor_shape = 2
-theme_type_variation = &"MusicIconButton"
-theme_override_constants/icon_max_width = 18
 icon = ExtResource("icon_volume")
 
 [node name="Volume" type="HSlider" parent="DialogMargin/Panel/DialogScroll/Body/Controls"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(72, 24)
+custom_minimum_size = Vector2(120, 24)
 layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 4
 tooltip_text = "Your music volume · does not affect other players"
 max_value = 1.0
@@ -104,13 +99,13 @@ step = 0.01
 [node name="Status" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.47451, 0.388235, 0.278431, 1)
-theme_override_font_sizes/font_size = 14
+theme_type_variation = &"MutedLabel"
 autowrap_mode = 3
 
 [node name="Tracks" type="VBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_constants/separation = 2
 
 [node name="Close" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
 custom_minimum_size = Vector2(0, 38)

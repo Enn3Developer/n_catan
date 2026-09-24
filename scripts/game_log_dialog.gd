@@ -2,7 +2,6 @@ extends CatanDialog
 ## The whole game log, newest at the bottom, with a player filter and search.
 
 var entries: Array=[]
-var plain_line: StyleBox
 var names: Array=[]
 var seat=-1
 
@@ -37,7 +36,7 @@ func _render(follow: bool):
 		row.get_node("Row/Number").text=str(i+1)
 		row.get_node("Row/Text").text=text
 		# Alternate the shading so long runs stay easy to follow.
-		if shown%2==1:row.add_theme_stylebox_override("panel",_plain(template))
+		row.theme_type_variation=&"PlainRow" if shown%2==1 else &"Row"
 		row.show()
 		%Lines.add_child(row)
 		shown+=1
@@ -45,13 +44,6 @@ func _render(follow: bool):
 	%Count.visible=shown!=entries.size()
 	%Count.text=tr("%d of %d entries") % [shown,entries.size()]
 	if follow:_scroll_to_end.call_deferred()
-
-## The shaded line style without its fill, so both kinds of row keep the same margins.
-func _plain(template: PanelContainer) -> StyleBox:
-	if plain_line==null:
-		plain_line=template.get_theme_stylebox("panel").duplicate()
-		plain_line.bg_color=Color.TRANSPARENT
-	return plain_line
 
 func _at_bottom() -> bool:
 	var bar: VScrollBar=%DialogScroll.get_v_scroll_bar()

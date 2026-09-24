@@ -265,8 +265,6 @@ msgstr "Cannot write the update cache."
 msgid "Change the actual albedo, normal and occlusion/roughness textures used by terrain, stone and wood. Higher settings retain detail during close inspection."
 msgstr "Change the actual albedo, normal and occlusion/roughness textures used by terrain, stone and wood. Higher settings retain detail during close inspection."
 
-msgid "Chart a course  →"
-msgstr "Chart a course  →"
 
 msgid "Check for a newer release."
 msgstr "Check for a newer release."
@@ -2400,3 +2398,12 @@ msgstr "\n%d points win the game."
 
 msgid "for"
 msgstr "for"
+
+msgid "Water and wind"
+msgstr "Water and wind"
+
+msgid "of %d"
+msgstr "of %d"
+
+msgid "%d of %d chosen"
+msgstr "%d of %d chosen"

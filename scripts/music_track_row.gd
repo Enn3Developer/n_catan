@@ -8,4 +8,4 @@ signal chosen
 func show_track(track: Dictionary):
 	button.text=track.title
 	button.tooltip_text=track.mood
-	$Duration.text=CatanSoundtrack.time_text(track.duration)
+	$Track/Duration.text=CatanSoundtrack.time_text(track.duration)

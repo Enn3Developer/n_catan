@@ -15,7 +15,8 @@ func show_player(state: Dictionary,index: int,seat: int,color: Color):
 	var hidden_points=player.cards[4]+player.new_cards[4] if player.cards.size()==5 else 0
 	tooltip_text+=tr("\n%d public points + %d victory-point cards = %d total") % [player.points,hidden_points,score] if player.cards.size()==5 else tr("\nVictory-point cards stay private until game end.")
 	%Name.text=player.name
-	%Name.add_theme_color_override("font_color",color)
+	# Seat colors can be too pale for lettering, so the name stays in ink beside a color bar.
+	%Accent.color=color
 	%TurnState.visible=current
 	%TurnState.text=tr("Your turn") if index==seat else tr("Playing")
 	for stat in [[%Score,score,tr("Victory points")],[%Resources,player.resource_count,"Resources"],[%Cards,player.card_count,tr("Development cards")],[%RoadLength,player.road_length,tr("Longest road length")],[%Knights,player.knights,tr("Played knights")]]:

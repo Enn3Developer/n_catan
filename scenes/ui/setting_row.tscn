@@ -2,19 +2,8 @@
 
 [ext_resource type="Script" path="res://scripts/setting_row.gd" id="script"]
 
-[sub_resource type="StyleBoxFlat" id="RowPanel"]
-content_margin_left = 14.0
-content_margin_top = 10.0
-content_margin_right = 14.0
-content_margin_bottom = 10.0
-bg_color = Color(0.933333, 0.854902, 0.690196, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
 [node name="SettingRow" type="PanelContainer"]
-theme_override_styles/panel = SubResource("RowPanel")
+theme_type_variation = &"Row"
 script = ExtResource("script")
 
 [node name="Row" type="HBoxContainer" parent="."]

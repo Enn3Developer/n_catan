@@ -46,15 +46,29 @@ var controls={}
 var rows={}
 var updating=false
 var last_tab="Graphics"
-var stats_clock=0.0
+## The long Graphics tab is split into these groups, in this order.
+const GROUPS=["Graphics","Lighting","Water and wind","Display"]
 
 func _ready():
 	%Version.text=CatanBuildInfo.VERSION
 	tabs={"Graphics":%GraphicsScroll,"World":%WorldScroll,"Audio":%AudioScroll}
 	var pages={"Graphics":%GraphicsOptions,"World":%WorldOptions,"Audio":%AudioOptions}
+	var groups={}
 	for spec in OPTIONS:
-		var group="Graphics" if spec[0] in ["Display","Graphics","Lighting"] or spec[2] in ["water_quality","wind"] else spec[0]
-		_add_control(pages[group],spec)
+		var page="Graphics" if spec[0] in ["Display","Graphics","Lighting"] or spec[2] in ["water_quality","wind"] else spec[0]
+		if page!="Graphics":_add_control(pages[page],spec)
+		else:
+			var group="Water and wind" if spec[2] in ["water_quality","wind"] else spec[0]
+			if not groups.has(group):groups[group]=[]
+			groups[group].append(spec)
+	for group in GROUPS:
+		var heading=Label.new()
+		# Labels translate their own text, so the heading follows a language change.
+		heading.text=group
+		heading.uppercase=true
+		heading.theme_type_variation=&"SectionLabel"
+		%GraphicsOptions.add_child(heading)
+		for spec in groups.get(group,[]):_add_control(%GraphicsOptions,spec)
 	_layout()
 
 func _layout():
@@ -64,7 +78,6 @@ func setup(settings: CatanSettings):
 	preferences=settings
 	refresh()
 	select_tab(last_tab)
-	_help(OPTIONS[8])
 
 func _add_control(parent: Node,spec: Array):
 	var row=ROWS[spec[4]].instantiate()
@@ -104,14 +117,14 @@ func select_tab(title: String):
 	for key in tabs: tabs[key].visible=key==title
 	for child in %Navigation.get_children():
 		if child is Button:child.set_pressed_no_signal(child.name==title+"Tab")
+	# Show the first setting of the tab until another one is hovered.
+	for row in tabs[title].get_child(0).get_children():
+		if row.has_method("show_spec"):
+			for spec in OPTIONS:
+				if rows.get(spec[2])==row:_help(spec);return
 
 func _help(spec: Array):
 	%HelpTitle.text=spec[3]
 	%HelpBody.text=spec[6]
 	%HelpCost.text=spec[7]
 
-func _process(delta):
-	stats_clock-=delta
-	if stats_clock>0:return
-	stats_clock=.5
-	%Performance.text=tr("%d FPS · %.1f ms / frame · %.0f MB VRAM") % [Engine.get_frames_per_second(),1000.0/maxf(1,Engine.get_frames_per_second()),Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED)/1048576.0]

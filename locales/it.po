@@ -265,8 +265,6 @@ msgstr "Impossibile salvare i file dell’aggiornamento. Controlla spazio libero
 msgid "Change the actual albedo, normal and occlusion/roughness textures used by terrain, stone and wood. Higher settings retain detail during close inspection."
 msgstr "Cambia la risoluzione delle texture di colore, rilievo e superficie per terreno, pietra e legno. I valori alti mantengono i dettagli da vicino."
 
-msgid "Chart a course  →"
-msgstr "Torna al gioco  →"
 
 msgid "Check for a newer release."
 msgstr "Cerca una versione più recente."
@@ -2400,3 +2398,12 @@ msgstr "\n%d punti vincono la partita."
 
 msgid "for"
 msgstr "per"
+
+msgid "Water and wind"
+msgstr "Acqua e vento"
+
+msgid "of %d"
+msgstr "su %d"
+
+msgid "%d of %d chosen"
+msgstr "%d su %d scelte"

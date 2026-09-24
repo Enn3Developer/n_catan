@@ -73,62 +73,62 @@ alignment = 2
 
 [node name="InspectBoard" type="Button" parent="Top/TopBody/HUDTools/ToolButtons" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(44, 40)
+custom_minimum_size = Vector2(40, 40)
+theme_type_variation = &"IconButton"
 layout_mode = 2
 size_flags_vertical = 0
 tooltip_text = "Inspect board (H)"
 mouse_default_cursor_shape = 2
-theme_override_constants/icon_max_width = 20
 icon = ExtResource("icon_inspect")
 
 [node name="OpenLog" type="Button" parent="Top/TopBody/HUDTools/ToolButtons" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(44, 40)
+custom_minimum_size = Vector2(40, 40)
+theme_type_variation = &"IconButton"
 layout_mode = 2
 size_flags_vertical = 0
 tooltip_text = "Game log"
 mouse_default_cursor_shape = 2
-theme_override_constants/icon_max_width = 20
 icon = ExtResource("icon_journal")
 
 [node name="OpenGuide" type="Button" parent="Top/TopBody/HUDTools/ToolButtons" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(44, 40)
+custom_minimum_size = Vector2(40, 40)
+theme_type_variation = &"IconButton"
 layout_mode = 2
 size_flags_vertical = 0
 tooltip_text = "Guide"
 mouse_default_cursor_shape = 2
-theme_override_constants/icon_max_width = 20
 icon = ExtResource("icon_help")
 
 [node name="OpenMusic" type="Button" parent="Top/TopBody/HUDTools/ToolButtons" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(44, 40)
+custom_minimum_size = Vector2(40, 40)
+theme_type_variation = &"IconButton"
 layout_mode = 2
 size_flags_vertical = 0
 tooltip_text = "Music"
 mouse_default_cursor_shape = 2
-theme_override_constants/icon_max_width = 20
 icon = ExtResource("icon_music")
 
 [node name="OpenSettings" type="Button" parent="Top/TopBody/HUDTools/ToolButtons" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(44, 40)
+custom_minimum_size = Vector2(40, 40)
+theme_type_variation = &"IconButton"
 layout_mode = 2
 size_flags_vertical = 0
 tooltip_text = "Settings"
 mouse_default_cursor_shape = 2
-theme_override_constants/icon_max_width = 20
 icon = ExtResource("icon_settings")
 
 [node name="LeaveGame" type="Button" parent="Top/TopBody/HUDTools/ToolButtons" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(44, 40)
+custom_minimum_size = Vector2(40, 40)
+theme_type_variation = &"IconButton"
 layout_mode = 2
 size_flags_vertical = 0
 tooltip_text = "Leave game"
 mouse_default_cursor_shape = 2
-theme_override_constants/icon_max_width = 20
 icon = ExtResource("icon_leave")
 
 [node name="Bottom" type="PanelContainer" parent="."]

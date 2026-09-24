@@ -181,8 +181,7 @@ text = "Night"
 
 [node name="DragHint" type="Label" parent="Panel/Margin/Layout/Content/PreviewBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.47451, 0.388235, 0.278431, 1)
-theme_override_font_sizes/font_size = 14
+theme_type_variation = &"MutedLabel"
 text = "Drag to turn · Scroll to zoom"
 horizontal_alignment = 1
 
@@ -194,8 +193,7 @@ theme_override_constants/separation = 8
 
 [node name="PresetLabel" type="Label" parent="Panel/Margin/Layout/Content/Editor"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54902, 0.321569, 0.176471, 1)
-theme_override_font_sizes/font_size = 14
+theme_type_variation = &"SectionLabel"
 text = "START FROM"
 
 [node name="Presets" type="HFlowContainer" parent="Panel/Margin/Layout/Content/Editor"]

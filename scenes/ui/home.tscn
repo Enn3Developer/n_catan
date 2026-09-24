@@ -3,7 +3,6 @@
 [ext_resource type="Theme" path="res://assets/ui_theme.tres" id="1"]
 [ext_resource type="Texture2D" path="res://assets/ui/game-logo.png" id="logo"]
 [ext_resource type="Script" path="res://scripts/home_screen.gd" id="script"]
-[ext_resource type="Texture2D" path="res://assets/icons/music.svg" id="icon_music"]
 [ext_resource type="Texture2D" path="res://assets/icons/settings.svg" id="icon_settings"]
 
 [node name="MainMenu" type="Control"]
@@ -185,10 +184,8 @@ layout_mode = 2
 size_flags_horizontal = 3
 mouse_default_cursor_shape = 2
 theme_override_constants/h_separation = 6
-theme_override_constants/icon_max_width = 22
 theme_override_font_sizes/font_size = 14
 text = "Music"
-icon = ExtResource("icon_music")
 
 [node name="CheckUpdates" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems/MenuUtilities" groups=["ui_click"]]
 unique_name_in_owner = true
@@ -210,7 +207,8 @@ text = "Exit to desktop"
 
 [node name="OpenSettings" type="Button" parent="." groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(40, 40)
+theme_type_variation = &"IconButton"
 layout_mode = 1
 anchor_left = 1.0
 anchor_right = 1.0
@@ -220,7 +218,6 @@ offset_right = -24.0
 offset_bottom = 64.0
 tooltip_text = "Settings"
 mouse_default_cursor_shape = 2
-theme_override_constants/icon_max_width = 22
 icon = ExtResource("icon_settings")
 
 [node name="Version" type="Label" parent="."]

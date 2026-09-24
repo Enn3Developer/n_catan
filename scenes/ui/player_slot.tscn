@@ -3,29 +3,10 @@
 [ext_resource type="Theme" uid="uid://cr50xu8k1vr3e" path="res://assets/ui_theme.tres" id="1"]
 [ext_resource type="Script" path="res://scripts/player_slot.gd" id="2_script"]
 
-[sub_resource type="StyleBoxFlat" id="SeatPanel"]
-content_margin_left = 16.0
-content_margin_top = 8.0
-content_margin_right = 16.0
-content_margin_bottom = 8.0
-bg_color = Color(0.964706, 0.894118, 0.745098, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.67451, 0.52549, 0.329412, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-shadow_color = Color(0.18, 0.1, 0.04, 0.18)
-shadow_size = 3
-shadow_offset = Vector2(0, 2)
-
 [node name="PlayerSlot" type="PanelContainer" unique_id=325427992]
 custom_minimum_size = Vector2(0, 66)
 theme = ExtResource("1")
-theme_override_styles/panel = SubResource("SeatPanel")
+theme_type_variation = &"Card"
 script = ExtResource("2_script")
 
 [node name="Row" type="HBoxContainer" parent="." unique_id=943765096]

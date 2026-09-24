@@ -18,7 +18,6 @@ custom_minimum_size = Vector2(0, 38)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
-theme_type_variation = &"PrimaryButton"
-text = "Chart a course  →"
+text = "Close"
 
 [connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/ChartCourse" to="." method="close"]

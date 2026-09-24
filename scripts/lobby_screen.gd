@@ -24,7 +24,8 @@ func show_room(net: CatanNetwork,invite_address: String,connection_status: Strin
 	%PlayerCount.text="%d / 6" % net.roster.size()
 	var controller=net.is_controller()
 	%RoomSummary.text=tr("30 hexes · Paired turns") if net.roster.size()>4 else tr("19 hexes · Classic")
-	if not net.solo:%RoomSummary.text+="\n"+(tr("Password required to join") if not net.room_password.is_empty() else tr("Open room · no password"))
+	%RoomAccess.visible=not net.solo
+	%RoomAccess.text=tr("Password required to join") if not net.room_password.is_empty() else tr("Open room · no password")
 	for i in CatanNetwork.MAX_PLAYERS:
 		var slot=PLAYER_SLOT.instantiate()
 		%PlayerSlots.add_child(slot)
@@ -34,6 +35,8 @@ func show_room(net: CatanNetwork,invite_address: String,connection_status: Strin
 	%AddBot.disabled=not controller or net.roster.size()>=CatanNetwork.MAX_PLAYERS
 	%ReadyButton.text=tr("Not ready") if net.seat>=0 and net.roster[net.seat].ready else tr("I'm ready")
 	%ReadyButton.disabled=net.seat<0
+	# Solo players are always ready; the only choice left is to start.
+	%ReadyButton.visible=not net.solo
 	var all_ready=net.roster.size()>=CatanNetwork.MIN_PLAYERS and net.roster.size()<=CatanNetwork.MAX_PLAYERS
 	for row in net.roster:
 		if not row.ready: all_ready=false
@@ -71,8 +74,7 @@ func _show_rules(settings: Dictionary,controller: bool,solo: bool):
 	for control: Control in [%IslandPicker,%TimerPicker,%PointsPicker,%FriendlyRobber]:control.set("disabled",not controller)
 
 func arrange(viewport: Vector2,_overlay_bottom: float) -> Rect2:
-	%Voyage.custom_minimum_size.x=280 if viewport.x<1100 else 340
-	%RulesGrid.columns=2 if viewport.x<1100 else 4
+	%Voyage.custom_minimum_size.x=320 if viewport.x<1100 else 380
 	return Rect2(Vector2.ZERO,viewport)
 
 func _on_invite_address_text_changed(address: String):

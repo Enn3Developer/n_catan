@@ -25,7 +25,8 @@ func show_card(id: int,player: Dictionary,card_played: bool,play: bool):
 	%Art.modulate=accent
 	%CardEffect.text=tr(EFFECTS[id])
 	var ready=player.cards[id]>0 and not card_played and play
-	%CardStatus.text=tr("Victory points") if id==4 else (tr("Ready") if ready else (tr("Next turn") if player.cards[id]==0 else tr("Waiting")))
+	# Victory cards score on their own, so they have no play status to show.
+	%CardStatus.text="" if id==4 else (tr("Ready") if ready else (tr("Next turn") if player.cards[id]==0 else tr("Waiting")))
 	tooltip_text=tr(TIPS[id])+tr("\n%d ready · %d bought this turn") % [player.cards[id],player.new_cards[id]]
 	disabled=id==4 or not play or player.cards[id]==0 or card_played
 	if id<4 and player.new_cards[id]>0:tooltip_text+=tr("\nNew action cards become playable next turn.")

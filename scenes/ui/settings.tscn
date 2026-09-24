@@ -77,14 +77,6 @@ toggle_mode = true
 text = "Audio"
 alignment = 0
 
-[node name="UpdatesTab" type="Button" parent="SettingsPanel/Body/Navigation" groups=["ui_click"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-text = "Updates"
-
 [node name="Columns" type="HBoxContainer" parent="SettingsPanel/Body"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -106,12 +98,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="GraphicsHeading" type="Label" parent="SettingsPanel/Body/Columns/SettingsContent/GraphicsScroll/GraphicsOptions"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.54902, 0.321569, 0.176471, 1)
-theme_override_font_sizes/font_size = 17
-text = "GRAPHICS"
-
 [node name="WorldScroll" type="ScrollContainer" parent="SettingsPanel/Body/Columns/SettingsContent"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -124,12 +110,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="WorldHeading" type="Label" parent="SettingsPanel/Body/Columns/SettingsContent/WorldScroll/WorldOptions"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.54902, 0.321569, 0.176471, 1)
-theme_override_font_sizes/font_size = 17
-text = "CONTROLS"
-
 [node name="AudioScroll" type="ScrollContainer" parent="SettingsPanel/Body/Columns/SettingsContent"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -141,12 +121,6 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
-
-[node name="AudioHeading" type="Label" parent="SettingsPanel/Body/Columns/SettingsContent/AudioScroll/AudioOptions"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.54902, 0.321569, 0.176471, 1)
-theme_override_font_sizes/font_size = 17
-text = "AUDIO"
 
 [node name="Help" type="VBoxContainer" parent="SettingsPanel/Body/Columns"]
 unique_name_in_owner = true
@@ -185,16 +159,10 @@ size_flags_vertical = 3
 [node name="Status" type="HBoxContainer" parent="SettingsPanel/Body"]
 layout_mode = 2
 theme_override_constants/separation = 16
-[node name="Performance" type="Label" parent="SettingsPanel/Body/Status"]
-unique_name_in_owner = true
-layout_mode = 2
-text = ""
-theme_override_font_sizes/font_size = 14
-
 [node name="Version" type="Label" parent="SettingsPanel/Body/Status"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
+theme_type_variation = &"MutedLabel"
 
 [node name="Buttons" type="HBoxContainer" parent="SettingsPanel/Body"]
 unique_name_in_owner = true
@@ -205,6 +173,14 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Restore defaults"
 custom_minimum_size = Vector2(0, 40)
+
+[node name="OpenUpdates" type="Button" parent="SettingsPanel/Body/Buttons" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+text = "Updates"
 
 [node name="SettingsNote" type="Label" parent="SettingsPanel/Body/Buttons"]
 unique_name_in_owner = true
@@ -230,7 +206,7 @@ custom_minimum_size = Vector2(0, 40)
 [connection signal="pressed" from="SettingsPanel/Body/Navigation/GraphicsTab" to="." method="select_tab" binds= ["Graphics"]]
 [connection signal="pressed" from="SettingsPanel/Body/Navigation/WorldTab" to="." method="select_tab" binds= ["World"]]
 [connection signal="pressed" from="SettingsPanel/Body/Navigation/AudioTab" to="." method="select_tab" binds= ["Audio"]]
-[connection signal="pressed" from="SettingsPanel/Body/Navigation/UpdatesTab" to="." method="emit_signal" binds= ["updates_requested"]]
+[connection signal="pressed" from="SettingsPanel/Body/Buttons/OpenUpdates" to="." method="emit_signal" binds= ["updates_requested"]]
 [connection signal="pressed" from="SettingsPanel/Body/Buttons/ResetSettings" to="." method="_on_reset_pressed"]
 [connection signal="pressed" from="SettingsPanel/Body/Buttons/CloseSettings" to="." method="emit_signal" binds= ["close_requested"]]
 [connection signal="pressed" from="SettingsPanel/Body/Buttons/ExitDesktop" to="." method="emit_signal" binds= ["exit_requested"]]
