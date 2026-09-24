@@ -22,11 +22,13 @@ func choose(data: Dictionary,p: int,difficulty: int=1) -> Dictionary:
 			cards[largest]+=1
 			hand[largest]-=1
 		return {"type":"discard","cards":cards}
-	if not data.offer.is_empty() and data.offer.from!=p and r.can_pay(p,data.offer.receive):
+	# Every bot answers an open offer once, so the offering player is not left waiting.
+	if not data.offer.is_empty() and data.offer.from!=p and not data.offer.get("responses",{}).has(str(p)):
 		var incoming=r.total(data.offer.give)
 		var outgoing=r.total(data.offer.receive)
-		if incoming>=outgoing and (difficulty==0 or _trade_value(data,p,data.offer.give)>=_trade_value(data,p,data.offer.receive)):
+		if r.can_pay(p,data.offer.receive) and incoming>=outgoing and (difficulty==0 or _trade_value(data,p,data.offer.give)>=_trade_value(data,p,data.offer.receive)):
 			return {"type":"accept_trade"}
+		return {"type":"decline_trade"}
 	if p!=data.turn: return {}
 	if data.phase=="setup_settlement":
 		var candidates=[]
@@ -48,8 +50,7 @@ func choose(data: Dictionary,p: int,difficulty: int=1) -> Dictionary:
 		return {"type":"road","id":_best(candidates,difficulty)}
 	if data.phase=="robber":
 		var candidates=[]
-		for t in data.tiles.size():
-			if t==data.robber: continue
+		for t in r.robber_sites(p):
 			var value=0.0
 			for v in data.tiles[t].corners:
 				var owner=data.vertices[v].owner

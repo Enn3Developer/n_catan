@@ -78,49 +78,55 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 18
 
-[node name="Crew" type="PanelContainer" parent="Frame/Columns"]
+[node name="Left" type="VBoxContainer" parent="Frame/Columns"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 12
 
-[node name="CrewBody" type="VBoxContainer" parent="Frame/Columns/Crew"]
+[node name="Crew" type="PanelContainer" parent="Frame/Columns/Left"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CrewBody" type="VBoxContainer" parent="Frame/Columns/Left/Crew"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="CrewHeader" type="HBoxContainer" parent="Frame/Columns/Crew/CrewBody"]
+[node name="CrewHeader" type="HBoxContainer" parent="Frame/Columns/Left/Crew/CrewBody"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="CrewTitle" type="Label" parent="Frame/Columns/Crew/CrewBody/CrewHeader"]
+[node name="CrewTitle" type="Label" parent="Frame/Columns/Left/Crew/CrewBody/CrewHeader"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "Players"
 
-[node name="PlayerCount" type="Label" parent="Frame/Columns/Crew/CrewBody/CrewHeader"]
+[node name="PlayerCount" type="Label" parent="Frame/Columns/Left/Crew/CrewBody/CrewHeader"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "1 / 6"
 
-[node name="CrewScroll" type="ScrollContainer" parent="Frame/Columns/Crew/CrewBody"]
+[node name="CrewScroll" type="ScrollContainer" parent="Frame/Columns/Left/Crew/CrewBody"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="PlayerSlots" type="VBoxContainer" parent="Frame/Columns/Crew/CrewBody/CrewScroll"]
+[node name="PlayerSlots" type="VBoxContainer" parent="Frame/Columns/Left/Crew/CrewBody/CrewScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="CrewActions" type="HBoxContainer" parent="Frame/Columns/Crew/CrewBody"]
+[node name="CrewActions" type="HBoxContainer" parent="Frame/Columns/Left/Crew/CrewBody"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="AddBot" type="Button" parent="Frame/Columns/Crew/CrewBody/CrewActions" groups=["ui_click"]]
+[node name="AddBot" type="Button" parent="Frame/Columns/Left/Crew/CrewBody/CrewActions" groups=["ui_click"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
@@ -128,13 +134,121 @@ size_flags_horizontal = 3
 mouse_default_cursor_shape = 2
 text = "+ Add bot"
 
-[node name="ReadyButton" type="Button" parent="Frame/Columns/Crew/CrewBody/CrewActions" groups=["ui_click"]]
+[node name="ReadyButton" type="Button" parent="Frame/Columns/Left/Crew/CrewBody/CrewActions" groups=["ui_click"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_default_cursor_shape = 2
 text = "I'm ready"
+
+[node name="RoomRules" type="PanelContainer" parent="Frame/Columns/Left"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="RulesBody" type="VBoxContainer" parent="Frame/Columns/Left/RoomRules"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RulesHeader" type="HBoxContainer" parent="Frame/Columns/Left/RoomRules/RulesBody"]
+layout_mode = 2
+
+[node name="RulesTitle" type="Label" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Room rules"
+
+[node name="RulesOwner" type="Label" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Set by the host"
+
+[node name="RulesGrid" type="GridContainer" parent="Frame/Columns/Left/RoomRules/RulesBody"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 8
+columns = 4
+
+[node name="SeedLabel" type="Label" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Map seed"
+
+[node name="SeedRow" type="HBoxContainer" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SeedField" type="LineEdit" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/SeedRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "The same seed and player count always build the same island. Share it to replay a map."
+max_length = 9
+virtual_keyboard_type = 2
+
+[node name="NewSeed" type="Button" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/SeedRow" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+tooltip_text = "Pick a new random seed"
+mouse_default_cursor_shape = 2
+text = "New"
+
+[node name="IslandLabel" type="Label" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Island"
+
+[node name="IslandPicker" type="OptionButton" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+
+[node name="TimerLabel" type="Label" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Turn timer"
+
+[node name="TimerPicker" type="OptionButton" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "When a turn runs out, the host finishes it with the shortest legal moves."
+mouse_default_cursor_shape = 2
+
+[node name="PointsLabel" type="Label" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Points to win"
+
+[node name="PointsPicker" type="OptionButton" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+
+[node name="RobberLabel" type="Label" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Friendly robber"
+
+[node name="FriendlyRobber" type="CheckButton" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "The robber cannot be placed next to a player with 2 points or fewer."
+mouse_default_cursor_shape = 2
 
 [node name="Voyage" type="PanelContainer" parent="Frame/Columns"]
 unique_name_in_owner = true
@@ -226,10 +340,17 @@ text = "Back"
 [connection signal="pressed" from="Frame/Header/LobbyCosmetics" to="." method="emit_signal" binds= ["cosmetics_requested"]]
 [connection signal="pressed" from="Frame/Header/LobbySettings" to="." method="emit_signal" binds= ["settings_requested"]]
 [connection signal="pressed" from="Frame/Header/OpenMusic" to="." method="emit_signal" binds= ["music_requested"]]
-[connection signal="pressed" from="Frame/Columns/Crew/CrewBody/CrewActions/AddBot" to="." method="emit_signal" binds= ["add_bot_requested"]]
-[connection signal="pressed" from="Frame/Columns/Crew/CrewBody/CrewActions/ReadyButton" to="." method="emit_signal" binds= ["ready_requested"]]
+[connection signal="pressed" from="Frame/Columns/Left/Crew/CrewBody/CrewActions/AddBot" to="." method="emit_signal" binds= ["add_bot_requested"]]
+[connection signal="pressed" from="Frame/Columns/Left/Crew/CrewBody/CrewActions/ReadyButton" to="." method="emit_signal" binds= ["ready_requested"]]
 [connection signal="text_changed" from="Frame/Columns/Voyage/VoyageBody/InviteAddress" to="." method="_on_invite_address_text_changed"]
 [connection signal="pressed" from="Frame/Columns/Voyage/VoyageBody/InviteActions/CopyInvite" to="." method="_on_copy_invite_pressed"]
 [connection signal="pressed" from="Frame/Columns/Voyage/VoyageBody/InviteActions/MapRouter" to="." method="emit_signal" binds= ["map_router_requested"]]
 [connection signal="pressed" from="Frame/Columns/Voyage/VoyageBody/StartGame" to="." method="emit_signal" binds= ["start_requested"]]
 [connection signal="pressed" from="Frame/Columns/Voyage/VoyageBody/LeaveRoom" to="." method="emit_signal" binds= ["leave_requested"]]
+[connection signal="text_submitted" from="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/SeedRow/SeedField" to="." method="_on_seed_submitted"]
+[connection signal="focus_exited" from="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/SeedRow/SeedField" to="." method="_on_seed_focus_exited"]
+[connection signal="pressed" from="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/SeedRow/NewSeed" to="." method="_on_new_seed_pressed"]
+[connection signal="item_selected" from="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/IslandPicker" to="." method="_on_island_selected"]
+[connection signal="item_selected" from="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/TimerPicker" to="." method="_on_timer_selected"]
+[connection signal="item_selected" from="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/PointsPicker" to="." method="_on_points_selected"]
+[connection signal="toggled" from="Frame/Columns/Left/RoomRules/RulesBody/RulesGrid/FriendlyRobber" to="." method="_on_friendly_robber_toggled"]

@@ -30,7 +30,7 @@ Export presets exclude authoring textures, old models, generated releases and un
 
 The game checks [GitHub Releases](https://github.com/Enn3Developer/n_catan/releases) for the latest stable version at startup. Open **Game updates** on the home screen or **Updates** in Settings, choose **Download update**, then **Restart to update**. You can keep playing while it downloads, but must leave the room before installing. Dedicated servers do not update automatically.
 
-The exact Git tag sets the application and manifest version. Multiplayer uses a separate protocol number, currently 14. Releases with the same protocol can play together. A protocol mismatch rejects the join and identifies both versions. If a release changes the protocol, the group should update together.
+The exact Git tag sets the application and manifest version. Multiplayer uses a separate protocol number, currently 16. Releases with the same protocol can play together. A protocol mismatch rejects the join and identifies both versions. If a release changes the protocol, the group should update together.
 
 The updater verifies the manifest's RSA/SHA-256 signature with its embedded public key, then checks the package and executable SHA-256 hashes. It uses a delta patch only when the installed executable matches a published base and the patch is smaller than 85% of the full download. If the delta fails, it downloads the full package.
 
@@ -86,20 +86,41 @@ The board scene contains the camera, sun, sky environment, ocean, terrain, build
 
 The server owns dice rolls, the deck, hands, resources and action validation. Clients receive other players' public counts, not private cards.
 
-Each turn has a 60-second limit, held by the host in `CatanNetwork.turn_seconds`. One clock covers the whole turn, including the setup settlement and its road, the robber move and the steal that follows. It restarts when the turn passes to the next seat, and also when a seven hands the wait to the players who must discard, since they have had none of that turn's time. It pauses while the room is paused or a player is reconnecting. Solo games and tutorial lessons have no limit. When the clock runs out, the host plays the stalling seat out along the shortest legal exit: it rolls if the seat has not rolled, places the settlements, roads, robber and steal the rules demand, discards down to the limit, then ends the turn. Every snapshot carries `turn_limit` and `turn_seconds`, and clients run the countdown in the HUD between snapshots.
+### Room rules and the board
+
+`CatanNetwork.room_settings` holds the room's rules: `seed`, `island` (`random` or `classic`), `turn_seconds` (one of `CatanRules.TURN_TIMERS`, 0 for off), `points` (5 to 15) and `friendly_robber`. The host picks a random seed when the room opens. Only the room controller can change a setting, only in the lobby, and the host validates every value before it broadcasts the roster and settings with `_lobby`. `rules.create(names, seed, options)` builds the game from them and stores `seed`, `island`, `points_target` and `friendly_robber` in the state.
+
+A random island grows outward from one hex. Each step picks a free neighbor, weighted towards hexes with more land around them, so the coast is ragged without long thin spits. Shapes that enclose water are thrown away and grown again. The finished island is centered on its average tile position. Tile and vertex keys are built before centering so shared corners round the same way. `CatanRules.island_scale()` returns how far the scenery ring (rocks, lighthouse, mainland) must scale out to clear the island, and the board uses it in place of the old fixed scale. Harbor types are shuffled with the same seed and spread evenly along the walked coastline from a seeded starting edge. Edges that face a narrow bay are skipped so moored boats have open water.
+
+The friendly robber refuses hexes that touch another player with 2 public points or fewer. If that leaves no legal hex, every hex is allowed again. `CatanRules.robber_sites()` is shared by the rules, the bot and the board markers.
+
+### Trades
+
+An offer goes to every other player. Each one answers with `accept_trade`, `decline_trade` or `counter_trade`. A counter keeps the offer's orientation: `give` is still what the offering player hands over. Answers can change until the trade happens. The offer is `waiting` for `CatanNetwork.TRADE_WINDOW` seconds, or until everyone has answered. After that the offering player sends `confirm_trade` with a partner's seat, and the rules check both hands again before swapping. Bots answer every offer once.
+
+### Game log and stats
+
+The host keeps the whole log. Snapshots carry the last 40 lines and `log_start`, the index of the first one. Clients append each tail to their own copy. If a client finds a gap, after joining or reconnecting mid-game, it asks the host for the full log with `request_log()`.
+
+Each player's `stats` counts rolls, resources produced per type, resources stolen and lost, discards, player and bank trades, and development cards played. The state's `dice_counts` holds how often each total from 2 to 12 came up. Both are public and appear on the victory screen.
+
+**Play again** calls `CatanNetwork.rematch()`. The controller starts a new game with the same seats and settings on a new seed. It needs every player connected. Each game carries a `game_id`, so clients know to rebuild the board rather than refresh it.
+
+Each turn has a time limit, 60 seconds by default, held by the host in `CatanNetwork.turn_seconds`. One clock covers the whole turn, including the setup settlement and its road, the robber move and the steal that follows. It restarts when the turn passes to the next seat, and also when a seven hands the wait to the players who must discard, since they have had none of that turn's time. It pauses while the room is paused or a player is reconnecting. Solo games and tutorial lessons have no limit, and the room can turn the limit off. When the clock runs out, the host plays the stalling seat out along the shortest legal exit: it rolls if the seat has not rolled, places the settlements, roads, robber and steal the rules demand, discards down to the limit, then ends the turn. Every snapshot carries `turn_limit` and `turn_seconds`, and clients run the countdown in the HUD between snapshots.
 
 Online rooms use ENet over authenticated DTLS. The `NC1-` invite carries the endpoint, a 128-bit SHA-256 certificate fingerprint and a two-byte typo checksum, encoded as canonical base64url. IPv4 with the default port takes 35 characters; custom ports and DNS names take more. The host generates a fresh RSA certificate for each room. Clients retrieve that public certificate automatically and check its fingerprint before starting a standard DTLS handshake. Only that certificate is trusted, and room passwords and reconnect tokens are sent after the handshake succeeds. The invite authenticates the host; a room password still controls admission.
 
 A public UDP socket on 24567 serves certificate discovery and forwards encrypted datagrams to an ENet listener bound to loopback on an ephemeral port. This local forwarding needs no extra public port or external lookup service. Certificate responses are no larger than the padded requests, and relay allocations are bounded. Godot/mbedTLS handles encryption and separate session keys for each client. The public certificate and endpoint remain visible on the wire. Share invites through a trusted channel: replacing an invite replaces the host identity the client trusts.
 
-Protocol 14 adds the turn timer; protocol 13 rejected bare addresses and older certificate invites, with no plaintext fallback. Saved reconnect invites remain valid while the original room runs; restarting the host requires a new invite. The certificate is valid for 30 days, so rooms left running longer must restart. Clients must update together. Update downloads retain signature and hash verification.
+Protocol 16 adds room rules, counter-offers and rematches; protocol 14 added the turn timer; protocol 13 rejected bare addresses and older certificate invites, with no plaintext fallback. Saved reconnect invites remain valid while the original room runs; restarting the host requires a new invite. The certificate is valid for 30 days, so rooms left running longer must restart. Clients must update together. Update downloads retain signature and hash verification.
 
 ## Verification
 
-CI runs the updater's Go tests with the race detector, vets it, compiles the Windows updater and imports the Godot project.
+CI runs the updater's Go tests with the race detector, vets it, compiles the Windows updater, imports the Godot project and runs the headless rules tests.
 
 ```bash
 go -C updater test -race ./...
+godot --headless --path . --script tests/rules_test.gd
 ```
 
 ## Localization and player appearance

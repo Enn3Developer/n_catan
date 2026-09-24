@@ -165,6 +165,7 @@ one_shot = true
 [connection signal="received" from="Network" to="." method="_received"]
 [connection signal="notice" from="Network" to="." method="_notice"]
 [connection signal="applied" from="Network" to="." method="_action_applied"]
+[connection signal="log_received" from="Network" to="." method="_log_received"]
 [connection signal="picked" from="Board" to="." method="_on_board_picked"]
 [connection signal="changed" from="Updater" to="." method="_updates_changed"]
 [connection signal="resized" from="UI/Root" to="." method="_queue_layout"]

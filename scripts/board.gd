@@ -161,7 +161,7 @@ func build(data: Dictionary):
 	if is_instance_valid(active_dice):active_dice.queue_free()
 	day_seconds=data.get("world_seconds",150.0)
 	state=data
-	board_scale=1.32 if data.get("extension",false) else 1.0
+	board_scale=CatanRules.island_scale(data)
 	scenery.scale=Vector3.ONE*board_scale*TILE_SIZE
 	_update_camera()
 	for entry in board_labels: entry.label.free()
@@ -207,7 +207,7 @@ func build(data: Dictionary):
 	sea_material.set_shader_parameter("tile_centers",centers)
 	sea_material.set_shader_parameter("tile_count",state.tiles.size())
 	sea_material.set_shader_parameter("tile_radius",TILE_SIZE*.993)
-	# Use the owning tile's edge normal, not the board's radial direction.
+	# Face away from the owning tile; random coasts are not convex.
 	for e in state.edges:
 		var a=state.vertices[e.a]
 		var b=state.vertices[e.b]
@@ -215,7 +215,8 @@ func build(data: Dictionary):
 		var pos=Vector3((a.x+b.x)*.5,0,(a.z+b.z)*.5)
 		var tangent=Vector3(b.x-a.x,0,b.z-a.z).normalized()
 		var outward=Vector3(-tangent.z,0,tangent.x)
-		if outward.dot(pos)<0:outward=-outward
+		for t in a.tiles:
+			if t in b.tiles and outward.dot(pos-Vector3(state.tiles[t].x,0,state.tiles[t].z))<0:outward=-outward
 		var harbor=living_world.harbor(a.port)
 		harbor.position=pos
 		harbor.rotation.y=atan2(outward.x,outward.z)
@@ -308,6 +309,7 @@ func set_mode(value: String,player: int):
 	if state.is_empty() or seat<0 or seat!=state.turn or state.winner!=-1: return
 	var rules=CatanRules.new()
 	rules.s=state
+	var robber_sites=rules.robber_sites(seat) if mode=="robber" else []
 	var source=state.edges if mode=="road" else state.tiles if mode=="robber" else state.vertices
 	for i in source.size():
 		var good=false
@@ -324,7 +326,7 @@ func set_mode(value: String,player: int):
 			good=source[i].owner==seat and source[i].level==1
 			pos=Vector3(source[i].x,0.8,source[i].z)
 		elif mode=="robber":
-			good=i!=state.robber
+			good=i in robber_sites
 			pos=Vector3(source[i].x,0.7,source[i].z)
 		if good:
 			var marker=(ROBBER_MARKER if mode=="robber" else PLACEMENT_MARKER).instantiate()

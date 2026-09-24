@@ -92,8 +92,6 @@ msgstr "%s ha scambiato con %s."
 msgid "%s traded with the bank."
 msgstr "%s ha scambiato con la banca."
 
-msgid "%s wins with 10 victory points!"
-msgstr "%s vince con 10 punti vittoria!"
 
 msgid "%s withdrew their trade offer."
 msgstr "%s ha ritirato l’offerta di scambio."
@@ -110,8 +108,8 @@ msgstr "%s%s\n%d punti · %d risorse · %d carte sviluppo\nLunghezza strada %d �
 msgid "+ Add bot"
 msgstr "+ Aggiungi bot"
 
-msgid "1. Gather 3–6 players (humans or bots). Everyone readies up.\n2. Place two settlements and roads in snake order.\n3. Roll: neighboring settlements collect 1 resource; cities 2.\n4. Connect roads, build settlements, upgrade to cities.\n5. Trade with players or the bank; coastal ports give better rates.\n6. A seven means discarding half if you have more than seven,\n    then moving the robber and stealing from a neighbor.\n7. Buy development cards; play at most one per turn.\n8. Reach 10 points on your turn to win. Settlements give 1,\n    cities 2, longest road and largest army 2 each.\n\nClick glowing board markers to build. Right-drag to orbit.\nScroll to zoom; middle-drag pans; F focuses a tile.\nH hides the interface; Home fits the board. Hover for costs.\n\n5–6 players: 30 hexes and paired turns. After the main turn,\n the player 3 seats ahead builds, plays cards and trades only\n with the bank. Then the next main player rolls.\n\nOnline hosts need UDP 24567 reachable from the internet.\nUse router mapping, port forwarding, or a dedicated server."
-msgstr "1. Riunisci 3–6 giocatori, persone o bot. Tutti devono essere pronti.\n2. Posiziona due colonie e due strade, invertendo l’ordine al secondo giro.\n3. Tira i dadi: le colonie vicine raccolgono 1 risorsa, le città 2.\n4. Collega strade, costruisci colonie e trasformale in città.\n5. Scambia con i giocatori o la banca; i porti offrono rapporti migliori.\n6. Con un 7, chi ha più di 7 risorse ne scarta metà, arrotondando per difetto.\n   Poi si sposta il brigante e si ruba una risorsa a un vicino.\n7. Compra carte sviluppo; gioca al massimo una carta azione per turno.\n8. Raggiungi 10 punti nel tuo turno per vincere. Le colonie valgono 1,\n   le città 2, la strada più lunga e l’esercito più grande 2 ciascuno.\n\nClicca sui punti illuminati per costruire. Trascina col destro per ruotare.\nLa rotella regola lo zoom; trascina col centrale per spostarti.\nF mette a fuoco una tessera; H nasconde l’interfaccia; Home inquadra il tabellone.\nPassa il puntatore sui comandi per vedere i costi.\n\nCon 5–6 giocatori: 30 esagoni e turni abbinati. Dopo il turno principale,\nil giocatore tre posti più avanti costruisce, gioca carte e scambia solo\ncon la banca. Poi il giocatore principale successivo tira i dadi.\n\nPer giocare online, la porta UDP 24567 dell’host deve essere raggiungibile.\nUsa la configurazione del router, l’inoltro della porta o un server dedicato."
+msgid "1. Gather 3–6 players (humans or bots). Everyone readies up.\n2. Place two settlements and roads in snake order.\n3. Roll: neighboring settlements collect 1 resource; cities 2.\n4. Connect roads, build settlements, upgrade to cities.\n5. Trade with players or the bank; coastal ports give better rates.\n6. A seven means discarding half if you have more than seven,\n    then moving the robber and stealing from a neighbor.\n7. Buy development cards; play at most one per turn.\n8. Reach the room's points target (10 unless the host changes it)\n    on your turn to win. Settlements give 1, cities 2,\n    longest road and largest army 2 each.\n\nClick glowing board markers to build. Right-drag to orbit.\nScroll to zoom; middle-drag pans; F focuses a tile.\nH hides the interface; Home fits the board. Hover for costs.\n\n5–6 players: 30 hexes and paired turns. After the main turn,\n the player 3 seats ahead builds, plays cards and trades only\n with the bank. Then the next main player rolls.\n\nOnline hosts need UDP 24567 reachable from the internet.\nUse router mapping, port forwarding, or a dedicated server."
+msgstr "1. Riunisci 3–6 giocatori, persone o bot. Tutti devono essere pronti.\n2. Posiziona due colonie e due strade, invertendo l’ordine al secondo giro.\n3. Tira i dadi: le colonie vicine raccolgono 1 risorsa, le città 2.\n4. Collega strade, costruisci colonie e trasformale in città.\n5. Scambia con i giocatori o la banca; i porti offrono rapporti migliori.\n6. Con un 7, chi ha più di 7 risorse ne scarta metà, arrotondando per difetto.\n   Poi si sposta il brigante e si ruba una risorsa a un vicino.\n7. Compra carte sviluppo; gioca al massimo una carta azione per turno.\n8. Raggiungi nel tuo turno i punti richiesti dalla stanza (10, salvo\n   diversa scelta dell’host). Le colonie valgono 1, le città 2,\n   la strada più lunga e l’esercito più grande 2 ciascuno.\n\nClicca sui punti illuminati per costruire. Trascina col destro per ruotare.\nLa rotella regola lo zoom; trascina col centrale per spostarti.\nF mette a fuoco una tessera; H nasconde l’interfaccia; Home inquadra il tabellone.\nPassa il puntatore sui comandi per vedere i costi.\n\nCon 5–6 giocatori: 30 esagoni e turni abbinati. Dopo il turno principale,\nil giocatore tre posti più avanti costruisce, gioca carte e scambia solo\ncon la banca. Poi il giocatore principale successivo tira i dadi.\n\nPer giocare online, la porta UDP 24567 dell’host deve essere raggiungibile.\nUsa la configurazione del router, l’inoltro della porta o un server dedicato."
 
 msgid "19 hexes · Classic"
 msgstr "19 esagoni · Classico"
@@ -131,8 +129,6 @@ msgstr "Proposta di scambio"
 msgid "AUDIO"
 msgstr "AUDIO"
 
-msgid "Accept trade"
-msgstr "Accetta scambio"
 
 msgid "Accessibility"
 msgstr "Accessibilità"
@@ -185,8 +181,6 @@ msgstr "Solo ambientale"
 msgid "Anisotropic filtering"
 msgstr "Filtro anisotropico"
 
-msgid "Any player who can afford this offer may accept it."
-msgstr "Qualsiasi giocatore con le risorse richieste può accettare."
 
 msgid "Appearance"
 msgstr "Aspetto"
@@ -2250,3 +2244,225 @@ msgstr " · Non ancora applicato"
 
 msgid "Design your own roads, settlements and cities"
 msgstr "Progetta a modo tuo strade, insediamenti e città"
+
+msgid "%d entries"
+msgstr "%d voci"
+
+msgid "%d min"
+msgstr "%d min"
+
+msgid "%d of %d entries"
+msgstr "%d di %d voci"
+
+msgid "%d rolled %d times"
+msgstr "%d è uscito %d volte"
+
+msgid "%d s"
+msgstr "%d s"
+
+msgid "%d stolen · %d discarded on a seven"
+msgstr "%d rubate · %d scartate con un 7"
+
+msgid "%d with players · %d with the bank"
+msgstr "%d con i giocatori · %d con la banca"
+
+msgid "%d:%02d min"
+msgstr "%d:%02d min"
+
+msgid "%s accepted your offer."
+msgstr "%s ha accettato la tua proposta."
+
+msgid "%s can take your counter instead of the original offer."
+msgstr "%s può scegliere la tua controproposta al posto della proposta originale."
+
+msgid "%s declined your offer."
+msgstr "%s ha rifiutato la tua proposta."
+
+msgid "%s discarded %d resources."
+msgstr "%s ha scartato %d risorse."
+
+msgid "%s made a counter-offer."
+msgstr "%s ha fatto una controproposta."
+
+msgid "%s moved the robber."
+msgstr "%s ha spostato il brigante."
+
+msgid "%s no longer has the resources for this trade."
+msgstr "%s non ha più le risorse per questo scambio."
+
+msgid "%s wins with %d victory points!"
+msgstr "%s vince con %d punti vittoria!"
+
+msgid "Accept"
+msgstr "Accetta"
+
+msgid "Accept, decline or propose a counter-offer."
+msgstr "Accetta, rifiuta o fai una controproposta."
+
+msgid "Accepts"
+msgstr "Accetta"
+
+msgid "Choose a player who accepted your offer."
+msgstr "Scegli un giocatore che ha accettato la tua proposta."
+
+msgid "Choose who to trade with."
+msgstr "Scegli con chi scambiare."
+
+msgid "Classic hexagon"
+msgstr "Esagono classico"
+
+msgid "Collected"
+msgstr "Raccolte"
+
+msgid "Counters:"
+msgstr "Controproposta:"
+
+msgid "Counter…"
+msgstr "Controproposta…"
+
+msgid "Decline"
+msgstr "Rifiuta"
+
+msgid "Declines"
+msgstr "Rifiuta"
+
+msgid "Dice rolls"
+msgstr "Tiri di dado"
+
+msgid "Everyone"
+msgstr "Tutti"
+
+msgid "Everyone declined. Withdraw the offer to make a new one."
+msgstr "Tutti hanno rifiutato. Ritira la proposta per farne una nuova."
+
+msgid "Friendly robber"
+msgstr "Brigante amichevole"
+
+msgid "Give the other players a moment to answer your offer."
+msgstr "Lascia agli altri giocatori un momento per rispondere."
+
+msgid "How the game went"
+msgstr "Com’è andata la partita"
+
+msgid "Island"
+msgstr "Isola"
+
+msgid "Lost"
+msgstr "Perse"
+
+msgid "Map seed"
+msgstr "Seme della mappa"
+
+msgid "Map seed %d · %s · %d points to win"
+msgstr "Seme della mappa %d · %s · %d punti per vincere"
+
+msgid "New"
+msgstr "Nuovo"
+
+msgid "No lines match."
+msgstr "Nessuna riga corrisponde."
+
+msgid "Nobody has accepted yet."
+msgstr "Nessuno ha ancora accettato."
+
+msgid "Other players answer first, then you choose who to trade with."
+msgstr "Prima rispondono gli altri giocatori, poi scegli tu con chi scambiare."
+
+msgid "Pick a new random seed"
+msgstr "Scegli un nuovo seme casuale"
+
+msgid "Play again"
+msgstr "Gioca ancora"
+
+msgid "Play again deals a new island to the same table."
+msgstr "Gioca ancora crea una nuova isola per lo stesso tavolo."
+
+msgid "Points"
+msgstr "Punti"
+
+msgid "Points to win"
+msgstr "Punti per vincere"
+
+msgid "Random coastline"
+msgstr "Costa casuale"
+
+msgid "Rolls"
+msgstr "Tiri"
+
+msgid "Room rules"
+msgstr "Regole della stanza"
+
+msgid "Search the log"
+msgstr "Cerca nel diario"
+
+msgid "Send counter-offer"
+msgstr "Invia controproposta"
+
+msgid "Set by the host"
+msgstr "Scelte dall’host"
+
+msgid "Show lines that mention one player"
+msgstr "Mostra le righe che citano un giocatore"
+
+msgid "Stole"
+msgstr "Rubate"
+
+msgid "The friendly robber spares players with 2 points or fewer. Choose another hex."
+msgstr "Il brigante amichevole risparmia chi ha 2 punti o meno. Scegli un altro esagono."
+
+msgid "The host can start another game with this table."
+msgstr "L’host può iniziare un’altra partita con questo tavolo."
+
+msgid "The robber cannot be placed next to a player with 2 points or fewer."
+msgstr "Il brigante non può essere messo accanto a un giocatore con 2 punti o meno."
+
+msgid "The same seed and player count always build the same island. Share it to replay a map."
+msgstr "Lo stesso seme con lo stesso numero di giocatori crea sempre la stessa isola. Condividilo per rigiocare una mappa."
+
+msgid "Thinking…"
+msgstr "Ci pensa…"
+
+msgid "Trades"
+msgstr "Scambi"
+
+msgid "Turn timer"
+msgstr "Tempo per turno"
+
+msgid "Wait for every player to reconnect before starting another game."
+msgstr "Aspetta che tutti i giocatori si ricolleghino prima di iniziare un’altra partita."
+
+msgid "Waiting for answers…"
+msgstr "In attesa di risposte…"
+
+msgid "When a turn runs out, the host finishes it with the shortest legal moves."
+msgstr "Quando il tempo del turno finisce, l’host lo conclude con le mosse valide più brevi."
+
+msgid "You accepted. %s picks a partner."
+msgstr "Hai accettato. %s sceglie con chi scambiare."
+
+msgid "You declined. You can still change your answer."
+msgstr "Hai rifiutato. Puoi ancora cambiare risposta."
+
+msgid "You get"
+msgstr "Ricevi"
+
+msgid "You give"
+msgstr "Dai"
+
+msgid "You offer:"
+msgstr "Offri:"
+
+msgid "You sent a counter-offer. %s picks a partner."
+msgstr "Hai inviato una controproposta. %s sceglie con chi scambiare."
+
+msgid "You set these"
+msgstr "Le scegli tu"
+
+msgid "Your counter-offer"
+msgstr "La tua controproposta"
+
+msgid "\n%d points win the game."
+msgstr "\n%d punti vincono la partita."
+
+msgid "for"
+msgstr "per"

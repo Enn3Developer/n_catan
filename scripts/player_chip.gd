@@ -21,7 +21,7 @@ func show_player(state: Dictionary,index: int,seat: int,color: Color):
 	for stat in [[%Score,score,tr("Victory points")],[%Resources,player.resource_count,"Resources"],[%Cards,player.card_count,tr("Development cards")],[%RoadLength,player.road_length,tr("Longest road length")],[%Knights,player.knights,tr("Played knights")]]:
 		stat[0].tooltip_text=tr(stat[2])+": "+str(stat[1])
 		stat[0].get_node("Value").text=str(stat[1])
-	%Score.tooltip_text=tooltip_text
+	%Score.tooltip_text=tooltip_text+tr("\n%d points win the game.") % scoring.target()
 
 ## Narrow windows stack the chips, so each one lays out name above tallies.
 func arrange(stacked: bool):

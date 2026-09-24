@@ -44,6 +44,9 @@ var turn_clock_left=0.0
 var turn_clock_limit=0.0
 var active_language=-1
 var quitting=false
+## The whole game log. Snapshots carry only the newest lines, which are merged in here.
+var game_log=[]
+var log_pending=false
 
 func _ready():
 	CatanDiagnostics.event("main.ready")
@@ -78,7 +81,7 @@ func _ready():
 func _clear(scene_path: String):
 	CatanDiagnostics.event("ui.screen",scene_path)
 	if is_instance_valid(screen): screen.free()
-	var keep_modal=is_instance_valid(modal) and (modal.name in ["Settings","Cosmetics","MusicLibrary","Updates"] or (scene_path=="res://scenes/ui/hud.tscn" and modal.name in ["Guide","GameLog","LeaveConfirm"]))
+	var keep_modal=is_instance_valid(modal) and (modal.name in ["Settings","Cosmetics","MusicLibrary","Updates"] or (scene_path=="res://scenes/ui/hud.tscn" and modal.name in ["Guide","GameLog","LeaveConfirm","TradeOffer","Victory"]))
 	if is_instance_valid(modal) and not keep_modal: modal.free()
 	screen=load(scene_path).instantiate()
 	screens.add_child(screen)
@@ -95,6 +98,8 @@ func _home():
 	board.reset_camera()
 	_clear("res://scenes/ui/home.tscn")
 	state={}
+	game_log=[]
+	log_pending=false
 	turn_clock_limit=0.0
 	turn_clock_left=0.0
 	guide=null
@@ -199,6 +204,7 @@ func _lobby():
 		"invite_requested":_copy_invite,
 		"bot_difficulty_changed":func(seat,level):net.configure_bot("difficulty",seat,level),
 		"bot_remove_requested":func(seat):net.configure_bot("remove",seat),
+		"setting_changed":net.choose_setting,
 	})
 	screen.invite_address_edited.connect(func(text):invite_address=text)
 	_apply_text(screen)
@@ -216,11 +222,13 @@ func _received(data: Dictionary):
 	var previous_trade=state.get("trade_event",{})
 	var previous_offer=state.get("offer",{})
 	var trading=is_instance_valid(modal) and modal.name=="TradeDialog"
-	var fresh=state.is_empty()
+	# A rematch sends a new board to a client that still holds the old one.
+	var fresh=state.is_empty() or state.get("game_id",0)!=data.get("game_id",0)
 	var new_turn=fresh or state.get("turn",-1)!=data.turn or state.get("setup",-1)!=data.get("setup",-1) or state.get("paired",false)!=data.get("paired",false)
 	var produced=not fresh and data.rolled and (not state.rolled or state.dice!=data.dice)
-	audio.transition(state,data,net.seat)
+	audio.transition({} if fresh else state,data,net.seat)
 	state=data
+	_merge_log(data)
 	board.camera.h_offset=0
 	board.camera.v_offset=1.8 if guide!=null else 0.0
 	if guide!=null: board.camera.fov=42
@@ -247,6 +255,26 @@ func _received(data: Dictionary):
 	if trading and state.phase=="play" and state.turn==net.seat and state.winner==-1:
 		if not state.offer.is_empty() and state.offer.from==net.seat:_view_offer()
 		else:_trade(false)
+	elif is_instance_valid(modal) and modal.name=="TradeOffer":
+		if state.offer.is_empty() or state.winner!=-1:_close_modal()
+		else:modal.show_offer(state,net.seat,net)
+
+func _merge_log(data: Dictionary):
+	var start=int(data.get("log_start",0))
+	var tail: Array=data.get("log",[])
+	if start<=game_log.size():
+		game_log=game_log.slice(0,start)+tail
+	else:
+		# Joined or reconnected mid-game: keep the tail until the full log arrives.
+		game_log=tail.duplicate()
+		if not log_pending:
+			log_pending=true
+			net.request_log()
+
+func _log_received(entries: Array):
+	log_pending=false
+	game_log=entries.duplicate()
+	if is_instance_valid(modal) and modal.name=="GameLog":modal.show_log(game_log,net.seat,state)
 
 func _process(delta):
 	var soundtrack=net.music_state()
@@ -283,10 +311,10 @@ func _hud():
 	})
 	_refresh_turn_clock()
 	_apply_text(screen)
-	if state.winner!=-1:
-		var victory=_present("res://scenes/ui/victory_dialog.tscn")
-		victory.show_winner(state.players[state.winner].name)
-		_route(victory,{"leave_requested":net.leave})
+	if is_instance_valid(modal) and modal.name=="GameLog":modal.show_log(game_log,net.seat,state)
+	if is_instance_valid(modal) and modal.name=="Victory" and state.winner==-1:_close_modal()
+	if state.winner!=-1 and not (is_instance_valid(modal) and modal.name in ["Victory","GameLog"]):
+		_show_victory()
 	if guide!=null:_tutorial_ui()
 	for row_player in net.roster:
 		if not row_player.connected:_notice(tr("%s disconnected. Waiting to reconnect.") % row_player.name)
@@ -311,7 +339,15 @@ func _refresh_music_library(sample: Dictionary):
 		modal.refresh(sample,net.can_control_music(),net.online and not net.solo,preferences.values.music)
 
 func _journal():
-	_present("res://scenes/ui/game_log_dialog.tscn").show_log(state.log)
+	var dialog=_present("res://scenes/ui/game_log_dialog.tscn")
+	dialog.show_log(game_log,net.seat,state)
+	if state.get("winner",-1)!=-1:dialog.close_requested.connect(_show_victory,CONNECT_DEFERRED)
+
+func _show_victory():
+	if state.get("winner",-1)==-1:return
+	var victory=_present("res://scenes/ui/victory_dialog.tscn")
+	victory.show_results(state,net)
+	_route(victory,{"leave_requested":net.leave,"rematch_requested":net.rematch,"log_requested":_journal})
 
 func _phase_text() -> String:
 	return {"setup_settlement":tr("Setup"),"setup_road":tr("Setup"),"play":tr("Build & trade") if state.rolled else tr("Roll dice"),"discard":tr("Discard"),"robber":tr("Robber"),"steal":tr("Steal"),"free_roads":tr("Free roads")}.get(state.phase,"")
@@ -377,7 +413,7 @@ func _trade_notifications(previous: Dictionary,previous_offer: Dictionary,fresh:
 	var event=state.get("trade_event",{})
 	var changed=not event.is_empty() and event.get("id",0)!=previous.get("id",0)
 	if offer.is_empty():notifications.dismiss("trade")
-	if not offer.is_empty() and (fresh or offer!=previous_offer or changed and event.get("kind","")=="offered"):
+	if not offer.is_empty() and (fresh or offer.get("id",0)!=previous_offer.get("id",0)):
 		var sender=int(offer.from)
 		var offer_message=tr("%s offers %s for %s.") % [state.players[sender].name,_resource_text(offer.give),_resource_text(offer.receive)]
 		if sender==net.seat:offer_message=tr("Your trade offer: %s for %s.") % [_resource_text(offer.give),_resource_text(offer.receive)]
@@ -394,6 +430,12 @@ func _trade_notifications(previous: Dictionary,previous_offer: Dictionary,fresh:
 			elif event.other==net.seat:message=tr("Trade completed with %s.") % state.players[actor].name
 			else:message=tr("%s traded with %s.") % [state.players[actor].name,state.players[event.other].name]
 		"withdrawn":message=tr("Trade offer withdrawn.") if actor==net.seat else tr("%s withdrew their trade offer.") % state.players[actor].name
+		"responded":
+			# Tell the offering player who answered, unless the offer is already open in front of them.
+			var answer=str(offer.get("responses",{}).get(str(actor),{}).get("answer",""))
+			if event.other==net.seat and not (is_instance_valid(modal) and modal.name=="TradeOffer"):
+				var responded={"accept":tr("%s accepted your offer."),"counter":tr("%s made a counter-offer."),"decline":tr("%s declined your offer.")}.get(answer,"")
+				if not responded.is_empty():notifications.show_notice("trade",responded % state.players[actor].name,tr("View offer"),_view_offer)
 		"bank":
 			if actor==net.seat:message=tr("Bank trade completed.")
 	if not message.is_empty():notifications.show_notice("trade_result",message,"",Callable())
@@ -401,8 +443,8 @@ func _trade_notifications(previous: Dictionary,previous_offer: Dictionary,fresh:
 func _view_offer():
 	if state.get("offer",{}).is_empty():return
 	var dialog=_present("res://scenes/ui/offer_dialog.tscn")
-	dialog.show_offer(state,net.seat)
-	_route(dialog,{"accept_requested":func():net.act({"type":"accept_trade"}),"withdraw_requested":func():net.act({"type":"cancel_trade"})})
+	dialog.show_offer(state,net.seat,net)
+	_route(dialog,{"response_requested":net.act,"withdraw_requested":func():net.act({"type":"cancel_trade"})})
 
 func _discard():
 	var dialog=_present("res://scenes/ui/discard_dialog.tscn")

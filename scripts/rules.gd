@@ -6,13 +6,30 @@ const COST = {"road": [1,1,0,0,0], "settlement": [1,1,1,1,0], "city": [0,0,0,2,3
 var s: Dictionary = {}
 var rng = RandomNumberGenerator.new()
 
-func create(names: Array, game_seed: int = 0) -> Dictionary:
+const ISLANDS=["random","classic"]
+const TURN_TIMERS=[0,30,45,60,90,120,180]
+const POINT_TARGETS=[5,15]
+const DEFAULT_OPTIONS={"island":"random","points":10,"friendly_robber":false}
+const LOG_LIMIT=5000
+## Unshifted center distance of the classic island's outer tile rim.
+const CLASSIC_EXTENT=4.4641
+const AXIAL=[Vector2i(1,0),Vector2i(1,-1),Vector2i(0,-1),Vector2i(-1,0),Vector2i(-1,1),Vector2i(0,1)]
+
+func create(names: Array, game_seed: int = 0, options: Dictionary = {}) -> Dictionary:
 	var extended=names.size()>4
-	rng.seed = game_seed if game_seed != 0 else int(Time.get_unix_time_from_system())
+	var settings=DEFAULT_OPTIONS.duplicate()
+	settings.merge(options,true)
+	if game_seed==0: game_seed=int(Time.get_unix_time_from_system())
+	rng.seed = game_seed
 	s = {"tiles": [], "vertices": [], "edges": [], "players": [], "turn": 0, "phase": "setup_settlement", "setup": 0, "anchor": -1, "rolled": false, "dice": [0,0], "robber": 0, "bank": [19,19,19,19,19], "deck": [], "log": [], "winner": -1, "longest": -1, "army": -1, "discards": {}, "victims": [], "offer": {}, "free_roads": 0, "card_played": false}
 	s.extension=extended
 	s.primary=0
 	s.paired=false
+	s.seed=game_seed
+	s.island=str(settings.island) if str(settings.island) in ISLANDS else "random"
+	s.points_target=clampi(int(settings.points),POINT_TARGETS[0],POINT_TARGETS[1])
+	s.friendly_robber=bool(settings.friendly_robber)
+	s.dice_counts=[0,0,0,0,0,0,0,0,0,0,0]
 	s.resource_limit=24 if extended else 19
 	if extended: s.bank=[24,24,24,24,24]
 	var terrain = [0,0,0,0,1,1,1,2,2,2,2,3,3,3,3,4,4,4,5]
@@ -21,44 +38,47 @@ func create(names: Array, game_seed: int = 0) -> Dictionary:
 	var numbers = [5,2,6,3,8,10,9,12,11,4,8,10,9,4,5,6,3,11]
 	if extended: numbers=[2,2,3,3,3,4,4,4,5,5,5,6,6,6,8,8,8,9,9,9,10,10,10,11,11,11,12,12]
 	_shuffle(numbers)
+	var centers=_island_centers(terrain.size(),extended) if s.island=="random" else _classic_centers(extended)
 	var keys = {}
 	var edge_keys = {}
 	var n = 0
-	var radius=3 if extended else 2
-	for q in range(-radius,radius+1):
-		for r in range(-radius,radius+1):
-			if abs(q+r)>radius: continue
-			if extended and q==mini(radius,radius-r): continue
-			var center = Vector2(sqrt(3.0)*(q+r*0.5+(0.5 if extended else 0.0)),1.5*r)
-			var tid = s.tiles.size()
-			var kind = terrain[tid]
-			var tile = {"x":center.x,"z":center.y,"kind":kind,"number":0,"corners":[]}
-			if kind != 5:
-				tile.number=numbers[n]
-				n+=1
-			else: s.robber=tid
-			for c in 6:
-				var a=deg_to_rad(30+60*c)
-				var p=center+Vector2(cos(a),sin(a))
-				var key="%d,%d" % [roundi(p.x*100),roundi(p.y*100)]
-				if not keys.has(key):
-					keys[key]=s.vertices.size()
-					s.vertices.append({"x":p.x,"z":p.y,"owner":-1,"level":0,"tiles":[],"edges":[],"port":-2})
-				var v=keys[key]
-				tile.corners.append(v)
-				s.vertices[v].tiles.append(tid)
-			for c in 6:
-				var a=int(tile.corners[c])
-				var b=int(tile.corners[(c+1)%6])
-				var key="%d:%d" % [mini(a,b),maxi(a,b)]
-				if not edge_keys.has(key):
-					edge_keys[key]=s.edges.size()
-					var eid=s.edges.size()
-					s.edges.append({"a":a,"b":b,"owner":-1,"tiles":0})
-					s.vertices[a].edges.append(eid)
-					s.vertices[b].edges.append(eid)
-				s.edges[edge_keys[key]].tiles+=1
-			s.tiles.append(tile)
+	for center in centers:
+		var tid = s.tiles.size()
+		var kind = terrain[tid]
+		var tile = {"x":center.x,"z":center.y,"kind":kind,"number":0,"corners":[]}
+		if kind != 5:
+			tile.number=numbers[n]
+			n+=1
+		else: s.robber=tid
+		for c in 6:
+			var a=deg_to_rad(30+60*c)
+			var p=center+Vector2(cos(a),sin(a))
+			var key="%d,%d" % [roundi(p.x*100),roundi(p.y*100)]
+			if not keys.has(key):
+				keys[key]=s.vertices.size()
+				s.vertices.append({"x":p.x,"z":p.y,"owner":-1,"level":0,"tiles":[],"edges":[],"port":-2})
+			var v=keys[key]
+			tile.corners.append(v)
+			s.vertices[v].tiles.append(tid)
+		for c in 6:
+			var a=int(tile.corners[c])
+			var b=int(tile.corners[(c+1)%6])
+			var key="%d:%d" % [mini(a,b),maxi(a,b)]
+			if not edge_keys.has(key):
+				edge_keys[key]=s.edges.size()
+				var eid=s.edges.size()
+				s.edges.append({"a":a,"b":b,"owner":-1,"tiles":0})
+				s.vertices[a].edges.append(eid)
+				s.vertices[b].edges.append(eid)
+			s.edges[edge_keys[key]].tiles+=1
+		s.tiles.append(tile)
+	# Keys are built before centering so shared corners round identically.
+	var middle=Vector2.ZERO
+	for center in centers: middle+=center
+	middle/=centers.size()
+	for item in s.tiles+s.vertices:
+		item.x-=middle.x
+		item.z-=middle.y
 	# Keep high-probability tokens apart.
 	for attempt in 500:
 		var valid=true
@@ -74,24 +94,145 @@ func create(names: Array, game_seed: int = 0) -> Dictionary:
 			if t.kind!=5:
 				t.number=numbers[n]
 				n+=1
-	var coast=[]
-	for i in s.edges.size():
-		if s.edges[i].tiles==1: coast.append(i)
-	coast.sort_custom(func(a,b): return atan2(s.vertices[s.edges[a].a].z+s.vertices[s.edges[a].b].z,s.vertices[s.edges[a].a].x+s.vertices[s.edges[a].b].x)<atan2(s.vertices[s.edges[b].a].z+s.vertices[s.edges[b].b].z,s.vertices[s.edges[b].a].x+s.vertices[s.edges[b].b].x))
 	var ports=[-1,0,-1,1,2,-1,3,4,-1]
 	if extended: ports.append_array([2,-1])
-	for i in ports.size():
-		var e=s.edges[coast[int(i*float(coast.size())/ports.size())]]
-		s.vertices[e.a].port=ports[i]
-		s.vertices[e.b].port=ports[i]
+	_shuffle(ports)
+	_place_ports(ports)
 	for pname in names:
-		s.players.append({"name":str(pname).substr(0,20),"hand":[0,0,0,0,0],"cards":[0,0,0,0,0],"new_cards":[0,0,0,0,0],"knights":0,"points":0,"road_length":0})
+		s.players.append({"name":str(pname).substr(0,20),"hand":[0,0,0,0,0],"cards":[0,0,0,0,0],"new_cards":[0,0,0,0,0],"knights":0,"points":0,"road_length":0,"stats":{"rolls":0,"produced":[0,0,0,0,0],"stolen":0,"lost":0,"discarded":0,"trades":0,"bank_trades":0,"cards_played":0}})
 	for i in (20 if extended else 14): s.deck.append(0)
 	for i in 5: s.deck.append(4)
 	for i in (3 if extended else 2): s.deck.append_array([1,2,3])
 	_shuffle(s.deck)
 	_log("The island awaits. Place your first settlement.")
 	return s
+
+## The original hexagon, or the six-player board with its offset rows.
+func _classic_centers(extended: bool) -> Array:
+	var centers=[]
+	var radius=3 if extended else 2
+	for q in range(-radius,radius+1):
+		for r in range(-radius,radius+1):
+			if abs(q+r)>radius: continue
+			if extended and q==mini(radius,radius-r): continue
+			centers.append(Vector2(sqrt(3.0)*(q+r*0.5+(0.5 if extended else 0.0)),1.5*r))
+	return centers
+
+## Grows a seeded island one hex at a time. A hex with more land around it is
+## likelier to join, which keeps the coast ragged without long thin spits, and
+## shapes that enclose a lagoon are thrown back.
+func _island_centers(count: int,extended: bool) -> Array:
+	var reach=4 if extended else 3
+	for attempt in 40:
+		var land={Vector2i.ZERO:true}
+		while land.size()<count:
+			var frontier={}
+			for hex in land:
+				for step in AXIAL:
+					var next: Vector2i=hex+step
+					if land.has(next) or _ring(next)>reach: continue
+					frontier[next]=0
+			var choices=[]
+			var total_weight=0.0
+			for hex in frontier:
+				var around=0
+				for step in AXIAL:
+					if land.has(hex+step): around+=1
+				var weight=pow(float(around),2.2)*(0.55 if _ring(hex)==reach else 1.0)
+				choices.append([hex,weight])
+				total_weight+=weight
+			var pick=rng.randf()*total_weight
+			for choice in choices:
+				pick-=choice[1]
+				if pick<=0.0 or choice==choices[-1]:
+					land[choice[0]]=true
+					break
+		if _has_lagoon(land,reach): continue
+		var hexes=land.keys()
+		hexes.sort_custom(func(a,b): return a.y<b.y or (a.y==b.y and a.x<b.x))
+		var centers=[]
+		for hex in hexes: centers.append(Vector2(sqrt(3.0)*(hex.x+hex.y*0.5),1.5*hex.y))
+		return centers
+	return _classic_centers(extended)
+
+func _ring(hex: Vector2i) -> int:
+	return maxi(absi(hex.x),maxi(absi(hex.y),absi(hex.x+hex.y)))
+
+func _has_lagoon(land: Dictionary,reach: int) -> bool:
+	var edge=reach+1
+	var start=Vector2i(edge,0)
+	var sea={start:true}
+	var queue=[start]
+	while not queue.is_empty():
+		var hex: Vector2i=queue.pop_back()
+		for step in AXIAL:
+			var next: Vector2i=hex+step
+			if _ring(next)>edge or land.has(next) or sea.has(next): continue
+			sea[next]=true
+			queue.append(next)
+	for q in range(-edge,edge+1):
+		for r in range(-edge,edge+1):
+			var hex=Vector2i(q,r)
+			if _ring(hex)<=edge and not land.has(hex) and not sea.has(hex): return true
+	return false
+
+## Spreads the harbors evenly around the coast, starting at a seeded point.
+## Edges that face a narrow bay are skipped so the moored boat has open water.
+func _place_ports(ports: Array):
+	var coast=_coast_loop()
+	if coast.is_empty(): return
+	var start=rng.randi_range(0,coast.size()-1)
+	for i in ports.size():
+		var slot=start+int(i*float(coast.size())/ports.size())
+		for offset in [0,1,-1,2,-2,3,-3]:
+			var e=s.edges[coast[posmod(slot+offset,coast.size())]]
+			if s.vertices[e.a].port!=-2 or s.vertices[e.b].port!=-2 or not _open_water(e): continue
+			s.vertices[e.a].port=ports[i]
+			s.vertices[e.b].port=ports[i]
+			break
+
+## Coast edges in order around the island. Without lagoons they form one loop.
+func _coast_loop() -> Array:
+	var by_vertex={}
+	var first=-1
+	for i in s.edges.size():
+		if s.edges[i].tiles!=1: continue
+		if first<0: first=i
+		for v in [s.edges[i].a,s.edges[i].b]:
+			if not by_vertex.has(v): by_vertex[v]=[]
+			by_vertex[v].append(i)
+	var loop=[]
+	var edge=first
+	var vertex=s.edges[first].b if first>=0 else -1
+	while edge>=0 and loop.size()<=s.edges.size():
+		loop.append(edge)
+		var next=-1
+		for candidate in by_vertex.get(vertex,[]):
+			if candidate!=edge: next=candidate
+		if next<0 or next==first: break
+		var e=s.edges[next]
+		vertex=e.b if e.a==vertex else e.a
+		edge=next
+	return loop
+
+func _open_water(e: Dictionary) -> bool:
+	var a=s.vertices[e.a]
+	var b=s.vertices[e.b]
+	var owner={}
+	for t in a.tiles:
+		if t in b.tiles: owner=s.tiles[t]
+	# The sea hex across the edge mirrors the tile that owns it.
+	var sea=Vector2(a.x+b.x-owner.x,a.z+b.z-owner.z)
+	var neighbors=0
+	for t in s.tiles:
+		if sea.distance_to(Vector2(t.x,t.z))<1.9: neighbors+=1
+	return neighbors<=2
+
+## Scale the scenery ring (rocks, lighthouse, mainland) needs to clear this island.
+static func island_scale(data: Dictionary) -> float:
+	var extent=0.0
+	for t in data.get("tiles",[]): extent=maxf(extent,Vector2(t.x,t.z).length()+1.0)
+	return maxf(1.32 if data.get("extension",false) else 1.0,extent/CLASSIC_EXTENT)
 
 func _shuffle(a: Array):
 	for i in range(a.size()-1,0,-1):
@@ -106,7 +247,7 @@ func _trade_event(kind: String,actor: int,other: int=-1):
 
 func _log(message: String):
 	s.log.append(message)
-	if s.log.size()>35: s.log.pop_front()
+	if s.log.size()>LOG_LIMIT: s.log.pop_front()
 
 func total(hand: Array) -> int:
 	var count=0
@@ -191,10 +332,12 @@ func apply(p: int,a: Dictionary) -> String:
 		if not _resource_array(cards) or total(cards)!=int(s.discards[str(p)]): return CatanI18n.message("Choose exactly %d resources to discard.",[int(s.discards[str(p)])])
 		if not can_pay(p,cards): return "You can only discard resources you have."
 		pay(p,cards)
+		_stat(p,"discarded",total(cards))
+		_log(CatanI18n.message("%s discarded %d resources.",[s.players[p].name,total(cards)]))
 		s.discards.erase(str(p))
 		if s.discards.is_empty(): s.phase="robber"
 		return ""
-	if action=="accept_trade": return _accept(p)
+	if action in ["accept_trade","decline_trade","counter_trade"]: return _respond(p,action,a)
 	if p!=s.turn: return "It is another player’s turn. You can act when yours begins."
 	var player=s.players[p]
 	if action=="cancel_trade":
@@ -228,7 +371,9 @@ func apply(p: int,a: Dictionary) -> String:
 	elif s.phase=="discard": return "Wait for all players to discard."
 	elif s.phase=="robber":
 		if action!="robber" or id<0 or id>=s.tiles.size() or id==s.robber: return "Move the robber to a different hex."
+		if id not in robber_sites(p): return "The friendly robber spares players with 2 points or fewer. Choose another hex."
 		s.robber=id
+		_log(CatanI18n.message("%s moved the robber.",[player.name]))
 		s.victims=[]
 		for v in s.tiles[id].corners:
 			var owner=s.vertices[v].owner
@@ -243,6 +388,8 @@ func apply(p: int,a: Dictionary) -> String:
 		var r=bag[rng.randi_range(0,bag.size()-1)]
 		s.players[id].hand[r]-=1
 		player.hand[r]+=1
+		_stat(p,"stolen",1)
+		_stat(id,"lost",1)
 		s.phase="play"
 		_log(CatanI18n.message("%s stole a resource from %s.",[player.name,s.players[id].name]))
 	elif s.phase=="free_roads":
@@ -260,6 +407,8 @@ func apply(p: int,a: Dictionary) -> String:
 			s.rolled=true
 			s.dice=[rng.randi_range(1,6),rng.randi_range(1,6)]
 			var roll=total(s.dice)
+			_stat(p,"rolls",1)
+			if s.has("dice_counts"): s.dice_counts[roll-2]+=1
 			_log(CatanI18n.message("%s rolled %d.",[player.name,roll]))
 			if roll==7:
 				for i in s.players.size():
@@ -292,6 +441,7 @@ func apply(p: int,a: Dictionary) -> String:
 						s.players[i].hand[r]=0
 			player.cards[card]-=1
 			s.card_played=true
+			_stat(p,"cards_played",1)
 			if card==0:
 				player.knights+=1
 				s.phase="robber"
@@ -332,6 +482,7 @@ func apply(p: int,a: Dictionary) -> String:
 				s.bank[give]+=amount
 				player.hand[receive]+=1
 				s.bank[receive]-=1
+				_stat(p,"bank_trades",1)
 				_log(CatanI18n.message("%s traded with the bank.",[player.name]))
 				_trade_event("bank",p)
 			elif action=="offer_trade":
@@ -342,8 +493,9 @@ func apply(p: int,a: Dictionary) -> String:
 				if not can_pay(p,give): return CatanI18n.message("You need %s more to make this offer.",[_missing(p,give)])
 				for r in 5:
 					if give[r]>0 and receive[r]>0: return "Offer and request different resources."
-				s.offer={"from":p,"give":give.duplicate(),"receive":receive.duplicate()}
 				_trade_event("offered",p)
+				s.offer={"id":s.trade_event.id,"from":p,"give":give.duplicate(),"receive":receive.duplicate(),"responses":{},"waiting":true}
+			elif action=="confirm_trade": return _confirm(p,id)
 			elif action=="end":
 				_score()
 				if s.winner!=-1: return ""
@@ -374,20 +526,74 @@ func _resource_array(a: Variant) -> bool:
 		if not (n is int or n is float) or n<0 or n>int(s.get("resource_limit",19)) or n!=int(n): return false
 	return true
 
-func _accept(p: int) -> String:
+## Other players answer an offer; the offering player then picks one partner.
+## A counter keeps the offer's orientation: "give" is still what the offering
+## player hands over and "receive" what they get back.
+func _respond(p: int,action: String,a: Dictionary) -> String:
 	if s.get("paired",false): return "During a paired turn, trades are only available with the bank."
 	if s.phase!="play" or s.offer.is_empty(): return "This offer is no longer available. Wait for a new offer."
-	if p==s.turn: return "Other players can accept your offer. You can withdraw it to make a new one."
 	var offer=s.offer
-	if not can_pay(p,offer.receive): return CatanI18n.message("You need %s more to accept this offer.",[_missing(p,offer.receive)])
-	if not can_pay(s.turn,offer.give): return "The player making this offer no longer has the resources. Ask them for a new offer."
+	if p==int(offer.from): return "Other players can accept your offer. You can withdraw it to make a new one."
+	var response={"answer":"decline"}
+	if action=="accept_trade":
+		if not can_pay(p,offer.receive): return CatanI18n.message("You need %s more to accept this offer.",[_missing(p,offer.receive)])
+		response={"answer":"accept"}
+	elif action=="counter_trade":
+		var give=a.get("give",[])
+		var receive=a.get("receive",[])
+		if not _resource_array(give) or not _resource_array(receive) or total(give)==0 or total(receive)==0: return "Choose at least one resource to give and one to receive."
+		for r in 5:
+			if give[r]>0 and receive[r]>0: return "Offer and request different resources."
+		if not can_pay(p,receive): return CatanI18n.message("You need %s more to make this offer.",[_missing(p,receive)])
+		if give==offer.give and receive==offer.receive: response={"answer":"accept"}
+		else: response={"answer":"counter","give":give.duplicate(),"receive":receive.duplicate()}
+	offer.responses[str(p)]=response
+	if offer.responses.size()>=s.players.size()-1: offer.waiting=false
+	_trade_event("responded",p,int(offer.from))
+	return ""
+
+## Closes the response window; the host calls it after a few seconds.
+func open_offer():
+	if not s.offer.is_empty(): s.offer.waiting=false
+
+func _confirm(p: int,partner: int) -> String:
+	if s.offer.is_empty(): return "This offer is no longer available. Wait for a new offer."
+	var offer=s.offer
+	if offer.get("waiting",false): return "Give the other players a moment to answer your offer."
+	var response=offer.responses.get(str(partner),{})
+	if partner<0 or partner>=s.players.size() or not response.get("answer","") in ["accept","counter"]: return "Choose a player who accepted your offer."
+	var give: Array=response.give if response.answer=="counter" else offer.give
+	var receive: Array=response.receive if response.answer=="counter" else offer.receive
+	if not can_pay(p,give): return CatanI18n.message("You need %s more to make this offer.",[_missing(p,give)])
+	if not can_pay(partner,receive): return CatanI18n.message("%s no longer has the resources for this trade.",[s.players[partner].name])
 	for r in 5:
-		s.players[p].hand[r]+=offer.give[r]-offer.receive[r]
-		s.players[s.turn].hand[r]+=offer.receive[r]-offer.give[r]
-	_log(CatanI18n.message("%s traded with %s.",[s.players[s.turn].name,s.players[p].name]))
-	_trade_event("accepted",s.turn,p)
+		s.players[partner].hand[r]+=give[r]-receive[r]
+		s.players[p].hand[r]+=receive[r]-give[r]
+	_stat(p,"trades",1)
+	_stat(partner,"trades",1)
+	_log(CatanI18n.message("%s traded with %s.",[s.players[p].name,s.players[partner].name]))
+	_trade_event("accepted",p,partner)
 	s.offer={}
 	return ""
+
+## Hexes the robber may move to. The friendly robber stays off hexes that touch
+## another player with 2 public points or fewer, unless that leaves nowhere to go.
+func robber_sites(p: int) -> Array:
+	var open=[]
+	var friendly=[]
+	for t in s.tiles.size():
+		if t==s.robber: continue
+		open.append(t)
+		var spared=false
+		for v in s.tiles[t].corners:
+			var owner=int(s.vertices[v].owner)
+			if owner>=0 and owner!=p and int(s.players[owner].points)<=2: spared=true
+		if not spared: friendly.append(t)
+	return friendly if s.get("friendly_robber",false) and not friendly.is_empty() else open
+
+func _stat(p: int,key: String,amount: int):
+	var stats=s.players[p].get("stats",{})
+	if stats.has(key): stats[key]+=amount
 
 func produce(roll: int):
 	var gains=[]
@@ -407,11 +613,17 @@ func produce(roll: int):
 				if gains[p][r]>0: recipients.append(p)
 			if recipients.size()==1:
 				s.players[recipients[0]].hand[r]+=s.bank[r]
+				_produced(recipients[0],r,s.bank[r])
 				s.bank[r]=0
 			continue
 		for p in s.players.size():
 			s.players[p].hand[r]+=gains[p][r]
 			s.bank[r]-=gains[p][r]
+			_produced(p,r,gains[p][r])
+
+func _produced(p: int,r: int,amount: int):
+	var stats=s.players[p].get("stats",{})
+	if stats.has("produced"): stats.produced[r]+=amount
 
 func _walk(p: int,v: int,used: Dictionary) -> int:
 	if not used.is_empty() and s.vertices[v].owner>=0 and s.vertices[v].owner!=p: return 0
@@ -449,12 +661,21 @@ func _score():
 		if s.longest==p: points+=2
 		if s.army==p: points+=2
 		s.players[p].points=points
-		if p==s.turn and points+s.players[p].cards[4]+s.players[p].new_cards[4]>=10:
+		if p==s.turn and points+s.players[p].cards[4]+s.players[p].new_cards[4]>=target():
 			s.winner=p
-			_log(CatanI18n.message("%s wins with 10 victory points!",[s.players[p].name]))
+			_log(CatanI18n.message("%s wins with %d victory points!",[s.players[p].name,points+s.players[p].cards[4]+s.players[p].new_cards[4]]))
 
-func snapshot(viewer: int) -> Dictionary:
+func target() -> int:
+	return int(s.get("points_target",10))
+
+## Snapshots carry only the newest log lines; clients keep the rest as it arrives.
+func snapshot(viewer: int,log_tail: int=40) -> Dictionary:
+	var history: Array=s.log
+	s.log=[]
 	var result=s.duplicate(true)
+	s.log=history
+	result.log=history.slice(maxi(0,history.size()-log_tail))
+	result.log_start=history.size()-result.log.size()
 	result.deck_count=result.deck.size()
 	result.erase("deck")
 	for p in result.players.size():

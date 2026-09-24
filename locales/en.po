@@ -92,8 +92,6 @@ msgstr "%s traded with %s."
 msgid "%s traded with the bank."
 msgstr "%s traded with the bank."
 
-msgid "%s wins with 10 victory points!"
-msgstr "%s wins with 10 victory points!"
 
 msgid "%s withdrew their trade offer."
 msgstr "%s withdrew their trade offer."
@@ -110,8 +108,8 @@ msgstr "%s%s\n%d points · %d resources · %d development cards\nRoad length %d 
 msgid "+ Add bot"
 msgstr "+ Add bot"
 
-msgid "1. Gather 3–6 players (humans or bots). Everyone readies up.\n2. Place two settlements and roads in snake order.\n3. Roll: neighboring settlements collect 1 resource; cities 2.\n4. Connect roads, build settlements, upgrade to cities.\n5. Trade with players or the bank; coastal ports give better rates.\n6. A seven means discarding half if you have more than seven,\n    then moving the robber and stealing from a neighbor.\n7. Buy development cards; play at most one per turn.\n8. Reach 10 points on your turn to win. Settlements give 1,\n    cities 2, longest road and largest army 2 each.\n\nClick glowing board markers to build. Right-drag to orbit.\nScroll to zoom; middle-drag pans; F focuses a tile.\nH hides the interface; Home fits the board. Hover for costs.\n\n5–6 players: 30 hexes and paired turns. After the main turn,\n the player 3 seats ahead builds, plays cards and trades only\n with the bank. Then the next main player rolls.\n\nOnline hosts need UDP 24567 reachable from the internet.\nUse router mapping, port forwarding, or a dedicated server."
-msgstr "1. Gather 3–6 players (humans or bots). Everyone readies up.\n2. Place two settlements and roads in snake order.\n3. Roll: neighboring settlements collect 1 resource; cities 2.\n4. Connect roads, build settlements, upgrade to cities.\n5. Trade with players or the bank; coastal ports give better rates.\n6. A seven means discarding half if you have more than seven,\n    then moving the robber and stealing from a neighbor.\n7. Buy development cards; play at most one per turn.\n8. Reach 10 points on your turn to win. Settlements give 1,\n    cities 2, longest road and largest army 2 each.\n\nClick glowing board markers to build. Right-drag to orbit.\nScroll to zoom; middle-drag pans; F focuses a tile.\nH hides the interface; Home fits the board. Hover for costs.\n\n5–6 players: 30 hexes and paired turns. After the main turn,\n the player 3 seats ahead builds, plays cards and trades only\n with the bank. Then the next main player rolls.\n\nOnline hosts need UDP 24567 reachable from the internet.\nUse router mapping, port forwarding, or a dedicated server."
+msgid "1. Gather 3–6 players (humans or bots). Everyone readies up.\n2. Place two settlements and roads in snake order.\n3. Roll: neighboring settlements collect 1 resource; cities 2.\n4. Connect roads, build settlements, upgrade to cities.\n5. Trade with players or the bank; coastal ports give better rates.\n6. A seven means discarding half if you have more than seven,\n    then moving the robber and stealing from a neighbor.\n7. Buy development cards; play at most one per turn.\n8. Reach the room's points target (10 unless the host changes it)\n    on your turn to win. Settlements give 1, cities 2,\n    longest road and largest army 2 each.\n\nClick glowing board markers to build. Right-drag to orbit.\nScroll to zoom; middle-drag pans; F focuses a tile.\nH hides the interface; Home fits the board. Hover for costs.\n\n5–6 players: 30 hexes and paired turns. After the main turn,\n the player 3 seats ahead builds, plays cards and trades only\n with the bank. Then the next main player rolls.\n\nOnline hosts need UDP 24567 reachable from the internet.\nUse router mapping, port forwarding, or a dedicated server."
+msgstr "1. Gather 3–6 players (humans or bots). Everyone readies up.\n2. Place two settlements and roads in snake order.\n3. Roll: neighboring settlements collect 1 resource; cities 2.\n4. Connect roads, build settlements, upgrade to cities.\n5. Trade with players or the bank; coastal ports give better rates.\n6. A seven means discarding half if you have more than seven,\n    then moving the robber and stealing from a neighbor.\n7. Buy development cards; play at most one per turn.\n8. Reach the room's points target (10 unless the host changes it)\n    on your turn to win. Settlements give 1, cities 2,\n    longest road and largest army 2 each.\n\nClick glowing board markers to build. Right-drag to orbit.\nScroll to zoom; middle-drag pans; F focuses a tile.\nH hides the interface; Home fits the board. Hover for costs.\n\n5–6 players: 30 hexes and paired turns. After the main turn,\n the player 3 seats ahead builds, plays cards and trades only\n with the bank. Then the next main player rolls.\n\nOnline hosts need UDP 24567 reachable from the internet.\nUse router mapping, port forwarding, or a dedicated server."
 
 msgid "19 hexes · Classic"
 msgstr "19 hexes · Classic"
@@ -131,8 +129,6 @@ msgstr "A trade on the table"
 msgid "AUDIO"
 msgstr "AUDIO"
 
-msgid "Accept trade"
-msgstr "Accept trade"
 
 msgid "Accessibility"
 msgstr "Accessibility"
@@ -185,8 +181,6 @@ msgstr "Ambient only"
 msgid "Anisotropic filtering"
 msgstr "Anisotropic filtering"
 
-msgid "Any player who can afford this offer may accept it."
-msgstr "Any player who can afford this offer may accept it."
 
 msgid "Appearance"
 msgstr "Appearance"
@@ -2250,3 +2244,225 @@ msgstr " · Not applied yet"
 
 msgid "Design your own roads, settlements and cities"
 msgstr "Design your own roads, settlements and cities"
+
+msgid "%d entries"
+msgstr "%d entries"
+
+msgid "%d min"
+msgstr "%d min"
+
+msgid "%d of %d entries"
+msgstr "%d of %d entries"
+
+msgid "%d rolled %d times"
+msgstr "%d rolled %d times"
+
+msgid "%d s"
+msgstr "%d s"
+
+msgid "%d stolen · %d discarded on a seven"
+msgstr "%d stolen · %d discarded on a seven"
+
+msgid "%d with players · %d with the bank"
+msgstr "%d with players · %d with the bank"
+
+msgid "%d:%02d min"
+msgstr "%d:%02d min"
+
+msgid "%s accepted your offer."
+msgstr "%s accepted your offer."
+
+msgid "%s can take your counter instead of the original offer."
+msgstr "%s can take your counter instead of the original offer."
+
+msgid "%s declined your offer."
+msgstr "%s declined your offer."
+
+msgid "%s discarded %d resources."
+msgstr "%s discarded %d resources."
+
+msgid "%s made a counter-offer."
+msgstr "%s made a counter-offer."
+
+msgid "%s moved the robber."
+msgstr "%s moved the robber."
+
+msgid "%s no longer has the resources for this trade."
+msgstr "%s no longer has the resources for this trade."
+
+msgid "%s wins with %d victory points!"
+msgstr "%s wins with %d victory points!"
+
+msgid "Accept"
+msgstr "Accept"
+
+msgid "Accept, decline or propose a counter-offer."
+msgstr "Accept, decline or propose a counter-offer."
+
+msgid "Accepts"
+msgstr "Accepts"
+
+msgid "Choose a player who accepted your offer."
+msgstr "Choose a player who accepted your offer."
+
+msgid "Choose who to trade with."
+msgstr "Choose who to trade with."
+
+msgid "Classic hexagon"
+msgstr "Classic hexagon"
+
+msgid "Collected"
+msgstr "Collected"
+
+msgid "Counters:"
+msgstr "Counters:"
+
+msgid "Counter…"
+msgstr "Counter…"
+
+msgid "Decline"
+msgstr "Decline"
+
+msgid "Declines"
+msgstr "Declines"
+
+msgid "Dice rolls"
+msgstr "Dice rolls"
+
+msgid "Everyone"
+msgstr "Everyone"
+
+msgid "Everyone declined. Withdraw the offer to make a new one."
+msgstr "Everyone declined. Withdraw the offer to make a new one."
+
+msgid "Friendly robber"
+msgstr "Friendly robber"
+
+msgid "Give the other players a moment to answer your offer."
+msgstr "Give the other players a moment to answer your offer."
+
+msgid "How the game went"
+msgstr "How the game went"
+
+msgid "Island"
+msgstr "Island"
+
+msgid "Lost"
+msgstr "Lost"
+
+msgid "Map seed"
+msgstr "Map seed"
+
+msgid "Map seed %d · %s · %d points to win"
+msgstr "Map seed %d · %s · %d points to win"
+
+msgid "New"
+msgstr "New"
+
+msgid "No lines match."
+msgstr "No lines match."
+
+msgid "Nobody has accepted yet."
+msgstr "Nobody has accepted yet."
+
+msgid "Other players answer first, then you choose who to trade with."
+msgstr "Other players answer first, then you choose who to trade with."
+
+msgid "Pick a new random seed"
+msgstr "Pick a new random seed"
+
+msgid "Play again"
+msgstr "Play again"
+
+msgid "Play again deals a new island to the same table."
+msgstr "Play again deals a new island to the same table."
+
+msgid "Points"
+msgstr "Points"
+
+msgid "Points to win"
+msgstr "Points to win"
+
+msgid "Random coastline"
+msgstr "Random coastline"
+
+msgid "Rolls"
+msgstr "Rolls"
+
+msgid "Room rules"
+msgstr "Room rules"
+
+msgid "Search the log"
+msgstr "Search the log"
+
+msgid "Send counter-offer"
+msgstr "Send counter-offer"
+
+msgid "Set by the host"
+msgstr "Set by the host"
+
+msgid "Show lines that mention one player"
+msgstr "Show lines that mention one player"
+
+msgid "Stole"
+msgstr "Stole"
+
+msgid "The friendly robber spares players with 2 points or fewer. Choose another hex."
+msgstr "The friendly robber spares players with 2 points or fewer. Choose another hex."
+
+msgid "The host can start another game with this table."
+msgstr "The host can start another game with this table."
+
+msgid "The robber cannot be placed next to a player with 2 points or fewer."
+msgstr "The robber cannot be placed next to a player with 2 points or fewer."
+
+msgid "The same seed and player count always build the same island. Share it to replay a map."
+msgstr "The same seed and player count always build the same island. Share it to replay a map."
+
+msgid "Thinking…"
+msgstr "Thinking…"
+
+msgid "Trades"
+msgstr "Trades"
+
+msgid "Turn timer"
+msgstr "Turn timer"
+
+msgid "Wait for every player to reconnect before starting another game."
+msgstr "Wait for every player to reconnect before starting another game."
+
+msgid "Waiting for answers…"
+msgstr "Waiting for answers…"
+
+msgid "When a turn runs out, the host finishes it with the shortest legal moves."
+msgstr "When a turn runs out, the host finishes it with the shortest legal moves."
+
+msgid "You accepted. %s picks a partner."
+msgstr "You accepted. %s picks a partner."
+
+msgid "You declined. You can still change your answer."
+msgstr "You declined. You can still change your answer."
+
+msgid "You get"
+msgstr "You get"
+
+msgid "You give"
+msgstr "You give"
+
+msgid "You offer:"
+msgstr "You offer:"
+
+msgid "You sent a counter-offer. %s picks a partner."
+msgstr "You sent a counter-offer. %s picks a partner."
+
+msgid "You set these"
+msgstr "You set these"
+
+msgid "Your counter-offer"
+msgstr "Your counter-offer"
+
+msgid "\n%d points win the game."
+msgstr "\n%d points win the game."
+
+msgid "for"
+msgstr "for"

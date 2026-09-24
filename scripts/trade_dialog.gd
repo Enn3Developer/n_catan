@@ -1,5 +1,6 @@
 extends CatanDialog
 ## Bank trades at the best port rate, or one offer to every other player.
+## Players answer the offer and the offering player picks a partner in the offer dialog.
 
 signal trade_requested(action: Dictionary)
 ## The draft outlives the dialog, which is rebuilt with every new snapshot.
@@ -62,7 +63,7 @@ func _refresh():
 	%BankTrade.disabled=not available or not different or state.bank[receive]<1
 	%OfferTrade.disabled=not available or not different or state.get("paired",false)
 	%Preview.text="%d %s → %d %s" % [int(amount_give.value),tr(CatanRules.RES[give]),int(amount_get.value),tr(CatanRules.RES[receive])]
-	%Reason.text=tr("Choose different resources.") if not different else (tr("You need %d more %s.") % [int(amount_give.value)-hand[give],tr(CatanRules.RES[give])] if not available else (tr("The bank has none of that resource.") if banking and state.bank[receive]==0 else (tr("Your best port rate: %d:1 · Bank stock: %d") % [rules.rate(seat,give),state.bank[receive]] if banking else tr("Any player who can afford this offer may accept it."))))
+	%Reason.text=tr("Choose different resources.") if not different else (tr("You need %d more %s.") % [int(amount_give.value)-hand[give],tr(CatanRules.RES[give])] if not available else (tr("The bank has none of that resource.") if banking and state.bank[receive]==0 else (tr("Your best port rate: %d:1 · Bank stock: %d") % [rules.rate(seat,give),state.bank[receive]] if banking else tr("Other players answer first, then you choose who to trade with."))))
 
 func _choose(picker: OptionButton,resource: int):
 	picker.select(resource)
