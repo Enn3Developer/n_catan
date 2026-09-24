@@ -524,6 +524,8 @@ func _tutorial_ui():
 	tutorial_panel=load("res://scenes/ui/tutorial.tscn").instantiate()
 	tutorial_layer.add_child(tutorial_panel)
 	tutorial_panel.show_lesson(guide)
+	# The lesson rewraps when its width changes; the island is framed below it.
+	tutorial_panel.find_child("LessonPanel",true,false).minimum_size_changed.connect(_queue_layout)
 	_route(tutorial_panel,{"step_requested":_tutorial_step,"restart_requested":func():guide.load_lesson(net,preferences.values.player_name)})
 
 func _tutorial_step(direction: int):
@@ -576,8 +578,9 @@ func _layout_screen():
 		var area=screen.overlay_area(ui.size)
 		lesson.offset_left=area.position.x
 		lesson.offset_right=area.end.x-width
-		lesson.offset_bottom=area.position.y+lesson.size.y
+		# No height of its own: the lesson grows down to fit its text at this width.
 		lesson.offset_top=area.position.y
+		lesson.offset_bottom=area.position.y
 		overlay_bottom=lesson.get_global_rect().end.y
 	board.view_region=screen.arrange(ui.size,overlay_bottom)
 	notifications.offset_left=-minf(420,width-32)

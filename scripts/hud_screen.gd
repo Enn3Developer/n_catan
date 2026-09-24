@@ -128,8 +128,12 @@ func arrange(viewport: Vector2,overlay_bottom: float) -> Rect2:
 	toast_bottom=viewport.y-bar_top+GAP
 	# The scoreboard and tools float over open sea in the top corners, which the
 	# island's frame leaves clear, so the island is framed across the full width.
+	# The island fills at most the middle half of that width; on small windows the
+	# scoreboard reaches into it, so the island is framed beside the scoreboard.
+	var left=MARGIN
+	if %Scoreboard.get_rect().end.x>MARGIN+room/4:left=%Scoreboard.get_rect().end.x+GAP
 	var top=overlay_bottom+10 if overlay_bottom>0 else MARGIN
-	return Rect2(MARGIN,top,room,maxf(100,island_bottom-GAP-top))
+	return Rect2(left,top,viewport.x-MARGIN-left,maxf(100,island_bottom-GAP-top))
 
 ## Where overlays such as the tutorial lesson may sit: right of the scoreboard, below the tools.
 func overlay_area(viewport: Vector2) -> Rect2:
