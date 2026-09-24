@@ -344,6 +344,8 @@ layout_mode = 2
 size_flags_vertical = 4
 mouse_default_cursor_shape = 2
 theme_type_variation = &"PrimaryButton"
+theme_override_constants/h_separation = 6
+theme_override_constants/icon_max_width = 22
 text = "Trade offer"
 icon = ExtResource("icon_trade")
 
