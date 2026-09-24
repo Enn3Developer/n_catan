@@ -2500,3 +2500,72 @@ msgstr "È l’offerta così com’è. Accettala invece."
 
 msgid "Any"
 msgstr "Qualsiasi"
+
+msgid "Every settlement, city and road you build takes this look."
+msgstr "Ogni colonia, città e strada che costruisci avrà questo aspetto."
+
+msgid "Roll new choices for this section only"
+msgstr "Scegli a caso solo questa sezione"
+
+msgid "Roll new choices for %s only"
+msgstr "Scegli a caso solo: %s"
+
+msgid "Take back the last change (Ctrl+Z)"
+msgstr "Annulla l’ultima modifica (Ctrl+Z)"
+
+msgid "Close the workshop. Unapplied changes wait here for next time."
+msgstr "Chiudi il laboratorio. Le modifiche non applicate restano qui per la prossima volta."
+
+msgid "Variation"
+msgstr "Variante"
+
+msgid "New variation"
+msgstr "Nuova variante"
+
+msgid "Same choices, rebuilt with different small differences"
+msgstr "Stesse scelte, ricostruite con piccole differenze nuove"
+
+msgid "Shape"
+msgstr "Forma"
+
+msgid "Base"
+msgstr "Base"
+
+msgid "Windows and doors"
+msgstr "Finestre e porte"
+
+msgid "Roofline"
+msgstr "Tetto e camini"
+
+msgid "Character"
+msgstr "Carattere"
+
+msgid "Town center"
+msgstr "Centro del villaggio"
+
+msgid "Buildings"
+msgstr "Edifici"
+
+msgid "Town and roads"
+msgstr "Villaggio e strade"
+
+msgid "Weathervane"
+msgstr "Banderuola"
+
+msgid "Garden"
+msgstr "Cortile"
+
+msgid "None"
+msgstr "Nessuno"
+
+msgid "Vegetable rows"
+msgstr "Filari di verdure"
+
+msgid "Flower beds"
+msgstr "Aiuole"
+
+msgid "Haystacks"
+msgstr "Covoni"
+
+msgid "Woodpile"
+msgstr "Catasta di legna"

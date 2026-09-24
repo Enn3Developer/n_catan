@@ -3,28 +3,33 @@ extends RefCounted
 ## A player's hand-built look for roads, settlements and cities. Every field packs
 ## into one byte (colors into three), so any byte string decodes to a valid look.
 ## The host re-encodes whatever a client sends and never trusts it further.
+##
+## Fields are packed in FIELDS order. A field added later carries "since", the
+## version that introduced it, and goes at the end so older looks still decode;
+## "after" names the field it sits beside in the workshop. "heading" starts a
+## small group of fields in the workshop.
 
-const VERSION=1
+const VERSION=2
 const GROUPS=[["homes","Homes"],["roofs","Roofs"],["town","Town"],["city","City"],["roads","Roads"],["colors","Colors"]]
 # Kinds: range [min,max] quantized to 256 steps, count [min,max] integers,
 # choice [options], toggle, color.
 const FIELDS=[
-	{"key":"house_width","group":"homes","label":"House width","kind":"range","min":.8,"max":1.25,"default":1.0},
+	{"key":"house_width","heading":"Shape","group":"homes","label":"House width","kind":"range","min":.8,"max":1.25,"default":1.0},
 	{"key":"house_depth","group":"homes","label":"House depth","kind":"range","min":.8,"max":1.25,"default":1.0},
 	{"key":"stories","group":"homes","label":"Stories","kind":"count","min":1,"max":3,"default":1},
 	{"key":"story_height","group":"homes","label":"Story height","kind":"range","min":.8,"max":1.3,"default":1.0},
-	{"key":"foundation","group":"homes","label":"Foundation","kind":"choice","options":["Stone plinth","Stilts","Timber deck","On the ground"],"default":0},
+	{"key":"foundation","heading":"Base","group":"homes","label":"Foundation","kind":"choice","options":["Stone plinth","Stilts","Timber deck","On the ground"],"default":0},
 	{"key":"foundation_height","group":"homes","label":"Foundation height","kind":"range","min":0.0,"max":1.0,"default":.3},
-	{"key":"wall_material","group":"homes","label":"Walls","kind":"choice","options":["Plaster","Stone","Brick","Planks","Logs"],"default":0},
+	{"key":"wall_material","heading":"Walls","group":"homes","label":"Walls","kind":"choice","options":["Plaster","Stone","Brick","Planks","Logs"],"default":0},
 	{"key":"framing","group":"homes","label":"Timber framing","kind":"choice","options":["No framing","Posts","Braced","Crossed"],"default":2},
-	{"key":"windows","group":"homes","label":"Windows per wall","kind":"count","min":0,"max":3,"default":1},
+	{"key":"windows","heading":"Windows and doors","group":"homes","label":"Windows per wall","kind":"count","min":0,"max":3,"default":1},
 	{"key":"window_shape","group":"homes","label":"Window shape","kind":"choice","options":["Square","Arched","Round","Tall"],"default":0},
 	{"key":"shutters","group":"homes","label":"Shutters","kind":"toggle","default":true},
 	{"key":"flower_boxes","group":"homes","label":"Flower boxes","kind":"toggle","default":false},
 	{"key":"door_style","group":"homes","label":"Door","kind":"choice","options":["Plank","Arched","Double","Round"],"default":0},
-	{"key":"chimneys","group":"homes","label":"Chimneys","kind":"count","min":0,"max":2,"default":1},
+	{"key":"chimneys","heading":"Roofline","group":"homes","label":"Chimneys","kind":"count","min":0,"max":2,"default":1},
 	{"key":"dormers","group":"homes","label":"Dormers","kind":"count","min":0,"max":2,"default":0},
-	{"key":"wobble","group":"homes","label":"Hand-built wobble","kind":"range","min":0.0,"max":1.0,"default":.25},
+	{"key":"wobble","heading":"Character","group":"homes","label":"Hand-built wobble","kind":"range","min":0.0,"max":1.0,"default":.25},
 	{"key":"variety","group":"homes","label":"Variety between houses","kind":"range","min":0.0,"max":1.0,"default":.4},
 	{"key":"seed","group":"homes","label":"Variation seed","kind":"count","min":0,"max":255,"default":7},
 	{"key":"roof_style","group":"roofs","label":"Roof shape","kind":"choice","options":["Gable","Hipped","Half-hipped","Mansard","Saltbox","Flat"],"default":0},
@@ -32,34 +37,36 @@ const FIELDS=[
 	{"key":"roof_pitch","group":"roofs","label":"Roof pitch","kind":"range","min":20.0,"max":60.0,"default":42.0},
 	{"key":"roof_overhang","group":"roofs","label":"Eaves overhang","kind":"range","min":0.0,"max":1.0,"default":.4},
 	{"key":"ridge_cap","group":"roofs","label":"Ridge cap","kind":"toggle","default":true},
-	{"key":"square","group":"town","label":"Town square","kind":"choice","options":["Cobbles","Flagstones","Grass","Sand","Planks"],"default":0},
+	{"key":"square","heading":"Town center","group":"town","label":"Town square","kind":"choice","options":["Cobbles","Flagstones","Grass","Sand","Planks"],"default":0},
 	{"key":"centerpiece","group":"town","label":"Centerpiece","kind":"choice","options":["Well","Fountain","Tree","Statue","Bonfire","Market stall"],"default":0},
 	{"key":"lanterns","group":"town","label":"Lanterns","kind":"count","min":0,"max":4,"default":2},
 	{"key":"border","group":"town","label":"Town edge","kind":"choice","options":["Open","Picket fence","Hedge","Low stone wall"],"default":0},
-	{"key":"banner_shape","group":"town","label":"Banner","kind":"choice","options":["Pennant","Swallowtail","Square flag","Hanging banner"],"default":0},
+	{"key":"banner_shape","heading":"Banner","group":"town","label":"Banner","kind":"choice","options":["Pennant","Swallowtail","Square flag","Hanging banner"],"default":0},
 	{"key":"emblem","group":"town","label":"Emblem","kind":"choice","options":["Plain","Stripe","Cross","Disc","Chevron","Quartered"],"default":1},
 	{"key":"pole_height","group":"town","label":"Flagpole height","kind":"range","min":.6,"max":1.6,"default":1.0},
-	{"key":"city_wall","group":"city","label":"City wall","kind":"choice","options":["Stone curtain","Timber palisade","Hedge rampart","No wall"],"default":0},
+	{"key":"city_wall","heading":"Walls","group":"city","label":"City wall","kind":"choice","options":["Stone curtain","Timber palisade","Hedge rampart","No wall"],"default":0},
 	{"key":"wall_height","group":"city","label":"Wall height","kind":"range","min":.5,"max":1.5,"default":1.0},
 	{"key":"crenels","group":"city","label":"Battlements","kind":"toggle","default":true},
-	{"key":"towers","group":"city","label":"Towers","kind":"count","min":0,"max":6,"default":3},
+	{"key":"towers","heading":"Towers","group":"city","label":"Towers","kind":"count","min":0,"max":6,"default":3},
 	{"key":"tower_roof","group":"city","label":"Tower tops","kind":"choice","options":["Cone","Battlements","Dome","Flat"],"default":0},
 	{"key":"tower_height","group":"city","label":"Tower height","kind":"range","min":.6,"max":1.6,"default":1.0},
-	{"key":"keep","group":"city","label":"Landmark","kind":"choice","options":["Round tower","Square keep","Great hall","Lighthouse","Windmill","Great tree"],"default":0},
+	{"key":"keep","heading":"Landmark","group":"city","label":"Landmark","kind":"choice","options":["Round tower","Square keep","Great hall","Lighthouse","Windmill","Great tree"],"default":0},
 	{"key":"keep_height","group":"city","label":"Landmark height","kind":"range","min":.6,"max":1.5,"default":1.0},
 	{"key":"road_surface","group":"roads","label":"Road surface","kind":"choice","options":["Planks","Cobbles","Flagstones","Dirt","Gravel"],"default":0},
 	{"key":"road_width","group":"roads","label":"Road width","kind":"range","min":.6,"max":1.4,"default":1.0},
 	{"key":"road_edges","group":"roads","label":"Road edges","kind":"choice","options":["No edging","Curbs","Fence","Hedge","Posts and rope"],"default":0},
 	{"key":"road_lamps","group":"roads","label":"Road lamps","kind":"toggle","default":false},
-	{"key":"wall_color","group":"colors","label":"Walls","kind":"color","default":"e9dcc0"},
+	{"key":"wall_color","heading":"Buildings","group":"colors","label":"Walls","kind":"color","default":"e9dcc0"},
 	{"key":"roof_color","group":"colors","label":"Roof","kind":"color","default":"d9714e"},
 	{"key":"trim_color","group":"colors","label":"Timber and trim","kind":"color","default":"6b4a32"},
 	{"key":"stone_color","group":"colors","label":"Stonework","kind":"color","default":"9a938a"},
 	{"key":"accent_color","group":"colors","label":"Doors and shutters","kind":"color","default":"4f7ea0"},
-	{"key":"road_color","group":"colors","label":"Road","kind":"color","default":"c7a57a"},
+	{"key":"road_color","heading":"Town and roads","group":"colors","label":"Road","kind":"color","default":"c7a57a"},
 	{"key":"ground_color","group":"colors","label":"Town square","kind":"color","default":"c9b99a"},
 	{"key":"foliage_color","group":"colors","label":"Plants","kind":"color","default":"6f9a55"},
-	{"key":"emblem_color","group":"colors","label":"Emblem","kind":"color","default":"f3ead8"}]
+	{"key":"emblem_color","group":"colors","label":"Emblem","kind":"color","default":"f3ead8"},
+	{"key":"weathervane","group":"roofs","label":"Weathervane","kind":"toggle","default":false,"since":2,"after":"ridge_cap"},
+	{"key":"garden","group":"town","label":"Garden","kind":"choice","options":["None","Vegetable rows","Flower beds","Haystacks","Woodpile"],"default":0,"since":2,"after":"centerpiece"}]
 
 const PRESETS=[
 	{"name":"Voyager","description":"Timber framing, clay tiles and a village well. A classic island expedition.","values":{}},
@@ -103,12 +110,16 @@ static func encode(values: Dictionary) -> PackedByteArray:
 				bytes.append(color.r8);bytes.append(color.g8);bytes.append(color.b8)
 	return bytes
 
-## Unpacks a look. Malformed or foreign data yields the default look.
+## Unpacks a look of this or an earlier version; fields newer than the look
+## take their defaults. Malformed or foreign data yields the default look.
 static func decode(bytes: PackedByteArray) -> Dictionary:
 	var values=defaults()
-	if bytes.size()!=byte_size() or bytes[0]!=VERSION:return values
+	if bytes.is_empty():return values
+	var version=bytes[0]
+	if version<1 or version>VERSION or bytes.size()!=byte_size(version):return values
 	var at=1
 	for entry in FIELDS:
+		if entry.get("since",1)>version:continue
 		match entry.kind:
 			"range":values[entry.key]=lerpf(entry.min,entry.max,bytes[at]/255.0)
 			"count":values[entry.key]=mini(entry.min+bytes[at],entry.max)
@@ -120,9 +131,10 @@ static func decode(bytes: PackedByteArray) -> Dictionary:
 		at+=1
 	return values
 
-static func byte_size() -> int:
+static func byte_size(version: int=VERSION) -> int:
 	var size=1
-	for entry in FIELDS:size+=3 if entry.kind=="color" else 1
+	for entry in FIELDS:
+		if entry.get("since",1)<=version:size+=3 if entry.kind=="color" else 1
 	return size
 
 static func sanitize(bytes: PackedByteArray) -> PackedByteArray:
@@ -132,7 +144,9 @@ static func default_bytes() -> PackedByteArray:
 	return encode(defaults())
 
 static func from_hex(text: String) -> PackedByteArray:
-	return sanitize(text.hex_decode()) if text.length()==byte_size()*2 else default_bytes()
+	for version in range(1,VERSION+1):
+		if text.length()==byte_size(version)*2:return sanitize(text.hex_decode())
+	return default_bytes()
 
 ## The preset this look matches exactly, or -1 once the player has changed anything.
 static func preset_of(bytes: PackedByteArray) -> int:

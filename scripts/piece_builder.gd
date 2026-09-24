@@ -159,6 +159,7 @@ func build_town(city: bool,parity: int):
 		_towers(gates)
 	else:
 		_centerpiece()
+		if look.garden!=0:_garden(parity)
 		_border(radius,gates)
 		banner_top=Vector3(-.09,.012,.1)
 		banner_top=_flagpole(banner_top,.2*float(look.pole_height))
@@ -254,6 +255,8 @@ func house(spec: Dictionary):
 	var roof=_roof(w,d,top,spec.roof)
 	_chimneys(w,d,top,roof)
 	if look.dormers>0:_dormers(w,d,top,roof,spec.roof)
+	# One vane per town, on the house at the back where the camera sees it whole.
+	if look.weathervane and spec.index==1:_weathervane(Vector3(0,_roof_height(roof,0,roof.ridge_z),roof.ridge_z))
 	lights.append(kit.xform*Vector3(0,base+.04,d*.5+.03))
 
 func _foundation(w: float,d: float) -> float:
@@ -673,6 +676,19 @@ func _dormers(w: float,d: float,top: float,roof: Dictionary,tint: Color):
 			kit.slab(q,n,.004,kit.vary(tint,.05))
 		kit.plate([Vector2(-.02,0),Vector2(.02,0),Vector2(0,.015)],Vector3(x,body_top,z_front+.002),Vector3.RIGHT,Vector3.UP,Vector3(0,0,.004),color("wall_color"))
 
+func _weathervane(ridge: Vector3):
+	var iron=Color("3b3632")
+	var height=.07
+	kit.rod(ridge-Vector3.UP*.004,ridge+Vector3.UP*height,.0022,5,iron)
+	kit.beam(ridge+Vector3(-.013,height*.55,0),ridge+Vector3(.013,height*.55,0),.002,.002,iron)
+	kit.beam(ridge+Vector3(0,height*.55,-.013),ridge+Vector3(0,height*.55,.013),.002,.002,iron)
+	kit.blob(ridge+Vector3.UP*height*.72,Vector3.ONE*.005,Color("d9b76c"),5,3)
+	var arm=ridge+Vector3.UP*(height-.008)
+	kit.beam(arm+Vector3(-.03,0,0),arm+Vector3(.026,0,0),.0025,.0025,iron)
+	kit.plate([Vector2(0,-.006),Vector2(.012,0),Vector2(0,.006)],arm+Vector3(.024,0,0),Vector3.RIGHT,Vector3.UP,Vector3(0,0,.002),iron)
+	# The tail fin flies the owner's color like the banner.
+	kit.plate([Vector2(0,-.004),Vector2(-.018,-.012),Vector2(-.018,.012),Vector2(0,.004)],arm+Vector3(-.014,0,0),Vector3.RIGHT,Vector3.UP,Vector3(0,0,.002),player)
+
 # ---------------------------------------------------------------- town dressing
 
 func _centerpiece():
@@ -727,6 +743,56 @@ func _centerpiece():
 				kit.slab([Vector3(x0,y+.062,.034),Vector3(x1,y+.062,.034),Vector3(x1,y+.072,-.03),Vector3(x0,y+.072,-.03)],Vector3(0,1,.16),.003,tint)
 			for i in 3:
 				kit.blob(Vector3(-.02+.02*i,y+.035,.012),Vector3.ONE*.007,FLOWERS[i],5,3)
+
+## A small plot in the open quarter of the square, away from the gates.
+func _garden(parity: int):
+	var at=Vector2(.085,.125) if parity==0 else Vector2(.04,.135)
+	var y=.012
+	# Faces out of the square, so the woodpile's cut ends and the beds' fronts show.
+	_push(Transform3D(Basis(Vector3.UP,atan2(at.x,at.y)),Vector3(at.x,0,at.y)))
+	var soil=Color("6a4d34")
+	var timber=color("trim_color")
+	match int(look.garden):
+		1:
+			kit.box(Vector3(0,y+.003,0),Vector3(.084,.006,.056),soil)
+			for side in [-1,1]:
+				kit.box(Vector3(0,y+.005,side*.03),Vector3(.09,.01,.005),timber)
+				kit.box(Vector3(side*.044,y+.005,0),Vector3(.005,.01,.064),timber)
+			var leaf=color("foliage_color")
+			for row in 3:
+				for i in 5:
+					var p=Vector3(-.032+.016*i+_jitter(.002),y+.009,-.017+.017*row)
+					kit.blob(p,Vector3(.0065,.0055,.0065)*rng.randf_range(.85,1.15),kit.vary(leaf.lightened(.08*row),.08),5,3)
+		2:
+			var leaf=color("foliage_color")
+			for bed in 2:
+				var z=-.015+.03*bed
+				kit.box(Vector3(0,y+.004,z),Vector3(.08,.008,.022),soil)
+				kit.box(Vector3(0,y+.004,z),Vector3(.086,.006,.026),color("stone_color"))
+				for i in 6:
+					var p=Vector3(-.032+.0128*i,y+.011,z+_jitter(.004))
+					kit.blob(p,Vector3.ONE*.006,kit.vary(leaf,.1),5,3)
+					kit.blob(p+Vector3(0,.005,0),Vector3.ONE*.0042,FLOWERS[(i+bed*2)%FLOWERS.size()],5,3)
+		3:
+			var hay=Color("d6b25c")
+			for spot in [Vector3(-.022,y,-.008),Vector3(.02,y,-.012),Vector3(0,y,.02)]:
+				var r=.022*rng.randf_range(.9,1.1)
+				kit.cylinder(spot,r,r*.95,.018,9,kit.vary(hay,.06))
+				kit.blob(spot+Vector3.UP*.018,Vector3(r*.95,r*.85,r*.95),kit.vary(hay.lightened(.06),.06),8,4)
+			kit.rod(Vector3(.034,y,.03),Vector3(.02,y+.05,.004),.0018,4,timber)
+		4:
+			for x in [-.036,.036]:
+				kit.box(Vector3(x,y+.022,-.016),Vector3(.005,.044,.005),timber)
+			kit.slab([Vector3(-.044,y+.046,-.026),Vector3(.044,y+.046,-.026),Vector3(.044,y+.036,.024),Vector3(-.044,y+.036,.024)],Vector3(0,1,.2),.004,kit.vary(color("roof_color"),.05))
+			var bark=BARK
+			for layer in 3:
+				var count=5-layer
+				for i in count:
+					var x=(i-(count-1)*.5)*.016
+					var p=Vector3(x,y+.006+layer*.0115,0)
+					kit.rod(p+Vector3(0,0,-.018),p+Vector3(0,0,.018),.006,6,kit.vary(bark,.1))
+					kit.blob(p+Vector3(0,0,.018),Vector3(.0056,.0056,.0015),Color("c9a06a"),6,2)
+	_pop()
 
 func _border(radius: float,gates: Array):
 	var style: int=look.border

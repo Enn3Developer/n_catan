@@ -2500,3 +2500,72 @@ msgstr "This is the offer as it stands. Accept it instead."
 
 msgid "Any"
 msgstr "Any"
+
+msgid "Every settlement, city and road you build takes this look."
+msgstr "Every settlement, city and road you build takes this look."
+
+msgid "Roll new choices for this section only"
+msgstr "Roll new choices for this section only"
+
+msgid "Roll new choices for %s only"
+msgstr "Roll new choices for %s only"
+
+msgid "Take back the last change (Ctrl+Z)"
+msgstr "Take back the last change (Ctrl+Z)"
+
+msgid "Close the workshop. Unapplied changes wait here for next time."
+msgstr "Close the workshop. Unapplied changes wait here for next time."
+
+msgid "Variation"
+msgstr "Variation"
+
+msgid "New variation"
+msgstr "New variation"
+
+msgid "Same choices, rebuilt with different small differences"
+msgstr "Same choices, rebuilt with different small differences"
+
+msgid "Shape"
+msgstr "Shape"
+
+msgid "Base"
+msgstr "Base"
+
+msgid "Windows and doors"
+msgstr "Windows and doors"
+
+msgid "Roofline"
+msgstr "Roofline"
+
+msgid "Character"
+msgstr "Character"
+
+msgid "Town center"
+msgstr "Town center"
+
+msgid "Buildings"
+msgstr "Buildings"
+
+msgid "Town and roads"
+msgstr "Town and roads"
+
+msgid "Weathervane"
+msgstr "Weathervane"
+
+msgid "Garden"
+msgstr "Garden"
+
+msgid "None"
+msgstr "None"
+
+msgid "Vegetable rows"
+msgstr "Vegetable rows"
+
+msgid "Flower beds"
+msgstr "Flower beds"
+
+msgid "Haystacks"
+msgstr "Haystacks"
+
+msgid "Woodpile"
+msgstr "Woodpile"
