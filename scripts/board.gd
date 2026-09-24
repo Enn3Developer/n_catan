@@ -96,6 +96,10 @@ var daylight=1.0
 ## The sea floor under the see-through water, sized to each board.
 var seabed: MeshInstance3D
 var seabed_material: ShaderMaterial
+## Beaches and rock shelves at the cliff foot, rebuilt with each board.
+var coast=CatanCoast.new()
+## Fish, weed and corals under the see-through water.
+var sea_life=CatanSeaLife.new()
 
 func _ready():
 	if "--server" in OS.get_cmdline_user_args():
@@ -112,6 +116,10 @@ func _ready():
 	# The shader moves every vertex down; keep culling from trusting the flat plane.
 	seabed.extra_cull_margin=60.0
 	add_child(seabed)
+	coast.name="Coast"
+	add_child(coast)
+	sea_life.name="SeaLife"
+	add_child(sea_life)
 	# The wave table is shared with boat bobbing on the CPU.
 	sea_material.set_shader_parameter("waves",preload("res://scripts/ocean_waves.gd").WAVES)
 	_update_camera()
@@ -131,6 +139,8 @@ func apply_preferences(values: Dictionary):
 			tile.ground.material_override=art.ground(tile.kind,tile.index)
 			tile.cliff.material_override=art.cliff()
 			art.apply_instance(tile.diorama,values)
+		coast.build(state,TILE_SIZE,art,values)
+		sea_life.build(state,CatanSeaFloor.new(water_centers,TILE_SIZE*.993),values)
 	if old.texture_quality!=values.texture_quality:_apply_surfaces(self)
 	art.animate(values)
 	sun.shadow_enabled=values.shadow_quality>0
@@ -241,6 +251,8 @@ func build(data: Dictionary):
 	sea_material.set_shader_parameter("tile_count",state.tiles.size())
 	sea_material.set_shader_parameter("tile_radius",TILE_SIZE*.993)
 	_fit_seabed(centers)
+	coast.build(state,TILE_SIZE,art,render_values)
+	sea_life.build(state,CatanSeaFloor.new(water_centers,TILE_SIZE*.993),render_values)
 	# Face away from the owning tile; random coasts are not convex.
 	for e in state.edges:
 		var a=state.vertices[e.a]
@@ -343,7 +355,7 @@ func refresh(data: Dictionary):
 	set_mode(mode,seat)
 	CatanDiagnostics.event("board.refresh.complete")
 
-## A ship sits well out on its edge's sea side, so the cliff never hides its hull.
+## A ship sits well out on its edge's sea side, clear of the beach and the cliff.
 func _ship(e: Dictionary):
 	var a=state.vertices[e.a]
 	var b=state.vertices[e.b]
@@ -354,7 +366,7 @@ func _ship(e: Dictionary):
 		if t in b.tiles and across.dot(middle-Vector3(state.tiles[t].x,0,state.tiles[t].z))<0:across=-across
 	var ship: Node3D=tint.paint(SHIP.instantiate(),player_color(e.owner),"Owner")
 	_apply_surfaces(ship)
-	ship.position=middle+across*(.2 if int(e.tiles)==1 else 0.0)+Vector3.UP*SHIP_BASE
+	ship.position=middle+across*(.36 if int(e.tiles)==1 else 0.0)+Vector3.UP*SHIP_BASE
 	ship.rotation.y=atan2(along.x,along.z)
 	# The hull is .5 long, a little shorter than an edge, so bow and stern clear the coast corners.
 	ship.scale=Vector3.ONE*1.05
@@ -420,6 +432,7 @@ func _process(delta):
 	elapsed+=delta
 	sea_material.set_shader_parameter("animation_time",elapsed)
 	if seabed_material:seabed_material.set_shader_parameter("animation_time",elapsed)
+	sea_life.animate(delta,elapsed)
 	environment.sky.sky_material.set_shader_parameter("animation_time",elapsed)
 	living_world.animate(actors,elapsed,art,daylight)
 	living_world.animate(band_actors,elapsed,art,daylight)

@@ -33,6 +33,8 @@ The lobby also has house rules, all off by default:
 
 On the archipelago, smaller islands lie across the water from the main one. Ships cost 1 timber and 1 wool. They go on sea edges, chain out from your coast like roads and count toward the longest road. The first settlement you build on each new island is worth 2 extra points.
 
+The islands have shores: sand beaches, shingle coves and rocky shelves with boulders and sea stacks at the foot of the cliffs, different on every map. Under the water are seagrass meadows, kelp, corals, sea fans and schools of fish.
+
 The camera eases between views. Drag the board or hold WASD to pan, right-drag or press Q and E to orbit, and scroll or press + and - to zoom. Home fits the whole board. The victory screen shows the seed with each player's rolls, resources collected, trades and steals, and the host can deal a new island to the same table with **Play again**.
 
 Trading works the way it does at a real table. Your offer goes to everyone; each player accepts, declines or sends a counter-offer. After a few seconds, or once everyone has answered, you pick who to trade with.

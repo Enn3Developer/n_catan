@@ -115,9 +115,20 @@ void fragment(){
   slope+=normalize(local+vec2(.0001))*ripple*.04*rain_strength*(1.0-smoothstep(.6,2.0,footprint));
  }
  NORMAL=normalize((VIEW_MATRIX*vec4(-slope.x,1.0,-slope.y,0.0)).xyz);
+ // How far light travels underwater before reaching what lies below. Waves
+ // bend the view a little; a bent sample that lands above the water is dropped.
+ vec3 surface=(INV_VIEW_MATRIX*vec4(VERTEX,1.0)).xyz;
+ vec2 bend=slope*.035*clamp(-VERTEX.z*.004,.2,1.0);
+ vec2 uv=SCREEN_UV+bend;
+ vec3 below=scene_point(uv,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX);
+ if(below.y>surface.y-.05){uv=SCREEN_UV;below=scene_point(uv,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX);}
+ float drop=max(surface.y-below.y,0.0);
  float coast_noise=painted_noise(p*.72+drift*.7);
- float wash=shore+(coast_noise-.5)*.40;
- float edge=1.0-smoothstep(.06,.58,wash);
+ // Beaches reach about 3 metres out from the cliffs before they meet the sea.
+ float wash=shore-3.0+(coast_noise-.5)*.40;
+ // Foam gathers wherever the water is shallow over something: beaches,
+ // boulders, piers and hulls alike.
+ float edge=1.0-smoothstep(.04,.75,drop+(coast_noise-.5)*.3);
  float lace=smoothstep(.29,.72,coast_noise);
  float foam=edge*(.23+.40*lace);
  if(water_quality>0){
@@ -125,7 +136,7 @@ void fragment(){
   float phase=wash*3.2-t*.58+coast_noise*1.8;
   float width=max(fwidth(phase),.08);
   float wavelet=1.0-smoothstep(.12,.12+width,abs(sin(phase)));
-  foam+=wavelet*exp(-shore*.60)*smoothstep(.42,.66,grain)*.22;
+  foam+=wavelet*exp(-max(wash,0.0)*.60)*smoothstep(.42,.66,grain)*.22;
  }
  float rings=0.0;
  if(water_quality>1){
@@ -155,15 +166,7 @@ void fragment(){
  }
  float fresnel=pow(1.0-clamp(dot(normalize(NORMAL),normalize(VIEW)),0.0,1.0),3.0);
  color=mix(color,vec3(.28,.43,.46),fresnel*.10);
- // How far light travels underwater before reaching what lies below. Waves
- // bend the view a little; a bent sample that lands above the water is dropped.
- vec3 surface=(INV_VIEW_MATRIX*vec4(VERTEX,1.0)).xyz;
- vec2 bend=slope*.035*clamp(-VERTEX.z*.004,.2,1.0);
- vec2 uv=SCREEN_UV+bend;
- vec3 below=scene_point(uv,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX);
- if(below.y>surface.y-.05){uv=SCREEN_UV;below=scene_point(uv,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX);}
  float path=clamp(length(below-surface),0.0,400.0);
- float drop=max(surface.y-below.y,0.0);
  // Mostly the vertical depth, so a grazing view does not fog the shallows.
  float optical=mix(drop,path,.35)/clarity;
  vec3 transmit=exp(-absorption*optical)*(1.0-smoothstep(12.0,40.0,optical));

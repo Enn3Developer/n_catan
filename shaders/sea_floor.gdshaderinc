@@ -25,3 +25,21 @@ float seabed_depth(float shore){
  depth+=20.0*smoothstep(60.0,140.0,s);
  return depth;
 }
+
+float bed_hash(vec2 p){
+ vec3 p3=fract(vec3(p.xyx)*.1031);
+ p3+=dot(p3,p3.yzx+33.33);
+ return fract((p3.x+p3.y)*p3.z);
+}
+float bed_noise(vec2 p){
+ vec2 i=floor(p),f=fract(p);
+ f=f*f*(3.0-2.0*f);
+ return mix(mix(bed_hash(i),bed_hash(i+vec2(1,0)),f.x),mix(bed_hash(i+vec2(0,1)),bed_hash(i+vec2(1)),f.x),f.y);
+}
+// Height of the bed below the waterline at a world point, with dunes on the
+// shelf and lumpier rock further out. Plants read it to stand on the bed.
+float bed_height(vec2 p){
+ float shore=shore_distance(p);
+ float rough=bed_noise(p*.08)*1.6+bed_noise(p*.23)*.6;
+ return -(seabed_depth(shore)+rough*smoothstep(-2.0,10.0,shore));
+}
