@@ -29,7 +29,6 @@ func show_trade(snapshot: Dictionary,player: int,with_players: bool,give: int,re
 	rules.s=state
 	var paired=state.get("paired",false)
 	var hand: Array=state.players[seat].hand
-	%Hand.show_amounts(hand)
 	%BankTab.button_pressed=not with_players or paired
 	%PlayersTab.disabled=paired
 	%PlayersTab.button_pressed=with_players and not paired

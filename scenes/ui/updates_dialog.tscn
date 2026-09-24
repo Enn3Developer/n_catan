@@ -6,65 +6,65 @@
 [node name="Updates" instance=ExtResource("base")]
 script = ExtResource("script")
 
-[node name="Title" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="Title" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 text = "Game updates"
 
-[node name="Installed" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="Installed" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"MutedLabel"
 
-[node name="UpdateMessage" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="UpdateMessage" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 autowrap_mode = 3
 
-[node name="UpdateProgress" type="ProgressBar" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="UpdateProgress" type="ProgressBar" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
-[node name="UpdateDetails" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="UpdateDetails" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"MutedLabel"
 autowrap_mode = 3
 
-[node name="UpdateCheck" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
+[node name="Later" type="Button" parent="DialogMargin/Panel/Frame/Footer" groups=["ui_click"]]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+text = "Later"
+
+[node name="UpdateCheck" type="Button" parent="DialogMargin/Panel/Frame/Footer" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
 text = "Check for updates"
 
-[node name="UpdateDownload" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
+[node name="UpdateDownload" type="Button" parent="DialogMargin/Panel/Frame/Footer" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
 theme_type_variation = &"PrimaryButton"
 text = "Download update"
 
-[node name="UpdateInstall" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
+[node name="UpdateInstall" type="Button" parent="DialogMargin/Panel/Frame/Footer" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
 theme_type_variation = &"PrimaryButton"
 text = "Restart to update"
 
-[node name="Later" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-text = "Later"
-
-[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/UpdateCheck" to="." method="emit_signal" binds= ["check_requested"]]
-[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/UpdateDownload" to="." method="emit_signal" binds= ["download_requested"]]
-[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/UpdateInstall" to="." method="emit_signal" binds= ["install_requested"]]
-[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/Later" to="." method="close"]
+[connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/UpdateCheck" to="." method="emit_signal" binds= ["check_requested"]]
+[connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/UpdateDownload" to="." method="emit_signal" binds= ["download_requested"]]
+[connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/UpdateInstall" to="." method="emit_signal" binds= ["install_requested"]]
+[connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/Later" to="." method="close"]

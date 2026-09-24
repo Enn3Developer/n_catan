@@ -1,169 +1,47 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/discard_dialog.gd" id="script"]
-[ext_resource type="Texture2D" path="res://assets/icons/timber.svg" id="icon_timber"]
-[ext_resource type="Texture2D" path="res://assets/icons/brick.svg" id="icon_brick"]
-[ext_resource type="Texture2D" path="res://assets/icons/wool.svg" id="icon_wool"]
-[ext_resource type="Texture2D" path="res://assets/icons/grain.svg" id="icon_grain"]
-[ext_resource type="Texture2D" path="res://assets/icons/ore.svg" id="icon_ore"]
+[ext_resource type="Script" path="res://scripts/resource_steppers.gd" id="steppers"]
 [ext_resource type="PackedScene" path="res://scenes/ui/dialog.tscn" id="base"]
 
 [node name="Discard" instance=ExtResource("base")]
 script = ExtResource("script")
 
-[node name="Title" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="Title" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 text = "The robber approaches"
 
-[node name="Instructions" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="Instructions" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
-[node name="TimberRow" type="HBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body"]
-layout_mode = 2
-tooltip_text = "Timber"
-
-[node name="Icon" type="TextureRect" parent="DialogMargin/Panel/DialogScroll/Body/TimberRow"]
-custom_minimum_size = Vector2(34, 34)
-layout_mode = 2
-mouse_filter = 2
-texture = ExtResource("icon_timber")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="TimberAmount" type="SpinBox" parent="DialogMargin/Panel/DialogScroll/Body/TimberRow"]
+[node name="Steppers" type="HBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(84, 44)
 layout_mode = 2
-size_flags_vertical = 4
-max_value = 0.0
-alignment = 1
+theme_override_constants/separation = 8
+script = ExtResource("steppers")
 
-[node name="TimberHave" type="Label" parent="DialogMargin/Panel/DialogScroll/Body/TimberRow"]
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-
-[node name="BrickRow" type="HBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body"]
-layout_mode = 2
-tooltip_text = "Brick"
-
-[node name="Icon" type="TextureRect" parent="DialogMargin/Panel/DialogScroll/Body/BrickRow"]
-custom_minimum_size = Vector2(34, 34)
-layout_mode = 2
-mouse_filter = 2
-texture = ExtResource("icon_brick")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="BrickAmount" type="SpinBox" parent="DialogMargin/Panel/DialogScroll/Body/BrickRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(84, 44)
-layout_mode = 2
-size_flags_vertical = 4
-max_value = 0.0
-alignment = 1
-
-[node name="BrickHave" type="Label" parent="DialogMargin/Panel/DialogScroll/Body/BrickRow"]
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-
-[node name="WoolRow" type="HBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body"]
-layout_mode = 2
-tooltip_text = "Wool"
-
-[node name="Icon" type="TextureRect" parent="DialogMargin/Panel/DialogScroll/Body/WoolRow"]
-custom_minimum_size = Vector2(34, 34)
-layout_mode = 2
-mouse_filter = 2
-texture = ExtResource("icon_wool")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="WoolAmount" type="SpinBox" parent="DialogMargin/Panel/DialogScroll/Body/WoolRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(84, 44)
-layout_mode = 2
-size_flags_vertical = 4
-max_value = 0.0
-alignment = 1
-
-[node name="WoolHave" type="Label" parent="DialogMargin/Panel/DialogScroll/Body/WoolRow"]
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-
-[node name="GrainRow" type="HBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body"]
-layout_mode = 2
-tooltip_text = "Grain"
-
-[node name="Icon" type="TextureRect" parent="DialogMargin/Panel/DialogScroll/Body/GrainRow"]
-custom_minimum_size = Vector2(34, 34)
-layout_mode = 2
-mouse_filter = 2
-texture = ExtResource("icon_grain")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="GrainAmount" type="SpinBox" parent="DialogMargin/Panel/DialogScroll/Body/GrainRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(84, 44)
-layout_mode = 2
-size_flags_vertical = 4
-max_value = 0.0
-alignment = 1
-
-[node name="GrainHave" type="Label" parent="DialogMargin/Panel/DialogScroll/Body/GrainRow"]
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-
-[node name="OreRow" type="HBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body"]
-layout_mode = 2
-tooltip_text = "Ore"
-
-[node name="Icon" type="TextureRect" parent="DialogMargin/Panel/DialogScroll/Body/OreRow"]
-custom_minimum_size = Vector2(34, 34)
-layout_mode = 2
-mouse_filter = 2
-texture = ExtResource("icon_ore")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="OreAmount" type="SpinBox" parent="DialogMargin/Panel/DialogScroll/Body/OreRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(84, 44)
-layout_mode = 2
-size_flags_vertical = 4
-max_value = 0.0
-alignment = 1
-
-[node name="OreHave" type="Label" parent="DialogMargin/Panel/DialogScroll/Body/OreRow"]
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-
-[node name="Chosen" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="Chosen" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"MutedLabel"
 
-[node name="DiscardSelected" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-theme_type_variation = &"PrimaryButton"
-text = "Discard selected resources"
-
-[node name="Close" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 40)
+[node name="Close" type="Button" parent="DialogMargin/Panel/Frame/Footer" groups=["ui_click"]]
+custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
 text = "Close"
 
-[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/Close" to="." method="close"]
-[connection signal="value_changed" from="DialogMargin/Panel/DialogScroll/Body/TimberRow/TimberAmount" to="." method="_on_amount_changed"]
-[connection signal="value_changed" from="DialogMargin/Panel/DialogScroll/Body/BrickRow/BrickAmount" to="." method="_on_amount_changed"]
-[connection signal="value_changed" from="DialogMargin/Panel/DialogScroll/Body/WoolRow/WoolAmount" to="." method="_on_amount_changed"]
-[connection signal="value_changed" from="DialogMargin/Panel/DialogScroll/Body/GrainRow/GrainAmount" to="." method="_on_amount_changed"]
-[connection signal="value_changed" from="DialogMargin/Panel/DialogScroll/Body/OreRow/OreAmount" to="." method="_on_amount_changed"]
-[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/DiscardSelected" to="." method="_on_discard_pressed"]
+[node name="DiscardSelected" type="Button" parent="DialogMargin/Panel/Frame/Footer" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+theme_type_variation = &"PrimaryButton"
+text = "Discard"
+
+[connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/Close" to="." method="close"]
+[connection signal="changed" from="DialogMargin/Panel/Frame/DialogScroll/Body/Steppers" to="." method="_on_amount_changed"]
+[connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/DiscardSelected" to="." method="_on_discard_pressed"]

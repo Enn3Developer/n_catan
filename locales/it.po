@@ -108,9 +108,6 @@ msgstr "%s%s\n%d punti · %d risorse · %d carte sviluppo\nLunghezza strada %d �
 msgid "+ Add bot"
 msgstr "+ Aggiungi bot"
 
-msgid "1. Gather 3–6 players (humans or bots). Everyone readies up.\n2. Place two settlements and roads in snake order.\n3. Roll: neighboring settlements collect 1 resource; cities 2.\n4. Connect roads, build settlements, upgrade to cities.\n5. Trade with players or the bank; coastal ports give better rates.\n6. A seven means discarding half if you have more than seven,\n    then moving the robber and stealing from a neighbor.\n7. Buy development cards; play at most one per turn.\n8. Reach the room's points target (10 unless the host changes it)\n    on your turn to win. Settlements give 1, cities 2,\n    longest road and largest army 2 each.\n\nClick glowing board markers to build. Right-drag to orbit.\nScroll to zoom; middle-drag pans; F focuses a tile.\nH hides the interface; Home fits the board. Hover for costs.\n\n5–6 players: 30 hexes and paired turns. After the main turn,\n the player 3 seats ahead builds, plays cards and trades only\n with the bank. Then the next main player rolls.\n\nOnline hosts need UDP 24567 reachable from the internet.\nUse router mapping, port forwarding, or a dedicated server."
-msgstr "1. Riunisci 3–6 giocatori, persone o bot. Tutti devono essere pronti.\n2. Posiziona due colonie e due strade, invertendo l’ordine al secondo giro.\n3. Tira i dadi: le colonie vicine raccolgono 1 risorsa, le città 2.\n4. Collega strade, costruisci colonie e trasformale in città.\n5. Scambia con i giocatori o la banca; i porti offrono rapporti migliori.\n6. Con un 7, chi ha più di 7 risorse ne scarta metà, arrotondando per difetto.\n   Poi si sposta il brigante e si ruba una risorsa a un vicino.\n7. Compra carte sviluppo; gioca al massimo una carta azione per turno.\n8. Raggiungi nel tuo turno i punti richiesti dalla stanza (10, salvo\n   diversa scelta dell’host). Le colonie valgono 1, le città 2,\n   la strada più lunga e l’esercito più grande 2 ciascuno.\n\nClicca sui punti illuminati per costruire. Trascina col destro per ruotare.\nLa rotella regola lo zoom; trascina col centrale per spostarti.\nF mette a fuoco una tessera; H nasconde l’interfaccia; Home inquadra il tabellone.\nPassa il puntatore sui comandi per vedere i costi.\n\nCon 5–6 giocatori: 30 esagoni e turni abbinati. Dopo il turno principale,\nil giocatore tre posti più avanti costruisce, gioca carte e scambia solo\ncon la banca. Poi il giocatore principale successivo tira i dadi.\n\nPer giocare online, la porta UDP 24567 dell’host deve essere raggiungibile.\nUsa la configurazione del router, l’inoltro della porta o un server dedicato."
-
 msgid "19 hexes · Classic"
 msgstr "19 esagoni · Classico"
 
@@ -2398,3 +2395,60 @@ msgstr "su %d"
 
 msgid "%d of %d chosen"
 msgstr "%d su %d scelte"
+
+msgid "First resource"
+msgstr "Prima risorsa"
+
+msgid "Second resource"
+msgstr "Seconda risorsa"
+
+msgid "Resource to claim"
+msgstr "Risorsa da reclamare"
+
+msgid "How to win"
+msgstr "Come si vince"
+
+msgid "Reach the room's points target on your turn, 10 unless the host changes it. Settlements give 1 point, cities 2, and longest road and largest army 2 each."
+msgstr "Raggiungi nel tuo turno i punti richiesti dalla stanza, 10 salvo diversa scelta dell’host. Le colonie valgono 1 punto, le città 2, la strada più lunga e l’esercito più grande 2 ciascuno."
+
+msgid "Setup"
+msgstr "Preparazione"
+
+msgid "Each player places two settlements, each with a road. The order reverses for the second round."
+msgstr "Ogni giocatore posiziona due colonie, ciascuna con una strada. Al secondo giro l’ordine si inverte."
+
+msgid "A turn"
+msgstr "Un turno"
+
+msgid "Roll the dice. Every settlement next to a hex with that number collects 1 resource, every city 2. Then build, trade with players or the bank, and play at most one development card. Ports give better bank rates."
+msgstr "Tira i dadi. Ogni colonia accanto a un esagono con quel numero raccoglie 1 risorsa, ogni città 2. Poi costruisci, scambia con i giocatori o la banca e gioca al massimo una carta sviluppo. I porti offrono rapporti migliori con la banca."
+
+msgid "Building costs"
+msgstr "Costi di costruzione"
+
+msgid "Rolling a seven"
+msgstr "Quando esce il 7"
+
+msgid "Anyone holding more than seven resources discards half, rounded down. Then the roller moves the robber, which stops that hex producing, and steals a resource from a neighbor."
+msgstr "Chi ha più di sette risorse ne scarta metà, arrotondando per difetto. Poi chi ha tirato sposta il brigante, che blocca la produzione di quell’esagono, e ruba una risorsa a un vicino."
+
+msgid "Click glowing markers to build. Right-drag to orbit, scroll to zoom and middle-drag to pan. F focuses a tile, H hides the interface and Home fits the board."
+msgstr "Clicca sui punti illuminati per costruire. Trascina col destro per ruotare, usa la rotella per lo zoom e trascina col centrale per spostarti. F mette a fuoco una tessera, H nasconde l’interfaccia e Home inquadra il tabellone."
+
+msgid "Five or six players"
+msgstr "Cinque o sei giocatori"
+
+msgid "The island has 30 hexes and turns come in pairs. After the main turn, the player three seats ahead builds, plays cards and trades with the bank. Then the next main player rolls."
+msgstr "L’isola ha 30 esagoni e i turni sono abbinati. Dopo il turno principale, il giocatore tre posti più avanti costruisce, gioca carte e scambia con la banca. Poi il giocatore principale successivo tira i dadi."
+
+msgid "Hosting online"
+msgstr "Ospitare online"
+
+msgid "The host's UDP port 24567 must be reachable from the internet. Use router mapping, port forwarding or a dedicated server."
+msgstr "La porta UDP 24567 dell’host deve essere raggiungibile da internet. Usa la mappatura del router, l’inoltro della porta o un server dedicato."
+
+msgid "Development card"
+msgstr "Carta sviluppo"
+
+msgid "Play online"
+msgstr "Gioca online"

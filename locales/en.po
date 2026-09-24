@@ -108,9 +108,6 @@ msgstr "%s%s\n%d points · %d resources · %d development cards\nRoad length %d 
 msgid "+ Add bot"
 msgstr "+ Add bot"
 
-msgid "1. Gather 3–6 players (humans or bots). Everyone readies up.\n2. Place two settlements and roads in snake order.\n3. Roll: neighboring settlements collect 1 resource; cities 2.\n4. Connect roads, build settlements, upgrade to cities.\n5. Trade with players or the bank; coastal ports give better rates.\n6. A seven means discarding half if you have more than seven,\n    then moving the robber and stealing from a neighbor.\n7. Buy development cards; play at most one per turn.\n8. Reach the room's points target (10 unless the host changes it)\n    on your turn to win. Settlements give 1, cities 2,\n    longest road and largest army 2 each.\n\nClick glowing board markers to build. Right-drag to orbit.\nScroll to zoom; middle-drag pans; F focuses a tile.\nH hides the interface; Home fits the board. Hover for costs.\n\n5–6 players: 30 hexes and paired turns. After the main turn,\n the player 3 seats ahead builds, plays cards and trades only\n with the bank. Then the next main player rolls.\n\nOnline hosts need UDP 24567 reachable from the internet.\nUse router mapping, port forwarding, or a dedicated server."
-msgstr "1. Gather 3–6 players (humans or bots). Everyone readies up.\n2. Place two settlements and roads in snake order.\n3. Roll: neighboring settlements collect 1 resource; cities 2.\n4. Connect roads, build settlements, upgrade to cities.\n5. Trade with players or the bank; coastal ports give better rates.\n6. A seven means discarding half if you have more than seven,\n    then moving the robber and stealing from a neighbor.\n7. Buy development cards; play at most one per turn.\n8. Reach the room's points target (10 unless the host changes it)\n    on your turn to win. Settlements give 1, cities 2,\n    longest road and largest army 2 each.\n\nClick glowing board markers to build. Right-drag to orbit.\nScroll to zoom; middle-drag pans; F focuses a tile.\nH hides the interface; Home fits the board. Hover for costs.\n\n5–6 players: 30 hexes and paired turns. After the main turn,\n the player 3 seats ahead builds, plays cards and trades only\n with the bank. Then the next main player rolls.\n\nOnline hosts need UDP 24567 reachable from the internet.\nUse router mapping, port forwarding, or a dedicated server."
-
 msgid "19 hexes · Classic"
 msgstr "19 hexes · Classic"
 
@@ -2398,3 +2395,60 @@ msgstr "of %d"
 
 msgid "%d of %d chosen"
 msgstr "%d of %d chosen"
+
+msgid "First resource"
+msgstr "First resource"
+
+msgid "Second resource"
+msgstr "Second resource"
+
+msgid "Resource to claim"
+msgstr "Resource to claim"
+
+msgid "How to win"
+msgstr "How to win"
+
+msgid "Reach the room's points target on your turn, 10 unless the host changes it. Settlements give 1 point, cities 2, and longest road and largest army 2 each."
+msgstr "Reach the room's points target on your turn, 10 unless the host changes it. Settlements give 1 point, cities 2, and longest road and largest army 2 each."
+
+msgid "Setup"
+msgstr "Setup"
+
+msgid "Each player places two settlements, each with a road. The order reverses for the second round."
+msgstr "Each player places two settlements, each with a road. The order reverses for the second round."
+
+msgid "A turn"
+msgstr "A turn"
+
+msgid "Roll the dice. Every settlement next to a hex with that number collects 1 resource, every city 2. Then build, trade with players or the bank, and play at most one development card. Ports give better bank rates."
+msgstr "Roll the dice. Every settlement next to a hex with that number collects 1 resource, every city 2. Then build, trade with players or the bank, and play at most one development card. Ports give better bank rates."
+
+msgid "Building costs"
+msgstr "Building costs"
+
+msgid "Rolling a seven"
+msgstr "Rolling a seven"
+
+msgid "Anyone holding more than seven resources discards half, rounded down. Then the roller moves the robber, which stops that hex producing, and steals a resource from a neighbor."
+msgstr "Anyone holding more than seven resources discards half, rounded down. Then the roller moves the robber, which stops that hex producing, and steals a resource from a neighbor."
+
+msgid "Click glowing markers to build. Right-drag to orbit, scroll to zoom and middle-drag to pan. F focuses a tile, H hides the interface and Home fits the board."
+msgstr "Click glowing markers to build. Right-drag to orbit, scroll to zoom and middle-drag to pan. F focuses a tile, H hides the interface and Home fits the board."
+
+msgid "Five or six players"
+msgstr "Five or six players"
+
+msgid "The island has 30 hexes and turns come in pairs. After the main turn, the player three seats ahead builds, plays cards and trades with the bank. Then the next main player rolls."
+msgstr "The island has 30 hexes and turns come in pairs. After the main turn, the player three seats ahead builds, plays cards and trades with the bank. Then the next main player rolls."
+
+msgid "Hosting online"
+msgstr "Hosting online"
+
+msgid "The host's UDP port 24567 must be reachable from the internet. Use router mapping, port forwarding or a dedicated server."
+msgstr "The host's UDP port 24567 must be reachable from the internet. Use router mapping, port forwarding or a dedicated server."
+
+msgid "Development card"
+msgstr "Development card"
+
+msgid "Play online"
+msgstr "Play online"

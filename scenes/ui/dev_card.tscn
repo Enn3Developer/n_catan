@@ -53,9 +53,9 @@ shadow_size = 4
 shadow_offset = Vector2(0, 2)
 
 [node name="DevCard" type="Button" groups=["ui_click"]]
-custom_minimum_size = Vector2(64, 90)
-offset_right = 64.0
-offset_bottom = 90.0
+custom_minimum_size = Vector2(72, 100)
+offset_right = 72.0
+offset_bottom = 100.0
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("Paper")
 theme_override_styles/hover = SubResource("PaperHover")
@@ -90,10 +90,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -17.0
+offset_left = -19.0
 offset_top = -11.0
-offset_right = 17.0
-offset_bottom = 23.0
+offset_right = 19.0
+offset_bottom = 27.0
 mouse_filter = 2
 texture = ExtResource("icon_knight")
 expand_mode = 1

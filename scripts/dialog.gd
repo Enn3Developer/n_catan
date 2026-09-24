@@ -1,14 +1,17 @@
 class_name CatanDialog
 extends Control
 ## A modal parchment card over a dimmed screen. Dialog scenes inherit
-## dialog.tscn and add their content below the title.
+## dialog.tscn, add their content below the title and put their buttons in the
+## footer, which stays in view below content that scrolls.
 
 signal close_requested
 
 ## Keeps the card near 580 px wide and scrolls content taller than the window.
 func fit():
 	for edge in ["left","right"]:%DialogMargin.add_theme_constant_override("margin_"+edge,maxi(20,int((size.x-580)/2)))
-	%DialogScroll.custom_minimum_size.y=minf(%Body.get_combined_minimum_size().y,size.y-96)
+	%Footer.visible=%Footer.get_child_count()>0
+	var footer=%Footer.get_combined_minimum_size().y+16 if %Footer.visible else 0.0
+	%DialogScroll.custom_minimum_size.y=minf(%Body.get_combined_minimum_size().y,size.y-96-footer)
 
 func close():
 	close_requested.emit()

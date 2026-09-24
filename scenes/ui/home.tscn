@@ -52,12 +52,39 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
+[node name="NameLabel" type="Label" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "Your name"
+uppercase = true
+
 [node name="PlayerName" type="LineEdit" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 placeholder_text = "Your name"
 max_length = 20
+
+[node name="Singleplayer" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_type_variation = &"PrimaryButton"
+text = "Play solo"
+
+[node name="Learn" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "Learn to play"
+
+[node name="OnlineLabel" type="Label" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "Play online"
+uppercase = true
 
 [node name="JoinForm" type="VBoxContainer" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
 unique_name_in_owner = true
@@ -82,7 +109,6 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(96, 48)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_type_variation = &"PrimaryButton"
 disabled = true
 text = "Join"
 
@@ -146,19 +172,10 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 text = "Reconnect"
 
-[node name="Singleplayer" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems" groups=["ui_click"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
+[node name="UtilitiesGap" type="Control" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
+custom_minimum_size = Vector2(0, 6)
 layout_mode = 2
-mouse_default_cursor_shape = 2
-text = "Play solo"
-
-[node name="Learn" type="Button" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems" groups=["ui_click"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-mouse_default_cursor_shape = 2
-text = "Learn to play"
+mouse_filter = 2
 
 [node name="MenuUtilities" type="GridContainer" parent="Expedition/ExpeditionBody/MenuScroll/MenuItems"]
 unique_name_in_owner = true

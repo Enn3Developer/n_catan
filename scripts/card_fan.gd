@@ -3,8 +3,8 @@ extends Control
 ## tilt outwards from the middle; the outer ones sit a little lower. A compact
 ## fan holds smaller cards and fits inside the bottom bar on small windows.
 
-const CARD_SIZE=Vector2(64,90)
-const STEP=56.0
+const CARD_SIZE=Vector2(72,100)
+const STEP=60.0
 const TILT=5.0
 const MOST_CARDS=5
 ## Room kept around the cards for their tilt, shadow and lift.

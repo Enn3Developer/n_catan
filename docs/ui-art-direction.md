@@ -22,6 +22,8 @@ Every control takes its look from the theme. Choose a variation rather than over
 
 Toggle buttons, tabs and pressed buttons sink into honey wood. Switches (`CheckButton`) and checkboxes draw only their glyph and label, never a button frame.
 
+Dialogs inherit `scenes/ui/dialog.tscn` and put their buttons in its footer: one row, right-aligned, pinned below the content when the content scrolls. Secondary buttons such as Close or Back come first and the main action comes last. Resources are picked with tiles showing their illustration (`resource_choice.tscn`), and amounts are set with − / + tiles (`resource_steppers.gd`), not dropdowns or spin boxes.
+
 ## In-game screen
 
 The island needs width more than height, so the HUD keeps the sides of the window clear. The scoreboard sits in the top left corner and the tools in the top right. Both corners are open sea, since the camera frames the island across the full width and the island fills at most the middle half of it. On small windows the scoreboard reaches into that half, so the camera frames the island to the right of it. The resources and actions are in one bar along the bottom. Every action stays in its place all game and greys out when it doesn't apply, so the bar never changes size. Its first line says what the game is waiting for, and the buttons for a single step, such as stealing or finishing free roads, sit on that line. Development cards are small portrait cards fanned out beside the bar, one per type with a count; pointing at a card lifts it upright. On windows too narrow for the fan beside the bar, a smaller fan sits in the bar next to the resources.

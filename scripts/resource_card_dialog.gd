@@ -8,6 +8,9 @@ var card=2
 func show_card(id: int):
 	card=id
 	%Title.text=tr("Year of plenty") if id==2 else tr("Monopoly")
+	%Effect.text=tr("Take two resources from the bank.") if id==2 else tr("Take one resource type from every player.")
+	%FirstLabel.text=tr("First resource") if id==2 else tr("Resource to claim")
+	%SecondLabel.visible=id==2
 	%Second.visible=id==2
 
 func _on_play_pressed():

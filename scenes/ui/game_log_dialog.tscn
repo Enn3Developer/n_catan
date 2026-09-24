@@ -6,20 +6,20 @@
 [node name="GameLog" instance=ExtResource("base")]
 script = ExtResource("script")
 
-[node name="Title" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="Title" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 text = "Game log"
 
-[node name="Filters" type="HBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="Filters" type="HBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 layout_mode = 2
 
-[node name="PlayerFilter" type="OptionButton" parent="DialogMargin/Panel/DialogScroll/Body/Filters"]
+[node name="PlayerFilter" type="OptionButton" parent="DialogMargin/Panel/Frame/DialogScroll/Body/Filters"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 40)
 layout_mode = 2
 tooltip_text = "Show lines that mention one player"
 mouse_default_cursor_shape = 2
 
-[node name="Search" type="LineEdit" parent="DialogMargin/Panel/DialogScroll/Body/Filters"]
+[node name="Search" type="LineEdit" parent="DialogMargin/Panel/Frame/DialogScroll/Body/Filters"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
@@ -27,26 +27,26 @@ size_flags_horizontal = 3
 placeholder_text = "Search the log"
 clear_button_enabled = true
 
-[node name="Count" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="Count" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"MutedLabel"
 
-[node name="Lines" type="VBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="Lines" type="VBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="LineTemplate" type="PanelContainer" parent="DialogMargin/Panel/DialogScroll/Body/Lines"]
+[node name="LineTemplate" type="PanelContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body/Lines"]
 visible = false
 layout_mode = 2
 theme_type_variation = &"Row"
 
-[node name="Row" type="HBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body/Lines/LineTemplate"]
+[node name="Row" type="HBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body/Lines/LineTemplate"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Number" type="Label" parent="DialogMargin/Panel/DialogScroll/Body/Lines/LineTemplate/Row"]
+[node name="Number" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/Lines/LineTemplate/Row"]
 custom_minimum_size = Vector2(34, 0)
 layout_mode = 2
 size_flags_vertical = 0
@@ -54,14 +54,14 @@ theme_override_colors/font_color = Color(0.67451, 0.52549, 0.329412, 1)
 theme_override_font_sizes/font_size = 13
 horizontal_alignment = 2
 
-[node name="Text" type="Label" parent="DialogMargin/Panel/DialogScroll/Body/Lines/LineTemplate/Row"]
+[node name="Text" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/Lines/LineTemplate/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.286275, 0.207843, 0.129412, 1)
 theme_override_font_sizes/font_size = 15
 autowrap_mode = 3
 
-[node name="Empty" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="Empty" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -69,13 +69,13 @@ theme_type_variation = &"MutedLabel"
 theme_override_font_sizes/font_size = 15
 text = "No lines match."
 
-[node name="Close" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 40)
+[node name="Close" type="Button" parent="DialogMargin/Panel/Frame/Footer" groups=["ui_click"]]
+custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
 text = "Close"
 
-[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/Close" to="." method="close"]
-[connection signal="item_selected" from="DialogMargin/Panel/DialogScroll/Body/Filters/PlayerFilter" to="." method="_on_filter_changed"]
-[connection signal="text_changed" from="DialogMargin/Panel/DialogScroll/Body/Filters/Search" to="." method="_on_filter_changed"]
+[connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/Close" to="." method="close"]
+[connection signal="item_selected" from="DialogMargin/Panel/Frame/DialogScroll/Body/Filters/PlayerFilter" to="." method="_on_filter_changed"]
+[connection signal="text_changed" from="DialogMargin/Panel/Frame/DialogScroll/Body/Filters/Search" to="." method="_on_filter_changed"]

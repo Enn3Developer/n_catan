@@ -75,6 +75,16 @@ func _show_rules(settings: Dictionary,controller: bool,solo: bool):
 
 func arrange(viewport: Vector2,_overlay_bottom: float) -> Rect2:
 	%Voyage.custom_minimum_size.x=320 if viewport.x<1100 else 380
+	# The room is a centred block no wider than it needs, and each list is as
+	# tall as its content until the window runs out of room; then it scrolls.
+	var side=maxf(24,(viewport.x-1080)/2)
+	%Frame.offset_left=side
+	%Frame.offset_right=-side
+	var room=viewport.y-48-%Header.get_combined_minimum_size().y-16
+	var crew_chrome=%Crew.get_combined_minimum_size().y-%CrewScroll.get_combined_minimum_size().y
+	%CrewScroll.custom_minimum_size.y=minf(%PlayerSlots.get_combined_minimum_size().y,room-crew_chrome)
+	var voyage_chrome=%Voyage.get_combined_minimum_size().y-%VoyageScroll.get_combined_minimum_size().y
+	%VoyageScroll.custom_minimum_size.y=minf(%VoyageContent.get_combined_minimum_size().y,room-voyage_chrome)
 	# The panels cover the board, so frame the island off screen; otherwise a
 	# sliver of it shows through the gap between the columns.
 	return Rect2(Vector2(-2*viewport.x,0),viewport)
