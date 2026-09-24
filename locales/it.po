@@ -826,8 +826,8 @@ msgstr "Minerale"
 msgid "Other players can accept your offer. You can withdraw it to make a new one."
 msgstr "Gli altri giocatori possono accettare la tua offerta. Puoi ritirarla per proporne una nuova."
 
-msgid "Overall volume, including music, effects and ocean ambience."
-msgstr "Volume generale, inclusi musica, effetti e suoni dell’oceano."
+msgid "Overall volume, including music, effects, ocean ambience and weather."
+msgstr "Volume generale, inclusi musica, effetti, suoni dell’oceano e meteo."
 
 msgid "Paired turn"
 msgstr "Turno abbinato"
@@ -1728,8 +1728,8 @@ msgstr "Temporale"
 msgid "Clouds and rain"
 msgstr "Nuvole e pioggia"
 
-msgid "Choose changing weather or keep one condition. Rain and thunder use the ambience volume. Reduced motion disables rain and lightning flashes."
-msgstr "Scegli un meteo variabile o una condizione fissa. Pioggia e tuoni usano il volume ambiente. Il movimento ridotto disattiva pioggia e lampi."
+msgid "Choose changing weather or keep one condition. Rain and thunder have their own volume under Audio. Reduced motion disables rain and lightning flashes."
+msgstr "Scegli un meteo variabile o una condizione fissa. Pioggia e tuoni hanno un volume a parte nella sezione Audio. Il movimento ridotto disattiva pioggia e lampi."
 
 msgid "Enter a valid public address and optional UDP port."
 msgstr "Inserisci un indirizzo pubblico valido e, se serve, la porta UDP."
@@ -2629,3 +2629,9 @@ msgstr "Tessera del tesoro"
 
 msgid "When its number is rolled, the treasure gives each settlement on it 2 random resources (a city 4), then draws a new number. No one can start within 3 roads of it."
 msgstr "Quando esce il suo numero, il tesoro dà 2 risorse a caso a ogni colonia che lo tocca (4 a una città), poi pesca un nuovo numero. Nessuno può partire a meno di 3 strade da lui."
+
+msgid "Rain and thunder"
+msgstr "Pioggia e tuoni"
+
+msgid "Volume of rain and thunder. Drizzle stays soft and muffled; only a downpour plays at full level."
+msgstr "Volume di pioggia e tuoni. La pioggerella resta leggera e ovattata; solo un acquazzone suona a pieno volume."

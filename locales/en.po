@@ -826,8 +826,8 @@ msgstr "Ore"
 msgid "Other players can accept your offer. You can withdraw it to make a new one."
 msgstr "Other players can accept your offer. You can withdraw it to make a new one."
 
-msgid "Overall volume, including music, effects and ocean ambience."
-msgstr "Overall volume, including music, effects and ocean ambience."
+msgid "Overall volume, including music, effects, ocean ambience and weather."
+msgstr "Overall volume, including music, effects, ocean ambience and weather."
 
 msgid "Paired turn"
 msgstr "Paired turn"
@@ -1728,8 +1728,8 @@ msgstr "Thunderstorm"
 msgid "Clouds and rain"
 msgstr "Clouds and rain"
 
-msgid "Choose changing weather or keep one condition. Rain and thunder use the ambience volume. Reduced motion disables rain and lightning flashes."
-msgstr "Choose changing weather or keep one condition. Rain and thunder use the ambience volume. Reduced motion disables rain and lightning flashes."
+msgid "Choose changing weather or keep one condition. Rain and thunder have their own volume under Audio. Reduced motion disables rain and lightning flashes."
+msgstr "Choose changing weather or keep one condition. Rain and thunder have their own volume under Audio. Reduced motion disables rain and lightning flashes."
 
 msgid "Enter a valid public address and optional UDP port."
 msgstr "Enter a valid public address and optional UDP port."
@@ -2629,3 +2629,9 @@ msgstr "Treasure tile"
 
 msgid "When its number is rolled, the treasure gives each settlement on it 2 random resources (a city 4), then draws a new number. No one can start within 3 roads of it."
 msgstr "When its number is rolled, the treasure gives each settlement on it 2 random resources (a city 4), then draws a new number. No one can start within 3 roads of it."
+
+msgid "Rain and thunder"
+msgstr "Rain and thunder"
+
+msgid "Volume of rain and thunder. Drizzle stays soft and muffled; only a downpour plays at full level."
+msgstr "Volume of rain and thunder. Drizzle stays soft and muffled; only a downpour plays at full level."

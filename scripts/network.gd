@@ -56,6 +56,7 @@ var turn_clock=TURN_SECONDS
 var turn_mark=[]
 var turn_expired=false
 var world_seconds=150.0
+var world_days=0
 var music_track=0
 var music_paused=false
 var music_position=0.0
@@ -280,6 +281,7 @@ func _start(id: int):
 	for row in roster:
 		if not row.ready: return
 	world_seconds=150.0
+	world_days=0
 	_new_game()
 
 func _new_game():
@@ -391,6 +393,7 @@ func _sync():
 		if not roster[p].connected or roster[p].get("bot",false): continue
 		var state=rules.snapshot(p)
 		state["world_seconds"]=world_seconds
+		state["world_days"]=world_days
 		state["turn_limit"]=turn_limit()
 		state["turn_seconds"]=turn_clock
 		state["player_colors"]=[]
@@ -538,6 +541,7 @@ func _process(delta: float):
 	secure_transport.poll()
 	_process_music(delta)
 	if online and started and multiplayer.is_server() and not paused and roster.all(func(row):return row.connected):
+		if world_seconds+delta>=600.0:world_days+=1
 		world_seconds=fposmod(world_seconds+delta,600.0)
 	if not online or not started or not multiplayer.is_server() or tutorial or paused or rules.s.is_empty() or rules.s.winner!=-1: return
 	for row in roster:

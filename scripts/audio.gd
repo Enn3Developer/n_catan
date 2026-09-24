@@ -7,6 +7,9 @@ var music: AudioStreamPlayer
 @onready var rain_ambience: AudioStreamPlayer=$RainAmbience
 @onready var thunder_ambience: AudioStreamPlayer=$ThunderAmbience
 var weather_last_thunder=-1
+## Thunder claps, near to far; a strike picks one by its distance.
+const THUNDER=[preload("res://assets/audio/thunder_0.wav"),preload("res://assets/audio/thunder_1.wav"),preload("res://assets/audio/thunder_2.wav")]
+var weather_filter: AudioEffectLowPassFilter
 @onready var voices: Array[Node]=$Voices.get_children()
 var voice_index=0
 var music_spare: AudioStreamPlayer
@@ -24,6 +27,7 @@ func _ready():
 	for index in CatanSoundtrack.TRACKS.size():track_stream(index)
 	ambience.stream=_loop(ambience.stream)
 	rain_ambience.stream=_loop(rain_ambience.stream)
+	_weather_bus()
 	apply(CatanSettings.new().values)
 	follow_soundtrack({"track":0,"position":0.0,"paused":false,"generation":0},.016)
 	ambience.play()
@@ -35,11 +39,28 @@ func _loop(source: AudioStreamWAV) -> AudioStreamWAV:
 	stream.loop_end=roundi(stream.get_length()*stream.mix_rate)
 	return stream
 func apply(values: Dictionary):
-	for pair in [["Master","master"],["Music","music"],["Effects","effects"],["Ambience","ambience"]]:
+	for pair in [["Master","master"],["Music","music"],["Effects","effects"],["Ambience","ambience"],["Weather","weather_volume"]]:
 		var index=AudioServer.get_bus_index(pair[0])
 		if index<0: continue
-		AudioServer.set_bus_mute(index,float(values[pair[1]])<=0.001)
-		AudioServer.set_bus_volume_db(index,linear_to_db(maxf(0.001,float(values[pair[1]]))))
+		var level=float(values.get(pair[1],CatanSettings.DEFAULTS[pair[1]]))
+		AudioServer.set_bus_mute(index,level<=0.001)
+		AudioServer.set_bus_volume_db(index,linear_to_db(maxf(0.001,level)))
+
+## Rain and thunder get their own bus, so the Rain and thunder slider sets
+## them apart from the ocean. A low-pass filter muffles light rain.
+func _weather_bus():
+	if AudioServer.get_bus_index("Weather")<0:
+		AudioServer.add_bus()
+		var index=AudioServer.bus_count-1
+		AudioServer.set_bus_name(index,"Weather")
+		AudioServer.set_bus_send(index,"Master")
+		weather_filter=AudioEffectLowPassFilter.new()
+		weather_filter.cutoff_hz=2000
+		AudioServer.add_bus_effect(index,weather_filter)
+	else:
+		weather_filter=AudioServer.get_bus_effect(AudioServer.get_bus_index("Weather"),0)
+	rain_ambience.bus=&"Weather"
+	thunder_ambience.bus=&"Weather"
 # Buttons opt into the interface click by joining the ui_click group in their scene.
 func _on_node_added(node: Node):
 	if node is BaseButton and node.is_in_group(&"ui_click") and not node.pressed.is_connected(_click):
@@ -167,13 +188,19 @@ func follow_soundtrack(sample: Dictionary,delta: float):
 func follow_weather(conditions: Dictionary,delta: float):
 	if shutting_down or not is_instance_valid(rain_ambience):return
 	var intensity=float(conditions.get("rain",0.0))
-	var volume=lerpf(rain_ambience.volume_linear,intensity*.65,1.0-exp(-delta*2.0))
+	# Level rises slower than intensity, so drizzle is a soft patter.
+	var volume=lerpf(rain_ambience.volume_linear,pow(intensity,1.6)*.5,1.0-exp(-delta*.8))
 	rain_ambience.volume_linear=volume
+	if weather_filter:weather_filter.cutoff_hz=lerpf(1400.0,7000.0,clampf(volume/.5,0.0,1.0))
 	if volume>.001 and not rain_ambience.playing:rain_ambience.play()
 	elif volume<=.001 and rain_ambience.playing:rain_ambience.stop()
 	var thunder=bool(conditions.get("thunder",false))
 	if thunder and int(conditions.get("strike",-1))!=weather_last_thunder:
-		thunder_ambience.volume_db=-5;thunder_ambience.play()
+		var distance=float(conditions.get("strike_distance",.5))
+		thunder_ambience.stream=THUNDER[clampi(int(distance*3.0),0,2)]
+		thunder_ambience.volume_db=lerpf(-16.0,-24.0,distance)
+		thunder_ambience.pitch_scale=lerpf(1.05,.85,distance)
+		thunder_ambience.play()
 		weather_last_thunder=int(conditions.strike)
 
 func shutdown():

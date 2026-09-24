@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://ct80ifil1wfv2" path="res://scripts/audio.gd" id="1"]
 [ext_resource type="AudioStream" path="res://assets/audio/sea.wav" id="sea"]
 [ext_resource type="AudioStream" path="res://assets/audio/rain.wav" id="rain"]
-[ext_resource type="AudioStream" path="res://assets/audio/thunder.wav" id="thunder"]
+[ext_resource type="AudioStream" path="res://assets/audio/thunder_0.wav" id="thunder"]
 [ext_resource type="AudioStream" path="res://assets/audio/click.wav" id="fx_click"]
 [ext_resource type="AudioStream" path="res://assets/audio/build.wav" id="fx_build"]
 [ext_resource type="AudioStream" path="res://assets/audio/trade.wav" id="fx_trade"]

@@ -11,7 +11,7 @@ const OPTIONS=[
 	["Game","BotSpeed","bot_speed","Bot turn speed","option",["Relaxed","Normal","Fast"],"Adjust the pause between bot actions without changing their difficulty or decisions.","Gameplay"],
 	["Game","Sensitivity","camera_speed","Camera sensitivity","slider",[0.4,2.0,0.1,1],"Adjust orbit and pan speed. Drag the board or hold WASD to pan; right-drag or Q/E orbits; the wheel or +/- zooms; Home fits the board.","Controls"],
 	["World","DayNightCycle","day_night_cycle","Day/night cycle","toggle",[],"Turn off to keep the island in daylight. This setting is personal.","Negligible"],
-	["World","Weather","weather","Weather","option",["Automatic","Clear skies","Cloudy","Rain","Thunderstorm"],"Choose changing weather or keep one condition. Rain and thunder use the ambience volume. Reduced motion disables rain and lightning flashes.","Clouds and rain"],
+	["World","Weather","weather","Weather","option",["Automatic","Clear skies","Cloudy","Rain","Thunderstorm"],"Choose changing weather or keep one condition. Rain and thunder have their own volume under Audio. Reduced motion disables rain and lightning flashes.","Clouds and rain"],
 	["World","Wind","wind","Wind strength","slider",[0,100,5,100],"Control foliage sway and wind-driven wave motion. Reduced motion overrides animated movement.","Negligible"],
 	["Accessibility","ReducedMotion","reduce_motion","Reduced motion","toggle",[],"Stop wind, waves, scenery movement, particles and construction animations while retaining all gameplay actions.","Accessibility"],
 	["Accessibility","LargeText","large_text","Larger small text","toggle",[],"Increase smaller interface labels for readability. Menus scroll when necessary.","Accessibility"],
@@ -38,10 +38,11 @@ const OPTIONS=[
 	["Lighting","Atmosphere","atmosphere","Atmospheric haze","toggle",[],"Use distance haze to soften distant water and scenery while keeping the board clear.","Low GPU impact"],
 	["Lighting","DepthOfField","depth_of_field","Cinematic depth of field","toggle",[],"Gently soften scenery beyond the camera focus distance. Off keeps the whole board sharp for play. Focus a tile with F for close inspection.","Moderate GPU impact"],
 	["Lighting","Exposure","exposure","Exposure","slider",[60,150,5,100],"Adjust scene brightness before cinematic tone mapping. Does not change the interface.","Negligible"],
-	["Audio","Master","master","Master volume","slider",[0,100,1,100],"Overall volume, including music, effects and ocean ambience.","Audio"],
+	["Audio","Master","master","Master volume","slider",[0,100,1,100],"Overall volume, including music, effects, ocean ambience and weather.","Audio"],
 	["Audio","Music","music","Music","slider",[0,100,1,100],"Volume of the original instrumental soundtrack.","Audio"],
 	["Audio","Effects","effects","Sound effects","slider",[0,100,1,100],"Volume of interface and gameplay cues.","Audio"],
-	["Audio","Ambience","ambience","Ocean ambience","slider",[0,100,1,100],"Volume of the ocean soundscape.","Audio"]]
+	["Audio","Ambience","ambience","Ocean ambience","slider",[0,100,1,100],"Volume of the ocean soundscape.","Audio"],
+	["Audio","WeatherVolume","weather_volume","Rain and thunder","slider",[0,100,1,100],"Volume of rain and thunder. Drizzle stays soft and muffled; only a downpour plays at full level.","Audio"]]
 var preferences: CatanSettings
 const ROWS={"option":preload("res://scenes/ui/option_setting.tscn"),"toggle":preload("res://scenes/ui/toggle_setting.tscn"),"slider":preload("res://scenes/ui/slider_setting.tscn")}
 ## Tabs whose settings need the Forward+ renderer to work fully.

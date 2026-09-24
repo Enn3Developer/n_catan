@@ -246,6 +246,7 @@ func _received(data: Dictionary):
 	turn_clock_limit=float(state.get("turn_limit",0.0))
 	turn_clock_left=float(state.get("turn_seconds",0.0))
 	board.day_seconds=state.get("world_seconds",board.day_seconds)
+	board.day_count=int(state.get("world_days",board.day_count))
 	board.advance_day(0)
 	if produced: board.throw_dice(state.dice)
 	mode=""

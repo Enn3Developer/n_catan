@@ -79,6 +79,8 @@ var show_labels=true
 var accepts_input=false
 var view_region=Rect2()
 var day_seconds=150.0
+## Whole days since the game began; the weather outline changes with each one.
+var day_count=0
 var active_dice: CatanDiceThrow
 var living_world=preload("res://scripts/living_world.gd").new()
 ## Paints the "Owner" surfaces of authored pieces in the player's color.
@@ -161,6 +163,7 @@ func build(data: Dictionary):
 	CatanDiagnostics.event("board.build.begin","tiles=%d"%data.get("tiles",[]).size())
 	if is_instance_valid(active_dice):active_dice.queue_free()
 	day_seconds=data.get("world_seconds",150.0)
+	day_count=int(data.get("world_days",0))
 	state=data
 	board_scale=CatanRules.island_scale(data)
 	scenery.scale=Vector3.ONE*board_scale*TILE_SIZE
@@ -651,6 +654,7 @@ func _float_boat(boat: Node3D):
 
 # A complete day lasts ten minutes of active play. Solo pause freezes the clock.
 func advance_day(delta: float):
+	if day_seconds+delta>=600.0:day_count+=1
 	day_seconds=fposmod(day_seconds+delta,600.0)
 	var lighting_seconds=day_seconds if render_values.get("day_night_cycle",true) else 150.0
 	daylight=smoothstep(-.15,.35,sin(lighting_seconds/600.0*TAU))
@@ -667,16 +671,18 @@ func advance_day(delta: float):
 	var sky_top=Color("091329").lerp(Color("2780cf"),daylight)
 	var sky_horizon=Color("33445d").lerp(Color("a4d5f4"),daylight)
 	if is_instance_valid(weather):
-		weather.update_weather(day_seconds,daylight,render_values,board_scale)
+		weather.update_weather(day_seconds,daylight,render_values,board_scale,day_count,int(state.get("seed",0)))
 		var conditions=weather.current
 		var overcast=float(conditions.clouds)
 		var storm=float(conditions.storm)
 		var direct_sun=float(conditions.sun_visibility)
 		var sky_overcast=smoothstep(.28,.72,overcast)
 		# Cloudy, rainy and stormy skies light the board diffusely, without sun shadows.
-		sun.light_energy*=direct_sun
-		sun.shadow_enabled=render_values.get("shadow_quality",3)>0 and direct_sun>.01
-		env.ambient_light_energy=lerpf(.65,.50,storm)
+		# Clouds scatter the sun instead of blocking it: a third of it stays as
+		# soft, shadowless light, and the sky fill rises to match.
+		sun.light_energy*=lerpf(.34,1.0,direct_sun)
+		sun.shadow_enabled=render_values.get("shadow_quality",3)>0 and direct_sun>.3
+		env.ambient_light_energy=lerpf(lerpf(.65,.95,overcast*daylight),.6,storm)
 		env.ambient_light_sky_contribution=lerpf(1.0,.35,overcast)
 		env.ambient_light_color=Color("7893bf").lerp(Color("c4d1db"),daylight)
 		env.fog_density=lerpf(.0018*2.2/TILE_SIZE,.0007,float(conditions.rain))
@@ -687,6 +693,8 @@ func advance_day(delta: float):
 		sky.set_shader_parameter("sun_visibility",direct_sun)
 		sky.set_shader_parameter("storm_strength",storm)
 		sky.set_shader_parameter("flash",0.0 if reduce_motion else conditions.flash)
+		sky.set_shader_parameter("flash_direction",Vector3(-sin(conditions.strike_angle+.85),.35,-cos(conditions.strike_angle+.85)).normalized())
+		sky.set_shader_parameter("rain_haze",float(conditions.rain))
 		sea_material.set_shader_parameter("sun_strength",daylight*direct_sun)
 		sea_material.set_shader_parameter("storm_strength",storm)
 		sea_material.set_shader_parameter("rain_strength",0.0 if reduce_motion or render_values.particles==0 else conditions.rain)
