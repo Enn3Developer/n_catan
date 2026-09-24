@@ -93,11 +93,25 @@ var road_travel=preload("res://scripts/road_travel.gd").new()
 var night_lights=[]
 var daylight=1.0
 @onready var weather=$Weather
+## The sea floor under the see-through water, sized to each board.
+var seabed: MeshInstance3D
+var seabed_material: ShaderMaterial
 
 func _ready():
 	if "--server" in OS.get_cmdline_user_args():
 		set_process(false)
 		return
+	seabed_material=ShaderMaterial.new()
+	seabed_material.shader=preload("res://shaders/seabed.gdshader")
+	seabed=MeshInstance3D.new()
+	seabed.name="Seabed"
+	seabed.mesh=PlaneMesh.new()
+	seabed.material_override=seabed_material
+	seabed.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	seabed.position.y=ocean.position.y
+	# The shader moves every vertex down; keep culling from trusting the flat plane.
+	seabed.extra_cull_margin=60.0
+	add_child(seabed)
 	# The wave table is shared with boat bobbing on the CPU.
 	sea_material.set_shader_parameter("waves",preload("res://scripts/ocean_waves.gd").WAVES)
 	_update_camera()
@@ -226,6 +240,7 @@ func build(data: Dictionary):
 	sea_material.set_shader_parameter("tile_centers",centers)
 	sea_material.set_shader_parameter("tile_count",state.tiles.size())
 	sea_material.set_shader_parameter("tile_radius",TILE_SIZE*.993)
+	_fit_seabed(centers)
 	# Face away from the owning tile; random coasts are not convex.
 	for e in state.edges:
 		var a=state.vertices[e.a]
@@ -404,6 +419,7 @@ func _process(delta):
 	if reduce_motion: delta=0.0
 	elapsed+=delta
 	sea_material.set_shader_parameter("animation_time",elapsed)
+	if seabed_material:seabed_material.set_shader_parameter("animation_time",elapsed)
 	environment.sky.sky_material.set_shader_parameter("animation_time",elapsed)
 	living_world.animate(actors,elapsed,art,daylight)
 	living_world.animate(band_actors,elapsed,art,daylight)
@@ -563,6 +579,20 @@ func reset_camera(snap: bool=false):
 		yaw=0.0;pitch=goal_pitch;camera_focus=goal_focus;camera_zoom=goal_zoom
 	_update_camera()
 
+## Spreads the bed well past the outermost tiles; by its edge the water is too
+## deep to see through, so the border never shows.
+func _fit_seabed(centers: PackedVector2Array):
+	if not seabed:return
+	var reach=0.0
+	for i in state.tiles.size():reach=maxf(reach,maxf(absf(centers[i].x),absf(centers[i].y)))
+	var size=2.0*(reach+170.0)
+	seabed.mesh.size=Vector2(size,size)
+	seabed.mesh.subdivide_width=clampi(int(size/5.0),80,220)
+	seabed.mesh.subdivide_depth=seabed.mesh.subdivide_width
+	seabed_material.set_shader_parameter("tile_centers",centers)
+	seabed_material.set_shader_parameter("tile_count",state.tiles.size())
+	seabed_material.set_shader_parameter("tile_radius",TILE_SIZE*.993)
+
 ## Frames the tiles' bounding box instead of the world origin, so spread-out
 ## boards like the archipelago fill the view. Classic boards keep zoom 1.
 func _fit_home():
@@ -696,6 +726,7 @@ func advance_day(delta: float):
 		sky.set_shader_parameter("flash_direction",Vector3(-sin(conditions.strike_angle+.85),.35,-cos(conditions.strike_angle+.85)).normalized())
 		sky.set_shader_parameter("rain_haze",float(conditions.rain))
 		sea_material.set_shader_parameter("sun_strength",daylight*direct_sun)
+		if seabed_material:seabed_material.set_shader_parameter("sun_strength",daylight*lerpf(.25,1.0,direct_sun))
 		sea_material.set_shader_parameter("storm_strength",storm)
 		sea_material.set_shader_parameter("rain_strength",0.0 if reduce_motion or render_values.particles==0 else conditions.rain)
 	sky.set_shader_parameter("sky_top_color",sky_top)
