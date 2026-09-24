@@ -2,7 +2,8 @@ class_name CatanDialog
 extends Control
 ## A modal parchment card over a dimmed screen. Dialog scenes inherit
 ## dialog.tscn, add their content below the title and put their buttons in the
-## footer, which stays in view below content that scrolls.
+## footer, which stays in view below content that scrolls. Controls moved into
+## the header with pin() stay in view above it.
 
 signal close_requested
 
@@ -10,8 +11,15 @@ signal close_requested
 func fit():
 	for edge in ["left","right"]:%DialogMargin.add_theme_constant_override("margin_"+edge,maxi(20,int((size.x-580)/2)))
 	%Footer.visible=%Footer.get_child_count()>0
+	%Header.visible=%Header.get_child_count()>0
 	var footer=%Footer.get_combined_minimum_size().y+16 if %Footer.visible else 0.0
-	%DialogScroll.custom_minimum_size.y=minf(%Body.get_combined_minimum_size().y,size.y-96-footer)
+	var header=%Header.get_combined_minimum_size().y+16 if %Header.visible else 0.0
+	%DialogScroll.custom_minimum_size.y=minf(%Body.get_combined_minimum_size().y,size.y-96-footer-header)
+
+## Moves controls out of the scrolling body into the fixed header, in order.
+func pin(nodes: Array):
+	for node in nodes:node.reparent(%Header,false)
+	fit()
 
 func close():
 	close_requested.emit()
