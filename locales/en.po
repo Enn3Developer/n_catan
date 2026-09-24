@@ -136,8 +136,8 @@ msgstr "Add contact shading under grass, in rock cracks and around buildings usi
 msgid "Adjust directional shadow-map resolution and soft-shadow filtering. Higher levels preserve fine branches and architecture in shadows."
 msgstr "Adjust directional shadow-map resolution and soft-shadow filtering. Higher levels preserve fine branches and architecture in shadows."
 
-msgid "Adjust ocean mesh resolution, wave layers, fine ripples and shoreline foam. Reflections are controlled in this Graphics tab."
-msgstr "Adjust ocean mesh resolution, wave layers, fine ripples and shoreline foam. Reflections are controlled in this Graphics tab."
+msgid "Adjust ocean mesh resolution, wave layers, fine ripples and shoreline foam. Reflections are set in the Lighting tab."
+msgstr "Adjust ocean mesh resolution, wave layers, fine ripples and shoreline foam. Reflections are set in the Lighting tab."
 
 msgid "Adjust orbit and pan speed. Right-drag orbits; middle-drag pans; the wheel zooms; Home fits the board."
 msgstr "Adjust orbit and pan speed. Right-drag orbits; middle-drag pans; the wheel zooms; Home fits the board."
@@ -2452,3 +2452,6 @@ msgstr "Development card"
 
 msgid "Play online"
 msgstr "Play online"
+
+msgid "Game"
+msgstr "Game"

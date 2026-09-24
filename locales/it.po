@@ -136,8 +136,8 @@ msgstr "Aggiunge ombre sotto l’erba, nelle fessure delle rocce e intorno agli 
 msgid "Adjust directional shadow-map resolution and soft-shadow filtering. Higher levels preserve fine branches and architecture in shadows."
 msgstr "Regola risoluzione e morbidezza delle ombre. I livelli alti conservano rami sottili e dettagli degli edifici nelle ombre."
 
-msgid "Adjust ocean mesh resolution, wave layers, fine ripples and shoreline foam. Reflections are controlled in this Graphics tab."
-msgstr "Regola il dettaglio dell’oceano, le onde, le increspature e la schiuma sulla costa. I riflessi si regolano in questa scheda Grafica."
+msgid "Adjust ocean mesh resolution, wave layers, fine ripples and shoreline foam. Reflections are set in the Lighting tab."
+msgstr "Regola il dettaglio dell’oceano, le onde, le increspature e la schiuma sulla costa. I riflessi si regolano nella scheda Illuminazione."
 
 msgid "Adjust orbit and pan speed. Right-drag orbits; middle-drag pans; the wheel zooms; Home fits the board."
 msgstr "Regola la velocità della telecamera. Trascina con il destro per ruotare e con il centrale per spostarti. La rotella regola lo zoom; Home inquadra il tabellone."
@@ -1326,7 +1326,7 @@ msgid "Wool"
 msgstr "Lana"
 
 msgid "World"
-msgstr "Comandi"
+msgstr "Mondo"
 
 msgid "Year of plenty"
 msgstr "Anno dell’abbondanza"
@@ -2452,3 +2452,6 @@ msgstr "Carta sviluppo"
 
 msgid "Play online"
 msgstr "Gioca online"
+
+msgid "Game"
+msgstr "Gioco"

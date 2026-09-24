@@ -501,7 +501,7 @@ func _open_settings():
 	net.paused=net.solo
 	settings.setup(preferences)
 	settings.preferences_changed.connect(_apply_preferences)
-	_route(settings,{"updates_requested":_open_updates,"exit_requested":_exit_desktop})
+	_route(settings,{})
 
 func _open_cosmetics():
 	_present("res://scenes/ui/cosmetics.tscn").setup(preferences,net)

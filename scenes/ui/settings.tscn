@@ -8,9 +8,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 theme = ExtResource("1")
 script = ExtResource("2")
+
 [node name="Shade" type="ColorRect" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
@@ -19,12 +19,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-offset_left = 0.0
-offset_top = 0.0
-offset_right = -0.0
-offset_bottom = -0.0
 color = Color(0.12, 0.085, 0.05, 0.86)
-[node name="SettingsPanel" type="PanelContainer" parent="."]
+
+[node name="Margin" type="MarginContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -32,181 +29,134 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-offset_left = 20.0
-offset_top = 20.0
-offset_right = -20.0
-offset_bottom = -20.0
 
-[node name="Body" type="VBoxContainer" parent="SettingsPanel"]
+[node name="SettingsPanel" type="PanelContainer" parent="Margin"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 12
-[node name="Title" type="Label" parent="SettingsPanel/Body"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-text = "Settings"
-theme_override_font_sizes/font_size = 30
 
-[node name="Navigation" type="HFlowContainer" parent="SettingsPanel/Body"]
-unique_name_in_owner = true
+[node name="Frame" type="HBoxContainer" parent="Margin/SettingsPanel"]
 layout_mode = 2
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 6
-[node name="GraphicsTab" type="Button" parent="SettingsPanel/Body/Navigation"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-toggle_mode = true
-text = "Graphics"
-alignment = 0
+theme_override_constants/separation = 24
 
-[node name="WorldTab" type="Button" parent="SettingsPanel/Body/Navigation"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-toggle_mode = true
-text = "Controls"
-alignment = 0
-
-[node name="AudioTab" type="Button" parent="SettingsPanel/Body/Navigation"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-toggle_mode = true
-text = "Audio"
-alignment = 0
-
-[node name="Columns" type="HBoxContainer" parent="SettingsPanel/Body"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 20
-[node name="SettingsContent" type="VBoxContainer" parent="SettingsPanel/Body/Columns"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-[node name="GraphicsScroll" type="ScrollContainer" parent="SettingsPanel/Body/Columns/SettingsContent"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-
-[node name="GraphicsOptions" type="VBoxContainer" parent="SettingsPanel/Body/Columns/SettingsContent/GraphicsScroll"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 8
-
-[node name="WorldScroll" type="ScrollContainer" parent="SettingsPanel/Body/Columns/SettingsContent"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-
-[node name="WorldOptions" type="VBoxContainer" parent="SettingsPanel/Body/Columns/SettingsContent/WorldScroll"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 8
-
-[node name="AudioScroll" type="ScrollContainer" parent="SettingsPanel/Body/Columns/SettingsContent"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-
-[node name="AudioOptions" type="VBoxContainer" parent="SettingsPanel/Body/Columns/SettingsContent/AudioScroll"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 8
-
-[node name="Help" type="VBoxContainer" parent="SettingsPanel/Body/Columns"]
-unique_name_in_owner = true
-layout_mode = 2
-custom_minimum_size = Vector2(240, 0)
-theme_override_constants/separation = 14
-[node name="RendererInfo" type="Label" parent="SettingsPanel/Body/Columns/Help"]
-unique_name_in_owner = true
-layout_mode = 2
-text = ""
-theme_override_font_sizes/font_size = 13
-autowrap_mode = 3
-[node name="HelpTitle" type="Label" parent="SettingsPanel/Body/Columns/Help"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-text = ""
-theme_override_font_sizes/font_size = 23
-autowrap_mode = 3
-[node name="HelpBody" type="Label" parent="SettingsPanel/Body/Columns/Help"]
-unique_name_in_owner = true
-layout_mode = 2
-text = ""
-theme_override_font_sizes/font_size = 16
-autowrap_mode = 3
-[node name="HelpCost" type="Label" parent="SettingsPanel/Body/Columns/Help"]
-unique_name_in_owner = true
-layout_mode = 2
-text = ""
-theme_override_font_sizes/font_size = 14
-autowrap_mode = 3
-[node name="Spacer" type="Control" parent="SettingsPanel/Body/Columns/Help"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-[node name="Status" type="HBoxContainer" parent="SettingsPanel/Body"]
+[node name="Sidebar" type="VBoxContainer" parent="Margin/SettingsPanel/Frame"]
+custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 theme_override_constants/separation = 16
-[node name="Version" type="Label" parent="SettingsPanel/Body/Status"]
+
+[node name="Title" type="Label" parent="Margin/SettingsPanel/Frame/Sidebar"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 30
+text = "Settings"
+
+[node name="Navigation" type="VBoxContainer" parent="Margin/SettingsPanel/Frame/Sidebar"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Spacer" type="Control" parent="Margin/SettingsPanel/Frame/Sidebar"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Version" type="Label" parent="Margin/SettingsPanel/Frame/Sidebar"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"MutedLabel"
-
-[node name="Buttons" type="HBoxContainer" parent="SettingsPanel/Body"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="ResetSettings" type="Button" parent="SettingsPanel/Body/Buttons"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Restore defaults"
-custom_minimum_size = Vector2(0, 40)
-
-[node name="OpenUpdates" type="Button" parent="SettingsPanel/Body/Buttons" groups=["ui_click"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-text = "Updates"
-
-[node name="SettingsNote" type="Label" parent="SettingsPanel/Body/Buttons"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Saved automatically"
 theme_override_font_sizes/font_size = 13
-size_flags_horizontal = 3
-horizontal_alignment = 1
-autowrap_mode = 3
-[node name="CloseSettings" type="Button" parent="SettingsPanel/Body/Buttons"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Done"
-custom_minimum_size = Vector2(100, 40)
 
-[node name="ExitDesktop" type="Button" parent="SettingsPanel/Body/Buttons"]
+[node name="Content" type="VBoxContainer" parent="Margin/SettingsPanel/Frame"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="PageTitle" type="Label" parent="Margin/SettingsPanel/Frame/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 24
+vertical_alignment = 2
+
+[node name="PageScroll" type="ScrollContainer" parent="Margin/SettingsPanel/Frame/Content"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Exit to desktop"
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Pages" type="VBoxContainer" parent="Margin/SettingsPanel/Frame/Content/PageScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RendererNote" type="Label" parent="Margin/SettingsPanel/Frame/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 14
+text = "Some lighting features require Forward+. Restart using the default renderer to enable them."
+autowrap_mode = 3
+
+[node name="Help" type="PanelContainer" parent="Margin/SettingsPanel/Frame/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 112)
+layout_mode = 2
+theme_type_variation = &"Card"
+
+[node name="HelpBox" type="VBoxContainer" parent="Margin/SettingsPanel/Frame/Content/Help"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HelpHeading" type="HBoxContainer" parent="Margin/SettingsPanel/Frame/Content/Help/HelpBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HelpTitle" type="Label" parent="Margin/SettingsPanel/Frame/Content/Help/HelpBox/HelpHeading"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 18
+
+[node name="HelpCost" type="Label" parent="Margin/SettingsPanel/Frame/Content/Help/HelpBox/HelpHeading"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 14
+
+[node name="HelpBody" type="Label" parent="Margin/SettingsPanel/Frame/Content/Help/HelpBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+autowrap_mode = 3
+
+[node name="Footer" type="HBoxContainer" parent="Margin/SettingsPanel/Frame/Content"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SettingsNote" type="Label" parent="Margin/SettingsPanel/Frame/Content/Footer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"MutedLabel"
+theme_override_font_sizes/font_size = 14
+text = "Saved automatically"
+
+[node name="ResetSettings" type="Button" parent="Margin/SettingsPanel/Frame/Content/Footer" groups=["ui_click"]]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "Restore defaults"
+
+[node name="CloseSettings" type="Button" parent="Margin/SettingsPanel/Frame/Content/Footer" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_type_variation = &"PrimaryButton"
+text = "Done"
 
 [connection signal="resized" from="." to="." method="_layout"]
-[connection signal="pressed" from="SettingsPanel/Body/Navigation/GraphicsTab" to="." method="select_tab" binds= ["Graphics"]]
-[connection signal="pressed" from="SettingsPanel/Body/Navigation/WorldTab" to="." method="select_tab" binds= ["World"]]
-[connection signal="pressed" from="SettingsPanel/Body/Navigation/AudioTab" to="." method="select_tab" binds= ["Audio"]]
-[connection signal="pressed" from="SettingsPanel/Body/Buttons/OpenUpdates" to="." method="emit_signal" binds= ["updates_requested"]]
-[connection signal="pressed" from="SettingsPanel/Body/Buttons/ResetSettings" to="." method="_on_reset_pressed"]
-[connection signal="pressed" from="SettingsPanel/Body/Buttons/CloseSettings" to="." method="emit_signal" binds= ["close_requested"]]
-[connection signal="pressed" from="SettingsPanel/Body/Buttons/ExitDesktop" to="." method="emit_signal" binds= ["exit_requested"]]
+[connection signal="pressed" from="Margin/SettingsPanel/Frame/Content/Footer/ResetSettings" to="." method="_on_reset_pressed"]
+[connection signal="pressed" from="Margin/SettingsPanel/Frame/Content/Footer/CloseSettings" to="." method="emit_signal" binds= ["close_requested"]]
