@@ -4,11 +4,11 @@ extends Control
 ## fan holds smaller cards and fits inside the bottom bar on small windows.
 
 const CARD_SIZE=Vector2(72,100)
-const STEP=60.0
+const STEP=56.0
 const TILT=5.0
 const MOST_CARDS=5
 ## Room kept around the cards for their tilt, shadow and lift.
-const PADDING=Vector2(10,18)
+const PADDING=Vector2(6,18)
 const COMPACT_SCALE=.7
 
 var compact=false

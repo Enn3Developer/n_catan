@@ -70,9 +70,9 @@ unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_left = 6.0
+offset_left = 5.0
 offset_top = 1.0
-offset_right = -2.0
+offset_right = -1.0
 offset_bottom = 21.0
 mouse_filter = 2
 theme_override_colors/font_color = Color(1, 0.952941, 0.839216, 1)
@@ -80,6 +80,7 @@ theme_override_fonts/font = ExtResource("heading_font")
 theme_override_font_sizes/font_size = 12
 text = "Knight"
 vertical_alignment = 1
+text_overrun_behavior = 3
 clip_text = true
 
 [node name="Art" type="TextureRect" parent="."]
