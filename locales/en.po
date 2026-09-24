@@ -323,6 +323,9 @@ msgstr "Choose a settlement to upgrade"
 msgid "Build, trade or end your turn"
 msgstr "Build, trade or end your turn"
 
+msgid "Wait for your turn."
+msgstr "Wait for your turn."
+
 msgid "Choose a neighboring player to steal from."
 msgstr "Choose a neighboring player to steal from."
 

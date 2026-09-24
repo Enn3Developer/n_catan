@@ -1,7 +1,8 @@
 extends CatanScreen
-## In-game HUD: the scoreboard in the top left corner, tools in the top right, and
-## a bar along the bottom that says what the turn needs and holds the hand, the
-## development cards and the actions that apply right now.
+## In-game HUD: the scoreboard in the top left corner, tools in the top right, a
+## bar along the bottom that says what the turn needs and holds the hand and the
+## actions, and the development cards fanned out beside the bar. The bar keeps
+## every action in place all game and greys out the ones that don't apply.
 ## Buttons only report intent; main.gd acts on it.
 
 signal action_requested(action: Dictionary)
@@ -19,6 +20,7 @@ signal leave_requested
 
 const PLAYER_CHIP=preload("res://scenes/ui/player_chip.tscn")
 const DEV_CARD=preload("res://scenes/ui/dev_card.tscn")
+const CARD_FAN=preload("res://scripts/card_fan.gd")
 const PIECE_LIMITS={"road":15,"settlement":5,"city":4}
 const MARGIN=16.0
 const GAP=12.0
@@ -38,21 +40,22 @@ func show_game(net: CatanNetwork,state: Dictionary,mode: String):
 	%Total.text=str(state.dice[0]+state.dice[1])
 	%Dice.tooltip_text=tr("Last roll: %d") % (state.dice[0]+state.dice[1])
 	# Roll and End share one spot: the turn only ever needs one of them.
-	%RollDice.visible=play and not state.rolled
-	%EndTurn.visible=play and state.rolled
+	%EndTurn.visible=mine and state.rolled
+	%RollDice.visible=not %EndTurn.visible
+	%RollDice.disabled=not play or state.rolled
+	%EndTurn.disabled=not play
 	var rules=CatanRules.new();rules.s=state
 	for kind in ["road","settlement","city"]:
 		var button: Button=get_node("%"+kind.capitalize()+"Action")
-		button.visible=play
 		_show_cost(button,CatanRules.COST[kind],hand)
 		button.set_pressed_no_signal(mode==kind)
 		var sites=rules.build_sites(seat,kind)
-		button.disabled=not state.rolled or not rules.can_pay(seat,CatanRules.COST[kind]) or sites.is_empty()
-		if rules.pieces(seat,kind)>=PIECE_LIMITS[kind]:
+		button.disabled=not play or not state.rolled or not rules.can_pay(seat,CatanRules.COST[kind]) or sites.is_empty()
+		if not mine:button.unavailable_reason=tr("Wait for your turn.")
+		elif rules.pieces(seat,kind)>=PIECE_LIMITS[kind]:
 			button.unavailable_reason=tr({"road":"All 15 of your roads are on the board. You have none left to place.","settlement":"All 5 of your settlements are on the board. Upgrade one to a city to free a settlement piece.","city":"All 4 of your cities are on the board. You have none left to place."}[kind])
 		elif rules.can_pay(seat,CatanRules.COST[kind]) and sites.is_empty():button.unavailable_reason=tr("No legal space to build a %s.") % tr(kind)
-	%TradeAction.visible=play
-	%TradeAction.disabled=not state.rolled
+	%TradeAction.disabled=not play or not state.rolled
 	%FinishRoads.visible=state.phase=="free_roads" and mine
 	%DiscardAction.visible=state.phase=="discard" and state.discards.has(str(seat))
 	if state.phase=="steal" and mine:
@@ -94,30 +97,37 @@ func show_turn_clock(seconds_left: float,limit: float,finished: bool):
 	%TurnClock.theme_type_variation="ErrorLabel" if left<=10 else "MutedLabel"
 
 func arrange(viewport: Vector2,overlay_bottom: float) -> Rect2:
-	# The bottom bar is as wide as its content; the hand stacks over the actions
-	# when one row would not fit.
+	# The bottom bar is as wide as its content and the card fan sits beside it,
+	# with room kept for every kind of card so nothing shifts when one is bought.
+	# When they don't fit side by side the hand stacks over the actions, and
+	# after that the fan moves above the bar.
 	var room=viewport.x-2*MARGIN
 	var padding=%Bottom.get_theme_stylebox("panel").get_minimum_size()
-	for vertical in [false,true]:
-		%BottomRow.vertical=vertical
-		%BottomRow.add_theme_constant_override("separation",10 if vertical else 24)
-		if %BottomBody.get_combined_minimum_size().x+padding.x<=room:break
-	var bar_width=minf(room,%BottomBody.get_combined_minimum_size().x+padding.x)
+	# Roll and End turn swap in one spot, so both take the wider one's width.
+	var spot=maxf(%RollDice.get_minimum_size().x,%EndTurn.get_minimum_size().x)
+	%RollDice.custom_minimum_size.x=spot
+	%EndTurn.custom_minimum_size.x=spot
+	var fan=CARD_FAN.full_size()
+	var beside=true
+	for layout in [[false,true],[true,true],[false,false],[true,false]]:
+		%BottomRow.vertical=layout[0]
+		%BottomRow.add_theme_constant_override("separation",10 if layout[0] else 24)
+		beside=layout[1]
+		# Without room beside the bar the fan shrinks into the bar, next to the hand.
+		%CardFan.set_compact(not beside,%Hand if not beside else self)
+		var needed=%BottomBody.get_combined_minimum_size().x+padding.x+(GAP+fan.x if beside else 0.0)
+		if needed<=room:break
+	var bar_width=minf(room-(GAP+fan.x if beside else 0.0),%BottomBody.get_combined_minimum_size().x+padding.x)
 	var bar_height=%Bottom.get_combined_minimum_size().y
-	%Bottom.offset_left=-bar_width/2
-	%Bottom.offset_right=bar_width/2
+	var bar_left=(viewport.x-bar_width-(GAP+fan.x if beside else 0.0))/2
+	%Bottom.offset_left=bar_left-viewport.x/2
+	%Bottom.offset_right=bar_left+bar_width-viewport.x/2
 	%Bottom.offset_top=-MARGIN-bar_height
 	%Bottom.offset_bottom=-MARGIN
 	var bar_top=viewport.y-MARGIN-bar_height
-	# The island keeps its place from turn to turn: the camera frames it above the
-	# bar as tall as it gets on this player's own turn, when every action shows.
-	var actions=-8.0
-	for button in [%RoadAction,%SettlementAction,%CityAction,%BuyCard,%TradeAction,%EndTurn]:actions+=button.get_combined_minimum_size().x+8
-	var hand=%Hand.get_combined_minimum_size()
-	var row=maxf(hand.y,%EndTurn.get_combined_minimum_size().y)
-	if hand.x+24+actions+padding.x>room:row=hand.y+10+%EndTurn.get_combined_minimum_size().y
-	var tallest=padding.y+%PromptRow.get_combined_minimum_size().y+10+row
-	var island_bottom=viewport.y-MARGIN-maxf(bar_height,tallest)
+	if beside:%CardFan.position=Vector2(bar_left+bar_width+GAP,viewport.y-MARGIN-fan.y)
+	# Every action shows all game, so the bar keeps its height and the island its place.
+	var island_bottom=minf(bar_top,%CardFan.position.y) if beside else bar_top
 	%Scoreboard.position=Vector2(MARGIN,MARGIN)
 	%Scoreboard.size=%Scoreboard.get_combined_minimum_size()
 	var tools=%HUDTools.get_combined_minimum_size()
@@ -145,27 +155,25 @@ func _show_cost(button: Button,cost: Array,hand: Array):
 	for resource in 5:button.missing.append(maxi(0,cost[resource]-hand[resource]))
 
 func _add_steal_action(victim: int,victim_name: String):
-	var button: Button=%ActionsBody.get_node("StealTemplate").duplicate()
+	var button: Button=%PromptActions.get_node("StealTemplate").duplicate()
 	button.text=tr("Steal from %s") % victim_name
 	button.show()
 	button.pressed.connect(func():action_requested.emit({"type":"steal","id":victim}))
-	%ActionsBody.add_child(button)
-	%ActionsBody.move_child(button,%ViewOffer.get_index())
+	%PromptActions.add_child(button)
+	%PromptActions.move_child(button,%ViewOffer.get_index())
 
 func _show_cards(seat: int,state: Dictionary,play: bool,rules: CatanRules):
 	var player: Dictionary=state.players[seat]
-	%BuyCard.visible=play
 	_show_cost(%BuyCard,CatanRules.COST.buy_card,player.hand)
-	%BuyCard.disabled=not state.rolled or not rules.can_pay(seat,CatanRules.COST.buy_card) or state.deck_count==0
+	%BuyCard.disabled=not play or not state.rolled or not rules.can_pay(seat,CatanRules.COST.buy_card) or state.deck_count==0
 	%BuyCard.unavailable_reason=tr("No development cards remain.") if state.deck_count==0 else tr("%d cards left in deck.") % state.deck_count
 	for id in 5:
 		if player.cards[id]+player.new_cards[id]==0:continue
 		var card=DEV_CARD.instantiate()
 		card.name="Card%d" % id
-		%CardsBody.add_child(card)
+		%CardFan.add_card(card)
 		card.show_card(id,player,state.card_played,play)
 		card.play_requested.connect(_on_card_play_requested)
-	%CardsBody.visible=%CardsBody.get_child_count()>0
 
 func _request(action_type: String):
 	action_requested.emit({"type":action_type})

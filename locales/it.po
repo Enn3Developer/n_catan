@@ -323,6 +323,9 @@ msgstr "Scegli una colonia da trasformare in città"
 msgid "Build, trade or end your turn"
 msgstr "Costruisci, scambia o termina il turno"
 
+msgid "Wait for your turn."
+msgstr "Aspetta il tuo turno."
+
 msgid "Choose a neighboring player to steal from."
 msgstr "Scegli un giocatore vicino al brigante a cui rubare una risorsa."
 

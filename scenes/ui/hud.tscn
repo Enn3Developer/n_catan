@@ -2,6 +2,7 @@
 
 [ext_resource type="Theme" path="res://assets/ui_theme.tres" id="1"]
 [ext_resource type="Script" path="res://scripts/hud_screen.gd" id="script"]
+[ext_resource type="Script" path="res://scripts/card_fan.gd" id="card_fan"]
 [ext_resource type="FontFile" path="res://assets/fonts/NotoSerif-Medium.ttf" id="heading_font"]
 [ext_resource type="Script" path="res://scripts/build_cost_button.gd" id="cost_button"]
 [ext_resource type="PackedScene" path="res://scenes/ui/resource_row.tscn" id="resource_row"]
@@ -140,6 +141,7 @@ theme_override_constants/separation = 10
 
 [node name="PromptRow" type="HBoxContainer" parent="Bottom/BottomBody"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 theme_override_constants/separation = 12
 
@@ -165,6 +167,7 @@ auto_translate_mode = 2
 layout_mode = 2
 theme_type_variation = &"HeadingLabel"
 theme_override_font_sizes/font_size = 20
+vertical_alignment = 1
 
 [node name="Prompt" type="Label" parent="Bottom/BottomBody/PromptRow"]
 unique_name_in_owner = true
@@ -173,6 +176,53 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"HeadingLabel"
 theme_override_font_sizes/font_size = 20
+text_overrun_behavior = 3
+vertical_alignment = 1
+
+[node name="PromptActions" type="HBoxContainer" parent="Bottom/BottomBody/PromptRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FinishRoads" type="Button" parent="Bottom/BottomBody/PromptRow/PromptActions" groups=["ui_click"]]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_default_cursor_shape = 2
+text = "Finish roads"
+
+[node name="DiscardAction" type="Button" parent="Bottom/BottomBody/PromptRow/PromptActions" groups=["ui_click"]]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_default_cursor_shape = 2
+theme_type_variation = &"PrimaryButton"
+text = "Discard"
+
+[node name="StealTemplate" type="Button" parent="Bottom/BottomBody/PromptRow/PromptActions" groups=["ui_click"]]
+visible = false
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_default_cursor_shape = 2
+theme_type_variation = &"PrimaryButton"
+
+[node name="ViewOffer" type="Button" parent="Bottom/BottomBody/PromptRow/PromptActions" groups=["ui_click"]]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_default_cursor_shape = 2
+theme_type_variation = &"PrimaryButton"
+theme_override_constants/h_separation = 6
+theme_override_constants/icon_max_width = 22
+text = "Trade offer"
+icon = ExtResource("icon_trade")
 
 [node name="TurnClock" type="Label" parent="Bottom/BottomBody/PromptRow"]
 unique_name_in_owner = true
@@ -184,6 +234,7 @@ theme_type_variation = &"MutedLabel"
 theme_override_fonts/font = ExtResource("heading_font")
 theme_override_font_sizes/font_size = 20
 horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="BottomRow" type="BoxContainer" parent="Bottom/BottomBody"]
 unique_name_in_owner = true
@@ -204,13 +255,6 @@ layout_mode = 2
 size_flags_horizontal = 4
 icon_size = 34
 show_zero = true
-
-[node name="CardsBody" type="HBoxContainer" parent="Bottom/BottomBody/BottomRow/Hand"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_constants/separation = 8
 
 [node name="ActionsBody" type="HBoxContainer" parent="Bottom/BottomBody/BottomRow"]
 unique_name_in_owner = true
@@ -310,45 +354,11 @@ theme_override_constants/icon_max_width = 22
 text = "End turn"
 icon = ExtResource("icon_arrow")
 
-[node name="FinishRoads" type="Button" parent="Bottom/BottomBody/BottomRow/ActionsBody" groups=["ui_click"]]
+[node name="CardFan" type="Control" parent="."]
 unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-size_flags_vertical = 4
-mouse_default_cursor_shape = 2
-text = "Finish roads"
-
-[node name="DiscardAction" type="Button" parent="Bottom/BottomBody/BottomRow/ActionsBody" groups=["ui_click"]]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-size_flags_vertical = 4
-mouse_default_cursor_shape = 2
-theme_type_variation = &"PrimaryButton"
-text = "Discard"
-
-[node name="StealTemplate" type="Button" parent="Bottom/BottomBody/BottomRow/ActionsBody" groups=["ui_click"]]
-visible = false
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-size_flags_vertical = 4
-mouse_default_cursor_shape = 2
-theme_type_variation = &"PrimaryButton"
-
-[node name="ViewOffer" type="Button" parent="Bottom/BottomBody/BottomRow/ActionsBody" groups=["ui_click"]]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-size_flags_vertical = 4
-mouse_default_cursor_shape = 2
-theme_type_variation = &"PrimaryButton"
-theme_override_constants/h_separation = 6
-theme_override_constants/icon_max_width = 22
-text = "Trade offer"
-icon = ExtResource("icon_trade")
+layout_mode = 0
+mouse_filter = 2
+script = ExtResource("card_fan")
 
 [connection signal="pressed" from="HUDTools/InspectBoard" to="." method="emit_signal" binds= ["inspect_requested"]]
 [connection signal="pressed" from="HUDTools/OpenLog" to="." method="emit_signal" binds= ["log_requested"]]
@@ -363,8 +373,8 @@ icon = ExtResource("icon_trade")
 [connection signal="pressed" from="Bottom/BottomBody/BottomRow/ActionsBody/BuyCard" to="." method="_request" binds= ["buy_card"]]
 [connection signal="pressed" from="Bottom/BottomBody/BottomRow/ActionsBody/TradeAction" to="." method="emit_signal" binds= ["trade_requested"]]
 [connection signal="pressed" from="Bottom/BottomBody/BottomRow/ActionsBody/EndTurn" to="." method="_request" binds= ["end"]]
-[connection signal="pressed" from="Bottom/BottomBody/BottomRow/ActionsBody/FinishRoads" to="." method="_request" binds= ["finish_roads"]]
-[connection signal="pressed" from="Bottom/BottomBody/BottomRow/ActionsBody/DiscardAction" to="." method="emit_signal" binds= ["discard_requested"]]
-[connection signal="pressed" from="Bottom/BottomBody/BottomRow/ActionsBody/ViewOffer" to="." method="emit_signal" binds= ["offer_requested"]]
+[connection signal="pressed" from="Bottom/BottomBody/PromptRow/PromptActions/FinishRoads" to="." method="_request" binds= ["finish_roads"]]
+[connection signal="pressed" from="Bottom/BottomBody/PromptRow/PromptActions/DiscardAction" to="." method="emit_signal" binds= ["discard_requested"]]
+[connection signal="pressed" from="Bottom/BottomBody/PromptRow/PromptActions/ViewOffer" to="." method="emit_signal" binds= ["offer_requested"]]
 [connection signal="minimum_size_changed" from="Scoreboard" to="." method="emit_signal" binds= ["layout_changed"]]
 [connection signal="minimum_size_changed" from="Bottom" to="." method="emit_signal" binds= ["layout_changed"]]

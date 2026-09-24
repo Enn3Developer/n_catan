@@ -24,7 +24,7 @@ Toggle buttons, tabs and pressed buttons sink into honey wood. Switches (`CheckB
 
 ## In-game screen
 
-The island needs width more than height, so the HUD keeps the sides of the window clear. The scoreboard sits in the top left corner and the tools in the top right. Both corners are open sea, since the camera frames the island across the full width and the island fills at most the middle half of it. On small windows the scoreboard reaches into that half, so the camera frames the island to the right of it. Everything the player holds or does is in one bar along the bottom. Its first line says what the game is waiting for, and it shows only the actions that apply right now. The camera reserves the bar's height from the player's own turn, so the island does not move when the turn passes.
+The island needs width more than height, so the HUD keeps the sides of the window clear. The scoreboard sits in the top left corner and the tools in the top right. Both corners are open sea, since the camera frames the island across the full width and the island fills at most the middle half of it. On small windows the scoreboard reaches into that half, so the camera frames the island to the right of it. The resources and actions are in one bar along the bottom. Every action stays in its place all game and greys out when it doesn't apply, so the bar never changes size. Its first line says what the game is waiting for, and the buttons for a single step, such as stealing or finishing free roads, sit on that line. Development cards are small portrait cards fanned out beside the bar, one per type with a count; pointing at a card lifts it upright. On windows too narrow for the fan beside the bar, a smaller fan sits in the bar next to the resources.
 
 ## Day and night
 
