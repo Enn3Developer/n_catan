@@ -1,8 +1,12 @@
 extends HBoxContainer
 ## One tile per resource with an amount and − / + buttons, for choosing how
-## many of each resource to hand over. Each tile shows how many the player has.
+## many of each resource to hand over or ask for. Each tile has a note under
+## the amount, such as how many the player has.
 
 signal changed
+
+## Smaller tiles, for a stepper row that shares a dialog with other content.
+@export var compact:=false
 
 var values=[0,0,0,0,0]
 var limits=[0,0,0,0,0]
@@ -10,6 +14,8 @@ var amount_labels=[]
 var minus_buttons=[]
 var plus_buttons=[]
 var have_labels=[]
+## Resources that can't be raised from here, such as ones already on the other side of a trade.
+var locked=[false,false,false,false,false]
 
 func _ready():
 	for resource in 5:
@@ -23,11 +29,12 @@ func _ready():
 		body.add_theme_constant_override("separation",4)
 		body.mouse_filter=MOUSE_FILTER_IGNORE
 		tile.add_child(body)
-		var art=CatanIcons.icon(body,CatanIcons.RESOURCES[resource],36)
+		body.add_theme_constant_override("separation",2 if compact else 4)
+		var art=CatanIcons.icon(body,CatanIcons.RESOURCES[resource],26 if compact else 36)
 		art.size_flags_horizontal=SIZE_SHRINK_CENTER
 		var amount=Label.new()
 		amount.theme_type_variation=&"HeadingLabel"
-		amount.add_theme_font_size_override("font_size",24)
+		amount.add_theme_font_size_override("font_size",20 if compact else 24)
 		amount.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 		body.add_child(amount)
 		amount_labels.append(amount)
@@ -43,7 +50,7 @@ func _ready():
 		for delta in [-1,1]:
 			var button=Button.new()
 			button.text="−" if delta<0 else "+"
-			button.custom_minimum_size=Vector2(34,32)
+			button.custom_minimum_size=Vector2(30,28) if compact else Vector2(34,32)
 			button.mouse_default_cursor_shape=CURSOR_POINTING_HAND
 			button.add_to_group("ui_click")
 			button.pressed.connect(step.bind(resource,delta))
@@ -56,6 +63,19 @@ func set_limits(amounts: Array,have_text: String="of %d"):
 	limits=amounts.duplicate()
 	values=[0,0,0,0,0]
 	for resource in 5:have_labels[resource].text=tr(have_text) % limits[resource]
+	_refresh()
+
+## Replaces the note under each amount.
+func set_notes(texts: Array):
+	for resource in 5:have_labels[resource].text=texts[resource]
+
+## Restores an earlier choice, kept within the limits.
+func set_values(amounts: Array):
+	for resource in 5:values[resource]=clampi(int(amounts[resource]),0,limits[resource])
+	_refresh()
+
+func set_locked(resources: Array):
+	locked=resources.duplicate()
 	_refresh()
 
 func step(resource: int,delta: int):
@@ -73,4 +93,4 @@ func _refresh():
 	for resource in 5:
 		amount_labels[resource].text=str(values[resource])
 		minus_buttons[resource].disabled=values[resource]<=0
-		plus_buttons[resource].disabled=values[resource]>=limits[resource]
+		plus_buttons[resource].disabled=values[resource]>=limits[resource] or locked[resource]

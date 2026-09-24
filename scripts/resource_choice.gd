@@ -7,7 +7,21 @@ signal changed(resource: int)
 var selected=0:
 	set(value):
 		selected=value
-		if get_child_count()==5:get_child(value).set_pressed_no_signal(true)
+		if get_child_count()==5:
+			for resource in 5:get_child(resource).set_pressed_no_signal(resource==value)
+
+## Replaces each tile's caption, which starts as the resource name.
+func set_captions(texts: Array):
+	for resource in 5:
+		get_child(resource).text=texts[resource]
+		# A second line of caption needs room under the illustration.
+		get_child(resource).custom_minimum_size.y=78+22*str(texts[resource]).count("\n")
+
+## Greys out tiles that can't be chosen; a tooltip on each says why.
+func set_unavailable(reasons: Array):
+	for resource in 5:
+		get_child(resource).disabled=not str(reasons[resource]).is_empty()
+		get_child(resource).tooltip_text=reasons[resource]
 
 func _ready():
 	var group=ButtonGroup.new()

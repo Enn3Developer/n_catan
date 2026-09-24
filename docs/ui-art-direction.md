@@ -22,7 +22,9 @@ Every control takes its look from the theme. Choose a variation rather than over
 
 Toggle buttons, tabs and pressed buttons sink into honey wood. Switches (`CheckButton`) and checkboxes draw only their glyph and label, never a button frame.
 
-Dialogs inherit `scenes/ui/dialog.tscn` and put their buttons in its footer: one row, right-aligned, pinned below the content when the content scrolls. Secondary buttons such as Close or Back come first and the main action comes last. Resources are picked with tiles showing their illustration (`resource_choice.tscn`), and amounts are set with − / + tiles (`resource_steppers.gd`), not dropdowns or spin boxes.
+Dialogs inherit `scenes/ui/dialog.tscn` and put their buttons in its footer: one row, right-aligned, pinned below the content when the content scrolls. Secondary buttons such as Close or Back come first and the main action comes last. Resources are picked with tiles showing their illustration (`resource_choice.tscn`), and amounts are set with − / + tiles (`resource_steppers.gd`), not dropdowns or spin boxes. Trades are always worded from the viewer's side: "You give" and "You get", whoever made the offer.
+
+Full-window screens with many options, such as Settings, are a centred card of at most 980 × 720 px with their tabs down the left, so labels stay close to their controls on wide windows.
 
 ## In-game screen
 

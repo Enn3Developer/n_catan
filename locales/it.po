@@ -2455,3 +2455,45 @@ msgstr "Gioca online"
 
 msgid "Game"
 msgstr "Gioco"
+
+msgid "Trade with the bank"
+msgstr "Scambia con la banca"
+
+msgid "have %d"
+msgstr "ne hai %d"
+
+msgid "%s for %s"
+msgstr "%s per %s"
+
+msgid "%s and %s"
+msgstr "%s e %s"
+
+msgid "Choose what you give and what you want in return."
+msgstr "Scegli cosa dai e cosa vuoi in cambio."
+
+msgid "Your offer to the other players."
+msgstr "La tua offerta agli altri giocatori."
+
+msgid "%s offers you a trade."
+msgstr "%s ti propone uno scambio."
+
+msgid "Choose who to trade with."
+msgstr "Scegli con chi scambiare."
+
+msgid "You accepted. %s picks who to trade with."
+msgstr "Hai accettato. %s sceglie con chi scambiare."
+
+msgid "Counters"
+msgstr "Controproposta"
+
+msgid "gives"
+msgstr "dà"
+
+msgid "wants"
+msgstr "vuole"
+
+msgid "Answers"
+msgstr "Risposte"
+
+msgid "This is the offer as it stands. Accept it instead."
+msgstr "È l’offerta così com’è. Accettala invece."

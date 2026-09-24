@@ -28,7 +28,15 @@ func choose(data: Dictionary,p: int,difficulty: int=1) -> Dictionary:
 		var outgoing=r.total(data.offer.receive)
 		if r.can_pay(p,data.offer.receive) and incoming>=outgoing and (difficulty==0 or _trade_value(data,p,data.offer.give)>=_trade_value(data,p,data.offer.receive)):
 			return {"type":"accept_trade"}
+		# Hard bots always look for a counter, Normal ones half the time.
+		if difficulty>1 or (difficulty==1 and random.randf()<0.5):
+			var counter=_counter(data,p,r)
+			if not counter.is_empty(): return counter
 		return {"type":"decline_trade"}
+	# Its own offer: wait for the answers, then trade with the best one or withdraw.
+	if not data.offer.is_empty() and data.offer.from==p:
+		if data.offer.get("waiting",false): return {}
+		return _pick_partner(data,p,r)
 	if p!=data.turn: return {}
 	if data.phase=="setup_settlement":
 		var candidates=[]
@@ -129,6 +137,11 @@ func choose(data: Dictionary,p: int,difficulty: int=1) -> Dictionary:
 				var extra=player.hand[res]-cost[res]
 				if extra>=r.rate(p,res) and extra>surplus: give=res; surplus=extra
 			if give>=0: return {"type":"bank_trade","give":give,"receive":receive}
+	# Without enough for the bank, ask the other players, once a turn. Every
+	# offer holds the turn while people answer, so bots don't offer lightly.
+	if difficulty>0 and int(data.get("offers_made",0))==0 and not data.get("paired",false):
+		var offer=_offer(data,p,cost)
+		if not offer.is_empty(): return offer
 	if r.can_pay(p,CatanRules.COST.buy_card) and int(data.get("deck_count",0))>0: return {"type":"buy_card"}
 	return {"type":"end"}
 
@@ -203,6 +216,61 @@ func _road(r: CatanRules,p: int,plan: Array) -> int:
 	for edge in r.s.edges.size():
 		if r.valid_edge(p,edge): return edge
 	return -1
+
+## One of the bot's spare resources for one it needs for its next build, or
+## two for one when it holds a large hand the robber could halve.
+func _offer(data: Dictionary,p: int,cost: Array) -> Dictionary:
+	var hand: Array=data.players[p].hand
+	# Only when a trade brings the next build within reach.
+	var missing=0
+	for res in 5: missing+=maxi(0,cost[res]-hand[res])
+	if missing>2: return {}
+	var wanted=-1
+	for res in 5:
+		if hand[res]<cost[res] and (wanted<0 or cost[res]-hand[res]>cost[wanted]-hand[wanted]): wanted=res
+	if wanted<0: return {}
+	var spare=-1
+	for res in 5:
+		if res!=wanted and hand[res]-cost[res]>=1 and (spare<0 or hand[res]-cost[res]>hand[spare]-cost[spare]): spare=res
+	if spare<0: return {}
+	var give=[0,0,0,0,0]
+	var receive=[0,0,0,0,0]
+	give[spare]=2 if hand[spare]-cost[spare]>=3 and hand.reduce(func(sum,n):return sum+n,0)>7 else 1
+	receive[wanted]=1
+	return {"type":"offer_trade","give":give,"receive":receive}
+
+## Counters an offer the bot wants but can't or won't pay for as asked: the
+## same number of cards, taken from what it holds most of.
+func _counter(data: Dictionary,p: int,r: CatanRules) -> Dictionary:
+	var offer: Dictionary=data.offer
+	var hand: Array=data.players[p].hand.duplicate()
+	var needed=r.total(offer.receive)
+	var receive=[0,0,0,0,0]
+	for i in needed:
+		var largest=-1
+		for res in 5:
+			if offer.give[res]==0 and hand[res]>1 and (largest<0 or hand[res]>hand[largest]): largest=res
+		if largest<0: return {}
+		receive[largest]+=1
+		hand[largest]-=1
+	if receive==offer.receive: return {}
+	if _trade_value(data,p,offer.give)<_trade_value(data,p,receive): return {}
+	return {"type":"counter_trade","give":offer.give.duplicate(),"receive":receive}
+
+## Of the players who said yes, the one whose terms suit the bot best.
+func _pick_partner(data: Dictionary,p: int,r: CatanRules) -> Dictionary:
+	var best=-1
+	var best_value=-INF
+	for key in data.offer.responses:
+		var response: Dictionary=data.offer.responses[key]
+		if not response.answer in ["accept","counter"]: continue
+		var give: Array=response.give if response.answer=="counter" else data.offer.give
+		var receive: Array=response.receive if response.answer=="counter" else data.offer.receive
+		if not r.can_pay(p,give) or data.players[int(key)].resource_count<r.total(receive): continue
+		var value=_trade_value(data,p,receive)-_trade_value(data,p,give)
+		if value>best_value: best=int(key); best_value=value
+	if best<0 or best_value<-1.0: return {"type":"cancel_trade"}
+	return {"type":"confirm_trade","id":best}
 
 func _trade_value(data: Dictionary,p: int,resources: Array) -> float:
 	var value=0.0

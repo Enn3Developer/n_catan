@@ -2,8 +2,9 @@
 
 [ext_resource type="Script" path="res://scripts/offer_dialog.gd" id="script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/resource_row.tscn" id="resource_row"]
-[ext_resource type="PackedScene" path="res://scenes/ui/resource_picker.tscn" id="resource_picker"]
+[ext_resource type="Script" path="res://scripts/resource_steppers.gd" id="steppers"]
 [ext_resource type="PackedScene" path="res://scenes/ui/dialog.tscn" id="base"]
+[ext_resource type="Texture2D" path="res://assets/icons/trade.svg" id="icon_trade"]
 
 [node name="TradeOffer" instance=ExtResource("base")]
 script = ExtResource("script")
@@ -14,40 +15,89 @@ text = "A trade on the table"
 [node name="Offerer" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 20
-
-[node name="Give" parent="DialogMargin/Panel/Frame/DialogScroll/Body" instance=ExtResource("resource_row")]
-unique_name_in_owner = true
-layout_mode = 2
-icon_size = 38
-
-[node name="InReturn" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 20
-text = "In return for:"
-
-[node name="Receive" parent="DialogMargin/Panel/Frame/DialogScroll/Body" instance=ExtResource("resource_row")]
-unique_name_in_owner = true
-layout_mode = 2
-icon_size = 38
-
-[node name="Status" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.54902, 0.321569, 0.176471, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 18
 autowrap_mode = 3
+
+[node name="Terms" type="HBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="GiveSide" type="PanelContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body/Terms"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"Card"
+
+[node name="GiveBox" type="VBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body/Terms/GiveSide"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="GiveLabel" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/Terms/GiveSide/GiveBox"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "You give"
+uppercase = true
+
+[node name="YouGive" parent="DialogMargin/Panel/Frame/DialogScroll/Body/Terms/GiveSide/GiveBox" instance=ExtResource("resource_row")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+alignment = 0
+icon_size = 36
+
+[node name="Arrow" type="TextureRect" parent="DialogMargin/Panel/Frame/DialogScroll/Body/Terms"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("icon_trade")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="GetSide" type="PanelContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body/Terms"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"Card"
+
+[node name="GetBox" type="VBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body/Terms/GetSide"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="GetLabel" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/Terms/GetSide/GetBox"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "You get"
+uppercase = true
+
+[node name="YouGet" parent="DialogMargin/Panel/Frame/DialogScroll/Body/Terms/GetSide/GetBox" instance=ExtResource("resource_row")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+alignment = 0
+icon_size = 36
+
+[node name="Missing" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_type_variation = &"ErrorLabel"
+autowrap_mode = 3
+
+[node name="AnswersLabel" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "Answers"
+vertical_alignment = 2
+uppercase = true
 
 [node name="Responses" type="VBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="Missing" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
+[node name="Status" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 theme_type_variation = &"MutedLabel"
 autowrap_mode = 3
@@ -56,67 +106,58 @@ autowrap_mode = 3
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
+theme_override_constants/separation = 8
 
 [node name="CounterHeading" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel"]
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 20
 text = "Your counter-offer"
+vertical_alignment = 2
 
-[node name="CounterGiveRow" type="HBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel"]
+[node name="CounterGiveLabel" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel"]
 layout_mode = 2
-
-[node name="CounterGiveLabel" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterGiveRow"]
-custom_minimum_size = Vector2(90, 0)
-layout_mode = 2
+theme_type_variation = &"SectionLabel"
 text = "You give"
+uppercase = true
 
-[node name="CounterGive" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterGiveRow" instance=ExtResource("resource_picker")]
+[node name="CounterGive" type="HBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_constants/separation = 8
+script = ExtResource("steppers")
+compact = true
 
-[node name="CounterGiveAmount" type="SpinBox" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterGiveRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(84, 44)
+[node name="CounterGetLabel" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel"]
 layout_mode = 2
-size_flags_vertical = 4
-min_value = 1.0
-max_value = 19.0
-value = 1.0
-alignment = 1
-
-[node name="CounterGetRow" type="HBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel"]
-layout_mode = 2
-
-[node name="CounterGetLabel" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterGetRow"]
-custom_minimum_size = Vector2(90, 0)
-layout_mode = 2
+theme_type_variation = &"SectionLabel"
 text = "You get"
+uppercase = true
 
-[node name="CounterGet" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterGetRow" instance=ExtResource("resource_picker")]
+[node name="CounterGet" type="HBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_constants/separation = 8
+script = ExtResource("steppers")
+compact = true
 
-[node name="CounterGetAmount" type="SpinBox" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterGetRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(84, 44)
+[node name="CounterActions" type="HBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel"]
 layout_mode = 2
-size_flags_vertical = 4
-min_value = 1.0
-max_value = 19.0
-value = 1.0
-alignment = 1
+theme_override_constants/separation = 10
 
-[node name="CounterReason" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel"]
+[node name="CounterReason" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterActions"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 theme_type_variation = &"MutedLabel"
 autowrap_mode = 3
 
-[node name="SendCounter" type="Button" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel" groups=["ui_click"]]
+[node name="SendCounter" type="Button" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterActions" groups=["ui_click"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
+size_flags_vertical = 0
 mouse_default_cursor_shape = 2
 theme_type_variation = &"PrimaryButton"
 text = "Send counter-offer"
@@ -168,9 +209,7 @@ text = "Accept"
 [connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/Answers/Accept" to="." method="_answer" binds= ["accept_trade"]]
 [connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/Answers/Decline" to="." method="_answer" binds= ["decline_trade"]]
 [connection signal="toggled" from="DialogMargin/Panel/Frame/Footer/Answers/Counter" to="." method="_on_counter_toggled"]
-[connection signal="item_selected" from="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterGiveRow/CounterGive" to="." method="_on_counter_changed"]
-[connection signal="value_changed" from="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterGiveRow/CounterGiveAmount" to="." method="_on_counter_changed"]
-[connection signal="item_selected" from="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterGetRow/CounterGet" to="." method="_on_counter_changed"]
-[connection signal="value_changed" from="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterGetRow/CounterGetAmount" to="." method="_on_counter_changed"]
-[connection signal="pressed" from="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/SendCounter" to="." method="_on_send_counter_pressed"]
+[connection signal="changed" from="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterGive" to="." method="_refresh_counter"]
+[connection signal="changed" from="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterGet" to="." method="_refresh_counter"]
+[connection signal="pressed" from="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterActions/SendCounter" to="." method="_on_send_counter_pressed"]
 [connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/Withdraw" to="." method="emit_signal" binds= ["withdraw_requested"]]

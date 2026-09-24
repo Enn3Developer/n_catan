@@ -34,9 +34,10 @@ var joining=false
 var join_draft={"address":"","password":""}
 var inspection_mode=false
 var layout_queued=false
-var trade_players=true
-var trade_give=0
-var trade_get=1
+## The trade dialog's choices, kept while the dialog is rebuilt for each snapshot.
+var trade_draft={}
+## Whether the board shows the menu's island rather than a game's.
+var menu_island=false
 var music_ui_clock=0.0
 var music_volume_before_mute=.42
 var notified_updates={}
@@ -69,8 +70,6 @@ func _ready():
 				if arg.begins_with("--address="):address=arg.trim_prefix("--address=")
 			print("CATAN_INVITE "+net.invite(address))
 		return
-	var preview=CatanRules.new()
-	board.build(preview.create(["Voyager","Mariner"],8426))
 	ui_day_night.setup(ui)
 	_apply_preferences()
 	_home()
@@ -95,6 +94,7 @@ func _home():
 	inspection_mode=false
 	inspection_hint.hide()
 	board.show_labels=true
+	if not menu_island:_build_menu_island()
 	board.reset_camera()
 	_clear("res://scenes/ui/home.tscn")
 	state={}
@@ -129,6 +129,12 @@ func _home():
 	})
 	_updates_changed()
 	_apply_text(screen)
+
+## The main menu floats over an island dealt from a new random seed at every
+## launch and after every game; a language change keeps the current one.
+func _build_menu_island():
+	board.build(CatanRules.new().create(["Voyager","Mariner"],randi_range(1,999999)))
+	menu_island=true
 
 # Screens and dialogs report intent through signals. Handlers run deferred so
 # they may replace the screen or dialog that emitted them.
@@ -233,7 +239,9 @@ func _received(data: Dictionary):
 	board.camera.v_offset=1.8 if guide!=null else 0.0
 	if guide!=null: board.camera.fov=42
 	board.show_labels=not inspection_mode
-	if fresh: board.build(state)
+	if fresh:
+		board.build(state)
+		menu_island=false
 	else: board.refresh(state)
 	turn_clock_limit=float(state.get("turn_limit",0.0))
 	turn_clock_left=float(state.get("turn_seconds",0.0))
@@ -393,11 +401,10 @@ func _close_modal():
 	if is_instance_valid(modal): modal.free()
 
 func _trade(reset: bool=true):
-	if reset:trade_players=true
+	if reset:trade_draft={}
 	var dialog=_present("res://scenes/ui/trade_dialog.tscn")
-	dialog.draft_changed.connect(func(with_players,give,receive):
-		trade_players=with_players;trade_give=give;trade_get=receive)
-	dialog.show_trade(state,net.seat,trade_players,trade_give,trade_get)
+	dialog.draft_changed.connect(func(draft):trade_draft=draft)
+	dialog.show_trade(state,net.seat,trade_draft)
 	_route(dialog,{"trade_requested":net.act})
 
 func _resource_text(a: Array) -> String:

@@ -2455,3 +2455,45 @@ msgstr "Play online"
 
 msgid "Game"
 msgstr "Game"
+
+msgid "Trade with the bank"
+msgstr "Trade with the bank"
+
+msgid "have %d"
+msgstr "have %d"
+
+msgid "%s for %s"
+msgstr "%s for %s"
+
+msgid "%s and %s"
+msgstr "%s and %s"
+
+msgid "Choose what you give and what you want in return."
+msgstr "Choose what you give and what you want in return."
+
+msgid "Your offer to the other players."
+msgstr "Your offer to the other players."
+
+msgid "%s offers you a trade."
+msgstr "%s offers you a trade."
+
+msgid "Choose who to trade with."
+msgstr "Choose who to trade with."
+
+msgid "You accepted. %s picks who to trade with."
+msgstr "You accepted. %s picks who to trade with."
+
+msgid "Counters"
+msgstr "Counters"
+
+msgid "gives"
+msgstr "gives"
+
+msgid "wants"
+msgstr "wants"
+
+msgid "Answers"
+msgstr "Answers"
+
+msgid "This is the offer as it stands. Accept it instead."
+msgstr "This is the offer as it stands. Accept it instead."

@@ -494,6 +494,7 @@ func apply(p: int,a: Dictionary) -> String:
 				for r in 5:
 					if give[r]>0 and receive[r]>0: return "Offer and request different resources."
 				_trade_event("offered",p)
+				s.offers_made=int(s.get("offers_made",0))+1
 				s.offer={"id":s.trade_event.id,"from":p,"give":give.duplicate(),"receive":receive.duplicate(),"responses":{},"waiting":true}
 			elif action=="confirm_trade": return _confirm(p,id)
 			elif action=="end":
@@ -515,6 +516,7 @@ func apply(p: int,a: Dictionary) -> String:
 					s.rolled=false
 				s.card_played=false
 				s.offer={}
+				s.offers_made=0
 			else: return "This action is unavailable. Please choose an action from the game controls."
 	else: return "This action is unavailable at this stage of the turn."
 	_score()
