@@ -66,6 +66,10 @@ func _ready():
 		# Labels translate their own text, so the heading follows a language change.
 		heading.text=group
 		heading.uppercase=true
+		# Later groups get room above their heading so they read as a new section.
+		if group!=GROUPS[0]:
+			heading.custom_minimum_size.y=36
+			heading.vertical_alignment=VERTICAL_ALIGNMENT_BOTTOM
 		heading.theme_type_variation=&"SectionLabel"
 		%GraphicsOptions.add_child(heading)
 		for spec in groups.get(group,[]):_add_control(%GraphicsOptions,spec)

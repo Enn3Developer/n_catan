@@ -56,10 +56,6 @@ grow_vertical = 2
 
 [node name="Margin" type="MarginContainer" parent="Panel"]
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
 
 [node name="Layout" type="VBoxContainer" parent="Panel/Margin"]
 layout_mode = 2
@@ -149,7 +145,7 @@ theme_override_constants/separation = 6
 
 [node name="ShowSettlement" type="Button" parent="Panel/Margin/Layout/Content/PreviewBox/PreviewBar"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 toggle_mode = true
 button_pressed = true
@@ -157,14 +153,14 @@ text = "Settlement"
 
 [node name="ShowCity" type="Button" parent="Panel/Margin/Layout/Content/PreviewBox/PreviewBar"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 toggle_mode = true
 text = "City"
 
 [node name="ShowRoad" type="Button" parent="Panel/Margin/Layout/Content/PreviewBox/PreviewBar"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 toggle_mode = true
 text = "Roads"
@@ -199,12 +195,11 @@ text = "START FROM"
 [node name="Presets" type="HFlowContainer" parent="Panel/Margin/Layout/Content/Editor"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/h_separation = 6
 theme_override_constants/v_separation = 6
 
 [node name="Surprise" type="Button" parent="Panel/Margin/Layout/Content/Editor/Presets"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 tooltip_text = "Roll a random, matching look"
 text = "Surprise me"
@@ -247,7 +242,7 @@ theme_override_constants/v_separation = 6
 columns = 7
 
 [node name="UseSeatColor" type="Button" parent="Panel/Margin/Layout/Content/Editor/FieldScroll/Fields/PlayerColorBox"]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 text = "Use seat color"
 
@@ -265,20 +260,20 @@ autowrap_mode = 3
 
 [node name="Revert" type="Button" parent="Panel/Margin/Layout/Bottom"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 42)
+custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
 tooltip_text = "Go back to the pieces currently in use"
 text = "Revert"
 
 [node name="ApplyLook" type="Button" parent="Panel/Margin/Layout/Bottom"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(130, 42)
+custom_minimum_size = Vector2(130, 40)
 layout_mode = 2
 theme_type_variation = &"PrimaryButton"
 text = "Apply"
 
 [node name="CloseCosmetics" type="Button" parent="Panel/Margin/Layout/Bottom"]
-custom_minimum_size = Vector2(100, 42)
+custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
 text = "Done"
 

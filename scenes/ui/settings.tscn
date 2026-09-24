@@ -55,7 +55,7 @@ theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 6
 [node name="GraphicsTab" type="Button" parent="SettingsPanel/Body/Navigation"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 toggle_mode = true
 text = "Graphics"
@@ -63,7 +63,7 @@ alignment = 0
 
 [node name="WorldTab" type="Button" parent="SettingsPanel/Body/Navigation"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 toggle_mode = true
 text = "Controls"
@@ -71,7 +71,7 @@ alignment = 0
 
 [node name="AudioTab" type="Button" parent="SettingsPanel/Body/Navigation"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 toggle_mode = true
 text = "Audio"

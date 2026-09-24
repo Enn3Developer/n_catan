@@ -14,14 +14,14 @@ layout_mode = 2
 
 [node name="PlayerFilter" type="OptionButton" parent="DialogMargin/Panel/DialogScroll/Body/Filters"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(150, 38)
+custom_minimum_size = Vector2(150, 40)
 layout_mode = 2
 tooltip_text = "Show lines that mention one player"
 mouse_default_cursor_shape = 2
 
 [node name="Search" type="LineEdit" parent="DialogMargin/Panel/DialogScroll/Body/Filters"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Search the log"
@@ -70,7 +70,7 @@ theme_override_font_sizes/font_size = 15
 text = "No lines match."
 
 [node name="Close" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2

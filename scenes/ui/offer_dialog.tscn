@@ -51,7 +51,7 @@ layout_mode = 2
 
 [node name="Accept" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/Answers" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_default_cursor_shape = 2
@@ -60,7 +60,7 @@ text = "Accept"
 
 [node name="Decline" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/Answers" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_default_cursor_shape = 2
@@ -68,7 +68,7 @@ text = "Decline"
 
 [node name="Counter" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/Answers" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_default_cursor_shape = 2
@@ -145,7 +145,7 @@ autowrap_mode = 3
 
 [node name="SendCounter" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/CounterPanel" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_type_variation = &"PrimaryButton"
@@ -153,14 +153,14 @@ text = "Send counter-offer"
 
 [node name="Withdraw" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
 text = "Withdraw offer"
 
 [node name="Close" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2

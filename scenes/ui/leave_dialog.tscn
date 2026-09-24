@@ -15,7 +15,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
 [node name="Stay" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
@@ -23,7 +23,7 @@ theme_type_variation = &"PrimaryButton"
 text = "Stay"
 
 [node name="LeaveGame" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2

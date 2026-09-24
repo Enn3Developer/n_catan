@@ -62,7 +62,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="Timber" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/GiveRow/GiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
@@ -78,7 +78,7 @@ icon = ExtResource("icon_timber")
 expand_icon = true
 
 [node name="Brick" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/GiveRow/GiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
@@ -94,7 +94,7 @@ icon = ExtResource("icon_brick")
 expand_icon = true
 
 [node name="Wool" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/GiveRow/GiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
@@ -110,7 +110,7 @@ icon = ExtResource("icon_wool")
 expand_icon = true
 
 [node name="Grain" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/GiveRow/GiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
@@ -126,7 +126,7 @@ icon = ExtResource("icon_grain")
 expand_icon = true
 
 [node name="Ore" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/GiveRow/GiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
@@ -171,7 +171,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="Timber" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/ReceiveRow/ReceiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
@@ -187,7 +187,7 @@ icon = ExtResource("icon_timber")
 expand_icon = true
 
 [node name="Brick" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/ReceiveRow/ReceiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
@@ -203,7 +203,7 @@ icon = ExtResource("icon_brick")
 expand_icon = true
 
 [node name="Wool" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/ReceiveRow/ReceiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
@@ -219,7 +219,7 @@ icon = ExtResource("icon_wool")
 expand_icon = true
 
 [node name="Grain" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/ReceiveRow/ReceiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
@@ -235,7 +235,7 @@ icon = ExtResource("icon_grain")
 expand_icon = true
 
 [node name="Ore" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/ReceiveRow/ReceiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
@@ -280,7 +280,7 @@ autowrap_mode = 3
 
 [node name="BankTrade" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
@@ -289,7 +289,7 @@ text = "Bank trade"
 
 [node name="OfferTrade" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
@@ -297,7 +297,7 @@ theme_type_variation = &"PrimaryButton"
 text = "Offer to all players"
 
 [node name="Close" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2

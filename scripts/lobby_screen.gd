@@ -45,7 +45,7 @@ func show_room(net: CatanNetwork,invite_address: String,connection_status: Strin
 	var hosting=net.multiplayer.is_server()
 	%InviteAddress.text=invite_address if hosting else net.reconnect_address
 	%InviteAddress.editable=hosting
-	for node: Control in [%InviteHeading,%InviteAddress,%InviteActions]:node.visible=not net.solo
+	for node: Control in [%InviteGap,%InviteHeading,%InviteAddress,%InviteActions]:node.visible=not net.solo
 	%MapRouter.disabled=not hosting
 	%ConnectionHelp.visible=not net.solo
 	%ConnectionHelp.text=tr("Share the invite code. Host: open UDP 24567.")
@@ -75,7 +75,9 @@ func _show_rules(settings: Dictionary,controller: bool,solo: bool):
 
 func arrange(viewport: Vector2,_overlay_bottom: float) -> Rect2:
 	%Voyage.custom_minimum_size.x=320 if viewport.x<1100 else 380
-	return Rect2(Vector2.ZERO,viewport)
+	# The panels cover the board, so frame the island off screen; otherwise a
+	# sliver of it shows through the gap between the columns.
+	return Rect2(Vector2(-2*viewport.x,0),viewport)
 
 func _on_invite_address_text_changed(address: String):
 	invite_address_edited.emit(address)

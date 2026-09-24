@@ -6,7 +6,7 @@
 
 [node name="Control" type="OptionButton" parent="Row"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 36)
+custom_minimum_size = Vector2(200, 40)
 layout_mode = 2
 
 [connection signal="item_selected" from="Row/Control" to="." method="_on_choice"]

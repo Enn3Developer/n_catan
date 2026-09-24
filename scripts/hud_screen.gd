@@ -68,7 +68,8 @@ func arrange(viewport: Vector2,overlay_bottom: float) -> Rect2:
 	%TopBody.vertical=stacked
 	%HUDTools.vertical=not stacked
 	for chip in %PlayersBody.get_children():chip.arrange(stacked)
-	var available=viewport.x-64
+	# The bar's outer offsets plus its own padding, read from the theme.
+	var available=viewport.x+%Top.offset_right-%Top.offset_left-%Top.get_theme_stylebox("panel").get_minimum_size().x
 	if not stacked:available-=%HUDTools.get_combined_minimum_size().x+8
 	var columns=maxi(1,mini(%PlayersBody.get_child_count(),int((available+6)/286)))
 	for chip in %PlayersBody.get_children():chip.custom_minimum_size.x=floorf((available-(columns-1)*6)/columns)

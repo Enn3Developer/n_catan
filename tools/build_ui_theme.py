@@ -22,17 +22,21 @@ svg('parchment-panel','''<defs><linearGradient id="paper" x2="0" y2="1"><stop st
 <g fill="#e9bc67" stroke="#654225" stroke-width="1"><circle cx="8" cy="8" r="2"/><circle cx="88" cy="8" r="2"/><circle cx="8" cy="88" r="2"/><circle cx="88" cy="88" r="2"/></g>''',96,96)
 
 # Wooden buttons stand on a darker lip; pressed and selected ones sink into it.
+# The face brightens toward its top edge; a gradient has no line to stretch into a bar.
 def raised(fill,edge,shine,low):
- return f'<rect x="2" y="3" width="92" height="43" rx="9" fill="{low}" stroke="{edge}" stroke-width="2"/><rect x="3" y="3" width="90" height="37" rx="8" fill="{fill}"/><path d="M12 6 H84" stroke="{shine}" stroke-width="2" fill="none"/>'
-def sunken(fill,edge,shade):
- return f'<rect x="2" y="3" width="92" height="43" rx="9" fill="{fill}" stroke="{edge}" stroke-width="2"/><path d="M11 6 H85" stroke="{shade}" stroke-width="3" stroke-opacity=".55" fill="none"/>'
+ face=f'f{fill[1:]}'
+ return f'<defs><linearGradient id="{face}" x2="0" y2="1"><stop stop-color="{shine}"/><stop offset=".45" stop-color="{fill}"/></linearGradient></defs><rect x="2" y="3" width="92" height="43" rx="9" fill="{low}" stroke="{edge}" stroke-width="2"/><rect x="3" y="3" width="90" height="37" rx="8" fill="url(#{face})"/>'
+# Pressed and selected planks drop their lip: one flat piece of wood with a soft
+# glow along the bottom edge instead of a shadow line.
+def sunken(fill,edge,glow):
+ return f'<rect x="2" y="3" width="92" height="43" rx="9" fill="{fill}" stroke="{edge}" stroke-width="2"/><path d="M12 42 H84" stroke="{glow}" stroke-width="2" stroke-opacity=".6" fill="none"/>'
 for name,body in [
  ('button',raised('#e4c18c','#785334','#ffedc3','#bb8d55')),
  ('button-hover',raised('#f2d4a0','#85542c','#fff3d3','#c29354')),
- ('button-selected',sunken('#e9bf73','#85542c','#a8753b')),
+ ('button-selected',sunken('#e9bf73','#85542c','#fbe3a8')),
  ('button-primary',raised('#5f794f','#314831','#a3b782','#435b3e')),
  ('button-primary-hover',raised('#748c5c','#314831','#bfd298','#506b42')),
- ('button-primary-pressed',sunken('#526747','#2f4532','#2f4532')),
+ ('button-primary-pressed',sunken('#526747','#2f4532','#8fa26d')),
  ('button-disabled',f'<rect x="2" y="3" width="92" height="43" rx="9" fill="#bbab8d" stroke="#a29478" stroke-width="2"/><rect x="3" y="3" width="90" height="37" rx="8" fill="#d4c4a5"/>')]:
  svg(name,body)
 # Knobs are plain brass buttons; grip lines on them read as a pause symbol.
@@ -57,17 +61,20 @@ lines=['[gd_resource type="Theme" format=3 uid="uid://cr50xu8k1vr3e"]','',
  '[ext_resource type="FontFile" path="res://assets/fonts/NotoSerif-Medium.ttf" id="heading-font"]']
 for name in TEXTURES:
  lines.append(f'[ext_resource type="Texture2D" path="res://assets/ui/{name}.svg" id="{name}"]')
-def texture_style(name,texture,margin=10,padx=14,pady=8):
+def texture_style(name,texture,margin=10,padx=16,pady=9):
  lines.extend(['',f'[sub_resource type="StyleBoxTexture" id="{name}"]',f'texture = ExtResource("{texture}")'])
  for edge in ['left','top','right','bottom']:
   lines.append(f'texture_margin_{edge} = {margin}.0')
   lines.append(f'content_margin_{edge} = {padx if edge in ["left","right"] else pady}.0')
-texture_style('Panel','parchment-panel',14,16,12)
+# The carved frame is 14 px deep, so content starts well inside it.
+texture_style('Panel','parchment-panel',14,28,24)
+# HUD bars sit over the board and keep a slimmer inset.
+texture_style('Bar','parchment-panel',14,24,16)
 BUTTONS=['button','button-hover','button-selected','button-primary','button-primary-hover','button-primary-pressed','button-disabled']
 for name in BUTTONS:
  texture_style(name,name)
  # Icon-only buttons share the wood but keep their glyph close to the frame.
- texture_style(name+'-icon',name,10,8,6)
+ texture_style(name+'-icon',name,10,9,8)
 def flat(name,fill,border=None,width=1,radius=8,padx=12,pady=8,alpha=1):
  lines.extend(['',f'[sub_resource type="StyleBoxFlat" id="{name}"]',f'bg_color = {color(fill,alpha)}'])
  if border:lines.append(f'border_color = {color(border)}')
@@ -79,7 +86,7 @@ def shadow():lines.extend(['shadow_color = Color(0.18, 0.1, 0.04, 0.18)','shadow
 flat('Input','fff1d3','b49668',1)
 flat('InputFocus','fff5df','6b834f',2)
 flat('InputReadOnly','eedab0','b49668',1)
-flat('Popup','f4e2bb','795635',2,8)
+flat('Popup','f4e2bb','795635',2,8,12,8)
 flat('Track','b5a07b','91734d',1,3,2,2)
 flat('Fill','6d8958','496340',1,3,2,2)
 flat('ScrollTrack','eedab0',None,1,5,5,5)
@@ -88,9 +95,9 @@ flat('ScrollGrabberHover','8c522d',None,1,5,5,5)
 flat('Focus','fff1d3','b77633',2,9,0,0,0)
 flat('Empty','fff1d3',None,1,0,4,4,0)
 # Cards are raised tiles inside a panel; rows are flat bands in a list.
-flat('Card','f6e4be','ac8654',1,10,14,10);shadow()
-flat('Row','eedab0',None,1,8,14,8)
-flat('RowPlain','eedab0',None,1,8,14,8,0)
+flat('Card','f6e4be','ac8654',1,10,16,12);shadow()
+flat('Row','eedab0',None,1,8,16,10)
+flat('RowPlain','eedab0',None,1,8,16,10,0)
 flat('Separator','ac8654',None,1,0,0,4,.45)
 lines.extend(['','[resource]','default_font = ExtResource("body")','default_font_size = 16'])
 def prop(key,value):lines.append(key+' = '+value)
@@ -144,6 +151,7 @@ prop('ToastLabel/base_type','&"Label"');prop('ToastLabel/styles/normal','SubReso
 for key,h in [('font_color',INK),('font_uneditable_color',INK),('font_placeholder_color','8a775c'),('caret_color','526747'),('selection_color','b4c696'),('clear_button_color',MUTED),('clear_button_color_pressed',INK)]:prop('LineEdit/colors/'+key,color(h))
 prop('LineEdit/styles/normal','SubResource("Input")');prop('LineEdit/styles/focus','SubResource("InputFocus")');prop('LineEdit/styles/read_only','SubResource("InputReadOnly")')
 prop('PanelContainer/styles/panel','SubResource("Panel")')
+prop('BarPanel/base_type','&"PanelContainer"');prop('BarPanel/styles/panel','SubResource("Bar")')
 prop('Card/base_type','&"PanelContainer"');prop('Card/styles/panel','SubResource("Card")')
 prop('Row/base_type','&"PanelContainer"');prop('Row/styles/panel','SubResource("Row")')
 prop('PlainRow/base_type','&"PanelContainer"');prop('PlainRow/styles/panel','SubResource("RowPlain")')
@@ -173,6 +181,10 @@ for typ in ['HSeparator','VSeparator']:
 prop('ProgressBar/styles/background','SubResource("Track")');prop('ProgressBar/styles/fill','SubResource("Fill")')
 prop('TooltipPanel/styles/panel','SubResource("Popup")');prop('TooltipLabel/colors/font_color',color(INK))
 prop('HBoxContainer/constants/separation','8');prop('VBoxContainer/constants/separation','8')
+# Even gaps everywhere, and room between scrolled content and its scrollbar.
+prop('GridContainer/constants/h_separation','12');prop('GridContainer/constants/v_separation','10')
+for typ in ['HFlowContainer','VFlowContainer']:prop(typ+'/constants/h_separation','8');prop(typ+'/constants/v_separation','8')
+prop('ScrollContainer/constants/scrollbar_h_separation','10');prop('ScrollContainer/constants/scrollbar_v_separation','10')
 # Resource identifiers accept underscores; asset filenames keep their hyphens.
 text='\n'.join(lines)+'\n'
 text=re.sub(r'(id="|(?:ExtResource|SubResource)\(")([^"]+)',lambda m:m[1]+m[2].replace('-','_'),text)

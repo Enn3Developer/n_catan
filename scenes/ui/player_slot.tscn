@@ -53,13 +53,13 @@ horizontal_alignment = 2
 
 [node name="Difficulty" type="OptionButton" parent="Row/Controls" unique_id=2115430219]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 36)
+custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
 size_flags_vertical = 4
 
 [node name="Remove" type="Button" parent="Row/Controls" unique_id=1554747599]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 4
 tooltip_text = "Remove bot"

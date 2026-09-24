@@ -33,7 +33,7 @@ autowrap_mode = 3
 
 [node name="UpdateCheck" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
@@ -41,7 +41,7 @@ text = "Check for updates"
 
 [node name="UpdateDownload" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
@@ -50,7 +50,7 @@ text = "Download update"
 
 [node name="UpdateInstall" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
@@ -58,7 +58,7 @@ theme_type_variation = &"PrimaryButton"
 text = "Restart to update"
 
 [node name="Later" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2

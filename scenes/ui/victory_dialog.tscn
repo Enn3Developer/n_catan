@@ -44,7 +44,7 @@ theme_override_constants/separation = 6
 
 [node name="PlayAgain" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
@@ -55,7 +55,7 @@ text = "Play again"
 layout_mode = 2
 
 [node name="ShowLog" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/Actions" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_default_cursor_shape = 2
@@ -63,7 +63,7 @@ text = "Game log"
 
 [node name="BackToMenu" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/Actions" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_default_cursor_shape = 2

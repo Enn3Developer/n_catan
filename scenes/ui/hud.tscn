@@ -31,6 +31,7 @@ script = ExtResource("script")
 
 [node name="Top" type="PanelContainer" parent="."]
 unique_name_in_owner = true
+theme_type_variation = &"BarPanel"
 layout_mode = 1
 anchor_right = 1.0
 offset_left = 16.0
@@ -133,6 +134,7 @@ icon = ExtResource("icon_leave")
 
 [node name="Bottom" type="PanelContainer" parent="."]
 unique_name_in_owner = true
+theme_type_variation = &"BarPanel"
 layout_mode = 1
 anchor_top = 1.0
 anchor_right = 1.0
@@ -174,7 +176,7 @@ alignment = 1
 
 [node name="RollDice" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
@@ -186,7 +188,7 @@ icon = ExtResource("icon_dice")
 
 [node name="RoadAction" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 tooltip_text = "Road"
@@ -200,7 +202,7 @@ script = ExtResource("cost_button")
 
 [node name="SettlementAction" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 tooltip_text = "Settlement"
@@ -214,7 +216,7 @@ script = ExtResource("cost_button")
 
 [node name="CityAction" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 tooltip_text = "City"
@@ -228,7 +230,7 @@ script = ExtResource("cost_button")
 
 [node name="TradeAction" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
@@ -239,7 +241,7 @@ icon = ExtResource("icon_trade")
 
 [node name="EndTurn" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
@@ -252,7 +254,7 @@ icon = ExtResource("icon_arrow")
 [node name="FinishRoads" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
@@ -261,7 +263,7 @@ text = "Finish roads"
 [node name="DiscardAction" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
@@ -269,7 +271,7 @@ theme_type_variation = &"PrimaryButton"
 
 [node name="StealTemplate" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
 visible = false
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
@@ -278,7 +280,7 @@ theme_type_variation = &"PrimaryButton"
 [node name="ViewOffer" type="Button" parent="Bottom/BottomBody/ActionsBody" groups=["ui_click"]]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
@@ -310,7 +312,7 @@ text = "Development cards"
 
 [node name="BuyCard" type="Button" parent="CardsRail/CardShop" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 tooltip_text = "Buy card"

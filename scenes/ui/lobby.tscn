@@ -177,6 +177,12 @@ layout_mode = 2
 theme_type_variation = &"MutedLabel"
 autowrap_mode = 3
 
+[node name="InviteGap" type="Control" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+mouse_filter = 2
+
 [node name="InviteHeading" type="Label" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -231,8 +237,6 @@ uppercase = true
 [node name="RulesGrid" type="GridContainer" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/h_separation = 12
-theme_override_constants/v_separation = 8
 columns = 2
 
 [node name="SeedLabel" type="Label" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid"]
@@ -246,7 +250,7 @@ size_flags_horizontal = 3
 
 [node name="SeedField" type="LineEdit" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid/SeedRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(96, 38)
+custom_minimum_size = Vector2(96, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 tooltip_text = "The same seed and player count always build the same island. Share it to replay a map."
@@ -255,7 +259,7 @@ virtual_keyboard_type = 2
 
 [node name="NewSeed" type="Button" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid/SeedRow" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 tooltip_text = "Pick a new random seed"
 mouse_default_cursor_shape = 2
@@ -268,7 +272,7 @@ text = "Island"
 
 [node name="IslandPicker" type="OptionButton" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_default_cursor_shape = 2
@@ -281,7 +285,7 @@ text = "Turn timer"
 
 [node name="TimerPicker" type="OptionButton" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 tooltip_text = "When a turn runs out, the host finishes it with the shortest legal moves."
@@ -294,7 +298,7 @@ text = "Points to win"
 
 [node name="PointsPicker" type="OptionButton" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_default_cursor_shape = 2
@@ -306,7 +310,7 @@ text = "Friendly robber"
 
 [node name="FriendlyRobber" type="CheckButton" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 tooltip_text = "The robber cannot be placed next to a player with 2 points or fewer."

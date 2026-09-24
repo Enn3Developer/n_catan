@@ -6,7 +6,7 @@
 script = ExtResource("script")
 
 [node name="Track" type="Button" parent="." groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
