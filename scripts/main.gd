@@ -277,6 +277,8 @@ func _log_received(entries: Array):
 	if is_instance_valid(modal) and modal.name=="GameLog":modal.show_log(game_log,net.seat,state)
 
 func _process(delta):
+	# Menus and dialogs keep the scroll wheel and drags to themselves.
+	board.accepts_input=not state.is_empty() and not is_instance_valid(modal)
 	var soundtrack=net.music_state()
 	audio.follow_soundtrack(soundtrack,delta)
 	if is_instance_valid(board.weather):audio.follow_weather(board.weather.current,delta)

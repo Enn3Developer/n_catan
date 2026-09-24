@@ -56,6 +56,9 @@ var camera_zoom=1.0
 var last_water_quality=-1
 var last_shadow_quality=-1
 var show_labels=true
+## Off in menus and under dialogs: the camera and pieces only answer the mouse
+## and keys while the board itself is what the player is looking at.
+var accepts_input=false
 var view_region=Rect2()
 var day_seconds=150.0
 var active_dice: CatanDiceThrow
@@ -376,6 +379,7 @@ func _process(delta):
 		for i in marker_nodes.size(): marker_nodes[i].scale=Vector3.ONE*(1.65 if i==hover else 1.0)
 
 func _unhandled_input(event):
+	if not accepts_input:return
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index==MOUSE_BUTTON_LEFT and hover>=0:picked.emit(mode,targets[hover].id)
 		if event.button_index in [MOUSE_BUTTON_WHEEL_UP,MOUSE_BUTTON_WHEEL_DOWN]:

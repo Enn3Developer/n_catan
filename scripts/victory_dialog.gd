@@ -12,8 +12,8 @@ const PEAK_COLOR=Color("8c522d")
 
 func show_results(state: Dictionary,net: CatanNetwork):
 	var winner: int=state.winner
-	%Winner.text=tr("%s wins!") % state.players[winner].name
-	%Winner.add_theme_color_override("font_color",net.player_color(winner).darkened(.25))
+	# The winner is the dialog's title; a separate "Victory" heading said the same thing.
+	%Title.text=tr("%s wins!") % state.players[winner].name
 	var island=tr("Random coastline") if state.get("island","random")=="random" else tr("Classic hexagon")
 	%Summary.text=tr("Map seed %d · %s · %d points to win") % [int(state.get("seed",0)),island,int(state.get("points_target",10))]
 	if state.get("friendly_robber",false):%Summary.text+=" · "+tr("Friendly robber")
@@ -33,7 +33,8 @@ func _show_stats(state: Dictionary,net: CatanNetwork):
 	for p in order:
 		var player: Dictionary=state.players[p]
 		var stats: Dictionary=player.get("stats",{})
-		var name_cell=_cell(player.name,net.player_color(p).darkened(.3),16)
+		# Seat colors are too pale for text on parchment, so darken them well.
+		var name_cell=_cell(player.name,net.player_color(p).darkened(.5),16)
 		name_cell.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED
 		name_cell.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
 		name_cell.custom_minimum_size.x=110

@@ -26,17 +26,16 @@ svg('parchment-panel','''<defs><linearGradient id="paper" x2="0" y2="1"><stop st
 def raised(fill,edge,shine,low):
  face=f'f{fill[1:]}'
  return f'<defs><linearGradient id="{face}" x2="0" y2="1"><stop stop-color="{shine}"/><stop offset=".45" stop-color="{fill}"/></linearGradient></defs><rect x="2" y="3" width="92" height="43" rx="9" fill="{low}" stroke="{edge}" stroke-width="2"/><rect x="3" y="3" width="90" height="37" rx="8" fill="url(#{face})"/>'
-# Pressed and selected planks drop their lip: one flat piece of wood with a soft
-# glow along the bottom edge instead of a shadow line.
-def sunken(fill,edge,glow):
- return f'<rect x="2" y="3" width="92" height="43" rx="9" fill="{fill}" stroke="{edge}" stroke-width="2"/><path d="M12 42 H84" stroke="{glow}" stroke-width="2" stroke-opacity=".6" fill="none"/>'
+# Pressed and selected planks drop their lip and sit flush: one flat piece of wood.
+def sunken(fill,edge):
+ return f'<rect x="2" y="3" width="92" height="43" rx="9" fill="{fill}" stroke="{edge}" stroke-width="2"/>'
 for name,body in [
  ('button',raised('#e4c18c','#785334','#ffedc3','#bb8d55')),
  ('button-hover',raised('#f2d4a0','#85542c','#fff3d3','#c29354')),
- ('button-selected',sunken('#e9bf73','#85542c','#fbe3a8')),
+ ('button-selected',sunken('#e9bf73','#85542c')),
  ('button-primary',raised('#5f794f','#314831','#a3b782','#435b3e')),
  ('button-primary-hover',raised('#748c5c','#314831','#bfd298','#506b42')),
- ('button-primary-pressed',sunken('#526747','#2f4532','#8fa26d')),
+ ('button-primary-pressed',sunken('#526747','#2f4532')),
  ('button-disabled',f'<rect x="2" y="3" width="92" height="43" rx="9" fill="#bbab8d" stroke="#a29478" stroke-width="2"/><rect x="3" y="3" width="90" height="37" rx="8" fill="#d4c4a5"/>')]:
  svg(name,body)
 # Knobs are plain brass buttons; grip lines on them read as a pause symbol.
