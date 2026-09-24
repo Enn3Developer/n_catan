@@ -23,3 +23,5 @@ jobs:
         run: |
           python3 tools/release.py bootstrap
           "$PWD/build/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --editor --import --quit
+      - name: Rules tests
+        run: '"$PWD/build/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --script tests/rules_test.gd'
