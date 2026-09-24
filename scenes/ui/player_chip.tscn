@@ -9,142 +9,147 @@
 
 [sub_resource type="StyleBoxFlat" id="ChipPanel"]
 resource_local_to_scene = true
-content_margin_left = 10.0
+content_margin_left = 8.0
 content_margin_top = 6.0
 content_margin_right = 10.0
 content_margin_bottom = 6.0
 bg_color = Color(0, 0, 0, 0)
-border_color = Color(0.67451, 0.52549, 0.329412, 0.35)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [node name="PlayerChip" type="PanelContainer"]
+mouse_filter = 0
 theme_override_styles/panel = SubResource("ChipPanel")
 script = ExtResource("script")
 
-[node name="PlayerContent" type="BoxContainer" parent="."]
-unique_name_in_owner = true
+[node name="ChipBody" type="HBoxContainer" parent="."]
 layout_mode = 2
-vertical = true
+mouse_filter = 2
+theme_override_constants/separation = 10
 
-[node name="PlayerName" type="BoxContainer" parent="PlayerContent"]
+[node name="Accent" type="ColorRect" parent="ChipBody"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(4, 0)
 layout_mode = 2
-theme_override_constants/separation = 5
-
-[node name="NameRow" type="HBoxContainer" parent="PlayerContent/PlayerName"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 6
-
-[node name="Accent" type="ColorRect" parent="PlayerContent/PlayerName/NameRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(4, 18)
-layout_mode = 2
-size_flags_vertical = 4
 mouse_filter = 2
 
-[node name="Name" type="Label" parent="PlayerContent/PlayerName/NameRow"]
+[node name="Info" type="VBoxContainer" parent="ChipBody"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="NameRow" type="HBoxContainer" parent="ChipBody/Info"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Name" type="Label" parent="ChipBody/Info/NameRow"]
 unique_name_in_owner = true
 auto_translate_mode = 2
+custom_minimum_size = Vector2(96, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"HeadingLabel"
-theme_override_colors/font_outline_color = Color(0.286275, 0.207843, 0.129412, 1)
-theme_override_constants/outline_size = 0
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 17
 text_overrun_behavior = 3
 
-[node name="TurnState" type="Label" parent="PlayerContent/PlayerName"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-
-[node name="PlayerStats" type="HBoxContainer" parent="PlayerContent"]
+[node name="Score" type="HBoxContainer" parent="ChipBody/Info/NameRow"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="Score" type="HBoxContainer" parent="PlayerContent/PlayerStats"]
-unique_name_in_owner = true
-layout_mode = 2
+mouse_filter = 0
 theme_override_constants/separation = 4
 
-[node name="Icon" type="TextureRect" parent="PlayerContent/PlayerStats/Score"]
-custom_minimum_size = Vector2(24, 24)
+[node name="Icon" type="TextureRect" parent="ChipBody/Info/NameRow/Score"]
+custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
+size_flags_vertical = 4
 mouse_filter = 2
 texture = ExtResource("icon_star")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Value" type="Label" parent="PlayerContent/PlayerStats/Score"]
+[node name="Value" type="Label" parent="ChipBody/Info/NameRow/Score"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 18
 
-[node name="Resources" type="HBoxContainer" parent="PlayerContent/PlayerStats"]
+[node name="PlayerStats" type="HBoxContainer" parent="ChipBody/Info"]
 unique_name_in_owner = true
 layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="Resources" type="HBoxContainer" parent="ChipBody/Info/PlayerStats"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 0
 theme_override_constants/separation = 4
 
-[node name="Icon" type="TextureRect" parent="PlayerContent/PlayerStats/Resources"]
-custom_minimum_size = Vector2(24, 24)
+[node name="Icon" type="TextureRect" parent="ChipBody/Info/PlayerStats/Resources"]
+custom_minimum_size = Vector2(18, 18)
 layout_mode = 2
+size_flags_vertical = 4
 mouse_filter = 2
 texture = ExtResource("icon_hand")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Value" type="Label" parent="PlayerContent/PlayerStats/Resources"]
+[node name="Value" type="Label" parent="ChipBody/Info/PlayerStats/Resources"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
 
-[node name="Cards" type="HBoxContainer" parent="PlayerContent/PlayerStats"]
+[node name="Cards" type="HBoxContainer" parent="ChipBody/Info/PlayerStats"]
 unique_name_in_owner = true
 layout_mode = 2
+mouse_filter = 0
 theme_override_constants/separation = 4
 
-[node name="Icon" type="TextureRect" parent="PlayerContent/PlayerStats/Cards"]
-custom_minimum_size = Vector2(24, 24)
+[node name="Icon" type="TextureRect" parent="ChipBody/Info/PlayerStats/Cards"]
+custom_minimum_size = Vector2(18, 18)
 layout_mode = 2
+size_flags_vertical = 4
 mouse_filter = 2
 texture = ExtResource("icon_cards")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Value" type="Label" parent="PlayerContent/PlayerStats/Cards"]
+[node name="Value" type="Label" parent="ChipBody/Info/PlayerStats/Cards"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
 
-[node name="RoadLength" type="HBoxContainer" parent="PlayerContent/PlayerStats"]
+[node name="RoadLength" type="HBoxContainer" parent="ChipBody/Info/PlayerStats"]
 unique_name_in_owner = true
 layout_mode = 2
+mouse_filter = 0
 theme_override_constants/separation = 4
 
-[node name="Icon" type="TextureRect" parent="PlayerContent/PlayerStats/RoadLength"]
-custom_minimum_size = Vector2(24, 24)
+[node name="Icon" type="TextureRect" parent="ChipBody/Info/PlayerStats/RoadLength"]
+custom_minimum_size = Vector2(18, 18)
 layout_mode = 2
+size_flags_vertical = 4
 mouse_filter = 2
 texture = ExtResource("icon_road")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Value" type="Label" parent="PlayerContent/PlayerStats/RoadLength"]
+[node name="Value" type="Label" parent="ChipBody/Info/PlayerStats/RoadLength"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
 
-[node name="Knights" type="HBoxContainer" parent="PlayerContent/PlayerStats"]
+[node name="Knights" type="HBoxContainer" parent="ChipBody/Info/PlayerStats"]
 unique_name_in_owner = true
 layout_mode = 2
+mouse_filter = 0
 theme_override_constants/separation = 4
 
-[node name="Icon" type="TextureRect" parent="PlayerContent/PlayerStats/Knights"]
-custom_minimum_size = Vector2(24, 24)
+[node name="Icon" type="TextureRect" parent="ChipBody/Info/PlayerStats/Knights"]
+custom_minimum_size = Vector2(18, 18)
 layout_mode = 2
+size_flags_vertical = 4
 mouse_filter = 2
 texture = ExtResource("icon_knight")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Value" type="Label" parent="PlayerContent/PlayerStats/Knights"]
+[node name="Value" type="Label" parent="ChipBody/Info/PlayerStats/Knights"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16

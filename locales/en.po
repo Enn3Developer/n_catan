@@ -228,9 +228,6 @@ msgstr "Brick"
 msgid "Bright harp, flute and warm strings"
 msgstr "Bright harp, flute and warm strings"
 
-msgid "Build & trade"
-msgstr "Build & trade"
-
 msgid "Build two roads for free."
 msgstr "Build two roads for free."
 
@@ -284,8 +281,47 @@ msgstr "Choose a connected road, or finish building."
 msgid "Choose a development card to play. Victory point cards count automatically."
 msgstr "Choose a development card to play. Victory point cards count automatically."
 
-msgid "Choose a glowing %s on the board."
-msgstr "Choose a glowing %s on the board."
+msgid "End turn"
+msgstr "End turn"
+
+msgid "Discard %d resources"
+msgstr "Discard %d resources"
+
+msgid "Waiting for %s to discard"
+msgstr "Waiting for %s to discard"
+
+msgid "%s is moving the robber"
+msgstr "%s is moving the robber"
+
+msgid "%s's turn"
+msgstr "%s's turn"
+
+msgid "Place a settlement on a glowing corner"
+msgstr "Place a settlement on a glowing corner"
+
+msgid "Place a road beside your settlement"
+msgstr "Place a road beside your settlement"
+
+msgid "Move the robber to a glowing hex"
+msgstr "Move the robber to a glowing hex"
+
+msgid "Choose who to rob"
+msgstr "Choose who to rob"
+
+msgid "Place a free road (%d left)"
+msgstr "Place a free road (%d left)"
+
+msgid "Choose a glowing edge for your road"
+msgstr "Choose a glowing edge for your road"
+
+msgid "Choose a glowing corner for your settlement"
+msgstr "Choose a glowing corner for your settlement"
+
+msgid "Choose a settlement to upgrade"
+msgstr "Choose a settlement to upgrade"
+
+msgid "Build, trade or end your turn"
+msgstr "Build, trade or end your turn"
 
 msgid "Choose a neighboring player to steal from."
 msgstr "Choose a neighboring player to steal from."
@@ -426,9 +462,6 @@ msgstr "Disabled"
 msgid "Discard"
 msgstr "Discard"
 
-msgid "Discard %d"
-msgstr "Discard %d"
-
 msgid "Discard selected resources"
 msgstr "Discard selected resources"
 
@@ -453,9 +486,6 @@ msgstr "During a paired turn, trades are only available with the bank."
 
 msgid "Easy"
 msgstr "Easy"
-
-msgid "End"
-msgstr "End"
 
 msgid "English"
 msgstr "English"
@@ -493,9 +523,6 @@ msgstr "Follow the current tutorial step, or choose Skip lesson."
 
 msgid "Frame limit"
 msgstr "Frame limit"
-
-msgid "Free roads"
-msgstr "Free roads"
 
 msgid "Full"
 msgstr "Full"
@@ -868,9 +895,6 @@ msgstr "Player color"
 msgid "Players"
 msgstr "Players"
 
-msgid "Playing"
-msgstr "Playing"
-
 msgid "Plenty"
 msgstr "Plenty"
 
@@ -960,9 +984,6 @@ msgstr "Road"
 msgid "Roads"
 msgstr "Roads"
 
-msgid "Robber"
-msgstr "Robber"
-
 msgid "Roll"
 msgstr "Roll"
 
@@ -1022,9 +1043,6 @@ msgstr "Settlement"
 msgid "Settlements give 1 point; cities give 2. The longest continuous road (at least 5) and largest army (at least 3 knights) give 2 each. Hidden point cards also count. Reach 10 on your turn to win. End turn when you finish building and trading."
 msgstr "Settlements give 1 point; cities give 2. The longest continuous road (at least 5) and largest army (at least 3 knights) give 2 each. Hidden point cards also count. Reach 10 on your turn to win. End turn when you finish building and trading."
 
-msgid "Setup"
-msgstr "Setup"
-
 msgid "Shadow quality"
 msgstr "Shadow quality"
 
@@ -1067,9 +1085,6 @@ msgstr "Start game"
 
 msgid "Stay"
 msgstr "Stay"
-
-msgid "Steal"
-msgstr "Steal"
 
 msgid "Steal: "
 msgstr "Steal: "
@@ -1397,12 +1412,6 @@ msgstr "buy card"
 msgid "city"
 msgstr "city"
 
-msgid "corner"
-msgstr "corner"
-
-msgid "edge"
-msgstr "edge"
-
 msgid "road"
 msgstr "road"
 
@@ -1458,27 +1467,6 @@ msgstr "FORWARD+ / VULKAN"
 
 msgid "CONTROLS"
 msgstr "CONTROLS"
-
-msgid "Move the robber"
-msgstr "Move the robber"
-
-msgid "Build two free roads"
-msgstr "Build two free roads"
-
-msgid "Take two resources"
-msgstr "Take two resources"
-
-msgid "Claim one resource type"
-msgstr "Claim one resource type"
-
-msgid "+1 victory point"
-msgstr "+1 victory point"
-
-msgid "Next turn"
-msgstr "Next turn"
-
-msgid "No development cards"
-msgstr "No development cards"
 
 msgid "Harbor at Dawn"
 msgstr "Harbor at Dawn"

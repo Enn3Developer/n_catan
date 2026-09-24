@@ -228,9 +228,6 @@ msgstr "Argilla"
 msgid "Bright harp, flute and warm strings"
 msgstr "Arpa vivace, flauto e archi caldi"
 
-msgid "Build & trade"
-msgstr "Costruisci e scambia"
-
 msgid "Build two roads for free."
 msgstr "Costruisci due strade gratuitamente."
 
@@ -284,8 +281,47 @@ msgstr "Scegli un lato collegato alla tua rete, oppure termina la costruzione."
 msgid "Choose a development card to play. Victory point cards count automatically."
 msgstr "Scegli una carta sviluppo da giocare. Le carte punto vittoria vengono conteggiate automaticamente."
 
-msgid "Choose a glowing %s on the board."
-msgstr "Scegli un %s illuminato sul tabellone."
+msgid "End turn"
+msgstr "Fine turno"
+
+msgid "Discard %d resources"
+msgstr "Scarta %d risorse"
+
+msgid "Waiting for %s to discard"
+msgstr "In attesa dello scarto di %s"
+
+msgid "%s is moving the robber"
+msgstr "%s sta spostando il brigante"
+
+msgid "%s's turn"
+msgstr "Turno di %s"
+
+msgid "Place a settlement on a glowing corner"
+msgstr "Metti una colonia su un vertice illuminato"
+
+msgid "Place a road beside your settlement"
+msgstr "Metti una strada accanto alla tua colonia"
+
+msgid "Move the robber to a glowing hex"
+msgstr "Sposta il brigante su un esagono illuminato"
+
+msgid "Choose who to rob"
+msgstr "Scegli a chi rubare"
+
+msgid "Place a free road (%d left)"
+msgstr "Metti una strada gratuita (ne restano %d)"
+
+msgid "Choose a glowing edge for your road"
+msgstr "Scegli un lato illuminato per la strada"
+
+msgid "Choose a glowing corner for your settlement"
+msgstr "Scegli un vertice illuminato per la colonia"
+
+msgid "Choose a settlement to upgrade"
+msgstr "Scegli una colonia da trasformare in città"
+
+msgid "Build, trade or end your turn"
+msgstr "Costruisci, scambia o termina il turno"
 
 msgid "Choose a neighboring player to steal from."
 msgstr "Scegli un giocatore vicino al brigante a cui rubare una risorsa."
@@ -426,9 +462,6 @@ msgstr "Disattivato"
 msgid "Discard"
 msgstr "Scarta"
 
-msgid "Discard %d"
-msgstr "Scarta %d"
-
 msgid "Discard selected resources"
 msgstr "Scarta risorse selezionate"
 
@@ -453,9 +486,6 @@ msgstr "Durante un turno abbinato puoi scambiare solo con la banca."
 
 msgid "Easy"
 msgstr "Facile"
-
-msgid "End"
-msgstr "Fine turno"
 
 msgid "English"
 msgstr "English"
@@ -493,9 +523,6 @@ msgstr "Completa il passaggio della lezione, oppure scegli Salta."
 
 msgid "Frame limit"
 msgstr "Limite fotogrammi"
-
-msgid "Free roads"
-msgstr "Strade gratuite"
 
 msgid "Full"
 msgstr "Completo"
@@ -868,9 +895,6 @@ msgstr "Colore del giocatore"
 msgid "Players"
 msgstr "Giocatori"
 
-msgid "Playing"
-msgstr "Sta giocando"
-
 msgid "Plenty"
 msgstr "Abbondanza"
 
@@ -960,9 +984,6 @@ msgstr "Strada"
 msgid "Roads"
 msgstr "Strade"
 
-msgid "Robber"
-msgstr "Brigante"
-
 msgid "Roll"
 msgstr "Tira"
 
@@ -1022,9 +1043,6 @@ msgstr "Colonia"
 msgid "Settlements give 1 point; cities give 2. The longest continuous road (at least 5) and largest army (at least 3 knights) give 2 each. Hidden point cards also count. Reach 10 on your turn to win. End turn when you finish building and trading."
 msgstr "Le colonie valgono 1 punto, le città 2. La strada continua più lunga, di almeno 5 tratti, e l’esercito più grande, di almeno 3 cavalieri, valgono 2 punti ciascuno. Contano anche le carte punto nascoste. Raggiungi 10 punti nel tuo turno per vincere. Premi Fine turno quando hai finito di costruire e scambiare."
 
-msgid "Setup"
-msgstr "Preparazione"
-
 msgid "Shadow quality"
 msgstr "Qualità ombre"
 
@@ -1067,9 +1085,6 @@ msgstr "Inizia partita"
 
 msgid "Stay"
 msgstr "Resta"
-
-msgid "Steal"
-msgstr "Ruba"
 
 msgid "Steal: "
 msgstr "Ruba a: "
@@ -1397,12 +1412,6 @@ msgstr "acquisto carta"
 msgid "city"
 msgstr "città"
 
-msgid "corner"
-msgstr "vertice"
-
-msgid "edge"
-msgstr "lato"
-
 msgid "road"
 msgstr "strada"
 
@@ -1458,27 +1467,6 @@ msgstr "FORWARD+ / VULKAN"
 
 msgid "CONTROLS"
 msgstr "COMANDI"
-
-msgid "Move the robber"
-msgstr "Sposta il brigante"
-
-msgid "Build two free roads"
-msgstr "Costruisci due strade gratuite"
-
-msgid "Take two resources"
-msgstr "Prendi due risorse"
-
-msgid "Claim one resource type"
-msgstr "Prendi tutte le risorse di un tipo"
-
-msgid "+1 victory point"
-msgstr "+1 punto vittoria"
-
-msgid "Next turn"
-msgstr "Prossimo turno"
-
-msgid "No development cards"
-msgstr "Nessuna carta sviluppo"
 
 msgid "Harbor at Dawn"
 msgstr "Il porto all’alba"

@@ -351,9 +351,6 @@ func _show_victory():
 	victory.show_results(state,net)
 	_route(victory,{"leave_requested":net.leave,"rematch_requested":net.rematch,"log_requested":_journal})
 
-func _phase_text() -> String:
-	return {"setup_settlement":tr("Setup"),"setup_road":tr("Setup"),"play":tr("Build & trade") if state.rolled else tr("Roll dice"),"discard":tr("Discard"),"robber":tr("Robber"),"steal":tr("Steal"),"free_roads":tr("Free roads")}.get(state.phase,"")
-
 func _choose(kind: String):
 	var rules=CatanRules.new();rules.s=state
 	if state.phase=="play" and rules.build_sites(net.seat,kind).is_empty():
@@ -362,7 +359,6 @@ func _choose(kind: String):
 	mode=kind
 	board.set_mode(mode,net.seat)
 	_hud()
-	_notice(tr("Choose a glowing %s on the board.") % (tr("edge") if kind=="road" else tr("corner")))
 
 func _notice(message: String):
 	print(message)
@@ -574,12 +570,21 @@ func _layout_screen():
 	var height=ui.size.y
 	toast.offset_left=-minf(470,width*.5-20)
 	toast.offset_right=minf(470,width*.5-20)
+	var overlay_bottom=0.0
+	if guide!=null and is_instance_valid(tutorial_panel):
+		var lesson: Control=tutorial_panel.find_child("LessonPanel",true,false)
+		var area=screen.overlay_area(ui.size)
+		lesson.offset_left=area.position.x
+		lesson.offset_right=area.end.x-width
+		lesson.offset_bottom=area.position.y+lesson.size.y
+		lesson.offset_top=area.position.y
+		overlay_bottom=lesson.get_global_rect().end.y
+	board.view_region=screen.arrange(ui.size,overlay_bottom)
 	notifications.offset_left=-minf(420,width-32)
 	notifications.offset_right=-16
-	var overlay_bottom=0.0
-	if guide!=null and is_instance_valid(tutorial_panel):overlay_bottom=tutorial_panel.find_child("LessonPanel",true,false).get_global_rect().end.y
-	board.view_region=screen.arrange(ui.size,overlay_bottom)
 	notifications.offset_top=screen.notifications_top
+	toast.offset_bottom=-screen.toast_bottom
+	toast.offset_top=-screen.toast_bottom-42
 	if inspection_mode:board.view_region=Rect2(16,16,width-32,height-64)
 	board._update_camera()
 

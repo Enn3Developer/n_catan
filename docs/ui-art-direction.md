@@ -22,6 +22,10 @@ Every control takes its look from the theme. Choose a variation rather than over
 
 Toggle buttons, tabs and pressed buttons sink into honey wood. Switches (`CheckButton`) and checkboxes draw only their glyph and label, never a button frame.
 
+## In-game screen
+
+The island needs width more than height, so the HUD keeps the sides of the window clear. The scoreboard sits in the top left corner and the tools in the top right. Both corners are open sea, since the camera frames the island across the full width. Everything the player holds or does is in one bar along the bottom. Its first line says what the game is waiting for, and it shows only the actions that apply right now. The camera reserves the bar's height from the player's own turn, so the island does not move when the turn passes.
+
 ## Day and night
 
 `scripts/ui_day_night.gd` swaps the interface to its night palette at dusk. Flat colors change through its `PALETTE` table, so a style may only use a day color that table maps. Textures go through `shaders/ui_night.gdshader`, which maps them by brightness and gives primary (green) and selected (honey) wood their own night tones.
