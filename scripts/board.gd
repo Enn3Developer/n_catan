@@ -3,7 +3,6 @@ extends Node3D
 signal picked(kind: String,id: int)
 const TILE_SIZE=25.0 # Regular hexes: 50 m tip to tip, 43.3 m across flats.
 const PLAYERS=[Color("ed815d"),Color("65bfcb"),Color("d9b76c"),Color("b697d7"),Color("7dcc83"),Color("d1aa87")]
-const LABEL_FONT=preload("res://assets/fonts/FiraSans-Medium.ttf")
 const NUMBER_TOKEN=preload("res://scenes/world/number_token.tscn")
 const PLACEMENT_MARKER=preload("res://scenes/world/placement_marker.tscn")
 const ROBBER_MARKER=preload("res://scenes/world/robber_marker.tscn")
@@ -23,7 +22,6 @@ const DICE_THROW=preload("res://scenes/world/dice_throw.tscn")
 @onready var ocean: MeshInstance3D=$Ocean
 @onready var sea_material: ShaderMaterial=$Ocean.material_override
 @onready var pollen: GPUParticles3D=$SunlitPollen
-@onready var label_layer: CanvasLayer=$Labels
 @onready var fps_label: Label=%FPS
 var state={}
 var mode=""
@@ -45,7 +43,8 @@ var birds=[]
 var seagulls=preload("res://scripts/seagulls.gd").new()
 var reduce_motion=false
 var camera_speed=1.0
-var board_labels=[]
+## Number tokens and port signboards, turned each frame to face the camera.
+var facing=[]
 var quality=2
 var art=CatanTileArt.new()
 var render_values=CatanSettings.DEFAULTS.duplicate()
@@ -80,28 +79,6 @@ func _ready():
 	sea_material.set_shader_parameter("waves",preload("res://scripts/ocean_waves.gd").WAVES)
 	_update_camera()
 	_world_props()
-
-func label3(text: String,pos: Vector3,size: int,color: Color=Color("fff1ce"),resource_id: int=-1) -> Node3D:
-	var anchor=Node3D.new()
-	anchor.position=pos
-	var label=Label.new()
-	label.text=text
-	label.mouse_filter=Control.MOUSE_FILTER_IGNORE
-	label.add_theme_font_override("font",LABEL_FONT)
-	label.add_theme_font_size_override("font_size",20 if size>30 else 13)
-	label.add_theme_color_override("font_color",color)
-	if text.contains(":"):
-		label.add_theme_color_override("font_outline_color",Color("133a41"))
-		label.add_theme_constant_override("outline_size",4)
-	var display: Control=label
-	if resource_id>=0:
-		var row=HBoxContainer.new();row.add_theme_constant_override("separation",3)
-		row.mouse_filter=Control.MOUSE_FILTER_IGNORE
-		CatanIcons.icon(row,CatanIcons.RESOURCES[resource_id],22)
-		row.add_child(label);display=row
-	label_layer.add_child(display)
-	board_labels.append({"anchor":anchor,"label":display,"port":text.contains(":")})
-	return anchor
 
 func apply_preferences(values: Dictionary):
 	var old=render_values.duplicate()
@@ -167,8 +144,7 @@ func build(data: Dictionary):
 	board_scale=CatanRules.island_scale(data)
 	scenery.scale=Vector3.ONE*board_scale*TILE_SIZE
 	_update_camera()
-	for entry in board_labels: entry.label.free()
-	board_labels=[]
+	facing=[]
 	for n in terrain.get_children(): n.free()
 	tile_nodes=[]
 	actors=[]
@@ -201,9 +177,11 @@ func build(data: Dictionary):
 			var marker=CatanWorldLayout.point(CatanWorldLayout.data.token)
 			var token=NUMBER_TOKEN.instantiate()
 			token.position=Vector3(marker.x,0,marker.y)
+			# Larger than the model so the printed number reads from the usual camera height.
+			token.scale=Vector3.ONE*1.3
 			root.add_child(token)
 			token.show_number(t.number)
-			token.add_child(label3(str(t.number),Vector3(0,.275,-.05),43,Color("913f2d") if t.number in [6,8] else Color("302d21")))
+			facing.append(token)
 
 	water_centers=centers.duplicate()
 	while centers.size()<30:centers.append(Vector2(10000,10000))
@@ -225,7 +203,11 @@ func build(data: Dictionary):
 		harbor.rotation.y=atan2(outward.x,outward.z)
 		terrain.add_child(harbor)
 		harbors.append(harbor)
-		terrain.add_child(label3("3:1" if a.port==-1 else "2:1",pos+outward*.82+Vector3.UP*.28,27,Color("fff1ce"),a.port))
+		# The signboard stands on the pier's seaward end, beside the lantern.
+		var port_sign=CatanPortSign.make(a.port)
+		port_sign.position=Vector3(-.1,.04,.6)
+		harbor.add_child(port_sign)
+		facing.append(port_sign)
 	refresh(data)
 	sea_traffic.configure(self)
 	seagulls.configure()
@@ -339,15 +321,15 @@ func set_mode(value: String,player: int):
 			marker_nodes.append(marker)
 
 func _process(delta):
-	for entry in board_labels:
-		if not is_instance_valid(entry.anchor): continue
-		entry.label.visible=show_labels and not camera.is_position_behind(entry.anchor.global_position)
-		var anchor_pos=entry.anchor.global_position
-		var projected=camera.unproject_position(anchor_pos+camera.global_basis.x*.38*TILE_SIZE).distance_to(camera.unproject_position(anchor_pos))
-		var label_scale=clampf(projected/30.0,.48,3.3)
-		if entry.port:label_scale=clampf(label_scale,.8,1.5)
-		entry.label.scale=Vector2.ONE*label_scale
-		entry.label.position=(camera.unproject_position(entry.anchor.global_position)-entry.label.size*entry.label.scale*0.5).round()
+	var yaw=camera.global_rotation.y
+	for node in facing:
+		if not is_instance_valid(node):continue
+		if node is CatanPortSign:
+			node.face(yaw)
+			node.board.visible=show_labels
+		else:
+			node.rotation.y=yaw-node.get_parent().global_rotation.y
+			node.print_label.visible=show_labels
 	if fps_label.visible:fps_label.text=tr("%d FPS · %.1f ms · %.0f MB VRAM") % [Engine.get_frames_per_second(),1000.0/maxf(1,Engine.get_frames_per_second()),Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED)/1048576.0]
 	if reduce_motion: delta=0.0
 	elapsed+=delta

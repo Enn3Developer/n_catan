@@ -2497,3 +2497,6 @@ msgstr "Answers"
 
 msgid "This is the offer as it stands. Accept it instead."
 msgstr "This is the offer as it stands. Accept it instead."
+
+msgid "Any"
+msgstr "Any"
