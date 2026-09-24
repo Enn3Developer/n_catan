@@ -33,10 +33,11 @@ func show_offer(snapshot: Dictionary,player: int,net: CatanNetwork):
 		_prefill_counter(offer)
 	var accepted=responses.values().filter(func(answer):return answer.answer in ["accept","counter"]).size()
 	if own:
-		%Status.text=tr("Waiting for answers…") if waiting else tr("Choose who to trade with.") if accepted>0 else tr("Nobody has accepted yet.") if responses.size()<state.players.size()-1 else tr("Everyone declined. Withdraw the offer to make a new one.")
+		# The response rows already show each answer; only say why nothing can be picked.
+		%Status.text=tr("Waiting for answers…") if waiting else tr("Everyone declined. Withdraw the offer to make a new one.") if accepted==0 and responses.size()>=state.players.size()-1 else ""
 	else:
-		%Status.text={"accept":tr("You accepted. %s picks a partner."),"counter":tr("You sent a counter-offer. %s picks a partner."),"decline":tr("You declined. You can still change your answer.")}.get(mine.get("answer",""),tr("Accept, decline or propose a counter-offer."))
-		if "%s" in %Status.text:%Status.text=%Status.text % state.players[offer.from].name
+		%Status.text=""
+	%Status.visible=not %Status.text.is_empty()
 	for child in %Responses.get_children():child.free()
 	for p in state.players.size():
 		if p!=int(offer.from):_add_response(p,responses.get(str(p),{}),own and not waiting,rules,net.player_color(p))
@@ -125,7 +126,8 @@ func _refresh_counter():
 	var different=give!=get_resource
 	var affordable=hand[give]>=int(%CounterGiveAmount.value)
 	%SendCounter.disabled=not different or not affordable
-	%CounterReason.text=tr("Choose different resources.") if not different else tr("You need %d more %s.") % [int(%CounterGiveAmount.value)-hand[give],tr(CatanRules.RES[give])] if not affordable else tr("%s can take your counter instead of the original offer.") % state.players[state.offer.from].name
+	%CounterReason.text=tr("Choose different resources.") if not different else tr("You need %d more %s.") % [int(%CounterGiveAmount.value)-hand[give],tr(CatanRules.RES[give])] if not affordable else ""
+	%CounterReason.visible=not %CounterReason.text.is_empty()
 
 func _on_send_counter_pressed():
 	# Counters keep the offer's orientation: "give" is what the offering player hands over.

@@ -42,7 +42,8 @@ func _render(follow: bool):
 		%Lines.add_child(row)
 		shown+=1
 	%Empty.visible=shown==0
-	%Count.text=tr("%d entries") % entries.size() if shown==entries.size() else tr("%d of %d entries") % [shown,entries.size()]
+	%Count.visible=shown!=entries.size()
+	%Count.text=tr("%d of %d entries") % [shown,entries.size()]
 	if follow:_scroll_to_end.call_deferred()
 
 ## The shaded line style without its fill, so both kinds of row keep the same margins.

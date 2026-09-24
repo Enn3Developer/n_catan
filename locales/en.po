@@ -120,9 +120,6 @@ msgstr "30 hexes · Paired turns"
 msgid "3D render scale"
 msgstr "3D render scale"
 
-msgid "3–6 players · Solo & online"
-msgstr "3–6 players · Solo & online"
-
 msgid "A trade on the table"
 msgstr "A trade on the table"
 
@@ -316,9 +313,6 @@ msgstr "Choose at least one resource to give and one to receive."
 
 msgid "Choose different resources."
 msgstr "Choose different resources."
-
-msgid "Choose each bot’s difficulty."
-msgstr "Choose each bot’s difficulty."
 
 msgid "Choose exactly %d resources to discard."
 msgstr "Choose exactly %d resources to discard."
@@ -517,9 +511,6 @@ msgstr "GPU workload increases with resolution"
 msgid "GRAPHICS"
 msgstr "GRAPHICS"
 
-msgid "GUIDED PRACTICE"
-msgstr "GUIDED PRACTICE"
-
 msgid "Game log"
 msgstr "Game log"
 
@@ -661,9 +652,6 @@ msgstr "Leave the current room before restarting to update."
 
 msgid "Leave the expedition?"
 msgstr "Leave the expedition?"
-
-msgid "Leave this solo expedition?"
-msgstr "Leave this solo expedition?"
 
 msgid "Leaving pauses this match for the other players.\nIf you host, the room will close."
 msgstr "Leaving pauses this match for the other players.\nIf you host, the room will close."
@@ -810,9 +798,6 @@ msgstr "Open seat"
 msgid "Ore"
 msgstr "Ore"
 
-msgid "Original instrumental music · automatically plays through all five tracks."
-msgstr "Original instrumental music · automatically plays through all five tracks."
-
 msgid "Other players can accept your offer. You can withdraw it to make a new one."
 msgstr "Other players can accept your offer. You can withdraw it to make a new one."
 
@@ -924,9 +909,6 @@ msgstr "Reach 10 victory points by building settlements and cities. Resources co
 
 msgid "Ready"
 msgstr "Ready"
-
-msgid "Ready to play"
-msgstr "Ready to play"
 
 msgid "Receive"
 msgstr "Receive"
@@ -1405,9 +1387,6 @@ msgstr "Your room"
 msgid "Your seat is unavailable. Please reconnect to the game."
 msgstr "Your seat is unavailable. Please reconnect to the game."
 
-msgid "Your soundtrack · choose a track or let the playlist continue."
-msgstr "Your soundtrack · choose a track or let the playlist continue."
-
 msgid "Your trade offer: %s for %s."
 msgstr "Your trade offer: %s for %s."
 
@@ -1452,9 +1431,6 @@ msgstr "To upgrade to a city, you still need %s."
 
 msgid "To buy a development card, you still need %s."
 msgstr "To buy a development card, you still need %s."
-
-msgid "Build, trade and make yourself at home."
-msgstr "Build, trade and make yourself at home."
 
 msgid "%d cards left in deck."
 msgstr "%d cards left in deck."
@@ -2194,9 +2170,6 @@ msgstr "Colors"
 msgid "Workshop"
 msgstr "Workshop"
 
-msgid "Shape every house, roof and road. Banners and road edges always carry the player color, so everyone can still tell whose town is whose."
-msgstr "Shape every house, roof and road. Banners and road edges always carry the player color, so everyone can still tell whose town is whose."
-
 msgid "Choose whose pieces to edit"
 msgstr "Choose whose pieces to edit"
 
@@ -2245,9 +2218,6 @@ msgstr " · Not applied yet"
 msgid "Design your own roads, settlements and cities"
 msgstr "Design your own roads, settlements and cities"
 
-msgid "%d entries"
-msgstr "%d entries"
-
 msgid "%d min"
 msgstr "%d min"
 
@@ -2272,9 +2242,6 @@ msgstr "%d:%02d min"
 msgid "%s accepted your offer."
 msgstr "%s accepted your offer."
 
-msgid "%s can take your counter instead of the original offer."
-msgstr "%s can take your counter instead of the original offer."
-
 msgid "%s declined your offer."
 msgstr "%s declined your offer."
 
@@ -2296,17 +2263,11 @@ msgstr "%s wins with %d victory points!"
 msgid "Accept"
 msgstr "Accept"
 
-msgid "Accept, decline or propose a counter-offer."
-msgstr "Accept, decline or propose a counter-offer."
-
 msgid "Accepts"
 msgstr "Accepts"
 
 msgid "Choose a player who accepted your offer."
 msgstr "Choose a player who accepted your offer."
-
-msgid "Choose who to trade with."
-msgstr "Choose who to trade with."
 
 msgid "Classic hexagon"
 msgstr "Classic hexagon"
@@ -2341,9 +2302,6 @@ msgstr "Friendly robber"
 msgid "Give the other players a moment to answer your offer."
 msgstr "Give the other players a moment to answer your offer."
 
-msgid "How the game went"
-msgstr "How the game went"
-
 msgid "Island"
 msgstr "Island"
 
@@ -2362,9 +2320,6 @@ msgstr "New"
 msgid "No lines match."
 msgstr "No lines match."
 
-msgid "Nobody has accepted yet."
-msgstr "Nobody has accepted yet."
-
 msgid "Other players answer first, then you choose who to trade with."
 msgstr "Other players answer first, then you choose who to trade with."
 
@@ -2373,9 +2328,6 @@ msgstr "Pick a new random seed"
 
 msgid "Play again"
 msgstr "Play again"
-
-msgid "Play again deals a new island to the same table."
-msgstr "Play again deals a new island to the same table."
 
 msgid "Points"
 msgstr "Points"
@@ -2398,9 +2350,6 @@ msgstr "Search the log"
 msgid "Send counter-offer"
 msgstr "Send counter-offer"
 
-msgid "Set by the host"
-msgstr "Set by the host"
-
 msgid "Show lines that mention one player"
 msgstr "Show lines that mention one player"
 
@@ -2409,9 +2358,6 @@ msgstr "Stole"
 
 msgid "The friendly robber spares players with 2 points or fewer. Choose another hex."
 msgstr "The friendly robber spares players with 2 points or fewer. Choose another hex."
-
-msgid "The host can start another game with this table."
-msgstr "The host can start another game with this table."
 
 msgid "The robber cannot be placed next to a player with 2 points or fewer."
 msgstr "The robber cannot be placed next to a player with 2 points or fewer."
@@ -2437,12 +2383,6 @@ msgstr "Waiting for answers…"
 msgid "When a turn runs out, the host finishes it with the shortest legal moves."
 msgstr "When a turn runs out, the host finishes it with the shortest legal moves."
 
-msgid "You accepted. %s picks a partner."
-msgstr "You accepted. %s picks a partner."
-
-msgid "You declined. You can still change your answer."
-msgstr "You declined. You can still change your answer."
-
 msgid "You get"
 msgstr "You get"
 
@@ -2451,12 +2391,6 @@ msgstr "You give"
 
 msgid "You offer:"
 msgstr "You offer:"
-
-msgid "You sent a counter-offer. %s picks a partner."
-msgstr "You sent a counter-offer. %s picks a partner."
-
-msgid "You set these"
-msgstr "You set these"
 
 msgid "Your counter-offer"
 msgstr "Your counter-offer"

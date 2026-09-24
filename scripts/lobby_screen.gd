@@ -22,7 +22,6 @@ var shown_seed=0
 func show_room(net: CatanNetwork,invite_address: String,connection_status: String):
 	%LobbyTitle.text=tr("Solo game") if net.solo else tr("Online room")
 	%PlayerCount.text="%d / 6" % net.roster.size()
-	%RoomType.text="SOLO" if net.solo else "ONLINE"
 	var controller=net.is_controller()
 	%RoomSummary.text=tr("30 hexes · Paired turns") if net.roster.size()>4 else tr("19 hexes · Classic")
 	if not net.solo:%RoomSummary.text+="\n"+(tr("Password required to join") if not net.room_password.is_empty() else tr("Open room · no password"))
@@ -39,18 +38,18 @@ func show_room(net: CatanNetwork,invite_address: String,connection_status: Strin
 	for row in net.roster:
 		if not row.ready: all_ready=false
 	%StartGame.disabled=not controller or not all_ready
-	%LobbyStatus.text=tr("Ready to play") if all_ready else tr("Add %d more player(s)") % (CatanNetwork.MIN_PLAYERS-net.roster.size()) if net.roster.size()<CatanNetwork.MIN_PLAYERS else tr("Waiting for players")
+	%LobbyStatus.text="" if all_ready else tr("Add %d more player(s)") % (CatanNetwork.MIN_PLAYERS-net.roster.size()) if net.roster.size()<CatanNetwork.MIN_PLAYERS else tr("Waiting for players")
 	var hosting=net.multiplayer.is_server()
 	%InviteAddress.text=invite_address if hosting else net.reconnect_address
 	%InviteAddress.editable=hosting
 	for node: Control in [%InviteHeading,%InviteAddress,%InviteActions]:node.visible=not net.solo
 	%MapRouter.disabled=not hosting
-	%ConnectionHelp.text=tr("Choose each bot’s difficulty.") if net.solo else tr("Share the invite code. Host: open UDP 24567.")
+	%ConnectionHelp.visible=not net.solo
+	%ConnectionHelp.text=tr("Share the invite code. Host: open UDP 24567.")
 	if not connection_status.is_empty() and not net.solo:%ConnectionHelp.text=CatanI18n.render(connection_status)
 	_show_rules(net.room_settings,controller,net.solo)
 
 func _show_rules(settings: Dictionary,controller: bool,solo: bool):
-	%RulesOwner.text=tr("You set these") if controller else tr("Set by the host")
 	shown_seed=int(settings.seed)
 	%SeedField.text=str(shown_seed)
 	%SeedField.editable=controller

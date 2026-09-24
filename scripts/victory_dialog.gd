@@ -21,8 +21,6 @@ func show_results(state: Dictionary,net: CatanNetwork):
 	_show_dice(state.get("dice_counts",[]))
 	var controller=net.is_controller() and not net.tutorial
 	%PlayAgain.visible=controller
-	%Rematch.visible=not net.tutorial
-	%Rematch.text=tr("Play again deals a new island to the same table.") if controller else tr("The host can start another game with this table.")
 	%BackToMenu.theme_type_variation=&"" if controller else &"PrimaryButton"
 
 func _show_stats(state: Dictionary,net: CatanNetwork):

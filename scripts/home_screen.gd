@@ -85,7 +85,7 @@ func arrange(viewport: Vector2,_overlay_bottom: float) -> Rect2:
 	var panel: Control=%Expedition
 	panel.offset_right=minf(390,viewport.x-90)
 	var fixed_height=panel.get_theme_stylebox("panel").get_minimum_size().y+30
-	for header: Control in [%Brand,%Title,%MenuNote]:fixed_height+=header.get_combined_minimum_size().y
+	for header: Control in [%Title]:fixed_height+=header.get_combined_minimum_size().y
 	var scroll_height=minf(%MenuItems.get_combined_minimum_size().y,viewport.y-48-fixed_height)
 	%MenuScroll.custom_minimum_size.y=maxf(0,scroll_height)
 	panel.offset_top=-(fixed_height+scroll_height)*.5

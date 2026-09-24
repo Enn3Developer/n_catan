@@ -32,13 +32,6 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Brand" type="Label" parent="Expedition/ExpeditionBody"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 13
-text = "3–6 players · Solo & online"
-horizontal_alignment = 1
-
 [node name="Title" type="TextureRect" parent="Expedition/ExpeditionBody"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 144)
@@ -214,14 +207,6 @@ size_flags_horizontal = 3
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 14
 text = "Exit to desktop"
-
-[node name="MenuNote" type="Label" parent="Expedition/ExpeditionBody"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 13
-text = "Build, trade and make yourself at home."
-horizontal_alignment = 1
-autowrap_mode = 3
 
 [node name="OpenSettings" type="Button" parent="." groups=["ui_click"]]
 unique_name_in_owner = true

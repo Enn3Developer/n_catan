@@ -120,9 +120,6 @@ msgstr "30 esagoni · Turni abbinati"
 msgid "3D render scale"
 msgstr "Scala di rendering 3D"
 
-msgid "3–6 players · Solo & online"
-msgstr "3–6 giocatori · Solo e online"
-
 msgid "A trade on the table"
 msgstr "Proposta di scambio"
 
@@ -316,9 +313,6 @@ msgstr "Scegli almeno una risorsa da dare e una da ricevere."
 
 msgid "Choose different resources."
 msgstr "Scegli risorse diverse."
-
-msgid "Choose each bot’s difficulty."
-msgstr "Scegli la difficoltà di ogni bot."
 
 msgid "Choose exactly %d resources to discard."
 msgstr "Scegli esattamente %d risorse da scartare."
@@ -517,9 +511,6 @@ msgstr "Il carico sulla GPU aumenta con la risoluzione"
 msgid "GRAPHICS"
 msgstr "GRAFICA"
 
-msgid "GUIDED PRACTICE"
-msgstr "ESERCITAZIONE GUIDATA"
-
 msgid "Game log"
 msgstr "Registro partita"
 
@@ -661,9 +652,6 @@ msgstr "Lascia la stanza prima di riavviare per aggiornare."
 
 msgid "Leave the expedition?"
 msgstr "Vuoi lasciare la partita?"
-
-msgid "Leave this solo expedition?"
-msgstr "Vuoi lasciare questa partita in solitaria?"
 
 msgid "Leaving pauses this match for the other players.\nIf you host, the room will close."
 msgstr "Se esci, la partita resta in pausa per gli altri.\nSe sei l’host, la stanza verrà chiusa."
@@ -810,9 +798,6 @@ msgstr "Posto libero"
 msgid "Ore"
 msgstr "Minerale"
 
-msgid "Original instrumental music · automatically plays through all five tracks."
-msgstr "Musica strumentale originale · riproduce automaticamente tutti e cinque i brani."
-
 msgid "Other players can accept your offer. You can withdraw it to make a new one."
 msgstr "Gli altri giocatori possono accettare la tua offerta. Puoi ritirarla per proporne una nuova."
 
@@ -924,9 +909,6 @@ msgstr "Raggiungi 10 punti vittoria costruendo colonie e città. Le risorse arri
 
 msgid "Ready"
 msgstr "Pronto"
-
-msgid "Ready to play"
-msgstr "Pronti a giocare"
 
 msgid "Receive"
 msgstr "Ricevi"
@@ -1405,9 +1387,6 @@ msgstr "La tua stanza"
 msgid "Your seat is unavailable. Please reconnect to the game."
 msgstr "Il tuo posto non è disponibile. Riconnettiti alla partita."
 
-msgid "Your soundtrack · choose a track or let the playlist continue."
-msgstr "La tua musica · scegli un brano o lascia proseguire la playlist."
-
 msgid "Your trade offer: %s for %s."
 msgstr "La tua offerta: %s in cambio di %s."
 
@@ -1452,9 +1431,6 @@ msgstr "Per trasformare la colonia in città ti servono ancora %s."
 
 msgid "To buy a development card, you still need %s."
 msgstr "Per comprare una carta sviluppo ti servono ancora %s."
-
-msgid "Build, trade and make yourself at home."
-msgstr "Costruisci, commercia e sentiti a casa."
 
 msgid "%d cards left in deck."
 msgstr "%d carte rimaste nel mazzo."
@@ -2194,9 +2170,6 @@ msgstr "Colori"
 msgid "Workshop"
 msgstr "Laboratorio"
 
-msgid "Shape every house, roof and road. Banners and road edges always carry the player color, so everyone can still tell whose town is whose."
-msgstr "Dai forma a ogni casa, tetto e strada. Stendardi e bordi delle strade usano sempre il colore del giocatore, così tutti capiscono di chi è ogni paese."
-
 msgid "Choose whose pieces to edit"
 msgstr "Scegli di chi modificare le pedine"
 
@@ -2245,9 +2218,6 @@ msgstr " · Non ancora applicato"
 msgid "Design your own roads, settlements and cities"
 msgstr "Progetta a modo tuo strade, insediamenti e città"
 
-msgid "%d entries"
-msgstr "%d voci"
-
 msgid "%d min"
 msgstr "%d min"
 
@@ -2272,9 +2242,6 @@ msgstr "%d:%02d min"
 msgid "%s accepted your offer."
 msgstr "%s ha accettato la tua proposta."
 
-msgid "%s can take your counter instead of the original offer."
-msgstr "%s può scegliere la tua controproposta al posto della proposta originale."
-
 msgid "%s declined your offer."
 msgstr "%s ha rifiutato la tua proposta."
 
@@ -2296,17 +2263,11 @@ msgstr "%s vince con %d punti vittoria!"
 msgid "Accept"
 msgstr "Accetta"
 
-msgid "Accept, decline or propose a counter-offer."
-msgstr "Accetta, rifiuta o fai una controproposta."
-
 msgid "Accepts"
 msgstr "Accetta"
 
 msgid "Choose a player who accepted your offer."
 msgstr "Scegli un giocatore che ha accettato la tua proposta."
-
-msgid "Choose who to trade with."
-msgstr "Scegli con chi scambiare."
 
 msgid "Classic hexagon"
 msgstr "Esagono classico"
@@ -2341,9 +2302,6 @@ msgstr "Brigante amichevole"
 msgid "Give the other players a moment to answer your offer."
 msgstr "Lascia agli altri giocatori un momento per rispondere."
 
-msgid "How the game went"
-msgstr "Com’è andata la partita"
-
 msgid "Island"
 msgstr "Isola"
 
@@ -2362,9 +2320,6 @@ msgstr "Nuovo"
 msgid "No lines match."
 msgstr "Nessuna riga corrisponde."
 
-msgid "Nobody has accepted yet."
-msgstr "Nessuno ha ancora accettato."
-
 msgid "Other players answer first, then you choose who to trade with."
 msgstr "Prima rispondono gli altri giocatori, poi scegli tu con chi scambiare."
 
@@ -2373,9 +2328,6 @@ msgstr "Scegli un nuovo seme casuale"
 
 msgid "Play again"
 msgstr "Gioca ancora"
-
-msgid "Play again deals a new island to the same table."
-msgstr "Gioca ancora crea una nuova isola per lo stesso tavolo."
 
 msgid "Points"
 msgstr "Punti"
@@ -2398,9 +2350,6 @@ msgstr "Cerca nel diario"
 msgid "Send counter-offer"
 msgstr "Invia controproposta"
 
-msgid "Set by the host"
-msgstr "Scelte dall’host"
-
 msgid "Show lines that mention one player"
 msgstr "Mostra le righe che citano un giocatore"
 
@@ -2409,9 +2358,6 @@ msgstr "Rubate"
 
 msgid "The friendly robber spares players with 2 points or fewer. Choose another hex."
 msgstr "Il brigante amichevole risparmia chi ha 2 punti o meno. Scegli un altro esagono."
-
-msgid "The host can start another game with this table."
-msgstr "L’host può iniziare un’altra partita con questo tavolo."
 
 msgid "The robber cannot be placed next to a player with 2 points or fewer."
 msgstr "Il brigante non può essere messo accanto a un giocatore con 2 punti o meno."
@@ -2437,12 +2383,6 @@ msgstr "In attesa di risposte…"
 msgid "When a turn runs out, the host finishes it with the shortest legal moves."
 msgstr "Quando il tempo del turno finisce, l’host lo conclude con le mosse valide più brevi."
 
-msgid "You accepted. %s picks a partner."
-msgstr "Hai accettato. %s sceglie con chi scambiare."
-
-msgid "You declined. You can still change your answer."
-msgstr "Hai rifiutato. Puoi ancora cambiare risposta."
-
 msgid "You get"
 msgstr "Ricevi"
 
@@ -2451,12 +2391,6 @@ msgstr "Dai"
 
 msgid "You offer:"
 msgstr "Offri:"
-
-msgid "You sent a counter-offer. %s picks a partner."
-msgstr "Hai inviato una controproposta. %s sceglie con chi scambiare."
-
-msgid "You set these"
-msgstr "Le scegli tu"
 
 msgid "Your counter-offer"
 msgstr "La tua controproposta"

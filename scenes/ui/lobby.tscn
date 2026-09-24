@@ -160,12 +160,6 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "Room rules"
 
-[node name="RulesOwner" type="Label" parent="Frame/Columns/Left/RoomRules/RulesBody/RulesHeader"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "Set by the host"
-
 [node name="RulesGrid" type="GridContainer" parent="Frame/Columns/Left/RoomRules/RulesBody"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -258,12 +252,6 @@ layout_mode = 2
 [node name="VoyageBody" type="VBoxContainer" parent="Frame/Columns/Voyage"]
 unique_name_in_owner = true
 layout_mode = 2
-
-[node name="RoomType" type="Label" parent="Frame/Columns/Voyage/VoyageBody"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "Online"
 
 [node name="RoomSummary" type="Label" parent="Frame/Columns/Voyage/VoyageBody"]
 unique_name_in_owner = true
