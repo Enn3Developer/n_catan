@@ -108,11 +108,11 @@ msgstr "%s%s\n%d points · %d resources · %d development cards\nRoad length %d 
 msgid "+ Add bot"
 msgstr "+ Add bot"
 
-msgid "19 hexes · Classic"
-msgstr "19 hexes · Classic"
+msgid "%d hexes · Classic"
+msgstr "%d hexes · Classic"
 
-msgid "30 hexes · Paired turns"
-msgstr "30 hexes · Paired turns"
+msgid "%d hexes · Paired turns"
+msgstr "%d hexes · Paired turns"
 
 msgid "3D render scale"
 msgstr "3D render scale"
@@ -139,8 +139,8 @@ msgstr "Adjust directional shadow-map resolution and soft-shadow filtering. High
 msgid "Adjust ocean mesh resolution, wave layers, fine ripples and shoreline foam. Reflections are set in the Lighting tab."
 msgstr "Adjust ocean mesh resolution, wave layers, fine ripples and shoreline foam. Reflections are set in the Lighting tab."
 
-msgid "Adjust orbit and pan speed. Right-drag orbits; middle-drag pans; the wheel zooms; Home fits the board."
-msgstr "Adjust orbit and pan speed. Right-drag orbits; middle-drag pans; the wheel zooms; Home fits the board."
+msgid "Adjust orbit and pan speed. Drag the board or hold WASD to pan; right-drag or Q/E orbits; the wheel or +/- zooms; Home fits the board."
+msgstr "Adjust orbit and pan speed. Drag the board or hold WASD to pan; right-drag or Q/E orbits; the wheel or +/- zooms; Home fits the board."
 
 msgid "Adjust scene brightness before cinematic tone mapping. Does not change the interface."
 msgstr "Adjust scene brightness before cinematic tone mapping. Does not change the interface."
@@ -2342,11 +2342,11 @@ msgstr "Show lines that mention one player"
 msgid "Stole"
 msgstr "Stole"
 
-msgid "The friendly robber spares players with 2 points or fewer. Choose another hex."
-msgstr "The friendly robber spares players with 2 points or fewer. Choose another hex."
+msgid "The friendly robber spares players with 3 points or fewer. Choose another hex."
+msgstr "The friendly robber spares players with 3 points or fewer. Choose another hex."
 
-msgid "The robber cannot be placed next to a player with 2 points or fewer."
-msgstr "The robber cannot be placed next to a player with 2 points or fewer."
+msgid "The robber cannot be placed next to a player with 3 points or fewer."
+msgstr "The robber cannot be placed next to a player with 3 points or fewer."
 
 msgid "The same seed and player count always build the same island. Share it to replay a map."
 msgstr "The same seed and player count always build the same island. Share it to replay a map."
@@ -2432,8 +2432,8 @@ msgstr "Rolling a seven"
 msgid "Anyone holding more than seven resources discards half, rounded down. Then the roller moves the robber, which stops that hex producing, and steals a resource from a neighbor."
 msgstr "Anyone holding more than seven resources discards half, rounded down. Then the roller moves the robber, which stops that hex producing, and steals a resource from a neighbor."
 
-msgid "Click glowing markers to build. Right-drag to orbit, scroll to zoom and middle-drag to pan. F focuses a tile, H hides the interface and Home fits the board."
-msgstr "Click glowing markers to build. Right-drag to orbit, scroll to zoom and middle-drag to pan. F focuses a tile, H hides the interface and Home fits the board."
+msgid "Click glowing markers to build. Drag the board or hold WASD to pan, right-drag or Q/E to orbit and scroll to zoom. F focuses a tile, H hides the interface and Home fits the board."
+msgstr "Click glowing markers to build. Drag the board or hold WASD to pan, right-drag or Q/E to orbit and scroll to zoom. F focuses a tile, H hides the interface and Home fits the board."
 
 msgid "Five or six players"
 msgstr "Five or six players"
@@ -2569,3 +2569,63 @@ msgstr "Haystacks"
 
 msgid "Woodpile"
 msgstr "Woodpile"
+
+msgid "%s found %d resources in the treasure."
+msgstr "%s found %d resources in the treasure."
+
+msgid "%s settled a new island: +%d points."
+msgstr "%s settled a new island: +%d points."
+
+msgid "A main island and smaller ones across the sea. Build ships to reach them; the first settlement on each new island is worth 2 extra points."
+msgstr "A main island and smaller ones across the sea. Build ships to reach them; the first settlement on each new island is worth 2 extra points."
+
+msgid "All 15 of your ships are at sea. You have none left to place."
+msgstr "All 15 of your ships are at sea. You have none left to place."
+
+msgid "Archipelago"
+msgstr "Archipelago"
+
+msgid "Choose a glowing sea edge for your ship"
+msgstr "Choose a glowing sea edge for your ship"
+
+msgid "Choose a sea edge next to your harbor town or the end of your ships."
+msgstr "Choose a sea edge next to your harbor town or the end of your ships."
+
+msgid "Everyone draws a development card before the first roll and can play it on their first turn."
+msgstr "Everyone draws a development card before the first roll and can play it on their first turn."
+
+msgid "Everyone drew a development card to start."
+msgstr "Everyone drew a development card to start."
+
+msgid "Everyone's first two settlements and roads are placed for them, on good spots of similar value."
+msgstr "Everyone's first two settlements and roads are placed for them, on good spots of similar value."
+
+msgid "Place a free road or ship (%d left)"
+msgstr "Place a free road or ship (%d left)"
+
+msgid "Random start"
+msgstr "Random start"
+
+msgid "Ship"
+msgstr "Ship"
+
+msgid "Starting card"
+msgstr "Starting card"
+
+msgid "Starting settlements were placed at random."
+msgstr "Starting settlements were placed at random."
+
+msgid "The robber sits on the treasure. It pays nothing this time."
+msgstr "The robber sits on the treasure. It pays nothing this time."
+
+msgid "The treasure moves on. Its number is now %d."
+msgstr "The treasure moves on. Its number is now %d."
+
+msgid "To build a ship, you still need %s."
+msgstr "To build a ship, you still need %s."
+
+msgid "Treasure tile"
+msgstr "Treasure tile"
+
+msgid "When its number is rolled, the treasure gives each settlement on it 2 random resources (a city 4), then draws a new number. No one can start within 3 roads of it."
+msgstr "When its number is rolled, the treasure gives each settlement on it 2 random resources (a city 4), then draws a new number. No one can start within 3 roads of it."

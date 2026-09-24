@@ -12,7 +12,7 @@ uniform vec4 shallow_color : source_color=vec4(.235,.49,.455,1.0);
 uniform float motion_speed=.65;
 uniform int water_quality=2;
 uniform int tile_count=0;
-uniform vec2 tile_centers[30];
+uniform vec2 tile_centers[48];
 uniform float tile_radius=10.0;
 uniform int boat_count=0;
 uniform vec4 boat_sources[16]; // world X/Z, longitudinal direction X/Z
@@ -40,7 +40,7 @@ float painted_noise(vec2 p){
 }
 float shore_distance(vec2 p){
  float d=10000.0;
- for(int i=0;i<30;i++){
+ for(int i=0;i<48;i++){
   if(i>=tile_count)break;
   vec2 q=p-tile_centers[i];
   float e=max(abs(q.x),max(abs(q.x*.5+q.y*.8660254),abs(-q.x*.5+q.y*.8660254)))-tile_radius*.8660254;

@@ -14,6 +14,7 @@
 [ext_resource type="Texture2D" path="res://assets/icons/leave.svg" id="icon_leave"]
 [ext_resource type="Texture2D" path="res://assets/icons/dice.svg" id="icon_dice"]
 [ext_resource type="Texture2D" path="res://assets/icons/road.svg" id="icon_road"]
+[ext_resource type="Texture2D" path="res://assets/icons/ship.svg" id="icon_ship"]
 [ext_resource type="Texture2D" path="res://assets/icons/settlement.svg" id="icon_settlement"]
 [ext_resource type="Texture2D" path="res://assets/icons/city.svg" id="icon_city"]
 [ext_resource type="Texture2D" path="res://assets/icons/trade.svg" id="icon_trade"]
@@ -290,6 +291,21 @@ text = "Road"
 icon = ExtResource("icon_road")
 script = ExtResource("cost_button")
 
+[node name="ShipAction" type="Button" parent="Bottom/BottomBody/BottomRow/ActionsBody" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Ship"
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/icon_max_width = 20
+visible = false
+toggle_mode = true
+text = "Ship"
+icon = ExtResource("icon_ship")
+script = ExtResource("cost_button")
+
 [node name="SettlementAction" type="Button" parent="Bottom/BottomBody/BottomRow/ActionsBody" groups=["ui_click"]]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
@@ -367,6 +383,7 @@ script = ExtResource("card_fan")
 [connection signal="pressed" from="HUDTools/OpenSettings" to="." method="emit_signal" binds= ["settings_requested"]]
 [connection signal="pressed" from="HUDTools/LeaveGame" to="." method="emit_signal" binds= ["leave_requested"]]
 [connection signal="pressed" from="Bottom/BottomBody/BottomRow/ActionsBody/RoadAction" to="." method="emit_signal" binds= ["build_requested", "road"]]
+[connection signal="pressed" from="Bottom/BottomBody/BottomRow/ActionsBody/ShipAction" to="." method="emit_signal" binds= ["build_requested", "ship"]]
 [connection signal="pressed" from="Bottom/BottomBody/BottomRow/ActionsBody/SettlementAction" to="." method="emit_signal" binds= ["build_requested", "settlement"]]
 [connection signal="pressed" from="Bottom/BottomBody/BottomRow/ActionsBody/CityAction" to="." method="emit_signal" binds= ["build_requested", "city"]]
 [connection signal="pressed" from="Bottom/BottomBody/BottomRow/ActionsBody/RollDice" to="." method="_request" binds= ["roll"]]

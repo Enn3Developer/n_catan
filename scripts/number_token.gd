@@ -13,8 +13,10 @@ const FACE=.268
 @export var hot_pip: Material
 @export var cold_pip: Material
 var print_label: Label3D
+var number=0
 
-func show_number(number: int):
+func show_number(value: int):
+	number=value
 	var count=6-absi(7-number)
 	var pip_material=hot_pip if number in [6,8] else cold_pip
 	for i in $Pips.get_child_count():
@@ -23,8 +25,10 @@ func show_number(number: int):
 		pip.position.x=(i-(count-1)*.5)*.033
 		pip.position.z=.105
 		pip.material_override=pip_material
-	print_label=Label3D.new()
-	print_label.name="Number"
+	if print_label==null:
+		print_label=Label3D.new()
+		print_label.name="Number"
+		add_child(print_label)
 	print_label.text=str(number)
 	print_label.font=FONT
 	print_label.font_size=128
@@ -39,4 +43,3 @@ func show_number(number: int):
 	print_label.texture_filter=BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 	print_label.rotation.x=-PI/2
 	print_label.position=Vector3(0,FACE,-.03)
-	add_child(print_label)

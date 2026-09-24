@@ -92,7 +92,7 @@ The server owns dice rolls, the deck, hands, resources and action validation. Cl
 
 A random island grows outward from one hex. Each step picks a free neighbor, weighted towards hexes with more land around them, so the coast is ragged without long thin spits. Shapes that enclose water are thrown away and grown again. The finished island is centered on its average tile position. Tile and vertex keys are built before centering so shared corners round the same way. `CatanRules.island_scale()` returns how far the scenery ring (rocks, lighthouse, mainland) must scale out to clear the island, and the board uses it in place of the old fixed scale. Harbor types are shuffled with the same seed and spread evenly along the walked coastline from a seeded starting edge. Edges that face a narrow bay are skipped so moored boats have open water.
 
-The friendly robber refuses hexes that touch another player with 2 public points or fewer. If that leaves no legal hex, every hex is allowed again. `CatanRules.robber_sites()` is shared by the rules, the bot and the board markers.
+The friendly robber refuses hexes that touch another player with 3 public points or fewer. If that leaves no legal hex, every hex is allowed again. `CatanRules.robber_sites()` is shared by the rules, the bot and the board markers.
 
 ### Trades
 

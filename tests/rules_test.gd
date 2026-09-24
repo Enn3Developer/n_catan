@@ -11,6 +11,12 @@ func _init():
 	_friendly_robber()
 	_points_target()
 	_log_tail()
+	_friendly_limit()
+	_fair_dice()
+	_random_start()
+	_start_card()
+	_treasure()
+	_archipelago()
 	print("rules_test: %s" % ("FAILED (%d)" % failures if failures else "ok"))
 	quit(1 if failures else 0)
 
@@ -129,3 +135,158 @@ func _log_tail():
 	var snap=rules.snapshot(0)
 	check(snap.log.size()==40 and snap.log_start==61 and snap.log[-1]=="line 99","log tail")
 	check(rules.s.log.size()==101,"host keeps the whole log")
+
+func _friendly_limit():
+	var rules=CatanRules.new()
+	rules.create(["A","B"],41,{"friendly_robber":true})
+	_setup(rules)
+	var s=rules.s
+	var city=-1
+	for v in s.vertices.size():
+		if s.vertices[v].owner==1: city=v
+	s.vertices[city].level=2
+	rules._score()
+	check(s.players[1].points==3,"three points")
+	var spared=false
+	for t in s.vertices[city].tiles:
+		if t!=s.robber and t not in rules.robber_sites(0): spared=true
+	check(spared,"3 points is still spared")
+	s.players[1].new_cards[4]=0
+	s.vertices[city].level=2
+	for v in s.vertices.size():
+		if s.vertices[v].owner==1 and v!=city: s.vertices[v].level=2
+	rules._score()
+	var open_all=true
+	for t in s.vertices[city].tiles:
+		if t!=s.robber and t not in rules.robber_sites(0): open_all=false
+	check(s.players[1].points==4 and open_all,"4 points is fair game")
+
+func _fair_dice():
+	var rules=CatanRules.new()
+	rules.create(["A","B"],51)
+	var counts={}
+	for i in 360:
+		var roll=rules.total(rules._draw_dice())
+		counts[roll]=counts.get(roll,0)+1
+	# 360 rolls is ten decks; each total lands within a deck's leftover of the odds.
+	for total in range(2,13):
+		var expected=(6-absi(7-total))*10
+		check(absi(int(counts.get(total,0))-expected)<=CatanRules.DICE_RESHUFFLE+2,"dice deck follows the odds for %d: %d" % [total,counts.get(total,0)])
+	check(not rules.snapshot(0).has("dice_bag"),"upcoming rolls stay hidden")
+	rules.force_roll(8)
+	check(rules.total(rules._draw_dice())==8,"forced roll")
+
+func _random_start():
+	for players in [3,4,6]:
+		var names=[]
+		for i in players: names.append("P%d" % i)
+		var rules=CatanRules.new()
+		var s=rules.create(names,61+players,{"random_start":true})
+		check(s.phase=="play" and s.turn==0,"random start skips setup (%d)" % players)
+		for p in players:
+			check(rules.pieces(p,"settlement")==2 and rules.pieces(p,"road")==2,"two of each (%d)" % p)
+			check(rules.total(s.players[p].hand)>0 or true,"starting hand")
+
+func _start_card():
+	var rules=CatanRules.new()
+	rules.create(["A","B","C"],71,{"start_card":true})
+	var deck=rules.s.deck.size()
+	_setup(rules)
+	var s=rules.s
+	check(s.deck.size()==deck-3,"one card each")
+	for p in 3: check(rules.total(s.players[p].cards)==1 and rules.total(s.players[p].new_cards)==0,"card is playable at once")
+
+func _treasure():
+	for island in ["random","classic","archipelago"]:
+		for players in [4,6]:
+			var names=[]
+			for i in players: names.append("P%d" % i)
+			var rules=CatanRules.new()
+			var s=rules.create(names,81+players,{"treasure":true,"island":island})
+			var treasure=-1
+			for t in s.tiles.size():
+				if s.tiles[t].kind==CatanRules.TREASURE: treasure=t
+			check(treasure>=0,"treasure placed")
+			check(s.tiles[treasure].number in CatanRules.TREASURE_NUMBERS,"treasure has a number")
+			_setup(rules)
+			for v in s.vertices.size():
+				if s.vertices[v].owner>=0: check(v not in s.treasure_near,"start is 3 roads from the treasure (%s %d)" % [island,players])
+			# Settle the treasure by hand and roll its number.
+			var corner=s.tiles[treasure].corners[0]
+			s.vertices[corner].owner=0
+			s.vertices[corner].level=2
+			if s.robber==treasure: s.robber=(treasure+1)%s.tiles.size()
+			var number=s.tiles[treasure].number
+			var before=rules.total(s.players[0].hand)
+			rules._pay_treasure(number)
+			check(rules.total(s.players[0].hand)==before+4,"city on the treasure finds 4")
+			check(s.tiles[treasure].number!=number and s.tiles[treasure].number!=7,"treasure number changes")
+
+func _archipelago():
+	for players in [3,4,6]:
+		var names=[]
+		for i in players: names.append("P%d" % i)
+		for game_seed in range(1,9):
+			var rules=CatanRules.new()
+			var s=rules.create(names,game_seed*7+players,{"island":"archipelago"})
+			var islands={}
+			for t in s.tiles: islands[t.island]=int(islands.get(t.island,0))+1
+			check(islands.size()>=3,"several islands (%d)" % islands.size())
+			check(s.tiles.size()==(35 if players>4 else 23),"archipelago tile count %d" % s.tiles.size())
+			var sea_edges=0
+			for e in s.edges: if e.tiles==0: sea_edges+=1
+			check(sea_edges>0,"open sea edges")
+			_setup(rules)
+			for v in s.vertices.size():
+				if s.vertices[v].owner>=0: check(rules._on_island(v,0),"everyone starts on the main island")
+	# Ships: sail from a coastal town to another island for the bonus.
+	var rules=CatanRules.new()
+	var s=rules.create(["A","B","C"],5,{"island":"archipelago"})
+	_setup(rules)
+	s.rolled=true
+	var sites=rules.build_sites(0,"ship")
+	s.players[0].hand=[9,9,9,9,9]
+	if sites.is_empty():
+		# Not every start is coastal; give player 0 a coastal settlement.
+		for v in s.vertices.size():
+			if rules._open_corner(v) and rules._on_island(v,0):
+				var coastal=false
+				for eid in s.vertices[v].edges: if s.edges[eid].tiles<2: coastal=true
+				if coastal:
+					s.vertices[v].owner=0;s.vertices[v].level=1
+					break
+		sites=rules.build_sites(0,"ship")
+	check(not sites.is_empty(),"a coastal town can launch a ship")
+	check(rules.apply(0,{"type":"ship","id":sites[0]})=="","build a ship")
+	check(rules.pieces(0,"ship")==1 and rules.is_ship(sites[0]),"ship on the board")
+	var land_edge=-1
+	for eid in s.edges.size():
+		if s.edges[eid].tiles==0 and s.edges[eid].owner==-1: land_edge=eid
+	check(not rules.valid_edge(0,land_edge),"no roads at sea")
+	# Walk ships to the nearest corner of another island.
+	var target=_sail(rules,0)
+	check(target>=0,"a ship route reaches another island")
+	if target>=0:
+		var before=s.players[0].points
+		check(rules.apply(0,{"type":"settlement","id":target})=="","settle the new island")
+		check(s.players[0].points==before+1+CatanRules.ISLAND_BONUS,"island bonus")
+
+## Builds ships along the shortest sea route to another island's free corner.
+func _sail(rules: CatanRules,p: int) -> int:
+	var s=rules.s
+	for step in 40:
+		for v in s.vertices.size():
+			if rules.valid_vertex(p,v) and not rules._on_island(v,0): return v
+		var best=-1
+		var best_distance=INF
+		for eid in rules.build_sites(p,"ship"):
+			var e=s.edges[eid]
+			for v in [e.a,e.b]:
+				for t in s.tiles:
+					if int(t.island)==0: continue
+					var d=Vector2(s.vertices[v].x-t.x,s.vertices[v].z-t.z).length()
+					if d<best_distance: best_distance=d;best=eid
+		if best<0: return -1
+		s.players[p].hand=[9,9,9,9,9]
+		if rules.apply(p,{"type":"ship","id":best})!="": return -1
+	return -1

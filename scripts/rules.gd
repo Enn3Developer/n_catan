@@ -2,15 +2,37 @@ class_name CatanRules
 extends RefCounted
 
 const RES = ["Timber", "Brick", "Wool", "Grain", "Ore"]
-const COST = {"road": [1,1,0,0,0], "settlement": [1,1,1,1,0], "city": [0,0,0,2,3], "buy_card": [0,0,1,1,1]}
+const COST = {"road": [1,1,0,0,0], "settlement": [1,1,1,1,0], "city": [0,0,0,2,3], "buy_card": [0,0,1,1,1], "ship": [1,0,1,0,0]}
+## Pieces each player owns.
+const PIECE_LIMITS={"road":15,"settlement":5,"city":4,"ship":15}
+## Tile kinds past the five resources.
+const DESERT=5
+const TREASURE=6
 var s: Dictionary = {}
 var rng = RandomNumberGenerator.new()
 
-const ISLANDS=["random","classic"]
+const ISLANDS=["random","classic","archipelago"]
 const TURN_TIMERS=[0,30,45,60,90,120,180]
 const POINT_TARGETS=[5,15]
-const DEFAULT_OPTIONS={"island":"random","points":10,"friendly_robber":false}
+const DEFAULT_OPTIONS={"island":"random","points":10,"friendly_robber":false,"random_start":false,"start_card":false,"treasure":false}
+## House rules that are simple switches in the lobby, with their name and help.
+const HOUSE_RULES=["friendly_robber","random_start","start_card","treasure"]
+const HOUSE_RULE_TEXT={
+	"friendly_robber":["Friendly robber","The robber cannot be placed next to a player with 3 points or fewer."],
+	"random_start":["Random start","Everyone's first two settlements and roads are placed for them, on good spots of similar value."],
+	"start_card":["Starting card","Everyone draws a development card before the first roll and can play it on their first turn."],
+	"treasure":["Treasure tile","When its number is rolled, the treasure gives each settlement on it 2 random resources (a city 4), then draws a new number. No one can start within 3 roads of it."]}
+## Numbers the treasure tile draws from each time it pays out.
+const TREASURE_NUMBERS=[2,3,4,5,6,8,9,10,11,12]
+## A starting settlement must be at least this many roads from the treasure.
+const TREASURE_DISTANCE=3
+## Points for the first settlement on each island past the one you started on.
+const ISLAND_BONUS=2
 const LOG_LIMIT=5000
+## The friendly robber spares players with this many public points or fewer.
+const FRIENDLY_LIMIT=3
+## Outcomes left in the dice deck when it is reshuffled.
+const DICE_RESHUFFLE=5
 ## Unshifted center distance of the classic island's outer tile rim.
 const CLASSIC_EXTENT=4.4641
 const AXIAL=[Vector2i(1,0),Vector2i(1,-1),Vector2i(0,-1),Vector2i(-1,0),Vector2i(-1,1),Vector2i(0,1)]
@@ -29,24 +51,35 @@ func create(names: Array, game_seed: int = 0, options: Dictionary = {}) -> Dicti
 	s.island=str(settings.island) if str(settings.island) in ISLANDS else "random"
 	s.points_target=clampi(int(settings.points),POINT_TARGETS[0],POINT_TARGETS[1])
 	s.friendly_robber=bool(settings.friendly_robber)
+	s.random_start=bool(settings.random_start)
+	s.start_card=bool(settings.start_card)
+	s.treasure=bool(settings.treasure)
 	s.dice_counts=[0,0,0,0,0,0,0,0,0,0,0]
 	s.resource_limit=24 if extended else 19
 	if extended: s.bank=[24,24,24,24,24]
 	var terrain = [0,0,0,0,1,1,1,2,2,2,2,3,3,3,3,4,4,4,5]
 	if extended: terrain.append_array([0,0,1,1,2,2,3,3,4,4,5])
-	_shuffle(terrain)
 	var numbers = [5,2,6,3,8,10,9,12,11,4,8,10,9,4,5,6,3,11]
 	if extended: numbers=[2,2,3,3,3,4,4,4,5,5,5,6,6,6,8,8,8,9,9,9,10,10,10,11,11,11,12,12]
+	# The archipelago spreads a little more land over its islands.
+	if s.island=="archipelago":
+		terrain.append_array([0,2,3,4] if not extended else [0,1,2,3,4])
+		numbers.append_array([3,4,10,11] if not extended else [3,5,9,10,11])
+	_shuffle(terrain)
 	_shuffle(numbers)
-	var centers=_island_centers(terrain.size(),extended) if s.island=="random" else _classic_centers(extended)
+	var land_count=terrain.size()+(1 if s.treasure else 0)
+	var centers=_island_centers(land_count,extended) if s.island=="random" else _archipelago_centers(land_count,extended) if s.island=="archipelago" else _classic_centers(extended)
+	var islands=_island_ids(centers)
+	if s.treasure: terrain.insert(_treasure_spot(centers,islands),TREASURE)
 	var keys = {}
 	var edge_keys = {}
 	var n = 0
 	for center in centers:
 		var tid = s.tiles.size()
 		var kind = terrain[tid]
-		var tile = {"x":center.x,"z":center.y,"kind":kind,"number":0,"corners":[]}
-		if kind != 5:
+		var tile = {"x":center.x,"z":center.y,"kind":kind,"number":0,"corners":[],"island":islands[tid]}
+		if kind==TREASURE: tile.number=TREASURE_NUMBERS[rng.randi_range(0,TREASURE_NUMBERS.size()-1)]
+		elif kind != DESERT:
 			tile.number=numbers[n]
 			n+=1
 		else: s.robber=tid
@@ -72,6 +105,7 @@ func create(names: Array, game_seed: int = 0, options: Dictionary = {}) -> Dicti
 				s.vertices[b].edges.append(eid)
 			s.edges[edge_keys[key]].tiles+=1
 		s.tiles.append(tile)
+	if s.island=="archipelago": _add_sea(centers,keys,edge_keys)
 	# Keys are built before centering so shared corners round identically.
 	var middle=Vector2.ZERO
 	for center in centers: middle+=center
@@ -86,12 +120,12 @@ func create(names: Array, game_seed: int = 0, options: Dictionary = {}) -> Dicti
 			var common=[]
 			for t in s.vertices[e.a].tiles:
 				if t in s.vertices[e.b].tiles: common.append(t)
-			if common.size()==2 and s.tiles[common[0]].number in [6,8] and s.tiles[common[1]].number in [6,8]: valid=false
+			if common.size()==2 and s.tiles[common[0]].kind<DESERT and s.tiles[common[1]].kind<DESERT and s.tiles[common[0]].number in [6,8] and s.tiles[common[1]].number in [6,8]: valid=false
 		if valid: break
 		_shuffle(numbers)
 		n=0
 		for t in s.tiles:
-			if t.kind!=5:
+			if t.kind<DESERT:
 				t.number=numbers[n]
 				n+=1
 	var ports=[-1,0,-1,1,2,-1,3,4,-1]
@@ -99,13 +133,189 @@ func create(names: Array, game_seed: int = 0, options: Dictionary = {}) -> Dicti
 	_shuffle(ports)
 	_place_ports(ports)
 	for pname in names:
-		s.players.append({"name":str(pname).substr(0,20),"hand":[0,0,0,0,0],"cards":[0,0,0,0,0],"new_cards":[0,0,0,0,0],"knights":0,"points":0,"road_length":0,"stats":{"rolls":0,"produced":[0,0,0,0,0],"stolen":0,"lost":0,"discarded":0,"trades":0,"bank_trades":0,"cards_played":0}})
+		s.players.append({"name":str(pname).substr(0,20),"hand":[0,0,0,0,0],"cards":[0,0,0,0,0],"new_cards":[0,0,0,0,0],"knights":0,"points":0,"road_length":0,"islands":[],"island_bonus":0,"stats":{"rolls":0,"produced":[0,0,0,0,0],"stolen":0,"lost":0,"discarded":0,"trades":0,"bank_trades":0,"cards_played":0}})
 	for i in (20 if extended else 14): s.deck.append(0)
 	for i in 5: s.deck.append(4)
 	for i in (3 if extended else 2): s.deck.append_array([1,2,3])
 	_shuffle(s.deck)
+	s.treasure_near=_treasure_near()
+	s.home_island=0
 	_log("The island awaits. Place your first settlement.")
+	if s.random_start: _random_setup()
 	return s
+
+## Groups land into islands: hexes that share a side belong together. The
+## largest island is 0, where everyone starts on an archipelago.
+func _island_ids(centers: Array) -> Array:
+	var ids=[]
+	ids.resize(centers.size())
+	ids.fill(-1)
+	var groups=[]
+	for i in centers.size():
+		if ids[i]>=0: continue
+		var group=[i]
+		ids[i]=groups.size()
+		var at=0
+		while at<group.size():
+			for j in centers.size():
+				if ids[j]<0 and centers[group[at]].distance_to(centers[j])<1.9:
+					ids[j]=ids[i]
+					group.append(j)
+			at+=1
+		groups.append(group)
+	var order=range(groups.size())
+	order.sort_custom(func(a,b):return groups[a].size()>groups[b].size() or (groups[a].size()==groups[b].size() and a<b))
+	var renamed=[]
+	for i in centers.size(): renamed.append(order.find(ids[i]))
+	return renamed
+
+## Where the treasure lies: a coastal hex, on an outer island when there is one,
+## so plenty of the board stays open for starting settlements.
+func _treasure_spot(centers: Array,islands: Array) -> int:
+	var best=[]
+	var fewest=99
+	for i in centers.size():
+		var around=0
+		for j in centers.size():
+			if i!=j and centers[i].distance_to(centers[j])<1.9: around+=1
+		if islands[i]>0: around-=10
+		if around<fewest:
+			fewest=around
+			best=[i]
+		elif around==fewest: best.append(i)
+	return best[rng.randi_range(0,best.size()-1)]
+
+## Corners closer than TREASURE_DISTANCE roads to the treasure tile.
+func _treasure_near() -> Array:
+	var near={}
+	var frontier=[]
+	for t in s.tiles:
+		if t.kind==TREASURE:
+			for v in t.corners:
+				near[v]=true
+				frontier.append(v)
+	for step in TREASURE_DISTANCE-1:
+		var next=[]
+		for v in frontier:
+			for eid in s.vertices[v].edges:
+				var e=s.edges[eid]
+				var other=e.b if e.a==v else e.a
+				if not near.has(other):
+					near[other]=true
+					next.append(other)
+		frontier=next
+	return near.keys()
+
+## A main island and two or three smaller ones, each a sea hex apart. The
+## islands grow like the random coastline, but never touch one another.
+func _archipelago_centers(count: int,extended: bool) -> Array:
+	var sizes=[13,4,3,3] if not extended else [19,6,5,5]
+	var extra=count-_sum(sizes)
+	sizes[0]+=extra
+	var reach=5 if not extended else 6
+	for attempt in 60:
+		var owner={}
+		var islands=[]
+		var turn=rng.randf()*TAU
+		islands.append([Vector2i.ZERO])
+		owner[Vector2i.ZERO]=0
+		for i in range(1,sizes.size()):
+			var angle=turn+TAU*i/(sizes.size()-1)+rng.randf_range(-.3,.3)
+			# World units: neighboring hexes are about 1.73 apart.
+			var distance=rng.randf_range(6.6,7.4) if not extended else rng.randf_range(8.4,9.2)
+			var seed_hex=_nearest_hex(Vector2(cos(angle),sin(angle))*distance)
+			islands.append([seed_hex])
+			owner[seed_hex]=i
+		var ok=true
+		var grown=true
+		while grown:
+			grown=false
+			for i in sizes.size():
+				if islands[i].size()>=sizes[i]: continue
+				var choices=[]
+				var total_weight=0.0
+				for hex in islands[i]:
+					for step in AXIAL:
+						var next: Vector2i=hex+step
+						if owner.has(next) or _ring(next)>reach: continue
+						var touches=false
+						var around=0
+						for side in AXIAL:
+							var near: Vector2i=next+side
+							if owner.has(near):
+								if owner[near]!=i: touches=true
+								else: around+=1
+						if touches: continue
+						var weight=pow(float(around),2.2)
+						choices.append([next,weight])
+						total_weight+=weight
+				if choices.is_empty():
+					ok=false
+					continue
+				var pick=rng.randf()*total_weight
+				for choice in choices:
+					pick-=choice[1]
+					if pick<=0.0 or choice==choices[-1]:
+						islands[i].append(choice[0])
+						owner[choice[0]]=i
+						break
+				grown=true
+		if not ok or _has_lagoon(owner,reach): continue
+		var hexes=owner.keys()
+		hexes.sort_custom(func(a,b): return a.y<b.y or (a.y==b.y and a.x<b.x))
+		var centers=[]
+		for hex in hexes: centers.append(Vector2(sqrt(3.0)*(hex.x+hex.y*0.5),1.5*hex.y))
+		return centers
+	return _island_centers(count,extended)
+
+func _nearest_hex(p: Vector2) -> Vector2i:
+	var r=p.y/1.5
+	var q=p.x/sqrt(3.0)-r*.5
+	var s3=-q-r
+	var rq=roundi(q);var rr=roundi(r);var rs=roundi(s3)
+	var dq=absf(rq-q);var dr=absf(rr-r);var ds=absf(rs-s3)
+	if dq>dr and dq>ds: rq=-rr-rs
+	elif dr>ds: rr=-rq-rs
+	return Vector2i(rq,rr)
+
+func _sum(values: Array) -> int:
+	var result=0
+	for v in values: result+=int(v)
+	return result
+
+## Sea hexes near the archipelago's coasts get corners and edges too, so
+## ships can sail between the islands. Their edges touch no land tile.
+func _add_sea(centers: Array,keys: Dictionary,edge_keys: Dictionary):
+	var land={}
+	for c in centers: land[_nearest_hex(c)]=true
+	var sea={}
+	for hex in land:
+		for a in AXIAL:
+			for b in AXIAL:
+				var near: Vector2i=hex+a+b
+				if not land.has(near): sea[near]=true
+				if not land.has(hex+a): sea[hex+a]=true
+	for hex in sea:
+		var center=Vector2(sqrt(3.0)*(hex.x+hex.y*0.5),1.5*hex.y)
+		var corners=[]
+		for c in 6:
+			var angle=deg_to_rad(30+60*c)
+			var p=center+Vector2(cos(angle),sin(angle))
+			var key="%d,%d" % [roundi(p.x*100),roundi(p.y*100)]
+			if not keys.has(key):
+				keys[key]=s.vertices.size()
+				s.vertices.append({"x":p.x,"z":p.y,"owner":-1,"level":0,"tiles":[],"edges":[],"port":-2})
+			corners.append(keys[key])
+		for c in 6:
+			var a=int(corners[c])
+			var b=int(corners[(c+1)%6])
+			var key="%d:%d" % [mini(a,b),maxi(a,b)]
+			if not edge_keys.has(key):
+				edge_keys[key]=s.edges.size()
+				var eid=s.edges.size()
+				s.edges.append({"a":a,"b":b,"owner":-1,"tiles":0})
+				s.vertices[a].edges.append(eid)
+				s.vertices[b].edges.append(eid)
 
 ## The original hexagon, or the six-player board with its offset rows.
 func _classic_centers(extended: bool) -> Array:
@@ -179,7 +389,7 @@ func _has_lagoon(land: Dictionary,reach: int) -> bool:
 ## Spreads the harbors evenly around the coast, starting at a seeded point.
 ## Edges that face a narrow bay are skipped so the moored boat has open water.
 func _place_ports(ports: Array):
-	var coast=_coast_loop()
+	var coast=_coast_loops()
 	if coast.is_empty(): return
 	var start=rng.randi_range(0,coast.size()-1)
 	for i in ports.size():
@@ -191,13 +401,24 @@ func _place_ports(ports: Array):
 			s.vertices[e.b].port=ports[i]
 			break
 
+## Every island's coast, one loop after another.
+func _coast_loops() -> Array:
+	var all=[]
+	var seen={}
+	while true:
+		var loop=_coast_loop(seen)
+		if loop.is_empty(): break
+		for e in loop: seen[e]=true
+		all.append_array(loop)
+	return all
+
 ## Coast edges in order around the island. Without lagoons they form one loop.
-func _coast_loop() -> Array:
+func _coast_loop(skip: Dictionary={}) -> Array:
 	var by_vertex={}
 	var first=-1
 	for i in s.edges.size():
 		if s.edges[i].tiles!=1: continue
-		if first<0: first=i
+		if first<0 and not skip.has(i): first=i
 		for v in [s.edges[i].a,s.edges[i].b]:
 			if not by_vertex.has(v): by_vertex[v]=[]
 			by_vertex[v].append(i)
@@ -265,31 +486,74 @@ func pay(p: int,cost: Array):
 		s.bank[r]+=cost[r]
 
 func valid_vertex(p: int,v: int,setup: bool=false) -> bool:
-	if v<0 or v>=s.vertices.size() or s.vertices[v].owner!=-1: return false
-	for eid in s.vertices[v].edges:
-		var e=s.edges[eid]
-		if s.vertices[e.b if e.a==v else e.a].owner!=-1: return false
-	if setup: return true
+	if not _open_corner(v): return false
+	if setup: return not _setup_restricted(v)
 	for eid in s.vertices[v].edges:
 		if s.edges[eid].owner==p: return true
 	return false
 
+## An empty land corner with no building on a neighboring corner.
+func _open_corner(v: int) -> bool:
+	if v<0 or v>=s.vertices.size() or s.vertices[v].owner!=-1 or s.vertices[v].tiles.is_empty(): return false
+	for eid in s.vertices[v].edges:
+		var e=s.edges[eid]
+		if s.vertices[e.b if e.a==v else e.a].owner!=-1: return false
+	return true
+
+## Starting settlements keep off the treasure and, on an archipelago, stay on
+## the main island, unless no such corner is left anywhere.
+func _setup_restricted(v: int) -> bool:
+	if not _setup_preferred(v): 
+		for other in s.vertices.size():
+			if _setup_preferred(other) and _open_corner(other): return true
+	return false
+
+func _setup_preferred(v: int) -> bool:
+	if v in s.get("treasure_near",[]): return false
+	if s.get("island","")=="archipelago" and not _on_island(v,int(s.get("home_island",0))): return false
+	return true
+
+func _on_island(v: int,island: int) -> bool:
+	for t in s.vertices[v].tiles:
+		if int(s.tiles[t].get("island",0))==island: return true
+	return false
+
+func is_ship(eid: int) -> bool:
+	return bool(s.edges[eid].get("ship",false))
+
 func valid_edge(p: int,eid: int,setup: bool=false) -> bool:
 	if eid<0 or eid>=s.edges.size() or s.edges[eid].owner!=-1: return false
 	var e=s.edges[eid]
+	# Roads need land on at least one side.
+	if int(e.tiles)==0: return false
 	if setup: return s.anchor in [e.a,e.b]
 	for v in [e.a,e.b]:
 		if s.vertices[v].owner==p: return true
 		if s.vertices[v].owner!=-1: continue
 		for adjacent in s.vertices[v].edges:
-			if s.edges[adjacent].owner==p: return true
+			if s.edges[adjacent].owner==p and not is_ship(adjacent): return true
+	return false
+
+## Ships sail on edges with sea on at least one side, from your own harbor
+## town or the end of your own line of ships. A road and a ship only meet at
+## one of your settlements or cities.
+func valid_ship(p: int,eid: int) -> bool:
+	if s.get("island","")!="archipelago": return false
+	if eid<0 or eid>=s.edges.size() or s.edges[eid].owner!=-1: return false
+	var e=s.edges[eid]
+	if int(e.tiles)>=2: return false
+	for v in [e.a,e.b]:
+		if s.vertices[v].owner==p: return true
+		if s.vertices[v].owner!=-1: continue
+		for adjacent in s.vertices[v].edges:
+			if s.edges[adjacent].owner==p and is_ship(adjacent): return true
 	return false
 
 func pieces(p: int,kind: String) -> int:
 	var count=0
-	if kind=="road":
-		for e in s.edges:
-			if e.owner==p: count+=1
+	if kind=="road" or kind=="ship":
+		for i in s.edges.size():
+			if s.edges[i].owner==p and is_ship(i)==(kind=="ship"): count+=1
 	else:
 		for v in s.vertices:
 			if v.owner==p and v.level==(1 if kind=="settlement" else 2): count+=1
@@ -299,10 +563,13 @@ func pieces(p: int,kind: String) -> int:
 func build_sites(p: int,kind: String) -> Array:
 	var result=[]
 	if p<0 or p>=s.players.size(): return result
-	if pieces(p,kind)>={"road":15,"settlement":5,"city":4}.get(kind,0): return result
+	if pieces(p,kind)>=PIECE_LIMITS.get(kind,0): return result
 	if kind=="road":
 		for e in s.edges.size():
 			if valid_edge(p,e): result.append(e)
+	elif kind=="ship":
+		for e in s.edges.size():
+			if valid_ship(p,e): result.append(e)
 	else:
 		for v in s.vertices.size():
 			if kind=="settlement" and valid_vertex(p,v): result.append(v)
@@ -349,6 +616,7 @@ func apply(p: int,a: Dictionary) -> String:
 		s.vertices[id].owner=p
 		s.vertices[id].level=1
 		s.anchor=id
+		_claim_islands(p,id,false)
 		if s.setup>=s.players.size():
 			for t in s.vertices[id].tiles:
 				var r=s.tiles[t].kind
@@ -364,6 +632,7 @@ func apply(p: int,a: Dictionary) -> String:
 		if s.setup==2*count:
 			s.turn=0
 			s.phase="play"
+			if s.get("start_card",false): _deal_start_cards()
 			_log("All settlements placed. Roll the dice to begin.")
 		else:
 			s.turn=s.setup if s.setup<count else 2*count-1-s.setup
@@ -371,7 +640,7 @@ func apply(p: int,a: Dictionary) -> String:
 	elif s.phase=="discard": return "Wait for all players to discard."
 	elif s.phase=="robber":
 		if action!="robber" or id<0 or id>=s.tiles.size() or id==s.robber: return "Move the robber to a different hex."
-		if id not in robber_sites(p): return "The friendly robber spares players with 2 points or fewer. Choose another hex."
+		if id not in robber_sites(p): return "The friendly robber spares players with 3 points or fewer. Choose another hex."
 		s.robber=id
 		_log(CatanI18n.message("%s moved the robber.",[player.name]))
 		s.victims=[]
@@ -399,13 +668,18 @@ func apply(p: int,a: Dictionary) -> String:
 		elif action=="road" and valid_edge(p,id) and pieces(p,"road")<15:
 			s.edges[id].owner=p
 			s.free_roads-=1
-			if s.free_roads==0 or pieces(p,"road")==15: s.phase="play"
+			if s.free_roads==0 or (pieces(p,"road")==15 and build_sites(p,"ship").is_empty()): s.phase="play"
+		elif action=="ship" and valid_ship(p,id) and pieces(p,"ship")<PIECE_LIMITS.ship:
+			s.edges[id].owner=p
+			s.edges[id].ship=true
+			s.free_roads-=1
+			if s.free_roads==0: s.phase="play"
 		else: return "Choose a connected road, or finish building."
 	elif s.phase=="play":
 		if action=="roll":
 			if s.rolled: return "You already rolled this turn."
 			s.rolled=true
-			s.dice=[rng.randi_range(1,6),rng.randi_range(1,6)]
+			s.dice=_draw_dice()
 			var roll=total(s.dice)
 			_stat(p,"rolls",1)
 			if s.has("dice_counts"): s.dice_counts[roll-2]+=1
@@ -415,7 +689,9 @@ func apply(p: int,a: Dictionary) -> String:
 					var count=total(s.players[i].hand)
 					if count>7: s.discards[str(i)]=floori(count/2.0)
 				s.phase="discard" if not s.discards.is_empty() else "robber"
-			else: produce(roll)
+			else:
+				produce(roll)
+				_pay_treasure(roll)
 		elif action=="play_card":
 			var card=id
 			if card<0 or card>3: return "Choose a development card to play. Victory point cards count automatically."
@@ -423,7 +699,7 @@ func apply(p: int,a: Dictionary) -> String:
 			if player.cards[card]<1:
 				if player.new_cards[card]>0: return "You bought this card this turn. You can play it on your next turn."
 				return "You do not have this development card."
-			if card==1 and pieces(p,"road")>=15: return "All 15 of your roads are on the board. You have none left to place."
+			if card==1 and pieces(p,"road")>=15 and build_sites(p,"ship").is_empty(): return "All 15 of your roads are on the board. You have none left to place."
 			if card==2:
 				var selected=a.get("cards",[])
 				if not _resource_array(selected) or total(selected)!=2: return "Choose two resources."
@@ -457,11 +733,17 @@ func apply(p: int,a: Dictionary) -> String:
 					if pieces(p,"road")>=15: return "All 15 of your roads are on the board. You have none left to place."
 					if not valid_edge(p,id): return "Choose an empty edge connected to your road or building. Another player’s building blocks the route."
 					s.edges[id].owner=p
+				elif action=="ship":
+					if pieces(p,"ship")>=PIECE_LIMITS.ship: return "All 15 of your ships are at sea. You have none left to place."
+					if not valid_ship(p,id): return "Choose a sea edge next to your harbor town or the end of your ships."
+					s.edges[id].owner=p
+					s.edges[id].ship=true
 				elif action=="settlement":
 					if pieces(p,"settlement")>=5: return "All 5 of your settlements are on the board. Upgrade one to a city to free a settlement piece."
 					if not valid_vertex(p,id): return "Choose an empty corner on your road, at least two edges from every settlement or city."
 					s.vertices[id].owner=p
 					s.vertices[id].level=1
+					_claim_islands(p,id,true)
 				elif action=="city":
 					if pieces(p,"city")>=4: return "All 4 of your cities are on the board. You have none left to place."
 					if id<0 or id>=s.vertices.size() or s.vertices[id].owner!=p or s.vertices[id].level!=1: return "Choose one of your settlements to upgrade to a city."
@@ -522,6 +804,28 @@ func apply(p: int,a: Dictionary) -> String:
 	_score()
 	return ""
 
+## Fairer dice: rolls come from a shuffled deck of all 36 two-dice outcomes, so
+## over a game each total turns up about as often as the odds say. The deck is
+## reshuffled with a few outcomes still unseen, so the last rolls stay a surprise.
+func _draw_dice() -> Array:
+	if s.has("next_dice"):
+		var forced: Array=s.next_dice
+		s.erase("next_dice")
+		return forced
+	var bag: Array=s.get("dice_bag",[])
+	if bag.size()<=DICE_RESHUFFLE:
+		bag=[]
+		for a in range(1,7):
+			for b in range(1,7):bag.append([a,b])
+		_shuffle(bag)
+		s.dice_bag=bag
+	return bag.pop_back()
+
+## Makes the next roll come up as this total; lessons use it to show production.
+func force_roll(roll: int):
+	var a=clampi(roll-1,1,6)
+	s.next_dice=[a,roll-a]
+
 func _resource_array(a: Variant) -> bool:
 	if not a is Array or a.size()!=5: return false
 	for n in a:
@@ -579,7 +883,7 @@ func _confirm(p: int,partner: int) -> String:
 	return ""
 
 ## Hexes the robber may move to. The friendly robber stays off hexes that touch
-## another player with 2 public points or fewer, unless that leaves nowhere to go.
+## another player with 3 public points or fewer, unless that leaves nowhere to go.
 func robber_sites(p: int) -> Array:
 	var open=[]
 	var friendly=[]
@@ -589,7 +893,7 @@ func robber_sites(p: int) -> Array:
 		var spared=false
 		for v in s.tiles[t].corners:
 			var owner=int(s.vertices[v].owner)
-			if owner>=0 and owner!=p and int(s.players[owner].points)<=2: spared=true
+			if owner>=0 and owner!=p and int(s.players[owner].points)<=FRIENDLY_LIMIT: spared=true
 		if not spared: friendly.append(t)
 	return friendly if s.get("friendly_robber",false) and not friendly.is_empty() else open
 
@@ -602,7 +906,7 @@ func produce(roll: int):
 	for p in s.players: gains.append([0,0,0,0,0])
 	for i in s.tiles.size():
 		var t=s.tiles[i]
-		if t.number!=roll or i==s.robber or t.kind==5: continue
+		if t.number!=roll or i==s.robber or t.kind>=DESERT: continue
 		for vid in t.corners:
 			var v=s.vertices[vid]
 			if v.owner>=0: gains[v.owner][t.kind]+=v.level
@@ -623,18 +927,107 @@ func produce(roll: int):
 			s.bank[r]-=gains[p][r]
 			_produced(p,r,gains[p][r])
 
+## The treasure pays 2 random resources to each settlement on it and 4 to each
+## city, from what the bank holds. Then it draws a new number.
+func _pay_treasure(roll: int):
+	for i in s.tiles.size():
+		var t=s.tiles[i]
+		if t.kind!=TREASURE or t.number!=roll: continue
+		if i==s.robber:
+			_log("The robber sits on the treasure. It pays nothing this time.")
+			continue
+		for vid in t.corners:
+			var v=s.vertices[vid]
+			if v.owner<0: continue
+			var found=0
+			for n in 2*int(v.level):
+				var stocked=[]
+				for r in 5:
+					if s.bank[r]>0: stocked.append(r)
+				if stocked.is_empty(): break
+				var r=stocked[rng.randi_range(0,stocked.size()-1)]
+				s.bank[r]-=1
+				s.players[v.owner].hand[r]+=1
+				_produced(v.owner,r,1)
+				found+=1
+			if found>0: _log(CatanI18n.message("%s found %d resources in the treasure.",[s.players[v.owner].name,found]))
+		var choices=TREASURE_NUMBERS.duplicate()
+		choices.erase(t.number)
+		t.number=choices[rng.randi_range(0,choices.size()-1)]
+		_log(CatanI18n.message("The treasure moves on. Its number is now %d.",[t.number]))
+
+## Each player draws one development card to hold from the start. It can be
+## played on the player's first turn.
+func _deal_start_cards():
+	for p in s.players.size():
+		if s.deck.is_empty(): break
+		s.players[p].cards[s.deck.pop_back()]+=1
+	_log("Everyone drew a development card to start.")
+
+## Records which islands a player has settled; a new island after the start earns the island bonus.
+func _claim_islands(p: int,v: int,bonus: bool):
+	var player=s.players[p]
+	if not player.has("islands"): player.islands=[]
+	for t in s.vertices[v].tiles:
+		var island=int(s.tiles[t].get("island",0))
+		if island in player.islands: continue
+		player.islands.append(island)
+		if bonus and s.get("island","")=="archipelago":
+			player.island_bonus=int(player.get("island_bonus",0))+1
+			_log(CatanI18n.message("%s settled a new island: +%d points.",[player.name,ISLAND_BONUS]))
+
+## Random start: every player's two settlements and roads are placed for them,
+## in the usual snake order. Each pick comes from the good but not best corners
+## left, so nobody is handed the prize spot.
+func _random_setup():
+	var guard=0
+	while str(s.phase).begins_with("setup") and guard<64:
+		guard+=1
+		var p=int(s.turn)
+		var candidates=[]
+		var owned={}
+		for v in s.vertices:
+			if v.owner==p:
+				for t in v.tiles: owned[s.tiles[t].kind]=true
+		for v in s.vertices.size():
+			if not valid_vertex(p,v,true): continue
+			var score=0.0
+			var kinds={}
+			for t in s.vertices[v].tiles:
+				var tile=s.tiles[t]
+				if tile.kind>=DESERT: continue
+				score+=maxi(0,6-absi(7-int(tile.number)))
+				if not owned.has(tile.kind): kinds[tile.kind]=true
+			candidates.append({"id":v,"score":score+kinds.size()*.8})
+		if candidates.is_empty(): break
+		candidates.sort_custom(func(a,b):return a.score>b.score)
+		var low=int(candidates.size()*.1)
+		var high=maxi(low+1,int(candidates.size()*.35))
+		var pick=candidates[rng.randi_range(low,mini(high,candidates.size())-1)].id
+		apply(p,{"type":"settlement","id":pick})
+		var roads=[]
+		for eid in s.vertices[pick].edges:
+			if valid_edge(p,eid,true): roads.append(eid)
+		if roads.is_empty(): break
+		apply(p,{"type":"road","id":roads[rng.randi_range(0,roads.size()-1)]})
+	_log("Starting settlements were placed at random.")
+
 func _produced(p: int,r: int,amount: int):
 	var stats=s.players[p].get("stats",{})
 	if stats.has("produced"): stats.produced[r]+=amount
 
-func _walk(p: int,v: int,used: Dictionary) -> int:
+## Longest route: roads and ships count together, but a route only switches
+## between them at one of the player's own settlements or cities.
+func _walk(p: int,v: int,used: Dictionary,last: int=-1) -> int:
 	if not used.is_empty() and s.vertices[v].owner>=0 and s.vertices[v].owner!=p: return 0
 	var best=0
 	for eid in s.vertices[v].edges:
 		if s.edges[eid].owner!=p or used.has(eid): continue
+		var ship=1 if is_ship(eid) else 0
+		if last>=0 and ship!=last and s.vertices[v].owner!=p: continue
 		used[eid]=true
 		var e=s.edges[eid]
-		best=maxi(best,1+_walk(p,e.b if e.a==v else e.a,used))
+		best=maxi(best,1+_walk(p,e.b if e.a==v else e.a,used,ship))
 		used.erase(eid)
 	return best
 
@@ -662,6 +1055,7 @@ func _score():
 			if v.owner==p: points+=v.level
 		if s.longest==p: points+=2
 		if s.army==p: points+=2
+		points+=ISLAND_BONUS*int(s.players[p].get("island_bonus",0))
 		s.players[p].points=points
 		if p==s.turn and points+s.players[p].cards[4]+s.players[p].new_cards[4]>=target():
 			s.winner=p
@@ -680,6 +1074,9 @@ func snapshot(viewer: int,log_tail: int=40) -> Dictionary:
 	result.log_start=history.size()-result.log.size()
 	result.deck_count=result.deck.size()
 	result.erase("deck")
+	# Upcoming rolls stay with the host.
+	result.erase("dice_bag")
+	result.erase("next_dice")
 	for p in result.players.size():
 		var player=result.players[p]
 		player.resource_count=total(player.hand)
@@ -698,5 +1095,5 @@ func _missing(player: int,cost: Array) -> Dictionary:
 	return {"list":parts}
 
 func cost_error(player: int,kind: String) -> String:
-	var keys={"road":"To build a road, you still need %s.","settlement":"To build a settlement, you still need %s.","city":"To upgrade to a city, you still need %s.","buy_card":"To buy a development card, you still need %s."}
+	var keys={"ship":"To build a ship, you still need %s.","road":"To build a road, you still need %s.","settlement":"To build a settlement, you still need %s.","city":"To upgrade to a city, you still need %s.","buy_card":"To buy a development card, you still need %s."}
 	return CatanI18n.message(keys[kind],[_missing(player,COST[kind])])

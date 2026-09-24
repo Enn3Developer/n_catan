@@ -46,7 +46,7 @@ var bot_turn=-1
 const TURN_SECONDS=60.0
 ## Seconds other players have to answer a trade offer before the offerer picks.
 const TRADE_WINDOW=4.0
-const DEFAULT_SETTINGS={"seed":0,"island":"random","turn_seconds":int(TURN_SECONDS),"points":10,"friendly_robber":false}
+const DEFAULT_SETTINGS={"seed":0,"island":"random","turn_seconds":int(TURN_SECONDS),"points":10,"friendly_robber":false,"random_start":false,"start_card":false,"treasure":false}
 ## House rules and the map seed, chosen in the lobby by the room controller.
 var room_settings=DEFAULT_SETTINGS.duplicate()
 var turn_seconds=TURN_SECONDS
@@ -285,7 +285,8 @@ func _start(id: int):
 func _new_game():
 	var names=[]
 	for row in roster: names.append(row.name)
-	var options={"island":room_settings.island,"points":room_settings.points,"friendly_robber":room_settings.friendly_robber}
+	var options={"island":room_settings.island,"points":room_settings.points}
+	for rule in CatanRules.HOUSE_RULES:options[rule]=bool(room_settings.get(rule,false))
 	rules.create(names,int(room_settings.seed),options)
 	game_count+=1
 	rules.s.game_id=game_count
@@ -346,9 +347,8 @@ func _set_setting(sender: int,key: String,value: Variant):
 			if not (value is int) or value not in CatanRules.TURN_TIMERS:return
 		"points":
 			if not (value is int) or value<CatanRules.POINT_TARGETS[0] or value>CatanRules.POINT_TARGETS[1]:return
-		"friendly_robber":
-			if not (value is bool):return
-		_:return
+		_:
+			if key not in CatanRules.HOUSE_RULES or not (value is bool):return
 	if room_settings.get(key)==value:return
 	room_settings[key]=value
 	_broadcast_lobby()

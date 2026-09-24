@@ -11,6 +11,12 @@ const CHIMNEY_SMOKE=preload("res://scenes/world/chimney_smoke.tscn")
 # Roads sit directly on the terrain surface around each vertex.
 const ROAD_BASE=.201
 const DICE_THROW=preload("res://scenes/world/dice_throw.tscn")
+const SHIP=preload("res://assets/models/props/ship.glb")
+const TREASURE=preload("res://assets/models/props/treasure.glb")
+# Matches the tile_centers array in water.gdshader.
+const MAX_WATER_TILES=48
+# Ships ride just above the calm water line.
+const SHIP_BASE=.04
 @onready var camera: Camera3D=$CameraRig/Camera
 @onready var sun: DirectionalLight3D=$Sun
 @onready var environment: Environment=$WorldEnvironment.environment
@@ -49,9 +55,22 @@ var quality=2
 var art=CatanTileArt.new()
 var render_values=CatanSettings.DEFAULTS.duplicate()
 var tile_nodes=[]
+## Number tokens by tile, so a treasure that moves on can reprint its number.
+var tokens={}
 var water_centers=PackedVector2Array()
 var camera_focus=Vector3(0,0,1.0)
 var camera_zoom=1.0
+## Input moves these goals; the camera eases toward them each frame.
+var goal_focus=Vector3(0,0,1.0)
+var goal_zoom=1.0
+var goal_yaw=0.0
+var goal_pitch=.745
+## The view Home returns to, fitted to the board's tiles.
+var home_focus=Vector3(0,0,1.0)
+var home_zoom=1.0
+## A left press on open ground becomes a pan once it moves a few pixels.
+var press_at=Vector2.INF
+var left_panning=false
 var last_water_quality=-1
 var last_shadow_quality=-1
 var show_labels=true
@@ -62,6 +81,8 @@ var view_region=Rect2()
 var day_seconds=150.0
 var active_dice: CatanDiceThrow
 var living_world=preload("res://scripts/living_world.gd").new()
+## Paints the "Owner" surfaces of authored pieces in the player's color.
+var tint=CatanModelTint.new()
 var actors=[]
 var harbors=[]
 var band_actors=[]
@@ -143,8 +164,10 @@ func build(data: Dictionary):
 	state=data
 	board_scale=CatanRules.island_scale(data)
 	scenery.scale=Vector3.ONE*board_scale*TILE_SIZE
-	_update_camera()
+	_fit_home()
+	reset_camera(true)
 	facing=[]
+	tokens={}
 	for n in terrain.get_children(): n.free()
 	tile_nodes=[]
 	actors=[]
@@ -153,9 +176,11 @@ func build(data: Dictionary):
 	var centers=PackedVector2Array()
 	for i in state.tiles.size():
 		var t=state.tiles[i]
+		# The treasure lies on a sandy tile like the desert's.
+		var kind=mini(int(t.kind),CatanRules.DESERT)
 		centers.append(Vector2(t.x,t.z)*TILE_SIZE)
 		var root=Node3D.new()
-		root.name="Tile_%02d_%s" % [i,CatanTileArt.BIOMES[t.kind]]
+		root.name="Tile_%02d_%s" % [i,"treasure" if t.kind==CatanRules.TREASURE else CatanTileArt.BIOMES[kind]]
 		root.position=Vector3(t.x,0,t.z)
 		terrain.add_child(root)
 		var side=MeshInstance3D.new()
@@ -165,14 +190,23 @@ func build(data: Dictionary):
 		root.add_child(side)
 		var top=MeshInstance3D.new()
 		top.name="SculptedGround"
-		top.mesh=art.ground_mesh(t.kind)
+		top.mesh=art.ground_mesh(kind)
 		top.lod_bias=CatanTileArt.lod_bias(render_values)
-		top.material_override=art.ground(t.kind,i)
+		top.material_override=art.ground(kind,i)
 		root.add_child(top)
-		var diorama=art.instantiate(t.kind,i,render_values)
+		var diorama=art.instantiate(kind,i,render_values)
 		root.add_child(diorama)
-		actors.append_array(living_world.populate(root,t.kind,i,art))
-		tile_nodes.append({"root":root,"ground":top,"cliff":side,"diorama":diorama,"kind":t.kind,"index":i})
+		actors.append_array(living_world.populate(root,kind,i,art))
+		tile_nodes.append({"root":root,"ground":top,"cliff":side,"diorama":diorama,"kind":kind,"index":i})
+		if t.kind==CatanRules.TREASURE:
+			var spot=Vector2(-.34,-.22)
+			var chest: Node3D=TREASURE.instantiate()
+			_apply_surfaces(chest)
+			chest.position=Vector3(spot.x,art.height_at(spot,kind),spot.y)
+			chest.rotation.y=.5
+			chest.scale=Vector3.ONE*2.0
+			living_world.wire_lights(chest)
+			root.add_child(chest)
 		if t.number>0:
 			var marker=CatanWorldLayout.point(CatanWorldLayout.data.token)
 			var token=NUMBER_TOKEN.instantiate()
@@ -182,9 +216,10 @@ func build(data: Dictionary):
 			root.add_child(token)
 			token.show_number(t.number)
 			facing.append(token)
+			tokens[i]=token
 
 	water_centers=centers.duplicate()
-	while centers.size()<30:centers.append(Vector2(10000,10000))
+	while centers.size()<MAX_WATER_TILES:centers.append(Vector2(10000,10000))
 	sea_material.set_shader_parameter("tile_centers",centers)
 	sea_material.set_shader_parameter("tile_count",state.tiles.size())
 	sea_material.set_shader_parameter("tile_radius",TILE_SIZE*.993)
@@ -232,7 +267,7 @@ func refresh(data: Dictionary):
 	for n in pieces_root.get_children(): n.free()
 	var joins={}
 	for e in state.edges:
-		if e.owner<0:continue
+		if e.owner<0 or e.get("ship",false):continue
 		for vid in [e.a,e.b]:
 			if state.vertices[vid].owner>=0:continue
 			var key=Vector2i(vid,e.owner)
@@ -241,6 +276,9 @@ func refresh(data: Dictionary):
 		if e.owner<0: continue
 		var a=state.vertices[e.a]
 		var b=state.vertices[e.b]
+		if e.get("ship",false):
+			_ship(e)
+			continue
 		var road=CatanPieceBuilder.road(_look(e.owner),player_color(e.owner),_full_detail())
 		var start=Vector3(a.x,0,a.z)
 		var end=Vector3(b.x,0,b.z)
@@ -273,9 +311,12 @@ func refresh(data: Dictionary):
 			village.scale=Vector3.ONE*0.1
 			create_tween().tween_property(village,"scale",Vector3.ONE,0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
+	for i in tokens:
+		if i<state.tiles.size() and is_instance_valid(tokens[i]) and tokens[i].number!=int(state.tiles[i].number):
+			tokens[i].show_number(int(state.tiles[i].number))
 	road_travel.assign(state,town_residents,pieces_root)
 	var t=state.tiles[state.robber]
-	var band=living_world.robber_band(t.kind,art)
+	var band=living_world.robber_band(mini(int(t.kind),CatanRules.DESERT),art)
 	band.root.position=Vector3(t.x,0,t.z)
 	pieces_root.add_child(band.root)
 	band_actors=band.actors
@@ -283,6 +324,24 @@ func refresh(data: Dictionary):
 	advance_day(0)
 	set_mode(mode,seat)
 	CatanDiagnostics.event("board.refresh.complete")
+
+## A ship sits well out on its edge's sea side, so the cliff never hides its hull.
+func _ship(e: Dictionary):
+	var a=state.vertices[e.a]
+	var b=state.vertices[e.b]
+	var middle=Vector3((a.x+b.x)*.5,0,(a.z+b.z)*.5)
+	var along=Vector3(b.x-a.x,0,b.z-a.z).normalized()
+	var across=Vector3(-along.z,0,along.x)
+	for t in a.tiles:
+		if t in b.tiles and across.dot(middle-Vector3(state.tiles[t].x,0,state.tiles[t].z))<0:across=-across
+	var ship: Node3D=tint.paint(SHIP.instantiate(),player_color(e.owner),"Owner")
+	_apply_surfaces(ship)
+	ship.position=middle+across*(.2 if int(e.tiles)==1 else 0.0)+Vector3.UP*SHIP_BASE
+	ship.rotation.y=atan2(along.x,along.z)
+	# The hull is .5 long, a little shorter than an edge, so bow and stern clear the coast corners.
+	ship.scale=Vector3.ONE*1.05
+	living_world.wire_lights(ship)
+	pieces_root.add_child(ship)
 
 func set_mode(value: String,player: int):
 	mode=value
@@ -295,15 +354,22 @@ func set_mode(value: String,player: int):
 	var rules=CatanRules.new()
 	rules.s=state
 	var robber_sites=rules.robber_sites(seat) if mode=="robber" else []
-	var source=state.edges if mode=="road" else state.tiles if mode=="robber" else state.vertices
+	var edges=mode in ["road","ship","route"]
+	var source=state.edges if edges else state.tiles if mode=="robber" else state.vertices
 	for i in source.size():
 		var good=false
 		var pos=Vector3.ZERO
-		if mode=="road":
-			good=rules.valid_edge(seat,i,state.phase=="setup_road")
+		var kind=mode
+		if edges:
+			# "route" offers both, for free roads on an archipelago.
+			good=mode!="ship" and rules.valid_edge(seat,i,state.phase=="setup_road")
+			kind="road"
+			if not good and mode!="road" and rules.valid_ship(seat,i):
+				good=true
+				kind="ship"
 			var a=state.vertices[source[i].a]
 			var b=state.vertices[source[i].b]
-			pos=Vector3((a.x+b.x)/2,0.33,(a.z+b.z)/2)
+			pos=Vector3((a.x+b.x)/2,0.33 if kind=="road" else .2,(a.z+b.z)/2)
 		elif mode=="settlement":
 			good=rules.valid_vertex(seat,i,state.phase=="setup_settlement")
 			pos=Vector3(source[i].x,0.33,source[i].z)
@@ -317,10 +383,11 @@ func set_mode(value: String,player: int):
 			var marker=(ROBBER_MARKER if mode=="robber" else PLACEMENT_MARKER).instantiate()
 			marker.position=pos
 			markers.add_child(marker)
-			targets.append({"id":i,"pos":markers.to_global(pos)})
+			targets.append({"id":i,"pos":markers.to_global(pos),"kind":kind})
 			marker_nodes.append(marker)
 
 func _process(delta):
+	_steer_camera(delta)
 	var yaw=camera.global_rotation.y
 	for node in facing:
 		if not is_instance_valid(node):continue
@@ -360,45 +427,111 @@ func _process(delta):
 		hover=nearest
 		for i in marker_nodes.size(): marker_nodes[i].scale=Vector3.ONE*(1.65 if i==hover else 1.0)
 
+const CAMERA_EASE=11.0
+const ZOOM_RANGE=Vector2(.16,1.6)
+const PITCH_RANGE=Vector2(.27,1.28)
+
 func _unhandled_input(event):
 	if not accepts_input:return
-	if event is InputEventMouseButton and event.pressed:
-		if event.button_index==MOUSE_BUTTON_LEFT and hover>=0:picked.emit(mode,targets[hover].id)
-		if event.button_index in [MOUSE_BUTTON_WHEEL_UP,MOUSE_BUTTON_WHEEL_DOWN]:
-			var before=_mouse_ground()
-			camera_zoom=clampf(camera_zoom*(.86 if event.button_index==MOUSE_BUTTON_WHEEL_UP else 1.16),.16,1.6)
-			_update_camera()
-			camera_focus+=before-_mouse_ground()
-			_clamp_focus()
-			_update_camera()
+	if event is InputEventMouseButton:
+		if event.button_index==MOUSE_BUTTON_LEFT:
+			if event.pressed and hover>=0:picked.emit(targets[hover].get("kind",mode),targets[hover].id)
+			press_at=event.position if event.pressed and hover<0 else Vector2.INF
+			left_panning=false
+		if event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP,MOUSE_BUTTON_WHEEL_DOWN]:
+			# Trackpads send fractional wheel steps; factor scales the zoom to match.
+			var steps=event.factor if event.factor>0 else 1.0
+			zoom_at(event.position,pow(.86 if event.button_index==MOUSE_BUTTON_WHEEL_UP else 1.16,steps))
+	if event is InputEventMagnifyGesture:zoom_at(event.position,1.0/maxf(event.factor,.01))
+	if event is InputEventPanGesture:
+		pan_by(-event.delta*6.0,false)
 	if event is InputEventMouseMotion:
 		if event.button_mask&MOUSE_BUTTON_MASK_MIDDLE:
-			var right=camera.global_basis.x
-			var forward=Vector3(right.z,0,-right.x)
-			var speed=camera.position.distance_to(camera_focus)*.0007*camera_speed
-			camera_focus+=(-right*event.relative.x+forward*event.relative.y)*speed
-			_clamp_focus()
-			_update_camera()
+			_grab(event.position-event.relative,event.position)
 		elif event.button_mask&MOUSE_BUTTON_MASK_RIGHT:
-			yaw-=event.relative.x*.006*camera_speed
-			pitch=clampf(pitch+event.relative.y*.004*camera_speed,.27,1.28)
+			goal_yaw-=event.relative.x*.006*camera_speed
+			goal_pitch=clampf(goal_pitch+event.relative.y*.004*camera_speed,PITCH_RANGE.x,PITCH_RANGE.y)
+			# Orbiting follows the hand directly; easing it feels like lag.
+			yaw=goal_yaw;pitch=goal_pitch
 			_update_camera()
+		elif event.button_mask&MOUSE_BUTTON_MASK_LEFT and press_at!=Vector2.INF:
+			if not left_panning and event.position.distance_to(press_at)>6:left_panning=true
+			if left_panning:_grab(event.position-event.relative,event.position)
 	if event is InputEventKey and event.pressed:
 		if event.keycode==KEY_HOME:reset_camera()
 		if event.keycode==KEY_F:focus_tile_at_cursor()
+		if event.keycode in [KEY_EQUAL,KEY_KP_ADD]:zoom_at(get_viewport().get_visible_rect().size*.5,.8)
+		if event.keycode in [KEY_MINUS,KEY_KP_SUBTRACT]:zoom_at(get_viewport().get_visible_rect().size*.5,1.25)
 
-func _mouse_ground() -> Vector3:
-	var mouse=get_viewport().get_mouse_position()
-	var origin=camera.project_ray_origin(mouse)
-	var direction=camera.project_ray_normal(mouse)
-	if absf(direction.y)<.01:return camera_focus
+## Zooms by factor while the ground under the pointer stays put. Scaling the
+## camera about that ground point keeps it on the same pixel.
+func zoom_at(screen: Vector2,factor: float):
+	var next=clampf(goal_zoom*factor,ZOOM_RANGE.x,ZOOM_RANGE.y)
+	var k=next/goal_zoom
+	var anchor=_ground_at(screen)
+	goal_zoom=next
+	goal_focus=anchor+(goal_focus-anchor)*k
+	_clamp_goal()
+
+## Pans by a screen-space offset in pixels, scaled to the camera distance.
+func pan_by(pixels: Vector2,direct: bool):
+	var right=Vector3(cos(goal_yaw),0,-sin(goal_yaw))
+	var back=Vector3(sin(goal_yaw),0,cos(goal_yaw))
+	var shift=(right*pixels.x+back*pixels.y)*camera.position.distance_to(camera_focus)*.0011*camera_speed
+	goal_focus+=shift
+	_clamp_goal()
+	if direct:
+		camera_focus=goal_focus
+		_update_camera()
+
+## Drags the board so the ground under the pointer follows it exactly.
+func _grab(from: Vector2,to: Vector2):
+	var shift=_ground_at(from)-_ground_at(to)
+	var reach=camera.position.distance_to(camera_focus)
+	# Near the horizon the ground point races away; fall back to a plain pan.
+	if shift.length()>reach*.25:shift=shift.normalized()*reach*.25
+	goal_focus+=Vector3(shift.x,0,shift.z)
+	_clamp_goal()
+	camera_focus=goal_focus
+	_update_camera()
+
+func _steer_camera(delta: float):
+	if accepts_input and not _typing():
+		var keys=Vector2(_held(KEY_D,KEY_RIGHT)-_held(KEY_A,KEY_LEFT),_held(KEY_S,KEY_DOWN)-_held(KEY_W,KEY_UP))
+		if keys!=Vector2.ZERO:pan_by(keys.normalized()*900*delta,false)
+		goal_yaw+=(_held(KEY_E,KEY_PAGEDOWN)-_held(KEY_Q,KEY_PAGEUP))*1.8*delta*camera_speed
+	var settled=camera_focus.distance_to(goal_focus)<.001 and absf(camera_zoom-goal_zoom)<.0001 and absf(yaw-goal_yaw)<.0001 and absf(pitch-goal_pitch)<.0001
+	if settled:return
+	var weight=1.0 if reduce_motion else 1.0-exp(-CAMERA_EASE*delta)
+	camera_focus=camera_focus.lerp(goal_focus,weight)
+	# Zoom eases in log space, so each wheel step feels the same near and far.
+	camera_zoom=exp(lerpf(log(camera_zoom),log(goal_zoom),weight))
+	yaw=lerpf(yaw,goal_yaw,weight)
+	pitch=lerpf(pitch,goal_pitch,weight)
+	_update_camera()
+
+func _held(key: Key,alternate: Key) -> float:
+	return 1.0 if Input.is_physical_key_pressed(key) or Input.is_key_pressed(alternate) else 0.0
+
+## Letters typed into chat or a trade note must not move the camera.
+func _typing() -> bool:
+	var focus=get_viewport().gui_get_focus_owner()
+	return focus is LineEdit or focus is TextEdit
+
+func _ground_at(screen: Vector2) -> Vector3:
+	var origin=camera.project_ray_origin(screen)
+	var direction=camera.project_ray_normal(screen)
+	if direction.y>-.01:return camera_focus
 	return origin+direction*((.20*TILE_SIZE-origin.y)/direction.y)
 
-func _clamp_focus():
+func _mouse_ground() -> Vector3:
+	return _ground_at(get_viewport().get_mouse_position())
+
+func _clamp_goal():
 	var limit=6*TILE_SIZE*board_scale
-	camera_focus.x=clampf(camera_focus.x,-limit,limit)
-	camera_focus.z=clampf(camera_focus.z,-limit,limit)
-	camera_focus.y=.20*TILE_SIZE
+	goal_focus.x=clampf(goal_focus.x,-limit,limit)
+	goal_focus.z=clampf(goal_focus.z,-limit,limit)
+	goal_focus.y=.20*TILE_SIZE
 
 func focus_tile_at_cursor():
 	if state.is_empty():return
@@ -411,17 +544,35 @@ func focus_tile_at_cursor():
 		if d<distance:distance=d;nearest=i
 	if nearest>=0:
 		var tile=state.tiles[nearest]
-		camera_focus=Vector3(tile.x*TILE_SIZE,.25*TILE_SIZE,tile.z*TILE_SIZE)
-		camera_zoom=.24
-		_update_camera()
+		goal_focus=Vector3(tile.x*TILE_SIZE,.20*TILE_SIZE,tile.z*TILE_SIZE)
+		goal_zoom=.24
 
-func reset_camera():
-	yaw=0
-	pitch=.745
+## Eases back to the fitted overview; snap jumps there at once.
+func reset_camera(snap: bool=false):
 	camera.fov=35
-	camera_focus=Vector3(0,0,1.0)
-	camera_zoom=1.0
+	# Unwind any full turns first, so the camera takes the short way back.
+	yaw=wrapf(yaw,-PI,PI)
+	goal_yaw=0.0
+	goal_pitch=.745
+	goal_focus=home_focus
+	goal_zoom=home_zoom
+	if snap:
+		yaw=0.0;pitch=goal_pitch;camera_focus=goal_focus;camera_zoom=goal_zoom
 	_update_camera()
+
+## Frames the tiles' bounding box instead of the world origin, so spread-out
+## boards like the archipelago fill the view. Classic boards keep zoom 1.
+func _fit_home():
+	var low=Vector2.INF
+	var high=-Vector2.INF
+	for t in state.get("tiles",[]):
+		low=low.min(Vector2(t.x,t.z));high=high.max(Vector2(t.x,t.z))
+	if low==Vector2.INF:
+		home_focus=Vector3(0,0,1.0);home_zoom=1.0;return
+	var centre=(low+high)*.5
+	var reach=maxf(high.x-low.x,high.y-low.y)*.5+1.0
+	home_zoom=clampf(reach/CatanRules.CLASSIC_EXTENT/board_scale,.6,1.0)
+	home_focus=Vector3(centre.x*TILE_SIZE,0,centre.y*TILE_SIZE+1.0)
 
 func _update_camera():
 	var viewport_size=get_viewport().get_visible_rect().size

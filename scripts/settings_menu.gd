@@ -9,7 +9,7 @@ signal close_requested
 const OPTIONS=[
 	["Game","Language","language","Language","option",["English","Italiano"],"Choose the language used on this computer.","Accessibility"],
 	["Game","BotSpeed","bot_speed","Bot turn speed","option",["Relaxed","Normal","Fast"],"Adjust the pause between bot actions without changing their difficulty or decisions.","Gameplay"],
-	["Game","Sensitivity","camera_speed","Camera sensitivity","slider",[0.4,2.0,0.1,1],"Adjust orbit and pan speed. Right-drag orbits; middle-drag pans; the wheel zooms; Home fits the board.","Controls"],
+	["Game","Sensitivity","camera_speed","Camera sensitivity","slider",[0.4,2.0,0.1,1],"Adjust orbit and pan speed. Drag the board or hold WASD to pan; right-drag or Q/E orbits; the wheel or +/- zooms; Home fits the board.","Controls"],
 	["World","DayNightCycle","day_night_cycle","Day/night cycle","toggle",[],"Turn off to keep the island in daylight. This setting is personal.","Negligible"],
 	["World","Weather","weather","Weather","option",["Automatic","Clear skies","Cloudy","Rain","Thunderstorm"],"Choose changing weather or keep one condition. Rain and thunder use the ambience volume. Reduced motion disables rain and lightning flashes.","Clouds and rain"],
 	["World","Wind","wind","Wind strength","slider",[0,100,5,100],"Control foliage sway and wind-driven wave motion. Reduced motion overrides animated movement.","Negligible"],

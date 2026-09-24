@@ -4,12 +4,14 @@ extends RefCounted
 
 var materials={}
 
-func material(color: Color) -> StandardMaterial3D:
-	var key=str(color)
+func material(color: Color,double_sided: bool=false) -> StandardMaterial3D:
+	var key=str(color)+("|both" if double_sided else "")
 	if not materials.has(key):
 		var m=StandardMaterial3D.new()
 		m.albedo_color=color
 		m.roughness=.82
+		# Thin sheets like sails and flags are seen from both sides.
+		if double_sided:m.cull_mode=BaseMaterial3D.CULL_DISABLED
 		materials[key]=m
 	return materials[key]
 
@@ -27,5 +29,6 @@ func paint(root: Node,color: Color,role: String) -> Node:
 			var base=node.mesh.surface_get_material(i)
 			var shade=role_shade(base.resource_name,role) if base else null
 			if shade==null:continue
-			node.set_surface_override_material(i,material(color.darkened(-shade) if shade<0 else color.lightened(shade)))
+			var both=base is BaseMaterial3D and base.cull_mode==BaseMaterial3D.CULL_DISABLED
+			node.set_surface_override_material(i,material(color.darkened(-shade) if shade<0 else color.lightened(shade),both))
 	return root

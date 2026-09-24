@@ -21,7 +21,6 @@ signal leave_requested
 const PLAYER_CHIP=preload("res://scenes/ui/player_chip.tscn")
 const DEV_CARD=preload("res://scenes/ui/dev_card.tscn")
 const CARD_FAN=preload("res://scripts/card_fan.gd")
-const PIECE_LIMITS={"road":15,"settlement":5,"city":4}
 const MARGIN=16.0
 const GAP=12.0
 
@@ -45,15 +44,17 @@ func show_game(net: CatanNetwork,state: Dictionary,mode: String):
 	%RollDice.disabled=not play or state.rolled
 	%EndTurn.disabled=not play
 	var rules=CatanRules.new();rules.s=state
-	for kind in ["road","settlement","city"]:
+	var seafaring=state.get("island","")=="archipelago"
+	%ShipAction.visible=seafaring
+	for kind in ["road","ship","settlement","city"] if seafaring else ["road","settlement","city"]:
 		var button: Button=get_node("%"+kind.capitalize()+"Action")
 		_show_cost(button,CatanRules.COST[kind],hand)
 		button.set_pressed_no_signal(mode==kind)
 		var sites=rules.build_sites(seat,kind)
 		button.disabled=not play or not state.rolled or not rules.can_pay(seat,CatanRules.COST[kind]) or sites.is_empty()
 		if not mine:button.unavailable_reason=tr("Wait for your turn.")
-		elif rules.pieces(seat,kind)>=PIECE_LIMITS[kind]:
-			button.unavailable_reason=tr({"road":"All 15 of your roads are on the board. You have none left to place.","settlement":"All 5 of your settlements are on the board. Upgrade one to a city to free a settlement piece.","city":"All 4 of your cities are on the board. You have none left to place."}[kind])
+		elif rules.pieces(seat,kind)>=CatanRules.PIECE_LIMITS[kind]:
+			button.unavailable_reason=tr({"ship":"All 15 of your ships are at sea. You have none left to place.","road":"All 15 of your roads are on the board. You have none left to place.","settlement":"All 5 of your settlements are on the board. Upgrade one to a city to free a settlement piece.","city":"All 4 of your cities are on the board. You have none left to place."}[kind])
 		elif rules.can_pay(seat,CatanRules.COST[kind]) and sites.is_empty():button.unavailable_reason=tr("No legal space to build a %s.") % tr(kind)
 	%TradeAction.disabled=not play or not state.rolled
 	%FinishRoads.visible=state.phase=="free_roads" and mine
@@ -81,9 +82,10 @@ func _prompt(state: Dictionary,seat: int,mode: String) -> String:
 		"setup_road":return tr("Place a road beside your settlement")
 		"robber":return tr("Move the robber to a glowing hex")
 		"steal":return tr("Choose who to rob")
-		"free_roads":return tr("Place a free road (%d left)") % state.free_roads
+		"free_roads":return (tr("Place a free road or ship (%d left)") if state.get("island","")=="archipelago" else tr("Place a free road (%d left)")) % state.free_roads
 	match mode:
 		"road":return tr("Choose a glowing edge for your road")
+		"ship":return tr("Choose a glowing sea edge for your ship")
 		"settlement":return tr("Choose a glowing corner for your settlement")
 		"city":return tr("Choose a settlement to upgrade")
 	return tr("Build, trade or end your turn") if state.rolled else tr("Roll dice")

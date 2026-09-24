@@ -37,11 +37,7 @@ func load_lesson(net: CatanNetwork,pname: String):
 				if v.owner==0:
 					for tile in v.tiles:
 						if net.rules.s.tiles[tile].kind<5: roll=net.rules.s.tiles[tile].number
-			for seed_value in range(1,10000):
-				net.rules.rng.seed=seed_value
-				if net.rules.rng.randi_range(1,6)+net.rules.rng.randi_range(1,6)==roll:
-					net.rules.rng.seed=seed_value
-					break
+			net.rules.force_roll(roll)
 		else:
 			net.rules.s.rolled=true
 			# Tutorial-only grants come from the bank and are clearly described in the lesson.

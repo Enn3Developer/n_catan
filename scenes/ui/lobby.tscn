@@ -313,7 +313,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
-tooltip_text = "The robber cannot be placed next to a player with 2 points or fewer."
+tooltip_text = "The robber cannot be placed next to a player with 3 points or fewer."
 mouse_default_cursor_shape = 2
 
 [node name="LobbyStatus" type="Label" parent="Frame/Columns/Voyage/VoyageBody"]
