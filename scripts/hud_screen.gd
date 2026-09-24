@@ -19,8 +19,6 @@ signal leave_requested
 
 const PLAYER_CHIP=preload("res://scenes/ui/player_chip.tscn")
 const DEV_CARD=preload("res://scenes/ui/dev_card.tscn")
-const CLOCK_COLOR=Color("796347")
-const CLOCK_URGENT_COLOR=Color("a8322a")
 const PIECE_LIMITS={"road":15,"settlement":5,"city":4}
 const MARGIN=16.0
 const GAP=12.0
@@ -92,7 +90,8 @@ func show_turn_clock(seconds_left: float,limit: float,finished: bool):
 	if not %TurnClock.visible:return
 	var left=ceili(seconds_left)
 	%TurnClock.text="%d:%02d" % [left/60,left%60]
-	%TurnClock.add_theme_color_override("font_color",CLOCK_URGENT_COLOR if left<=10 else CLOCK_COLOR)
+	# Theme variations, not a color override, so the clock follows the night palette.
+	%TurnClock.theme_type_variation="ErrorLabel" if left<=10 else "MutedLabel"
 
 func arrange(viewport: Vector2,overlay_bottom: float) -> Rect2:
 	# The bottom bar is as wide as its content; the hand stacks over the actions
