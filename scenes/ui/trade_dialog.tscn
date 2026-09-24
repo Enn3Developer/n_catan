@@ -1,13 +1,8 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/trade_dialog.gd" id="script"]
-[ext_resource type="PackedScene" path="res://scenes/ui/resource_row.tscn" id="resource_row"]
-[ext_resource type="PackedScene" path="res://scenes/ui/resource_picker.tscn" id="picker"]
-[ext_resource type="Texture2D" path="res://assets/icons/timber.svg" id="icon_timber"]
-[ext_resource type="Texture2D" path="res://assets/icons/brick.svg" id="icon_brick"]
-[ext_resource type="Texture2D" path="res://assets/icons/wool.svg" id="icon_wool"]
-[ext_resource type="Texture2D" path="res://assets/icons/grain.svg" id="icon_grain"]
-[ext_resource type="Texture2D" path="res://assets/icons/ore.svg" id="icon_ore"]
+[ext_resource type="Script" path="res://scripts/resource_steppers.gd" id="steppers"]
+[ext_resource type="PackedScene" path="res://scenes/ui/resource_choice.tscn" id="choice"]
 [ext_resource type="PackedScene" path="res://scenes/ui/dialog.tscn" id="base"]
 
 [sub_resource type="ButtonGroup" id="TradeModeGroup"]
@@ -16,300 +11,135 @@ resource_local_to_scene = true
 [node name="TradeDialog" instance=ExtResource("base")]
 script = ExtResource("script")
 
-[node name="Title" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="Title" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 text = "Trade"
 
-[node name="YourResources" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="Tabs" type="HBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.47451, 0.388235, 0.278431, 1)
-theme_override_font_sizes/font_size = 14
-text = "Your resources"
+theme_override_constants/separation = 8
 
-[node name="Hand" parent="DialogMargin/Panel/DialogScroll/Body" instance=ExtResource("resource_row")]
+[node name="PlayersTab" type="Button" parent="DialogMargin/Panel/Frame/DialogScroll/Body/Tabs" groups=["ui_click"]]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
 layout_mode = 2
-show_zero = true
-
-[node name="Tabs" type="HBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body"]
-layout_mode = 2
-
-[node name="BankTab" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/Tabs"]
-unique_name_in_owner = true
-layout_mode = 2
-toggle_mode = true
-button_group = SubResource("TradeModeGroup")
-text = "Bank"
-
-[node name="PlayersTab" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/Tabs"]
-unique_name_in_owner = true
-layout_mode = 2
+mouse_default_cursor_shape = 2
 toggle_mode = true
 button_group = SubResource("TradeModeGroup")
 text = "Players"
 
-[node name="GiveLabel" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="BankTab" type="Button" parent="DialogMargin/Panel/Frame/DialogScroll/Body/Tabs" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 38)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.47451, 0.388235, 0.278431, 1)
-theme_override_font_sizes/font_size = 14
-text = "Give"
+mouse_default_cursor_shape = 2
+toggle_mode = true
+button_group = SubResource("TradeModeGroup")
+text = "Bank"
 
-[node name="GiveRow" type="HBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body"]
-layout_mode = 2
-
-[node name="GiveChoices" type="HBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body/GiveRow"]
+[node name="PlayersPage" type="VBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
+theme_override_constants/separation = 8
 
-[node name="Timber" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/GiveRow/GiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+[node name="GiveLabel" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/PlayersPage"]
 layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
-theme_override_constants/h_separation = 6
-theme_override_constants/icon_max_width = 24
-toggle_mode = true
-icon = ExtResource("icon_timber")
-expand_icon = true
+theme_type_variation = &"SectionLabel"
+text = "You give"
+uppercase = true
 
-[node name="Brick" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/GiveRow/GiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
-theme_override_constants/h_separation = 6
-theme_override_constants/icon_max_width = 24
-toggle_mode = true
-icon = ExtResource("icon_brick")
-expand_icon = true
-
-[node name="Wool" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/GiveRow/GiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
-theme_override_constants/h_separation = 6
-theme_override_constants/icon_max_width = 24
-toggle_mode = true
-icon = ExtResource("icon_wool")
-expand_icon = true
-
-[node name="Grain" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/GiveRow/GiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
-theme_override_constants/h_separation = 6
-theme_override_constants/icon_max_width = 24
-toggle_mode = true
-icon = ExtResource("icon_grain")
-expand_icon = true
-
-[node name="Ore" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/GiveRow/GiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
-theme_override_constants/h_separation = 6
-theme_override_constants/icon_max_width = 24
-toggle_mode = true
-icon = ExtResource("icon_ore")
-expand_icon = true
-
-[node name="GivePicker" parent="DialogMargin/Panel/DialogScroll/Body/GiveRow" instance=ExtResource("picker")]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-
-[node name="GiveAmount" type="SpinBox" parent="DialogMargin/Panel/DialogScroll/Body/GiveRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(84, 44)
-layout_mode = 2
-size_flags_vertical = 4
-min_value = 1.0
-max_value = 24.0
-value = 1.0
-alignment = 1
-
-[node name="ReceiveLabel" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.47451, 0.388235, 0.278431, 1)
-theme_override_font_sizes/font_size = 14
-text = "Receive"
-
-[node name="ReceiveRow" type="HBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body"]
-layout_mode = 2
-
-[node name="ReceiveChoices" type="HBoxContainer" parent="DialogMargin/Panel/DialogScroll/Body/ReceiveRow"]
+[node name="Give" type="HBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body/PlayersPage"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
+theme_override_constants/separation = 8
+script = ExtResource("steppers")
 
-[node name="Timber" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/ReceiveRow/ReceiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+[node name="GetLabel" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/PlayersPage"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
-theme_override_constants/h_separation = 6
-theme_override_constants/icon_max_width = 24
-toggle_mode = true
-icon = ExtResource("icon_timber")
-expand_icon = true
+theme_type_variation = &"SectionLabel"
+text = "You get"
+vertical_alignment = 2
+uppercase = true
 
-[node name="Brick" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/ReceiveRow/ReceiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
-theme_override_constants/h_separation = 6
-theme_override_constants/icon_max_width = 24
-toggle_mode = true
-icon = ExtResource("icon_brick")
-expand_icon = true
-
-[node name="Wool" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/ReceiveRow/ReceiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
-theme_override_constants/h_separation = 6
-theme_override_constants/icon_max_width = 24
-toggle_mode = true
-icon = ExtResource("icon_wool")
-expand_icon = true
-
-[node name="Grain" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/ReceiveRow/ReceiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
-theme_override_constants/h_separation = 6
-theme_override_constants/icon_max_width = 24
-toggle_mode = true
-icon = ExtResource("icon_grain")
-expand_icon = true
-
-[node name="Ore" type="Button" parent="DialogMargin/Panel/DialogScroll/Body/ReceiveRow/ReceiveChoices" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
-theme_override_constants/h_separation = 6
-theme_override_constants/icon_max_width = 24
-toggle_mode = true
-icon = ExtResource("icon_ore")
-expand_icon = true
-
-[node name="ReceivePicker" parent="DialogMargin/Panel/DialogScroll/Body/ReceiveRow" instance=ExtResource("picker")]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-
-[node name="ReceiveAmount" type="SpinBox" parent="DialogMargin/Panel/DialogScroll/Body/ReceiveRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(84, 44)
-layout_mode = 2
-size_flags_vertical = 4
-min_value = 1.0
-max_value = 24.0
-value = 1.0
-alignment = 1
-
-[node name="Preview" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="Get" type="HBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body/PlayersPage"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.54902, 0.321569, 0.176471, 1)
+theme_override_constants/separation = 8
+script = ExtResource("steppers")
+
+[node name="BankPage" type="VBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BankGiveLabel" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/BankPage"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "You give"
+uppercase = true
+
+[node name="BankGive" parent="DialogMargin/Panel/Frame/DialogScroll/Body/BankPage" instance=ExtResource("choice")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="BankGetLabel" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/BankPage"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "You get"
+vertical_alignment = 2
+uppercase = true
+
+[node name="BankGet" parent="DialogMargin/Panel/Frame/DialogScroll/Body/BankPage" instance=ExtResource("choice")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Preview" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
 theme_override_font_sizes/font_size = 18
+vertical_alignment = 2
 autowrap_mode = 3
 
-[node name="Reason" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="Reason" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.47451, 0.388235, 0.278431, 1)
-theme_override_font_sizes/font_size = 14
+theme_type_variation = &"MutedLabel"
 autowrap_mode = 3
 
-[node name="BankTrade" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
+[node name="Close" type="Button" parent="DialogMargin/Panel/Frame/Footer" groups=["ui_click"]]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+text = "Close"
+
+[node name="BankTrade" type="Button" parent="DialogMargin/Panel/Frame/Footer" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
 theme_type_variation = &"PrimaryButton"
-text = "Bank trade"
+text = "Trade with the bank"
 
-[node name="OfferTrade" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
+[node name="OfferTrade" type="Button" parent="DialogMargin/Panel/Frame/Footer" groups=["ui_click"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
 theme_type_variation = &"PrimaryButton"
 text = "Offer to all players"
 
-[node name="Close" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-text = "Close"
-
-[connection signal="item_selected" from="DialogMargin/Panel/DialogScroll/Body/GiveRow/GivePicker" to="." method="_on_selection_changed"]
-[connection signal="value_changed" from="DialogMargin/Panel/DialogScroll/Body/GiveRow/GiveAmount" to="." method="_on_selection_changed"]
-[connection signal="item_selected" from="DialogMargin/Panel/DialogScroll/Body/ReceiveRow/ReceivePicker" to="." method="_on_selection_changed"]
-[connection signal="value_changed" from="DialogMargin/Panel/DialogScroll/Body/ReceiveRow/ReceiveAmount" to="." method="_on_selection_changed"]
-[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/Close" to="." method="close"]
-[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/Tabs/BankTab" to="." method="_refresh"]
-[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/Tabs/PlayersTab" to="." method="_on_players_tab_pressed"]
-[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/BankTrade" to="." method="_on_bank_trade_pressed"]
-[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/OfferTrade" to="." method="_on_offer_trade_pressed"]
+[connection signal="pressed" from="DialogMargin/Panel/Frame/DialogScroll/Body/Tabs/PlayersTab" to="." method="_refresh"]
+[connection signal="pressed" from="DialogMargin/Panel/Frame/DialogScroll/Body/Tabs/BankTab" to="." method="_refresh"]
+[connection signal="changed" from="DialogMargin/Panel/Frame/DialogScroll/Body/PlayersPage/Give" to="." method="_refresh"]
+[connection signal="changed" from="DialogMargin/Panel/Frame/DialogScroll/Body/PlayersPage/Get" to="." method="_refresh"]
+[connection signal="changed" from="DialogMargin/Panel/Frame/DialogScroll/Body/BankPage/BankGive" to="." method="_on_bank_choice"]
+[connection signal="changed" from="DialogMargin/Panel/Frame/DialogScroll/Body/BankPage/BankGet" to="." method="_on_bank_choice"]
+[connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/Close" to="." method="close"]
+[connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/BankTrade" to="." method="_on_bank_trade_pressed"]
+[connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/OfferTrade" to="." method="_on_offer_trade_pressed"]

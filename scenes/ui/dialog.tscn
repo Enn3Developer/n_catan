@@ -37,22 +37,34 @@ theme_override_constants/margin_bottom = 32
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="DialogScroll" type="ScrollContainer" parent="DialogMargin/Panel"]
+[node name="Frame" type="VBoxContainer" parent="DialogMargin/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="DialogScroll" type="ScrollContainer" parent="DialogMargin/Panel/Frame"]
 unique_name_in_owner = true
 layout_mode = 2
 horizontal_scroll_mode = 0
 
-[node name="Body" type="VBoxContainer" parent="DialogMargin/Panel/DialogScroll"]
+[node name="Body" type="VBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 12
 
-[node name="Title" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+
+[node name="Title" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"HeadingLabel"
 theme_override_colors/font_color = Color(0.54902, 0.321569, 0.176471, 1)
 theme_override_font_sizes/font_size = 28
 
+[node name="Footer" type="HBoxContainer" parent="DialogMargin/Panel/Frame"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 2
+
 [connection signal="resized" from="." to="." method="fit"]
-[connection signal="minimum_size_changed" from="DialogMargin/Panel/DialogScroll/Body" to="." method="fit"]
+[connection signal="minimum_size_changed" from="DialogMargin/Panel/Frame/DialogScroll/Body" to="." method="fit"]

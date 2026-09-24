@@ -224,9 +224,6 @@ draw_pass_1 = SubResource("Mote")
 
 [node name="Weather" parent="." instance=ExtResource("weather")]
 
-[node name="Labels" type="CanvasLayer" parent="."]
-layer = 0
-
 [node name="Stats" type="CanvasLayer" parent="."]
 layer = 5
 

@@ -36,7 +36,7 @@ corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
 [node name="ColorSwatch" type="Button"]
-custom_minimum_size = Vector2(40, 36)
+custom_minimum_size = Vector2(40, 40)
 theme_override_constants/outline_size = 0
 theme_override_styles/normal = SubResource("Plain")
 theme_override_styles/hover = SubResource("Hover")

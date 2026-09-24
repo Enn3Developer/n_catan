@@ -6,28 +6,28 @@
 [node name="LeaveConfirm" instance=ExtResource("base")]
 script = ExtResource("script")
 
-[node name="Title" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="Title" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 text = "Leave the expedition?"
 
-[node name="Message" type="Label" parent="DialogMargin/Panel/DialogScroll/Body"]
+[node name="Message" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
-[node name="Stay" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
+[node name="LeaveGame" type="Button" parent="DialogMargin/Panel/Frame/Footer" groups=["ui_click"]]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+text = "Leave game"
+
+[node name="Stay" type="Button" parent="DialogMargin/Panel/Frame/Footer" groups=["ui_click"]]
+custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_default_cursor_shape = 2
 theme_type_variation = &"PrimaryButton"
 text = "Stay"
 
-[node name="LeaveGame" type="Button" parent="DialogMargin/Panel/DialogScroll/Body" groups=["ui_click"]]
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-text = "Leave game"
-
-[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/Stay" to="." method="close"]
-[connection signal="pressed" from="DialogMargin/Panel/DialogScroll/Body/LeaveGame" to="." method="emit_signal" binds= ["leave_requested"]]
+[connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/Stay" to="." method="close"]
+[connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/LeaveGame" to="." method="emit_signal" binds= ["leave_requested"]]

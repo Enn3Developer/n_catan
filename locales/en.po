@@ -92,8 +92,6 @@ msgstr "%s traded with %s."
 msgid "%s traded with the bank."
 msgstr "%s traded with the bank."
 
-msgid "%s wins with 10 victory points!"
-msgstr "%s wins with 10 victory points!"
 
 msgid "%s withdrew their trade offer."
 msgstr "%s withdrew their trade offer."
@@ -110,9 +108,6 @@ msgstr "%s%s\n%d points · %d resources · %d development cards\nRoad length %d 
 msgid "+ Add bot"
 msgstr "+ Add bot"
 
-msgid "1. Gather 3–6 players (humans or bots). Everyone readies up.\n2. Place two settlements and roads in snake order.\n3. Roll: neighboring settlements collect 1 resource; cities 2.\n4. Connect roads, build settlements, upgrade to cities.\n5. Trade with players or the bank; coastal ports give better rates.\n6. A seven means discarding half if you have more than seven,\n    then moving the robber and stealing from a neighbor.\n7. Buy development cards; play at most one per turn.\n8. Reach 10 points on your turn to win. Settlements give 1,\n    cities 2, longest road and largest army 2 each.\n\nClick glowing board markers to build. Right-drag to orbit.\nScroll to zoom; middle-drag pans; F focuses a tile.\nH hides the interface; Home fits the board. Hover for costs.\n\n5–6 players: 30 hexes and paired turns. After the main turn,\n the player 3 seats ahead builds, plays cards and trades only\n with the bank. Then the next main player rolls.\n\nOnline hosts need UDP 24567 reachable from the internet.\nUse router mapping, port forwarding, or a dedicated server."
-msgstr "1. Gather 3–6 players (humans or bots). Everyone readies up.\n2. Place two settlements and roads in snake order.\n3. Roll: neighboring settlements collect 1 resource; cities 2.\n4. Connect roads, build settlements, upgrade to cities.\n5. Trade with players or the bank; coastal ports give better rates.\n6. A seven means discarding half if you have more than seven,\n    then moving the robber and stealing from a neighbor.\n7. Buy development cards; play at most one per turn.\n8. Reach 10 points on your turn to win. Settlements give 1,\n    cities 2, longest road and largest army 2 each.\n\nClick glowing board markers to build. Right-drag to orbit.\nScroll to zoom; middle-drag pans; F focuses a tile.\nH hides the interface; Home fits the board. Hover for costs.\n\n5–6 players: 30 hexes and paired turns. After the main turn,\n the player 3 seats ahead builds, plays cards and trades only\n with the bank. Then the next main player rolls.\n\nOnline hosts need UDP 24567 reachable from the internet.\nUse router mapping, port forwarding, or a dedicated server."
-
 msgid "19 hexes · Classic"
 msgstr "19 hexes · Classic"
 
@@ -122,17 +117,12 @@ msgstr "30 hexes · Paired turns"
 msgid "3D render scale"
 msgstr "3D render scale"
 
-msgid "3–6 players · Solo & online"
-msgstr "3–6 players · Solo & online"
-
 msgid "A trade on the table"
 msgstr "A trade on the table"
 
 msgid "AUDIO"
 msgstr "AUDIO"
 
-msgid "Accept trade"
-msgstr "Accept trade"
 
 msgid "Accessibility"
 msgstr "Accessibility"
@@ -146,8 +136,8 @@ msgstr "Add contact shading under grass, in rock cracks and around buildings usi
 msgid "Adjust directional shadow-map resolution and soft-shadow filtering. Higher levels preserve fine branches and architecture in shadows."
 msgstr "Adjust directional shadow-map resolution and soft-shadow filtering. Higher levels preserve fine branches and architecture in shadows."
 
-msgid "Adjust ocean mesh resolution, wave layers, fine ripples and shoreline foam. Reflections are controlled in this Graphics tab."
-msgstr "Adjust ocean mesh resolution, wave layers, fine ripples and shoreline foam. Reflections are controlled in this Graphics tab."
+msgid "Adjust ocean mesh resolution, wave layers, fine ripples and shoreline foam. Reflections are set in the Lighting tab."
+msgstr "Adjust ocean mesh resolution, wave layers, fine ripples and shoreline foam. Reflections are set in the Lighting tab."
 
 msgid "Adjust orbit and pan speed. Right-drag orbits; middle-drag pans; the wheel zooms; Home fits the board."
 msgstr "Adjust orbit and pan speed. Right-drag orbits; middle-drag pans; the wheel zooms; Home fits the board."
@@ -185,8 +175,6 @@ msgstr "Ambient only"
 msgid "Anisotropic filtering"
 msgstr "Anisotropic filtering"
 
-msgid "Any player who can afford this offer may accept it."
-msgstr "Any player who can afford this offer may accept it."
 
 msgid "Appearance"
 msgstr "Appearance"
@@ -237,9 +225,6 @@ msgstr "Brick"
 msgid "Bright harp, flute and warm strings"
 msgstr "Bright harp, flute and warm strings"
 
-msgid "Build & trade"
-msgstr "Build & trade"
-
 msgid "Build two roads for free."
 msgstr "Build two roads for free."
 
@@ -274,8 +259,6 @@ msgstr "Cannot write the update cache."
 msgid "Change the actual albedo, normal and occlusion/roughness textures used by terrain, stone and wood. Higher settings retain detail during close inspection."
 msgstr "Change the actual albedo, normal and occlusion/roughness textures used by terrain, stone and wood. Higher settings retain detail during close inspection."
 
-msgid "Chart a course  →"
-msgstr "Chart a course  →"
 
 msgid "Check for a newer release."
 msgstr "Check for a newer release."
@@ -295,8 +278,50 @@ msgstr "Choose a connected road, or finish building."
 msgid "Choose a development card to play. Victory point cards count automatically."
 msgstr "Choose a development card to play. Victory point cards count automatically."
 
-msgid "Choose a glowing %s on the board."
-msgstr "Choose a glowing %s on the board."
+msgid "End turn"
+msgstr "End turn"
+
+msgid "Discard %d resources"
+msgstr "Discard %d resources"
+
+msgid "Waiting for %s to discard"
+msgstr "Waiting for %s to discard"
+
+msgid "%s is moving the robber"
+msgstr "%s is moving the robber"
+
+msgid "%s's turn"
+msgstr "%s's turn"
+
+msgid "Place a settlement on a glowing corner"
+msgstr "Place a settlement on a glowing corner"
+
+msgid "Place a road beside your settlement"
+msgstr "Place a road beside your settlement"
+
+msgid "Move the robber to a glowing hex"
+msgstr "Move the robber to a glowing hex"
+
+msgid "Choose who to rob"
+msgstr "Choose who to rob"
+
+msgid "Place a free road (%d left)"
+msgstr "Place a free road (%d left)"
+
+msgid "Choose a glowing edge for your road"
+msgstr "Choose a glowing edge for your road"
+
+msgid "Choose a glowing corner for your settlement"
+msgstr "Choose a glowing corner for your settlement"
+
+msgid "Choose a settlement to upgrade"
+msgstr "Choose a settlement to upgrade"
+
+msgid "Build, trade or end your turn"
+msgstr "Build, trade or end your turn"
+
+msgid "Wait for your turn."
+msgstr "Wait for your turn."
 
 msgid "Choose a neighboring player to steal from."
 msgstr "Choose a neighboring player to steal from."
@@ -322,9 +347,6 @@ msgstr "Choose at least one resource to give and one to receive."
 
 msgid "Choose different resources."
 msgstr "Choose different resources."
-
-msgid "Choose each bot’s difficulty."
-msgstr "Choose each bot’s difficulty."
 
 msgid "Choose exactly %d resources to discard."
 msgstr "Choose exactly %d resources to discard."
@@ -440,9 +462,6 @@ msgstr "Disabled"
 msgid "Discard"
 msgstr "Discard"
 
-msgid "Discard %d"
-msgstr "Discard %d"
-
 msgid "Discard selected resources"
 msgstr "Discard selected resources"
 
@@ -467,9 +486,6 @@ msgstr "During a paired turn, trades are only available with the bank."
 
 msgid "Easy"
 msgstr "Easy"
-
-msgid "End"
-msgstr "End"
 
 msgid "English"
 msgstr "English"
@@ -508,9 +524,6 @@ msgstr "Follow the current tutorial step, or choose Skip lesson."
 msgid "Frame limit"
 msgstr "Frame limit"
 
-msgid "Free roads"
-msgstr "Free roads"
-
 msgid "Full"
 msgstr "Full"
 
@@ -522,9 +535,6 @@ msgstr "GPU workload increases with resolution"
 
 msgid "GRAPHICS"
 msgstr "GRAPHICS"
-
-msgid "GUIDED PRACTICE"
-msgstr "GUIDED PRACTICE"
 
 msgid "Game log"
 msgstr "Game log"
@@ -667,9 +677,6 @@ msgstr "Leave the current room before restarting to update."
 
 msgid "Leave the expedition?"
 msgstr "Leave the expedition?"
-
-msgid "Leave this solo expedition?"
-msgstr "Leave this solo expedition?"
 
 msgid "Leaving pauses this match for the other players.\nIf you host, the room will close."
 msgstr "Leaving pauses this match for the other players.\nIf you host, the room will close."
@@ -816,9 +823,6 @@ msgstr "Open seat"
 msgid "Ore"
 msgstr "Ore"
 
-msgid "Original instrumental music · automatically plays through all five tracks."
-msgstr "Original instrumental music · automatically plays through all five tracks."
-
 msgid "Other players can accept your offer. You can withdraw it to make a new one."
 msgstr "Other players can accept your offer. You can withdraw it to make a new one."
 
@@ -891,9 +895,6 @@ msgstr "Player color"
 msgid "Players"
 msgstr "Players"
 
-msgid "Playing"
-msgstr "Playing"
-
 msgid "Plenty"
 msgstr "Plenty"
 
@@ -930,9 +931,6 @@ msgstr "Reach 10 victory points by building settlements and cities. Resources co
 
 msgid "Ready"
 msgstr "Ready"
-
-msgid "Ready to play"
-msgstr "Ready to play"
 
 msgid "Receive"
 msgstr "Receive"
@@ -985,9 +983,6 @@ msgstr "Road"
 
 msgid "Roads"
 msgstr "Roads"
-
-msgid "Robber"
-msgstr "Robber"
 
 msgid "Roll"
 msgstr "Roll"
@@ -1048,9 +1043,6 @@ msgstr "Settlement"
 msgid "Settlements give 1 point; cities give 2. The longest continuous road (at least 5) and largest army (at least 3 knights) give 2 each. Hidden point cards also count. Reach 10 on your turn to win. End turn when you finish building and trading."
 msgstr "Settlements give 1 point; cities give 2. The longest continuous road (at least 5) and largest army (at least 3 knights) give 2 each. Hidden point cards also count. Reach 10 on your turn to win. End turn when you finish building and trading."
 
-msgid "Setup"
-msgstr "Setup"
-
 msgid "Shadow quality"
 msgstr "Shadow quality"
 
@@ -1093,9 +1085,6 @@ msgstr "Start game"
 
 msgid "Stay"
 msgstr "Stay"
-
-msgid "Steal"
-msgstr "Steal"
 
 msgid "Steal: "
 msgstr "Steal: "
@@ -1411,9 +1400,6 @@ msgstr "Your room"
 msgid "Your seat is unavailable. Please reconnect to the game."
 msgstr "Your seat is unavailable. Please reconnect to the game."
 
-msgid "Your soundtrack · choose a track or let the playlist continue."
-msgstr "Your soundtrack · choose a track or let the playlist continue."
-
 msgid "Your trade offer: %s for %s."
 msgstr "Your trade offer: %s for %s."
 
@@ -1425,12 +1411,6 @@ msgstr "buy card"
 
 msgid "city"
 msgstr "city"
-
-msgid "corner"
-msgstr "corner"
-
-msgid "edge"
-msgstr "edge"
 
 msgid "road"
 msgstr "road"
@@ -1458,9 +1438,6 @@ msgstr "To upgrade to a city, you still need %s."
 
 msgid "To buy a development card, you still need %s."
 msgstr "To buy a development card, you still need %s."
-
-msgid "Build, trade and make yourself at home."
-msgstr "Build, trade and make yourself at home."
 
 msgid "%d cards left in deck."
 msgstr "%d cards left in deck."
@@ -1490,27 +1467,6 @@ msgstr "FORWARD+ / VULKAN"
 
 msgid "CONTROLS"
 msgstr "CONTROLS"
-
-msgid "Move the robber"
-msgstr "Move the robber"
-
-msgid "Build two free roads"
-msgstr "Build two free roads"
-
-msgid "Take two resources"
-msgstr "Take two resources"
-
-msgid "Claim one resource type"
-msgstr "Claim one resource type"
-
-msgid "+1 victory point"
-msgstr "+1 victory point"
-
-msgid "Next turn"
-msgstr "Next turn"
-
-msgid "No development cards"
-msgstr "No development cards"
 
 msgid "Harbor at Dawn"
 msgstr "Harbor at Dawn"
@@ -2200,9 +2156,6 @@ msgstr "Colors"
 msgid "Workshop"
 msgstr "Workshop"
 
-msgid "Shape every house, roof and road. Banners and road edges always carry the player color, so everyone can still tell whose town is whose."
-msgstr "Shape every house, roof and road. Banners and road edges always carry the player color, so everyone can still tell whose town is whose."
-
 msgid "Choose whose pieces to edit"
 msgstr "Choose whose pieces to edit"
 
@@ -2250,3 +2203,369 @@ msgstr " · Not applied yet"
 
 msgid "Design your own roads, settlements and cities"
 msgstr "Design your own roads, settlements and cities"
+
+msgid "%d min"
+msgstr "%d min"
+
+msgid "%d of %d entries"
+msgstr "%d of %d entries"
+
+msgid "%d rolled %d times"
+msgstr "%d rolled %d times"
+
+msgid "%d s"
+msgstr "%d s"
+
+msgid "%d stolen · %d discarded on a seven"
+msgstr "%d stolen · %d discarded on a seven"
+
+msgid "%d with players · %d with the bank"
+msgstr "%d with players · %d with the bank"
+
+msgid "%d:%02d min"
+msgstr "%d:%02d min"
+
+msgid "%s accepted your offer."
+msgstr "%s accepted your offer."
+
+msgid "%s declined your offer."
+msgstr "%s declined your offer."
+
+msgid "%s discarded %d resources."
+msgstr "%s discarded %d resources."
+
+msgid "%s made a counter-offer."
+msgstr "%s made a counter-offer."
+
+msgid "%s moved the robber."
+msgstr "%s moved the robber."
+
+msgid "%s no longer has the resources for this trade."
+msgstr "%s no longer has the resources for this trade."
+
+msgid "%s wins with %d victory points!"
+msgstr "%s wins with %d victory points!"
+
+msgid "Accept"
+msgstr "Accept"
+
+msgid "Accepts"
+msgstr "Accepts"
+
+msgid "Choose a player who accepted your offer."
+msgstr "Choose a player who accepted your offer."
+
+msgid "Classic hexagon"
+msgstr "Classic hexagon"
+
+msgid "Collected"
+msgstr "Collected"
+
+msgid "Counters:"
+msgstr "Counters:"
+
+msgid "Counter…"
+msgstr "Counter…"
+
+msgid "Decline"
+msgstr "Decline"
+
+msgid "Declines"
+msgstr "Declines"
+
+msgid "Dice rolls"
+msgstr "Dice rolls"
+
+msgid "Everyone"
+msgstr "Everyone"
+
+msgid "Everyone declined. Withdraw the offer to make a new one."
+msgstr "Everyone declined. Withdraw the offer to make a new one."
+
+msgid "Friendly robber"
+msgstr "Friendly robber"
+
+msgid "Give the other players a moment to answer your offer."
+msgstr "Give the other players a moment to answer your offer."
+
+msgid "Island"
+msgstr "Island"
+
+msgid "Lost"
+msgstr "Lost"
+
+msgid "Map seed"
+msgstr "Map seed"
+
+msgid "Map seed %d · %s · %d points to win"
+msgstr "Map seed %d · %s · %d points to win"
+
+msgid "New"
+msgstr "New"
+
+msgid "No lines match."
+msgstr "No lines match."
+
+msgid "Other players answer first, then you choose who to trade with."
+msgstr "Other players answer first, then you choose who to trade with."
+
+msgid "Pick a new random seed"
+msgstr "Pick a new random seed"
+
+msgid "Play again"
+msgstr "Play again"
+
+msgid "Points"
+msgstr "Points"
+
+msgid "Points to win"
+msgstr "Points to win"
+
+msgid "Random coastline"
+msgstr "Random coastline"
+
+msgid "Rolls"
+msgstr "Rolls"
+
+msgid "Room rules"
+msgstr "Room rules"
+
+msgid "Search the log"
+msgstr "Search the log"
+
+msgid "Send counter-offer"
+msgstr "Send counter-offer"
+
+msgid "Show lines that mention one player"
+msgstr "Show lines that mention one player"
+
+msgid "Stole"
+msgstr "Stole"
+
+msgid "The friendly robber spares players with 2 points or fewer. Choose another hex."
+msgstr "The friendly robber spares players with 2 points or fewer. Choose another hex."
+
+msgid "The robber cannot be placed next to a player with 2 points or fewer."
+msgstr "The robber cannot be placed next to a player with 2 points or fewer."
+
+msgid "The same seed and player count always build the same island. Share it to replay a map."
+msgstr "The same seed and player count always build the same island. Share it to replay a map."
+
+msgid "Thinking…"
+msgstr "Thinking…"
+
+msgid "Trades"
+msgstr "Trades"
+
+msgid "Turn timer"
+msgstr "Turn timer"
+
+msgid "Wait for every player to reconnect before starting another game."
+msgstr "Wait for every player to reconnect before starting another game."
+
+msgid "Waiting for answers…"
+msgstr "Waiting for answers…"
+
+msgid "When a turn runs out, the host finishes it with the shortest legal moves."
+msgstr "When a turn runs out, the host finishes it with the shortest legal moves."
+
+msgid "You get"
+msgstr "You get"
+
+msgid "You give"
+msgstr "You give"
+
+msgid "You offer:"
+msgstr "You offer:"
+
+msgid "Your counter-offer"
+msgstr "Your counter-offer"
+
+msgid "\n%d points win the game."
+msgstr "\n%d points win the game."
+
+msgid "for"
+msgstr "for"
+
+msgid "Water and wind"
+msgstr "Water and wind"
+
+msgid "of %d"
+msgstr "of %d"
+
+msgid "%d of %d chosen"
+msgstr "%d of %d chosen"
+
+msgid "First resource"
+msgstr "First resource"
+
+msgid "Second resource"
+msgstr "Second resource"
+
+msgid "Resource to claim"
+msgstr "Resource to claim"
+
+msgid "How to win"
+msgstr "How to win"
+
+msgid "Reach the room's points target on your turn, 10 unless the host changes it. Settlements give 1 point, cities 2, and longest road and largest army 2 each."
+msgstr "Reach the room's points target on your turn, 10 unless the host changes it. Settlements give 1 point, cities 2, and longest road and largest army 2 each."
+
+msgid "Setup"
+msgstr "Setup"
+
+msgid "Each player places two settlements, each with a road. The order reverses for the second round."
+msgstr "Each player places two settlements, each with a road. The order reverses for the second round."
+
+msgid "A turn"
+msgstr "A turn"
+
+msgid "Roll the dice. Every settlement next to a hex with that number collects 1 resource, every city 2. Then build, trade with players or the bank, and play at most one development card. Ports give better bank rates."
+msgstr "Roll the dice. Every settlement next to a hex with that number collects 1 resource, every city 2. Then build, trade with players or the bank, and play at most one development card. Ports give better bank rates."
+
+msgid "Building costs"
+msgstr "Building costs"
+
+msgid "Rolling a seven"
+msgstr "Rolling a seven"
+
+msgid "Anyone holding more than seven resources discards half, rounded down. Then the roller moves the robber, which stops that hex producing, and steals a resource from a neighbor."
+msgstr "Anyone holding more than seven resources discards half, rounded down. Then the roller moves the robber, which stops that hex producing, and steals a resource from a neighbor."
+
+msgid "Click glowing markers to build. Right-drag to orbit, scroll to zoom and middle-drag to pan. F focuses a tile, H hides the interface and Home fits the board."
+msgstr "Click glowing markers to build. Right-drag to orbit, scroll to zoom and middle-drag to pan. F focuses a tile, H hides the interface and Home fits the board."
+
+msgid "Five or six players"
+msgstr "Five or six players"
+
+msgid "The island has 30 hexes and turns come in pairs. After the main turn, the player three seats ahead builds, plays cards and trades with the bank. Then the next main player rolls."
+msgstr "The island has 30 hexes and turns come in pairs. After the main turn, the player three seats ahead builds, plays cards and trades with the bank. Then the next main player rolls."
+
+msgid "Hosting online"
+msgstr "Hosting online"
+
+msgid "The host's UDP port 24567 must be reachable from the internet. Use router mapping, port forwarding or a dedicated server."
+msgstr "The host's UDP port 24567 must be reachable from the internet. Use router mapping, port forwarding or a dedicated server."
+
+msgid "Development card"
+msgstr "Development card"
+
+msgid "Play online"
+msgstr "Play online"
+
+msgid "Game"
+msgstr "Game"
+
+msgid "Trade with the bank"
+msgstr "Trade with the bank"
+
+msgid "have %d"
+msgstr "have %d"
+
+msgid "%s for %s"
+msgstr "%s for %s"
+
+msgid "%s and %s"
+msgstr "%s and %s"
+
+msgid "Choose what you give and what you want in return."
+msgstr "Choose what you give and what you want in return."
+
+msgid "Your offer to the other players."
+msgstr "Your offer to the other players."
+
+msgid "%s offers you a trade."
+msgstr "%s offers you a trade."
+
+msgid "Choose who to trade with."
+msgstr "Choose who to trade with."
+
+msgid "You accepted. %s picks who to trade with."
+msgstr "You accepted. %s picks who to trade with."
+
+msgid "Counters"
+msgstr "Counters"
+
+msgid "gives"
+msgstr "gives"
+
+msgid "wants"
+msgstr "wants"
+
+msgid "Answers"
+msgstr "Answers"
+
+msgid "This is the offer as it stands. Accept it instead."
+msgstr "This is the offer as it stands. Accept it instead."
+
+msgid "Any"
+msgstr "Any"
+
+msgid "Every settlement, city and road you build takes this look."
+msgstr "Every settlement, city and road you build takes this look."
+
+msgid "Roll new choices for this section only"
+msgstr "Roll new choices for this section only"
+
+msgid "Roll new choices for %s only"
+msgstr "Roll new choices for %s only"
+
+msgid "Take back the last change (Ctrl+Z)"
+msgstr "Take back the last change (Ctrl+Z)"
+
+msgid "Close the workshop. Unapplied changes wait here for next time."
+msgstr "Close the workshop. Unapplied changes wait here for next time."
+
+msgid "Variation"
+msgstr "Variation"
+
+msgid "New variation"
+msgstr "New variation"
+
+msgid "Same choices, rebuilt with different small differences"
+msgstr "Same choices, rebuilt with different small differences"
+
+msgid "Shape"
+msgstr "Shape"
+
+msgid "Base"
+msgstr "Base"
+
+msgid "Windows and doors"
+msgstr "Windows and doors"
+
+msgid "Roofline"
+msgstr "Roofline"
+
+msgid "Character"
+msgstr "Character"
+
+msgid "Town center"
+msgstr "Town center"
+
+msgid "Buildings"
+msgstr "Buildings"
+
+msgid "Town and roads"
+msgstr "Town and roads"
+
+msgid "Weathervane"
+msgstr "Weathervane"
+
+msgid "Garden"
+msgstr "Garden"
+
+msgid "None"
+msgstr "None"
+
+msgid "Vegetable rows"
+msgstr "Vegetable rows"
+
+msgid "Flower beds"
+msgstr "Flower beds"
+
+msgid "Haystacks"
+msgstr "Haystacks"
+
+msgid "Woodpile"
+msgstr "Woodpile"

@@ -5,6 +5,7 @@ signal changed
 signal received(state: Dictionary)
 signal notice(message: String)
 signal applied(player: int, action: Dictionary)
+signal log_received(entries: Array)
 const PORT=24567
 const SECURE_INVITE=preload("res://scripts/secure_invite.gd")
 var secure_transport=preload("res://scripts/secure_transport.gd").new()
@@ -43,7 +44,14 @@ var bot_brains={}
 var bot_action_count=0
 var bot_turn=-1
 const TURN_SECONDS=60.0
+## Seconds other players have to answer a trade offer before the offerer picks.
+const TRADE_WINDOW=4.0
+const DEFAULT_SETTINGS={"seed":0,"island":"random","turn_seconds":int(TURN_SECONDS),"points":10,"friendly_robber":false}
+## House rules and the map seed, chosen in the lobby by the room controller.
+var room_settings=DEFAULT_SETTINGS.duplicate()
 var turn_seconds=TURN_SECONDS
+var offer_clock=0.0
+var game_count=0
 var turn_clock=TURN_SECONDS
 var turn_mark=[]
 var turn_expired=false
@@ -94,6 +102,7 @@ func host(pname: String,password: String="",server_only: bool=false) -> Error:
 	room_password=password
 	seat_tokens={}
 	reconnect_token=""
+	_reset_settings()
 	if not dedicated:
 		roster=[{"id":1,"name":pname,"ready":false,"connected":true,"bot":false,"look":CatanAppearance.sanitize(my_look),"color":my_color}]
 		seat=0
@@ -152,6 +161,7 @@ func leave():
 	roster=[]
 	seat=-1
 	last_action={}
+	room_settings=DEFAULT_SETTINGS.duplicate()
 	_reset_music()
 	if continuing_music.get("ready",false):
 		music_track=continuing_music.track
@@ -228,12 +238,14 @@ func _seat_for(id: int) -> int:
 
 func _broadcast_lobby():
 	for row in roster:
-		if row.id>1 and row.connected: _lobby.rpc_id(row.id,roster,started,dedicated)
+		if row.id>1 and row.connected: _lobby.rpc_id(row.id,roster,started,dedicated,room_settings)
 	changed.emit()
 
 @rpc("authority","call_remote","reliable")
-func _lobby(players: Array,in_game: bool,server_dedicated: bool=false):
+func _lobby(players: Array,in_game: bool,server_dedicated: bool=false,settings: Dictionary={}):
 	dedicated=server_dedicated
+	room_settings=DEFAULT_SETTINGS.duplicate()
+	room_settings.merge(settings,true)
 	roster=players
 	seat=_seat_for(multiplayer.get_unique_id())
 	started=in_game
@@ -267,14 +279,79 @@ func _start(id: int):
 	if id!=1 and (not dedicated or _seat_for(id)!=0): return
 	for row in roster:
 		if not row.ready: return
+	world_seconds=150.0
+	_new_game()
+
+func _new_game():
 	var names=[]
 	for row in roster: names.append(row.name)
-	rules.create(names)
-	world_seconds=150.0
+	var options={"island":room_settings.island,"points":room_settings.points,"friendly_robber":room_settings.friendly_robber}
+	rules.create(names,int(room_settings.seed),options)
+	game_count+=1
+	rules.s.game_id=game_count
+	turn_seconds=float(room_settings.turn_seconds)
 	started=true
+	bot_brains={}
+	bot_turn=-1
+	bot_action_count=0
+	turn_mark=[]
+	offer_clock=0.0
 	_refresh_turn_clock()
 	_broadcast_lobby()
 	_sync()
+
+## The controller starts another game with the same seats and rules on a fresh map.
+func rematch():
+	if multiplayer.is_server(): _rematch(1)
+	else: _rematch_request.rpc_id(1)
+
+@rpc("any_peer","call_remote","reliable")
+func _rematch_request():
+	if multiplayer.is_server(): _rematch(multiplayer.get_remote_sender_id())
+
+func _rematch(id: int):
+	if not started or tutorial or rules.s.is_empty() or int(rules.s.winner)==-1: return
+	if id!=1 and (not dedicated or _seat_for(id)!=0): return
+	if not roster.all(func(row):return row.connected):
+		_send_error(id,"Wait for every player to reconnect before starting another game.")
+		return
+	room_settings.seed=_random_seed()
+	_new_game()
+
+static func _random_seed() -> int:
+	return randi_range(1,999999)
+
+func _reset_settings():
+	room_settings=DEFAULT_SETTINGS.duplicate()
+	room_settings.seed=_random_seed()
+
+## Validates and stores one room setting. Only the controller may change them, and only in the lobby.
+func choose_setting(key: String,value: Variant):
+	if not online:return
+	if multiplayer.is_server():_set_setting(1,key,value)
+	else:_setting_request.rpc_id(1,key,value)
+
+@rpc("any_peer","call_remote","reliable")
+func _setting_request(key: String,value: Variant):
+	if online and multiplayer.is_server():_set_setting(multiplayer.get_remote_sender_id(),key,value)
+
+func _set_setting(sender: int,key: String,value: Variant):
+	if started or (sender!=1 and (not dedicated or _seat_for(sender)!=0)):return
+	match key:
+		"seed":
+			if not (value is int) or value<1 or value>999999999:return
+		"island":
+			if not (value is String) or value not in CatanRules.ISLANDS:return
+		"turn_seconds":
+			if not (value is int) or value not in CatanRules.TURN_TIMERS:return
+		"points":
+			if not (value is int) or value<CatanRules.POINT_TARGETS[0] or value>CatanRules.POINT_TARGETS[1]:return
+		"friendly_robber":
+			if not (value is bool):return
+		_:return
+	if room_settings.get(key)==value:return
+	room_settings[key]=value
+	_broadcast_lobby()
 
 func act(action: Dictionary):
 	if not started or seat<0: return
@@ -305,6 +382,7 @@ func _apply(id: int,action: Dictionary):
 	if not error.is_empty(): _send_error(id,error)
 	else:
 		_refresh_turn_clock()
+		if str(action.get("type",""))=="offer_trade":offer_clock=TRADE_WINDOW
 		applied.emit(p,action)
 		_sync()
 
@@ -386,6 +464,7 @@ func host_solo(pname: String):
 	solo=true
 	dedicated=false
 	seat=0
+	_reset_settings()
 	roster=[{"id":1,"name":pname,"ready":true,"connected":true,"bot":false,"look":CatanAppearance.sanitize(my_look),"color":my_color}]
 	changed.emit()
 
@@ -464,6 +543,7 @@ func _process(delta: float):
 	for row in roster:
 		if not row.connected: return
 	_advance_turn_clock(delta)
+	_advance_offer_clock(delta)
 	bot_clock-=delta
 	if bot_clock>0: return
 	bot_clock=bot_delay
@@ -481,6 +561,31 @@ func _process(delta: float):
 			if bot_action_count>30 and rules.s.phase=="play" and rules.s.rolled: action={"type":"end"}
 		_apply(roster[p].id,action)
 		return
+
+func _advance_offer_clock(delta: float):
+	if rules.s.offer.is_empty() or not rules.s.offer.get("waiting",false):return
+	offer_clock-=delta
+	if offer_clock>0.0:return
+	rules.open_offer()
+	_sync()
+
+## Clients receive only the newest log lines with each state; the log dialog
+## asks for the whole history when it has a gap.
+func request_log():
+	if not online or not started:return
+	if multiplayer.is_server():log_received.emit(rules.s.get("log",[]).duplicate())
+	else:_log_request.rpc_id(1)
+
+@rpc("any_peer","call_remote","reliable")
+func _log_request():
+	if not online or not multiplayer.is_server() or not started:return
+	var sender=multiplayer.get_remote_sender_id()
+	if _seat_for(sender)<0:return
+	_full_log.rpc_id(sender,rules.s.get("log",[]))
+
+@rpc("authority","call_remote","reliable")
+func _full_log(entries: Array):
+	log_received.emit(entries)
 
 ## Seconds a seat may hold the game before the host plays the turn out for it.
 func turn_limit() -> float:

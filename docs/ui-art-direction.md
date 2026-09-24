@@ -2,7 +2,37 @@
 
 The shared UI uses warm parchment, carved wooden borders, brass details, and moss-green primary actions to match the miniature medieval island. Fira Sans keeps controls readable; Noto Serif adds character to headings. Both font licenses ship with exports.
 
-Run `python3 tools/build_ui_theme.py` from the repository to rebuild the authored SVG surfaces and `assets/ui_theme.tres`. The nine-slice surfaces stretch across menus and HUD panels without stretching their corners. Resource and development-card illustrations retain their own palettes.
+Run `python3 tools/build_ui_theme.py` from the repository to rebuild the authored SVG surfaces and `assets/ui_theme.tres`. The nine-slice surfaces stretch across menus and HUD panels without stretching their corners, so their decoration stays inside the slice margins: a stroke that crosses the middle smears into a bar across every panel. Resource and development-card illustrations retain their own palettes.
+
+## Controls
+
+Every control takes its look from the theme. Choose a variation rather than overriding colors or styles on a node:
+
+| Variation | Base | Use |
+| --- | --- | --- |
+| `PrimaryButton` | Button | The one main action on a screen or dialog. Green is kept for this. |
+| `IconButton` | Button | Icon-only tools, 40 × 40 px. |
+| `ListButton` | Button | Rows in a list, such as music tracks. Bare until hovered, honey when chosen. |
+| `Card` | PanelContainer | A raised tile inside a panel: lobby seats, notifications. |
+| `Row` / `PlainRow` | PanelContainer | Flat bands in a list; alternate them for long lists. |
+| `HeadingLabel` | Label | Serif titles and headings. |
+| `SectionLabel` | Label | Small rust labels above a group of controls, usually upper case. |
+| `MutedLabel` | Label | Captions, hints and secondary values. |
+| `ErrorLabel` | Label | Validation messages. |
+
+Toggle buttons, tabs and pressed buttons sink into honey wood. Switches (`CheckButton`) and checkboxes draw only their glyph and label, never a button frame.
+
+Dialogs inherit `scenes/ui/dialog.tscn` and put their buttons in its footer: one row, right-aligned, pinned below the content when the content scrolls. Secondary buttons such as Close or Back come first and the main action comes last. Resources are picked with tiles showing their illustration (`resource_choice.tscn`), and amounts are set with − / + tiles (`resource_steppers.gd`), not dropdowns or spin boxes. Trades are always worded from the viewer's side: "You give" and "You get", whoever made the offer.
+
+Full-window screens with many options, such as Settings, are a centred card of at most 980 × 720 px with their tabs down the left, so labels stay close to their controls on wide windows.
+
+## In-game screen
+
+The island needs width more than height, so the HUD keeps the sides of the window clear. The scoreboard sits in the top left corner and the tools in the top right. Both corners are open sea, since the camera frames the island across the full width and the island fills at most the middle half of it. On small windows the scoreboard reaches into that half, so the camera frames the island to the right of it. The resources and actions are in one bar along the bottom. Every action stays in its place all game and greys out when it doesn't apply, so the bar never changes size. Its first line says what the game is waiting for, and the buttons for a single step, such as stealing or finishing free roads, sit on that line. Development cards are small portrait cards fanned out beside the bar, one per type with a count; pointing at a card lifts it upright. On windows too narrow for the fan beside the bar, a smaller fan sits in the bar next to the resources.
+
+## Day and night
+
+`scripts/ui_day_night.gd` swaps the interface to its night palette at dusk. Flat colors change through its `PALETTE` table, so a style may only use a day color that table maps. Textures go through `shaders/ui_night.gdshader`, which maps them by brightness and gives primary (green) and selected (honey) wood their own night tones.
 
 ## Main-menu logo
 

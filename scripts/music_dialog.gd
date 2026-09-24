@@ -38,7 +38,8 @@ func refresh(sample: Dictionary,can_control: bool,shared: bool,music_volume: flo
 	volume.set_value_no_signal(music_volume)
 	%Mute.icon=CatanIcons.get_icon("muted" if music_volume<=0 else "volume")
 	%Mute.tooltip_text=tr("Unmute music for you") if music_volume<=0 else tr("Mute music for you")
-	%Status.text=tr("Shared with the room · ")+(tr("You control playback. Everyone keeps their own volume.") if controller else tr("The host controls playback. Your volume is personal.")) if shared else tr("Your soundtrack · choose a track or let the playlist continue.")
+	%Status.visible=shared
+	%Status.text=tr("Shared with the room · ")+(tr("You control playback. Everyone keeps their own volume.") if controller else tr("The host controls playback. Your volume is personal."))
 	for i in tracks.size():
 		tracks[i].set_pressed_no_signal(i==int(sample.track))
 		tracks[i].disabled=not controller

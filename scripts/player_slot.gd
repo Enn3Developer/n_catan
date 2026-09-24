@@ -14,7 +14,12 @@ func show_seat(net: CatanNetwork,index: int,controller: bool):
 	var occupied=index<net.roster.size()
 	var row: Dictionary=net.roster[index] if occupied else {}
 	var bot=occupied and row.get("bot",false)
-	%Accent.color=net.player_color(index) if occupied else Color("c3aa80")
+	# Open seats shrink to a faint placeholder so the filled ones stand out.
+	%Accent.visible=occupied
+	%Accent.color=net.player_color(index) if occupied else Color.TRANSPARENT
+	%PlayerInfo.visible=occupied
+	custom_minimum_size.y=66 if occupied else 44
+	modulate.a=1.0 if occupied else 0.55
 	%PlayerName.text=row.name if occupied else tr("Open seat")
 	var info=""
 	if occupied: info=tr("Bot") if bot else tr("You") if index==net.seat else tr("Player")
@@ -23,7 +28,7 @@ func show_seat(net: CatanNetwork,index: int,controller: bool):
 		info+=" · "+(tr(CatanAppearance.PRESETS[preset].name) if preset>=0 else tr("Custom pieces"))
 	%PlayerInfo.text=info
 	%Status.text=tr("Ready") if occupied and row.ready else tr("Waiting") if occupied else ""
-	%Status.visible=occupied and not bot
+	%Status.visible=occupied and not bot and not net.solo
 	%Status.add_theme_color_override("font_color",READY_COLOR if occupied and row.ready else WAITING_COLOR)
 	%Difficulty.visible=bot
 	if bot:
