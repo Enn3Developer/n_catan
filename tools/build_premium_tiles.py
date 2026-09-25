@@ -344,17 +344,19 @@ class Art:
     if self.clear(xx,yy,sz):self.rock(xx,yy,sz,'Ore','SmallDetails')
    self.grass(260,'DryGrass')
   else:
+   # The treasure tile reuses this ground and sets its chest at (-.34,-.22); keep that clear.
+   self.occupy(-.34,-.22,.21,.18)
    # Wind-cut buttes in bands of pale and rust sandstone.
-   for x,y,rx,ry,h,n in [(-.32,-.34,.14,.11,.2,5),(.23,-.38,.16,.12,.27,6),(.49,-.01,.08,.07,.12,3)]:
+   for x,y,rx,ry,h,n in [(-.02,-.47,.12,.09,.2,5),(.3,-.43,.14,.1,.27,6),(.49,-.01,.08,.07,.12,3)]:
     self.strata(x,y,rx*1.35,ry*1.35,h*.14,1,['SandstoneDark'],None,0)
     self.strata(x,y,rx,ry,h,n,['Sandstone','SandstoneDark','Sandstone'],None,.1)
     self.rock(x+rx*.9,y+ry*.8,rx*.22,'Sandstone','SmallDetails')
    for row in range(3):
     for col in range(4-row):
-     x=-.52+col*.061;y=-.06+row*.012;z=self.ground(x,y)
+     x=.2+col*.061;y=-.2+row*.012;z=self.ground(x,y)
      self.box((x,y,z+.018+row*.037),(.055,.075,.034),'Sandstone',bevel=.005)
-   self.occupy(-.43,-.03,.15,.075)
-   for x,y,h in [(-.43,.25,.23),(.43,.28,.18),(-.03,-.39,.16)]:
+   self.occupy(.29,-.17,.15,.075)
+   for x,y,h in [(-.43,.25,.23),(.43,.28,.18),(-.1,-.36,.16)]:
     z=self.ground(x,y);self.occupy(x,y,.082)
     self.tube((x,y,z-.004),(x,y,z+h),.019,.016,'Cactus',14)
     self.ellipsoid((x,y,z+h),(.016,.016,.014),'Cactus',7,12)
