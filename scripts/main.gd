@@ -555,7 +555,10 @@ func _confirm_leave():
 	_route(dialog,{"leave_requested":net.leave})
 
 func _help():
-	_present("res://scenes/ui/guide_dialog.tscn")
+	var guide=_present("res://scenes/ui/guide_dialog.tscn")
+	guide.show_guide(state)
+	# The sections exist only now, so size their text again.
+	_apply_text(guide)
 
 func _node(node_name: String) -> Node:
 	return screen.find_child(node_name,true,false)

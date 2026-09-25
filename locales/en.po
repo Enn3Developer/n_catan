@@ -2280,20 +2280,14 @@ msgstr "Resource to claim"
 msgid "How to win"
 msgstr "How to win"
 
-msgid "Reach the room's points target on your turn, 10 unless the host changes it. Settlements give 1 point, cities 2, and longest road and largest army 2 each."
-msgstr "Reach the room's points target on your turn, 10 unless the host changes it. Settlements give 1 point, cities 2, and longest road and largest army 2 each."
 
 msgid "Setup"
 msgstr "Setup"
 
-msgid "Each player places two settlements, each with a road. The order reverses for the second round."
-msgstr "Each player places two settlements, each with a road. The order reverses for the second round."
 
 msgid "A turn"
 msgstr "A turn"
 
-msgid "Roll the dice. Every settlement next to a hex with that number collects 1 resource, every city 2. Then build, trade with players or the bank, and play at most one development card. Harbors give better bank rates."
-msgstr "Roll the dice. Every settlement next to a hex with that number collects 1 resource, every city 2. Then build, trade with players or the bank, and play at most one development card. Harbors give better bank rates."
 
 msgid "Building costs"
 msgstr "Building costs"
@@ -2744,3 +2738,36 @@ msgstr "After each turn, the player three seats ahead builds, plays cards and tr
 
 msgid " · paired turns"
 msgstr " · paired turns"
+
+msgid "Reach %d points on your turn. Settlements give 1 point, cities 2, and the longest road and largest army 2 each. Victory point cards count too."
+msgstr "Reach %d points on your turn. Settlements give 1 point, cities 2, and the longest road and largest army 2 each. Victory point cards count too."
+
+msgid "Each player places two settlements, each with a road. The order reverses for the second round, and your second settlement collects 1 resource from each hex around it."
+msgstr "Each player places two settlements, each with a road. The order reverses for the second round, and your second settlement collects 1 resource from each hex around it."
+
+msgid "Roll the dice. Every settlement next to a hex with that number collects 1 resource, every city 2. Then build, trade with players or the bank, and play at most one development card."
+msgstr "Roll the dice. Every settlement next to a hex with that number collects 1 resource, every city 2. Then build, trade with players or the bank, and play at most one development card."
+
+msgid "Trading"
+msgstr "Trading"
+
+msgid "The bank takes 4 of one resource for 1 of another. A settlement or city on a 3:1 harbor lowers that to 3 for any resource, and one on a 2:1 harbor to 2 for the resource it shows. An offer to players goes to everyone at once: each one accepts, declines or sends a counter-offer, and you pick who to trade with."
+msgstr "The bank takes 4 of one resource for 1 of another. A settlement or city on a 3:1 harbor lowers that to 3 for any resource, and one on a 2:1 harbor to 2 for the resource it shows. An offer to players goes to everyone at once: each one accepts, declines or sends a counter-offer, and you pick who to trade with."
+
+msgid "Knight: move the robber and steal a resource.\nRoad building: place 2 roads for free.\nYear of plenty: take any 2 resources from the bank.\nMonopoly: every other player gives you all their cards of one resource.\nVictory point: worth 1 point, kept hidden until the game ends.\n\nYou can play one card per turn, before or after rolling, but not on the turn you bought it. Victory points count on their own."
+msgstr "Knight: move the robber and steal a resource.\nRoad building: place 2 roads for free.\nYear of plenty: take any 2 resources from the bank.\nMonopoly: every other player gives you all their cards of one resource.\nVictory point: worth 1 point, kept hidden until the game ends.\n\nYou can play one card per turn, before or after rolling, but not on the turn you bought it. Victory points count on their own."
+
+msgid "Longest road and largest army"
+msgstr "Longest road and largest army"
+
+msgid "The longest unbroken road, at least 5 long, is worth 2 points. So is the largest army, at least 3 played knights. To take either one you have to beat the player who holds it; a tie leaves it where it is."
+msgstr "The longest unbroken road, at least 5 long, is worth 2 points. So is the largest army, at least 3 played knights. To take either one you have to beat the player who holds it; a tie leaves it where it is."
+
+msgid "Smaller islands lie across the sea. Ships go on sea edges and cost 1 timber and 1 wool. A ship has to touch one of your buildings or continue a line of your ships; roads and ships only join at a building. Ships count toward the longest road, and the first settlement on each new island is worth 2 extra points."
+msgstr "Smaller islands lie across the sea. Ships go on sea edges and cost 1 timber and 1 wool. A ship has to touch one of your buildings or continue a line of your ships; roads and ships only join at a building. Ships count toward the longest road, and the first settlement on each new island is worth 2 extra points."
+
+msgid "House rules in this game"
+msgstr "House rules in this game"
+
+msgid "Archipelago only."
+msgstr "Archipelago only."
