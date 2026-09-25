@@ -26,9 +26,9 @@ func refresh(sample: Dictionary,can_control: bool,shared: bool,music_volume: flo
 	var track: Dictionary=CatanSoundtrack.TRACKS[int(sample.track)]
 	var playback_ready=sample.get("ready",true)
 	var controller=can_control and playback_ready
-	now_playing.text=(tr("Paused · ") if sample.paused else "")+tr(track.title) if playback_ready else tr("Joining room soundtrack…")
-	now_playing.tooltip_text=tr(track.title)+" · "+tr(track.mood)
-	%Description.text=track.mood
+	# The highlighted row names the track; this line only shows while a guest's music loads.
+	now_playing.text=tr("Joining room soundtrack…")
+	now_playing.visible=not playback_ready
 	%Progress.max_value=track.duration
 	%Progress.value=sample.position
 	%Clock.text=CatanSoundtrack.time_text(sample.position)+" / "+CatanSoundtrack.time_text(track.duration)

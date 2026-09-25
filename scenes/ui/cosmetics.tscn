@@ -78,11 +78,6 @@ theme_type_variation = &"HeadingLabel"
 theme_override_font_sizes/font_size = 28
 text = "Workshop"
 
-[node name="Subtitle" type="Label" parent="Margin/Panel/Layout/Heading/Titles"]
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-text = "Every settlement, city and road you build takes this look."
-
 [node name="CosmeticPlayer" type="OptionButton" parent="Margin/Panel/Layout/Heading"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 40)

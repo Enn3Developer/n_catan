@@ -24,14 +24,12 @@ var shown_seed=0
 
 func show_room(net: CatanNetwork,invite_address: String,connection_status: String):
 	%LobbyTitle.text=tr("Solo game") if net.solo else tr("Online room")
-	%PlayerCount.text="%d / 6" % net.roster.size()
 	var controller=net.is_controller()
+	# Five or six players get the larger island and paired turns.
 	var extended=net.roster.size()>4
-	var hexes=(30 if extended else 19)+((5 if extended else 4) if net.room_settings.island=="archipelago" else 0)+(1 if net.room_settings.get("treasure",false) else 0)
-	%RoomSummary.text=(tr("%d land hexes · paired turns") if extended else tr("%d land hexes")) % hexes
-	%RoomSummary.tooltip_text=tr("After each turn, the player three seats ahead builds, plays cards and trades with the bank.") if extended else ""
-	%RoomAccess.visible=not net.solo
-	%RoomAccess.text=tr("Guests need the invite and the password.") if not net.room_password.is_empty() else tr("No password. Anyone with the invite can join.")
+	%PlayerCount.text="%d / 6" % net.roster.size()+(tr(" · paired turns") if extended else "")
+	%PlayerCount.tooltip_text=tr("After each turn, the player three seats ahead builds, plays cards and trades with the bank.") if extended else ""
+	%RoomAccess.visible=not net.solo and not net.room_password.is_empty()
 	for i in CatanNetwork.MAX_PLAYERS:
 		var slot=PLAYER_SLOT.instantiate()
 		%PlayerSlots.add_child(slot)

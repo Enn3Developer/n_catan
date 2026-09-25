@@ -29,7 +29,7 @@ func show_offer(snapshot: Dictionary,player: int,net: CatanNetwork):
 	var waiting: bool=offer.get("waiting",false)
 	var offerer: String=state.players[offer.from].name
 	%Title.text=tr("Counter-offer") if countering else tr("A trade on the table")
-	%Offerer.text=tr("Your offer to the other players.") if own else tr("%s offers %s for %s. Change the terms and send them back.") % [offerer,_amounts(offer.give),_amounts(offer.receive)] if countering else tr("%s offers you a trade.") % offerer
+	%Offerer.text=tr("Your offer to the other players.") if own else tr("%s offers %s for %s.") % [offerer,_amounts(offer.give),_amounts(offer.receive)] if countering else tr("%s offers you a trade.") % offerer
 	%Terms.visible=not countering
 	# "give" is always what the offering player hands over.
 	%YouGive.show_amounts(offer.give if own else offer.receive)
@@ -47,7 +47,7 @@ func show_offer(snapshot: Dictionary,player: int,net: CatanNetwork):
 		%CounterGive.set_limits(hand)
 		%CounterGive.set_notes(have)
 		%CounterGet.set_limits([9,9,9,9,9])
-		%CounterGet.set_notes(have)
+		%CounterGet.set_notes(["","","","",""])
 		# A counter starts from the offer as seen from this side of the table.
 		%CounterGive.set_values(offer.receive)
 		%CounterGet.set_values(offer.give)

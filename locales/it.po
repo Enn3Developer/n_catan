@@ -98,11 +98,7 @@ msgstr "%s%s\n%d punti · %d risorse · %d carte sviluppo\nLunghezza strada %d �
 msgid "+ Add bot"
 msgstr "+ Aggiungi bot"
 
-msgid "%d land hexes"
-msgstr "%d esagoni di terra"
 
-msgid "%d land hexes · paired turns"
-msgstr "%d esagoni di terra · turni in coppia"
 
 msgid "3D render scale"
 msgstr "Scala di rendering 3D"
@@ -148,8 +144,8 @@ msgstr "Tutte le tue 4 città sono sul tabellone. Non ne hai altre da posizionar
 msgid "All 5 of your settlements are on the board. Upgrade one to a city to free a settlement piece."
 msgstr "Tutte le tue 5 colonie sono sul tabellone. Trasformane una in città per recuperare una pedina colonia."
 
-msgid "All settlements placed. Roll the dice to begin."
-msgstr "Tutte le colonie sono posizionate. Tira i dadi per iniziare."
+msgid "Setup finished."
+msgstr "Preparazione terminata."
 
 msgid "Already included in your score; never needs to be played."
 msgstr "Già inclusa nel punteggio; non occorre giocarla."
@@ -349,8 +345,6 @@ msgstr "Cittadella"
 msgid "City"
 msgstr "Città"
 
-msgid "19 land hexes"
-msgstr "19 esagoni di terra"
 
 msgid "Click Roll dice. This practice roll will produce resources beside one of your settlements. A settlement collects 1 resource, a city 2. Everyone collects on every player's roll, not just their own turn."
 msgstr "Clicca su Tira i dadi. Questo tiro di prova produrrà risorse accanto a una tua colonia. Una colonia raccoglie 1 risorsa, una città 2. Tutti raccolgono a ogni tiro, anche nei turni degli altri."
@@ -768,8 +762,6 @@ msgstr "Fai clic sulla carta Cavaliere accanto alla barra delle azioni per gioca
 msgid "Click Trade and swap with the bank. Usually 4 of one resource buys 1 of another. A 3:1 harbor improves every trade; a 2:1 harbor improves its pictured resource. In a real game you can also offer a trade to other players."
 msgstr "Fai clic su Scambia e commercia con la banca. Di solito 4 risorse uguali ne comprano 1 di un altro tipo. Un porto 3:1 migliora ogni scambio; un porto 2:1 migliora la risorsa raffigurata. In una partita vera puoi anche proporre scambi agli altri giocatori."
 
-msgid "No password. Anyone with the invite can join."
-msgstr "Nessuna password. Chiunque abbia l'invito può entrare."
 
 msgid "Open seat"
 msgstr "Posto libero"
@@ -783,8 +775,6 @@ msgstr "Gli altri giocatori possono accettare la tua offerta. Puoi ritirarla per
 msgid "Overall volume, including music, effects, ocean ambience and weather."
 msgstr "Volume generale, inclusi musica, effetti, suoni dell’oceano e meteo."
 
-msgid "Paired turn"
-msgstr "Turno abbinato"
 
 
 msgid "Particle effects"
@@ -800,14 +790,10 @@ msgstr "Incolla un codice invito valido ricevuto dall’host."
 msgid "Pause soundtrack"
 msgstr "Metti in pausa la musica"
 
-msgid "Paused · "
-msgstr "In pausa · "
 
 msgid "Performance overlay"
 msgstr "Mostra prestazioni"
 
-msgid "Piece cosmetics"
-msgstr "Aspetto delle pedine"
 
 msgid "Pizzicato strings, woodwinds and a lilting waltz"
 msgstr "Archi pizzicati, fiati e un valzer leggero"
@@ -951,8 +937,6 @@ msgstr "SDFGI · Alta"
 msgid "SDFGI · Medium"
 msgstr "SDFGI · Media"
 
-msgid "Saved automatically"
-msgstr "Salvataggio automatico"
 
 msgid "Screen-space bounce"
 msgstr "Rimbalzi nello spazio schermo"
@@ -1067,8 +1051,8 @@ msgstr "L’host controlla la riproduzione. Il volume è personale."
 msgid "The host controls room playback"
 msgstr "L’host controlla la riproduzione della stanza"
 
-msgid "The island awaits. Place your first settlement."
-msgstr "Posiziona la tua prima colonia per iniziare."
+msgid "Setup started."
+msgstr "Preparazione iniziata."
 
 msgid "The paired player may trade only with the bank."
 msgstr "Nel turno abbinato puoi scambiare solo con la banca."
@@ -1164,8 +1148,6 @@ msgstr "Aggiornamento pronto"
 msgid "Updates"
 msgstr "Aggiornamenti"
 
-msgid "Updates are verified before installation. Downloads can run in the background."
-msgstr "Gli aggiornamenti vengono verificati prima dell’installazione. Puoi continuare a giocare durante il download."
 
 msgid "Upscaling filter"
 msgstr "Filtro di upscaling"
@@ -1298,8 +1280,6 @@ msgstr "Ti servono ancora %s per proporre questo scambio."
 msgid "Your first real game"
 msgstr "La tua prima partita vera"
 
-msgid "Your best port rate: %d:1 · Bank stock: %d"
-msgstr "Miglior rapporto al porto: %d:1 · Scorte banca: %d"
 
 msgid "Your guide to the island"
 msgstr "Guida al gioco"
@@ -2206,8 +2186,6 @@ msgstr "Nuovo"
 msgid "No lines match."
 msgstr "Nessuna riga corrisponde."
 
-msgid "Other players answer first, then you choose who to trade with."
-msgstr "Prima rispondono gli altri giocatori, poi scegli tu con chi scambiare."
 
 msgid "Pick a new random seed"
 msgstr "Scegli un nuovo seme casuale"
@@ -2395,8 +2373,6 @@ msgstr "Sono i termini dell’offerta. Cambia qualcosa, oppure torna indietro e 
 msgid "Any"
 msgstr "Qualsiasi"
 
-msgid "Every settlement, city and road you build takes this look."
-msgstr "Ogni colonia, città e strada che costruisci avrà questo aspetto."
 
 msgid "Roll new choices for this section only"
 msgstr "Scegli a caso solo questa sezione"
@@ -2671,8 +2647,6 @@ msgstr "Un bot gioca per %s finché non torna."
 msgid "The saved game is from version %s, which plays by different rules. It can't be resumed here, and starting a new game replaces it."
 msgstr "La partita salvata viene dalla versione %s, che usa regole diverse. Non si può riprendere qui, e una nuova partita la sostituisce."
 
-msgid "%s offers %s for %s. Change the terms and send them back."
-msgstr "%s offre %s per %s. Cambia i termini e rimandali."
 
 msgid "You sent a counter-offer. %s picks who to trade with."
 msgstr "Hai inviato una controproposta. %s sceglie con chi scambiare."
@@ -2775,3 +2749,6 @@ msgstr "Pezzi %s"
 
 msgid "After each turn, the player three seats ahead builds, plays cards and trades with the bank."
 msgstr "Dopo ogni turno, il giocatore tre posti più avanti costruisce, gioca carte e commercia con la banca."
+
+msgid " · paired turns"
+msgstr " · turni in coppia"

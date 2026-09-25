@@ -157,7 +157,7 @@ func create(names: Array, game_seed: int = 0, options: Dictionary = {}) -> Dicti
 	_shuffle(s.deck)
 	s.treasure_near=_treasure_near()
 	s.home_island=0
-	_log("The island awaits. Place your first settlement.")
+	_log("Setup started.")
 	if s.random_start: _random_setup()
 	return s
 
@@ -690,7 +690,7 @@ func apply(p: int,a: Dictionary) -> String:
 			s.turn=0
 			s.phase="play"
 			if s.get("start_card",false): _deal_start_cards()
-			_log("All settlements placed. Roll the dice to begin.")
+			_log("Setup finished.")
 			_score()
 			_record_points()
 		else:

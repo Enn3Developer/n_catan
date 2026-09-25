@@ -30,7 +30,7 @@ func show_trade(snapshot: Dictionary,player: int,draft: Dictionary):
 	%Give.set_notes(have)
 	%Give.set_values(draft.get("give",[0,0,0,0,0]))
 	%Get.set_limits([MOST_ASKED,MOST_ASKED,MOST_ASKED,MOST_ASKED,MOST_ASKED])
-	%Get.set_notes(have)
+	%Get.set_notes(["","","","",""])
 	%Get.set_values(draft.get("receive",[0,0,0,0,0]))
 	var captions=[]
 	for resource in 5:captions.append("%s\n%d:1" % [tr(CatanRules.RES[resource]),rules.rate(seat,resource)])
@@ -71,7 +71,8 @@ func _refresh_offer():
 	%OfferTrade.disabled=not complete or state.get("paired",false)
 	%Preview.text=tr("%s for %s") % [_amounts(give),_amounts(receive)] if complete else ""
 	%Preview.visible=complete
-	%Reason.text=tr("Other players answer first, then you choose who to trade with.") if complete else tr("Choose what you give and what you want in return.")
+	%Reason.text="" if complete else tr("Choose what you give and what you want in return.")
+	%Reason.visible=not complete
 
 func _refresh_bank():
 	var hand: Array=state.players[seat].hand
@@ -98,7 +99,8 @@ func _refresh_bank():
 	%Preview.visible=true
 	var affordable=hand[give]>=rate
 	%BankTrade.disabled=not affordable or state.bank[receive]<1
-	%Reason.text=tr("You need %d more %s.") % [rate-hand[give],tr(CatanRules.RES[give])] if not affordable else tr("The bank has none of that resource.") if state.bank[receive]<1 else tr("Your best port rate: %d:1 · Bank stock: %d") % [rate,state.bank[receive]]
+	%Reason.text=tr("You need %d more %s.") % [rate-hand[give],tr(CatanRules.RES[give])] if not affordable else tr("The bank has none of that resource.") if state.bank[receive]<1 else ""
+	%Reason.visible=not %Reason.text.is_empty()
 
 ## "2 Wool and 1 Ore": the amounts in words, for the summary line.
 func _amounts(amounts: Array) -> String:
