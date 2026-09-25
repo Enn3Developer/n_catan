@@ -432,6 +432,7 @@ func _process(delta):
 	elapsed+=delta
 	sea_material.set_shader_parameter("animation_time",elapsed)
 	if seabed_material:seabed_material.set_shader_parameter("animation_time",elapsed)
+	_point_fish()
 	sea_life.animate(delta,elapsed)
 	environment.sky.sky_material.set_shader_parameter("animation_time",elapsed)
 	living_world.animate(actors,elapsed,art,daylight)
@@ -555,6 +556,22 @@ func _ground_at(screen: Vector2) -> Vector3:
 	var direction=camera.project_ray_normal(screen)
 	if direction.y>-.01:return camera_focus
 	return origin+direction*((.20*TILE_SIZE-origin.y)/direction.y)
+
+## Tells the fish where the pointer meets open water, so they can scatter
+## from it. Beaches, land and the HUD don't count.
+func _point_fish():
+	sea_life.cursor_active=false
+	var viewport=get_viewport()
+	var screen=viewport.get_mouse_position()
+	if not viewport.get_visible_rect().has_point(screen) or viewport.gui_get_hovered_control()!=null:return
+	if sea_life.floor_map==null or not DisplayServer.window_is_focused():return
+	var origin=camera.project_ray_origin(screen)
+	var direction=camera.project_ray_normal(screen)
+	if direction.y>-.01:return
+	var hit=sea_life.to_local(origin+direction*((CatanSeaLife.WATER_Y-origin.y)/direction.y))
+	if sea_life.floor_map.shore_distance(Vector2(hit.x,hit.z))<4.0:return
+	sea_life.cursor=hit
+	sea_life.cursor_active=true
 
 func _mouse_ground() -> Vector3:
 	return _ground_at(get_viewport().get_mouse_position())

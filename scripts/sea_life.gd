@@ -34,6 +34,12 @@ const FISH={
 }
 ## Fish keep this far off the coast, in metres from the hex edge.
 const COAST_CLEARANCE=9.0
+## Fish within this many metres of the cursor dart away from it.
+const FLEE_RADIUS=11.0
+
+## Where the pointer meets the water, and whether it is over open water now.
+var cursor=Vector3.ZERO
+var cursor_active=false
 
 var floor_map: CatanSeaFloor
 var materials=[]
@@ -132,7 +138,7 @@ func _school(kind: String,size: int):
 	for i in size:
 		var offset=Vector3(rng.randf_range(-3,3),rng.randf_range(-1,1),rng.randf_range(-3,3))
 		var heading=Vector3(rng.randf_range(-1,1),0,rng.randf_range(-1,1)).normalized()
-		fish.append({"p":home+offset,"v":heading*spec.speed.x,"phase":rng.randf(),"rate":rng.randf_range(7.0,9.0)})
+		fish.append({"p":home+offset,"v":heading*spec.speed.x,"phase":rng.randf(),"rate":rng.randf_range(7.0,9.0),"fright":0.0})
 	schools.append({"kind":kind,"fish":fish,"goal":_open_water(spec.depth),"timer":rng.randf_range(8,16)})
 
 func _open_water(depth_band: Vector2) -> Vector3:
@@ -184,7 +190,9 @@ func animate(delta: float,elapsed: float):
 		if holder.has_meta("kind"):_draw_fish(holder)
 
 ## Boid rules inside each school: keep apart, match heading, stay together,
-## head for the school's goal, and turn away from the coast and the bed.
+## head for the school's goal, and turn away from the coast, the bed and the
+## cursor. A fright fades over a second or two, so a startled fish keeps going
+## for a moment after the cursor has moved on.
 func _steer(school: Dictionary,delta: float):
 	var spec=FISH[school.kind]
 	school.timer-=delta
@@ -196,8 +204,20 @@ func _steer(school: Dictionary,delta: float):
 		school.goal=_open_water(spec.depth)
 		school.timer=rng.randf_range(10,20)
 	var alone=school.fish.size()==1
+	var startled=false
 	for f in school.fish:
 		var push=Vector3.ZERO
+		f.fright=maxf(f.fright-delta*.7,0.0)
+		if cursor_active:
+			var gap=Vector2(f.p.x-cursor.x,f.p.z-cursor.z)
+			var d=gap.length()
+			if d<FLEE_RADIUS:
+				var away=gap/d if d>.001 else Vector2.RIGHT.rotated(f.phase*TAU)
+				var close=(FLEE_RADIUS-d)/FLEE_RADIUS
+				f.fright=maxf(f.fright,close)
+				# Out sideways and down, away from the shadow on the surface.
+				push+=Vector3(away.x,-.35,away.y)*(4.0+close*26.0)
+				startled=true
 		if not alone:
 			var apart=Vector3.ZERO
 			for other in school.fish:
@@ -220,11 +240,15 @@ func _steer(school: Dictionary,delta: float):
 		if f.p.y>top:push.y-=(f.p.y-top)*2.0
 		f.v+=push*delta
 		f.v.y*=.96
-		var speed=clampf(f.v.length(),spec.speed.x,spec.speed.y)
+		var speed=clampf(f.v.length(),spec.speed.x,spec.speed.y*(1.0+f.fright*1.2))
 		f.v=f.v.normalized()*speed
 		f.p+=f.v*delta
 		# A faster fish beats its tail faster.
 		f.rate=lerpf(f.rate,6.0+speed*2.5,delta*2.0)
+	# A startled school picks a new goal on the far side from the cursor.
+	if startled and Vector2(school.goal.x-cursor.x,school.goal.z-cursor.z).dot(Vector2(centre.x-cursor.x,centre.z-cursor.z))<0.0:
+		school.goal=_open_water(spec.depth)
+		school.timer=rng.randf_range(10,20)
 
 func _draw_fish(holder: MultiMeshInstance3D):
 	var kind=holder.get_meta("kind")
