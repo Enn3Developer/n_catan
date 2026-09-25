@@ -7,6 +7,7 @@ normals, hard shapes (planks, stones, blades) keep flat faces with a small
 bevel so their edges catch the light.
 """
 import math
+import random
 
 import bpy  # noqa: F401, bmesh only loads after bpy
 import bmesh
@@ -163,6 +164,67 @@ class Part:
         if matrix is not None:
             m = m @ matrix
         return self._add(bm, mat, smooth, m)
+
+    def crag(self, center, radii, mat, seed=0, cuts=8, rough=.16, terrace=0.0, subdiv=2, top=None, matrix=None):
+        """A chiselled boulder: a lumpy sphere with random planes sliced off it.
+
+        Each cut flattens everything past a plane, so the rock gets broad flat
+        facets like split stone. terrace bunches heights into ledges (in unit
+        sphere terms, before radii), and top shaves a flat summit at that height.
+        """
+        rng = random.Random(seed)
+        waves = [(Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-1, 1))).normalized() * rng.uniform(2.5, 5.5),
+                  rng.uniform(0, math.tau), rng.uniform(.4, 1)) for _ in range(4)]
+        planes = []
+        for _ in range(cuts):
+            n = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-.35, 1))).normalized()
+            planes.append((n, rng.uniform(.5, .84)))
+        bm = bmesh.new()
+        bmesh.ops.create_icosphere(bm, subdivisions=subdiv, radius=1.0)
+        for v in bm.verts:
+            n = v.co.normalized()
+            h = sum(a * math.sin(n.dot(k) + p) for k, p, a in waves) / 2.5
+            co = n * (1 + rough * h)
+            for pn, d in planes:
+                over = co.dot(pn) - d
+                if over > 0:
+                    co -= pn * over
+            if terrace and co.z > -.3:
+                co.z += (round(co.z / terrace) * terrace - co.z) * .6
+            if top is not None and co.z > top:
+                co.z = top + (co.z - top) * .12
+            v.co = Vector((co.x * radii[0], co.y * radii[1], co.z * radii[2]))
+        m = Matrix.Translation(Vector(center))
+        if matrix is not None:
+            m = m @ matrix
+        return self._add(bm, mat, False, m)
+
+    def sweep(self, points, radius, mat, sides=6, smooth=True):
+        """A rod of constant radius following a polyline: rails, ropes, hoops."""
+        points = [Vector(p) for p in points]
+        rings = []
+        up = Vector((0, 0, 1))
+        for i, p in enumerate(points):
+            a = points[max(i - 1, 0)]
+            b = points[min(i + 1, len(points) - 1)]
+            t = (b - a).normalized()
+            side = t.cross(up)
+            if side.length < 1e-4:
+                side = t.cross(Vector((1, 0, 0)))
+            side.normalize()
+            normal = side.cross(t)
+            rings.append([p + (side * math.cos(math.tau * k / sides) + normal * math.sin(math.tau * k / sides)) * radius
+                          for k in range(sides)])
+        bm = bmesh.new()
+        verts = [[bm.verts.new(v) for v in ring] for ring in rings]
+        for lo, hi in zip(verts, verts[1:]):
+            for k in range(sides):
+                j = (k + 1) % sides
+                bm.faces.new((lo[k], lo[j], hi[j], hi[k]))
+        bm.faces.new(list(reversed(verts[0])))
+        bm.faces.new(verts[-1])
+        bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+        return self._add(bm, mat, smooth)
 
     def quad_strip(self, rows, mat, smooth=True, close=False):
         """Faces between consecutive rows of points (each row a list of Vectors)."""

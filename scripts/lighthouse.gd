@@ -8,6 +8,7 @@ const HAZE_DENSITY=.012
 @onready var beacon: Node3D=$LighthouseBeacon
 @onready var spot: SpotLight3D=$LighthouseBeacon/Spot
 @onready var haze: FogVolume=$SeaHaze
+@onready var rowboat: Node3D=$Rowboat
 
 func _ready():
 	# Like the towns' lanterns, the glowing lamp records the light it casts.
@@ -21,3 +22,10 @@ func shine(time: float,night: float):
 	lamp.material_override.emission_energy_multiplier=night*1.4
 	# Evening haze gathers over the water, so the beam only shows after dusk.
 	haze.material.density=HAZE_DENSITY*night
+
+## Rests the rowboat at the calm water line, rolling gently; the board then adds the swell.
+func moor(water_y: float,time: float):
+	var at=rowboat.global_position
+	rowboat.position.y=to_local(Vector3(at.x,water_y,at.z)).y
+	rowboat.rotation.z=sin(time*.9)*.04
+	rowboat.rotation.x=sin(time*.7+1.3)*.025
