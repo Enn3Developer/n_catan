@@ -78,6 +78,14 @@ func animate(entries: Array,time: float,art,daylight: float=1.0):
 		if actor.type=="sheep":animate_sheep(actor,time,art,daylight)
 		else:animate_worker(actor,time,art,daylight)
 
+# A smooth 0→1→0 bump between a and b, peaking in the middle.
+static func pulse(x: float,a: float,b: float) -> float:
+	return sin(PI*clampf((x-a)/(b-a),0,1))
+
+# Now and then, a short burst: 1 for a fraction of each period, eased in and out.
+static func now_and_then(t: float,period: float,length: float) -> float:
+	return pulse(fposmod(t,period),0,length)
+
 func animate_sheep(actor: Dictionary,time: float,art,daylight: float):
 	var t=time+actor.phase
 	# Six seconds to amble between patches, then ten seconds with planted feet.
@@ -95,20 +103,33 @@ func animate_sheep(actor: Dictionary,time: float,art,daylight: float):
 	var turn=smoothstep(14.0,16.0,local)
 	actor.root.rotation.y=lerp_angle(PI,facing+(PI if returning else 0.0)+turn*PI,smoothstep(.08,.4,daylight))
 	var moving=sin(PI*clampf(local/6.0,0,1))*daylight
-	var stride=progress*TAU*2.0
+	var stride=progress*TAU*3.0
 	var rest=1.0-smoothstep(.08,.4,daylight)
-	actor.body.position.y=.082-rest*.032+sin(stride*2)*.0018*moving
-	actor.body.rotation.z=sin(stride)*.014*moving
+	# Walk: hind then fore on one side, then the other, each foot lifted as it swings.
+	const GAIT=[PI*.5,0.0,PI*1.5,PI]
+	var breathe=sin(t*1.9)*.0012*(1.0-moving)
+	actor.body.position.y=.070-rest*.042+absf(sin(stride*2))*.0016*moving+breathe
+	actor.body.rotation.z=sin(stride)*.035*moving
+	actor.body.rotation.x=sin(stride*2)*.02*moving
 	for i in 4:
-		var gait=stride+[0.0,PI,PI,0.0][i]
-		actor.limbs[i].rotation.x=sin(gait)*.38*moving+rest*1.12
-		actor.knees[i].rotation.x=-maxf(0,cos(gait))*.48*moving-rest*1.95
-	var graze=smoothstep(6.0,7.5,local)*(1.0-smoothstep(12.0,14.0,local))*daylight
-	actor.head.rotation.x=-.12-graze*.92-rest*.30
-	actor.head.rotation.y=sin(t*.65)*.12*(1.0-graze)*(1.0-rest)
-	actor.head.position.y=.005+sin(t*4.3)*.0015*graze
-	actor.tail.rotation.x=sin(t*2.1)*.12*daylight
-	for i in 2:actor.ears[i].rotation.z=sin(t*1.7+i*2.0)*.08*daylight
+		var gait=stride+GAIT[i]
+		# Lying down, every hoof tucks under the belly: fore shins fold back, hind shins forward.
+		var tuck=-1.0 if actor.limbs[i].position.z>0 else 1.0
+		actor.limbs[i].rotation.x=sin(gait)*.42*moving+rest*.35*tuck
+		actor.knees[i].rotation.x=-maxf(0,cos(gait))*.62*moving-rest*2.6*tuck
+	# Graze: lower the head, nibble in short bobs, lift it to chew and look about.
+	var graze=smoothstep(6.0,7.5,local)*(1.0-smoothstep(12.0,13.5,local))*daylight
+	var nibble=maxf(0,sin(t*7.5))*.10*graze*(1.0-now_and_then(t,4.3,1.4))
+	var chew=sin(t*9.0)*.03*(1.0-graze)*(1.0-moving)*daylight
+	var look=sin(t*.55)*.25*(1.0-graze)*(1.0-rest)*(1.0-moving*.6)
+	actor.head.rotation.x=-.10-graze*.95-rest*.30+nibble+sin(stride*2)*.06*moving+chew
+	actor.head.rotation.y=look
+	actor.head.position.y=.005
+	# Tail wags in bursts; ears flick one at a time.
+	actor.tail.rotation.x=(.15+sin(t*14.0)*.35*now_and_then(t+actor.phase,5.7,.9))*daylight
+	for i in 2:
+		var flick=now_and_then(t*(1.0+i*.13)+i*2.1,3.9+i*1.3,.35)
+		actor.ears[i].rotation.z=(sin(t*1.3+i*2.0)*.06+flick*.5*(1 if i==0 else -1))*daylight
 
 func animate_worker(actor: Dictionary,time: float,art,daylight: float):
 	var t=time+actor.phase
@@ -118,80 +139,113 @@ func animate_worker(actor: Dictionary,time: float,art,daylight: float):
 	actor.root.position=Vector3(point.x,art.height_at(point,actor.kind)+.003,point.y)
 	actor.root.visible=bandit or daylight>.03
 	actor.root.rotation=Vector3.ZERO
-	var cycle=fposmod(t*(.88+fposmod(actor.phase,.23)),5.6)
-	# Deliberate lift, short impact, slower recovery, then a breathing pause.
-	var lift=smoothstep(.3,1.6,cycle)
-	var hit=smoothstep(1.6,1.92,cycle)
-	var recover=smoothstep(2.15,3.4,cycle)
-	var stroke=lift-hit
-	var working=daylight if not bandit else 0.0
-	var bend=(hit-recover)*.22*working
-	actor.body.rotation.x=-bend+stroke*.05*working
-	actor.body.rotation.y=sin(cycle*1.1)*.035*working
-	actor.body.position.y=.079+sin(t*1.5)*.0008
-	actor.head.rotation.x=.12+bend*.45-stroke*.12*working
-	actor.head.rotation.y=sin(t*.45)*.09*(1.0-working*.8)
-	actor.tool.position=Vector3(.006,.028+stroke*.040*working,-.043)
-	actor.tool.rotation=Vector3(-2.08+stroke*2.93*working,0,-.12)
-	if actor.kind==3 and not bandit:
-		var rake=(1.0-cos(cycle/5.6*TAU))*.5*working
-		actor.body.rotation.x=-.10-rake*.12
-		actor.tool.position=Vector3(.004,.019,-.039-rake*.007)
-		actor.tool.rotation=Vector3(-2.05+rake*.55,0,-.08)
 	if bandit:
-		actor.tool.position=Vector3(.025,.012,-.031)
-		actor.tool.rotation=Vector3(-.25,0,-.25)
-	if not bandit and actor.kind!=3:strike_pose(actor,cycle,working)
+		guard_pose(actor,t,daylight)
+		return
+	# Walking to and from work happens at dusk and dawn; the tool rides on the shoulder.
+	var commute=sin(PI*daylight)
+	var working=daylight*(1.0-commute)
+	var cycle=fposmod(t*(.88+fposmod(actor.phase,.23)),5.6)
+	var pose: Dictionary
+	if actor.kind==3:pose=rake_pose(cycle,working)
+	else:pose=strike_pose(actor,cycle,working)
+	# Idle life on top of the work: breathing and the odd glance aside.
+	var breathe=sin(t*1.6)*.0008
+	var glance=now_and_then(t,11.0+fposmod(actor.phase,3.0),2.2)*(1.0-pose.effort)
+	var walk=t*5.2
+	var drop=pose.squat*working
+	actor.body.position.y=.079-drop+breathe-absf(sin(walk))*.0025*commute
+	actor.body.rotation=Vector3(-pose.lean*working+.05*commute,pose.twist*working+sin(walk)*.06*commute,cos(walk)*.03*commute)
+	actor.head.rotation=Vector3(.12+pose.nod*working-.08*commute,glance*.55*sin(t*.4+actor.phase),0)
+	# Carry the tool over the right shoulder while walking.
+	var carry=Transform3D(Basis(Vector3.RIGHT,.95)*Basis(Vector3.BACK,-.25),Vector3(.036,.118,-.018))
+	var tool: Transform3D=pose.tool.interpolate_with(carry,commute)
+	actor.tool.transform=actor.body.transform.affine_inverse()*tool
 	for i in 2:
-		var grip=actor.tool.transform*actor.grips[i]
+		var grip=actor.tool.transform*actor.grips[i].lerp([Vector3(0,-.030,0),Vector3(0,-.004,0)][i],commute)
 		reach(actor.arms[i],actor.elbows[i],grip,-1.0 if i==0 else 1.0)
-		# A wide, planted stance during work. Commute steps only at dusk/dawn.
-		var commute=sin(PI*daylight) if not bandit else 0.0
-		actor.limbs[i].rotation.x=sin(t*5.0+i*PI)*.32*commute
-		actor.limbs[i].rotation.z=.045 if i==0 else -.045
-		actor.knees[i].rotation.x=maxf(0,-sin(t*5.0+i*PI))*.5*commute
+	_legs(actor,drop,.05*(1.0-commute),walk,commute)
+
+## Bends both knees to lower the hips by drop, keeping the feet under the body,
+## and walks with the given stride phase and amount.
+func _legs(actor: Dictionary,drop: float,spread: float,walk: float,amount: float):
+	var squat=acos(clampf(1.0-drop/.079,0.0,1.0))
+	for i in 2:
+		var gait=walk+i*PI
+		actor.limbs[i].position.y=.079-drop
+		actor.limbs[i].rotation.x=squat+sin(gait)*.42*amount
+		actor.limbs[i].rotation.z=spread*(-1.0 if i==0 else 1.0)
+		actor.knees[i].rotation.x=-squat*2.0-maxf(0,cos(gait))*.75*amount
 
 # The head lies in the swing plane. Solve the impact from the cutting edge/tip,
-# then animate the handle up and back from that contact, independently of torso bend.
-func strike_pose(actor: Dictionary,cycle: float,working: float):
+# then key the handle through a wind-up over the right shoulder, a fast fall into
+# the contact, a short jolt, and a pull back to the ready pose.
+func strike_pose(actor: Dictionary,cycle: float,working: float) -> Dictionary:
 	var axe=actor.kind==0
 	var tip=Vector3(0,.084,-.038) if axe else Vector3(0,.069,-.052)
 	var contact=Vector3(0,.044 if axe else .0345,-.14)
 	var impact_angle=-1.9 if axe else -1.85
-	var impact_basis=Basis(Vector3.RIGHT,impact_angle)
-	var impact_origin=contact-impact_basis*tip
-	var overhead=Vector3(.010,.170,-.044)
-	var ready=Vector3(.010,.119,-.041)
-	var ready_angle=-.55
-	var origin=ready
-	var angle=ready_angle
-	var slide=0.0
-	var lean=0.0
-	if cycle<1.7:
-		var lift=smoothstep(.35,1.7,cycle)
-		origin=ready.lerp(overhead,lift)
-		angle=lerpf(ready_angle,.42,lift)
-		lean=-lift*.045
-	elif cycle<2.12:
-		# Accelerate into contact, instead of easing to a stop before the hit.
-		var swing=pow((cycle-1.7)/.42,2.0)
-		origin=overhead.lerp(impact_origin,swing)
-		angle=lerpf(.42,impact_angle,swing)
-		slide=swing
-		lean=lerpf(-.045,.24,swing)
-	elif cycle<2.5:
-		origin=impact_origin;angle=impact_angle;slide=1.0;lean=.24
-	else:
-		# Pull the head free before returning to the ready position.
-		var recover=smoothstep(2.5,4.3,cycle)
-		origin=impact_origin.lerp(ready,recover)
-		angle=lerpf(impact_angle,ready_angle,recover)
-		slide=1.0-recover;lean=.24*(1.0-recover)
-	actor.body.rotation=Vector3(-lean*working,0,0)
-	actor.head.rotation.x=.12+lean*.35
+	var impact_origin=contact-Basis(Vector3.RIGHT,impact_angle)*tip
+	# Keys: time, handle origin, handle pitch, roll, torso lean, twist, squat, head nod, grip slide.
+	var keys=[
+		[0.0,Vector3(.010,.118,-.046),-.55,0.0,.02,0.0,.004,.10,0.0],
+		[.35,Vector3(.010,.118,-.046),-.55,0.0,.02,0.0,.004,.10,0.0],
+		[1.25,Vector3(.034,.176,-.024),.30,-.40,-.06,.22,.0,-.10,0.0],
+		[1.62,Vector3(.036,.184,-.018),.40,-.45,-.08,.26,.0,-.14,0.0],
+		[2.02,impact_origin,impact_angle,0.0,.26,-.04,.012,.30,1.0],
+		[2.10,impact_origin+Vector3(0,.003,.001),impact_angle+.04,0.0,.24,-.04,.013,.28,1.0],
+		[2.45,impact_origin,impact_angle,0.0,.24,-.03,.012,.28,1.0],
+		[2.90,impact_origin+Vector3(0,.022,.012),impact_angle+.35,0.0,.16,0.0,.010,.20,.6],
+		[4.20,Vector3(.010,.118,-.046),-.55,0.0,.02,0.0,.004,.10,0.0],
+		[5.60,Vector3(.010,.118,-.046),-.55,0.0,.02,0.0,.004,.10,0.0]]
+	var k=0
+	while k<keys.size()-2 and cycle>=keys[k+1][0]:k+=1
+	var a=keys[k];var b=keys[k+1]
+	var x=clampf((cycle-a[0])/maxf(.0001,b[0]-a[0]),0,1)
+	# The downswing accelerates into the hit; every other move eases.
+	x=x*x if k==3 else x*x*(3.0-2.0*x)
+	var origin: Vector3=a[1].lerp(b[1],x)
+	var pitch=lerpf(a[2],b[2],x)
+	var roll=lerpf(a[3],b[3],x)
+	var slide=lerpf(a[8],b[8],x)
 	actor.grips=[Vector3(0,lerpf(.022,-.014,slide),0),Vector3(0,-.033,0)]
-	var pose=Transform3D(Basis(Vector3.RIGHT,lerpf(ready_angle,angle,working)),ready.lerp(origin,working))
-	actor.tool.transform=actor.body.transform.affine_inverse()*pose
+	var rest=Transform3D(Basis(Vector3.RIGHT,-.55),Vector3(.010,.118,-.046))
+	var tool=rest.interpolate_with(Transform3D(Basis(Vector3.BACK,roll)*Basis(Vector3.RIGHT,pitch),origin),working)
+	return {"tool":tool,"lean":lerpf(a[4],b[4],x),"twist":lerpf(a[5],b[5],x),"squat":lerpf(a[6],b[6],x),"nod":lerpf(a[7],b[7],x),"effort":pulse(cycle,.3,4.3)}
+
+# Rake hay: reach out, drag it back in two strokes, lift and reset.
+func rake_pose(cycle: float,working: float) -> Dictionary:
+	var stroke=fposmod(cycle,2.8)
+	var reach_out=smoothstep(0,.9,stroke)*(1.0-smoothstep(1.0,2.2,stroke))
+	var lift=pulse(stroke,2.2,2.8)
+	var tool=Transform3D(Basis(Vector3.RIGHT,-2.10+reach_out*.30+lift*.25),Vector3(.004,.020+lift*.012,-.036-reach_out*.034))
+	return {"tool":Transform3D(Basis(Vector3.RIGHT,-2.05),Vector3(.004,.019,-.039)).interpolate_with(tool,working),
+		"lean":.14+reach_out*.22,"twist":sin(stroke/2.8*TAU)*.08,"squat":.005+reach_out*.009,"nod":.10+reach_out*.08,"effort":1.0}
+
+# Outlaws stand guard around their fire: facing out by day with the sword on the
+# shoulder, shifting their weight and scanning; turned to the fire by night.
+func guard_pose(actor: Dictionary,t: float,daylight: float):
+	var night=1.0-daylight
+	var out=Vector2(actor.origin.x,actor.origin.y)
+	var outward=atan2(-out.x,-out.y)
+	actor.root.rotation.y=lerp_angle(outward,outward+PI,smoothstep(.2,.8,night))
+	var shift=sin(t*.45)
+	var scan=sin(t*.31+actor.phase)*.6*daylight
+	var tap=now_and_then(t,7.0+fposmod(actor.phase,2.0),.8)
+	actor.body.position.y=.079+sin(t*1.5)*.0008-absf(shift)*.002
+	actor.body.rotation=Vector3(.03*night,scan*.35,shift*.035)
+	actor.head.rotation=Vector3(.10+.18*night,scan*.65,-shift*.04)
+	# Sword on the right shoulder, blade up behind it; it bounces when tapped.
+	var shoulder=Transform3D(Basis(Vector3.BACK,-.3)*Basis(Vector3.RIGHT,.65+tap*.35),Vector3(.040,.098,-.020))
+	actor.tool.transform=actor.body.transform.affine_inverse()*shoulder
+	reach(actor.arms[1],actor.elbows[1],actor.tool.transform*Vector3(0,-.004,0),1.0)
+	# The free hand rests on the hip, or warms at the fire at night.
+	var hip=Vector3(-.046,.004,-.012).lerp(Vector3(-.018,.030,-.062),night)
+	reach(actor.arms[0],actor.elbows[0],hip,-1.0)
+	for i in 2:
+		actor.limbs[i].position.y=.079-absf(shift)*.002
+		actor.limbs[i].rotation=Vector3(0,0,(.06+shift*.03)*(-1.0 if i==0 else 1.0))
+		actor.knees[i].rotation.x=-maxf(0,shift*(1 if i==0 else -1))*.12
 
 func town(look: PackedByteArray,color: Color,city: bool,parity: int=0,full_detail: bool=true) -> Node3D:
 	var root: Node3D=CatanPieceBuilder.town(look,color,city,parity,full_detail)
@@ -299,13 +353,21 @@ func _animate_road_dweller(actor: Dictionary,time: float,daylight: float):
 
 func _animate_dweller_stride(actor: Dictionary,time: float,moving: float):
 	var stride=time*4.6+actor.index*1.7
-	actor.body.position.y=.079+absf(sin(stride))*.003*moving
-	actor.body.rotation.y=sin(time*.5+actor.index)*.10*(1.0-moving)
+	var still=1.0-moving
+	var t=time+actor.index*3.1
+	# Walking: a bob at each step, hips sway over the planted foot, arms swing
+	# against the legs. Standing: breathing, weight shifts and chatty gestures.
+	var talk=now_and_then(t,6.0+float(actor.index%4),2.4)*still
+	var shift=sin(t*.37)*still
+	actor.body.position.y=.079-absf(sin(stride))*.0035*moving+sin(t*1.7)*.0006*still
+	actor.body.rotation=Vector3(-.06*moving+sin(t*5.5)*.03*talk,sin(stride)*.09*moving+sin(t*.5)*.14*still,cos(stride)*.035*moving+shift*.03)
 	for leg in 2:
-		actor.limbs[leg].rotation.x=sin(stride+leg*PI)*.35*moving
-		actor.arms[leg].rotation.x=-sin(stride+leg*PI)*.28*moving
-	# Occasional small hand gestures while stopped, with planted feet.
-	actor.arms[0].rotation.z=sin(time*.9+actor.index)*.12*(1.0-moving)
+		var swing=sin(stride+leg*PI)
+		actor.limbs[leg].rotation=Vector3(swing*.42*moving,0,(.03+shift*.02)*(-1.0 if leg==0 else 1.0)*still)
+		actor.arms[leg].rotation=Vector3(-swing*.38*moving,0,(.10 if leg==1 else -.10)*moving+(.06 if leg==1 else -.06)*still)
+	# One hand talks, rising and turning over while they chat.
+	actor.arms[0].rotation.x+=talk*(.9+sin(t*3.1)*.25)
+	actor.arms[0].rotation.z-=talk*.25
 
 func harbor(resource: int) -> Node3D:
 	var root: Node3D=HARBOR.instantiate();root.name="CoastalHarbor";root.set_meta("resource",resource)

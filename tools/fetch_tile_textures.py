@@ -2,7 +2,7 @@
 import concurrent.futures, hashlib, json, pathlib, urllib.request
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 DEST=ROOT/'assets'/'materials'
-ASSETS=['forest_ground_04','leafy_grass','brown_mud_dry','red_sand','rock_face','rock_ground','pine_bark','weathered_brown_planks','rock_boulder_dry']
+ASSETS=['forest_ground_04','leafy_grass','brown_mud_dry','red_sand','rock_ground','pine_bark','weathered_brown_planks','rock_boulder_dry']
 def get(url):
     return urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'CatanTileArt/1.0 (local asset authoring)'}),timeout=50).read()
 def fetch(asset):

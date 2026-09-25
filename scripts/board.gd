@@ -500,11 +500,13 @@ func _process(delta):
 	living_world.animate_dwellers(dwellers,elapsed,daylight)
 	for harbor in harbors:
 		harbor.get_node("MooredBoat").position.y=-.025+sin(elapsed*.7+harbor.position.x)*.003
+	lighthouse.moor(ocean.global_position.y,elapsed)
 	seagulls.animate(delta,elapsed,daylight,weather.current if is_instance_valid(weather) else {},reduce_motion)
 	sea_traffic.animate(delta,elapsed)
 	if delta>0:
 		for harbor in harbors:_float_boat(harbor.get_node("MooredBoat"))
 		for ship in sea_traffic.fleet:_float_boat(ship.boat)
+		_float_boat(lighthouse.rowboat)
 	_update_boat_wakes()
 	_animate_beacon()
 	if targets.is_empty(): return

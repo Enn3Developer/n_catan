@@ -32,7 +32,9 @@ The island needs width more than height, so the HUD keeps the sides of the windo
 
 ## Day and night
 
-`scripts/ui_day_night.gd` swaps the interface to its night palette at dusk. Flat colors change through its `PALETTE` table, so a style may only use a day color that table maps. Textures go through `shaders/ui_night.gdshader`, which maps them by brightness and gives primary (green) and selected (honey) wood their own night tones.
+`scripts/ui_day_night.gd` swaps the interface to its night palette at dusk. Flat colors change through its `PALETTE` table, so a style may only use a day color that table maps. Textures go through `shaders/ui_night.gdshader`, which maps them by brightness and gives primary (green) and selected (honey) wood their own night tones. Switches, checkboxes, radios and slider knobs say little besides their state, and the brightness mapping would turn their green and cream the same tan, so the build script also draws each one in night colors (`-night.svg`). The shader fades a texture to its `-night` twin when one exists. Hovered wood gets a small lift at night so it stays apart from resting wood.
+
+Every control has a distinct disabled look in both palettes: greyed wood for buttons, faded art for switches, checkboxes and radios, and a grey knob for sliders.
 
 ## Main-menu logo
 

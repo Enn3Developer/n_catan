@@ -2,10 +2,11 @@ class_name CatanTileArt
 extends RefCounted
 const BIOMES=["forest","hills","pasture","fields","mountains","desert"]
 const GROUND=["forest_ground_04","brown_mud_dry","leafy_grass","brown_mud_dry","rock_ground","red_sand"]
-const TINTS=[Color("768b62"),Color("be8b69"),Color("9cab71"),Color("bba276"),Color("93a0a1"),Color("d2b886")]
+const TINTS=[Color("768b62"),Color("be8b69"),Color("9cab71"),Color("bba276"),Color("9d9a88"),Color("d2b886")]
 # Ground cover needs a darker value than the sunlit terrain to read at board scale.
 const LEAVES={"PineNeedles":Color("426e57"),"PineTips":Color("588568"),"OakLeaves":Color("749455"),"OakLight":Color("8ba766"),"Grass":Color("417638"),"DryGrass":Color("84603c"),"Wheat":Color("dab15e"),"Fern":Color("476b3e"),"Moss":Color("6b8660")}
-const SURFACES={"PBR_Rock":Color("83939d"),"PBR_Wood":Color("b39162"),"PBR_Bark":Color("74543c"),"PBR_Clay":Color("bd7655"),"Brick":Color("ba7555"),"Sandstone":Color("d0ac79"),"Plaster":Color("dfcba3"),"Roof":Color("657a85")}
+# Sea rocks and mountain crags stand in full sun, so they need a darker, warmer stone than the tile rocks.
+const SURFACES={"PBR_Rock":Color("83939d"),"PBR_SeaRock":Color("675f56"),"PBR_Crag":Color("746d64"),"PBR_Wood":Color("b39162"),"PBR_Bark":Color("74543c"),"PBR_Clay":Color("bd7655"),"Brick":Color("ba7555"),"Sandstone":Color("d0ac79"),"Plaster":Color("dfcba3"),"Roof":Color("657a85")}
 
 # Ground and cliff meshes are authored in assets/source/terrain.blend.
 const GROUNDS=[preload("res://assets/models/terrain/ground_forest.glb"),preload("res://assets/models/terrain/ground_hills.glb"),preload("res://assets/models/terrain/ground_pasture.glb"),preload("res://assets/models/terrain/ground_fields.glb"),preload("res://assets/models/terrain/ground_mountains.glb"),preload("res://assets/models/terrain/ground_desert.glb")]
@@ -75,14 +76,14 @@ func surface(name: String,base: Material,values: Dictionary) -> Material:
 		leaf.set_shader_parameter("motion_speed",0.0 if values.reduce_motion else values.wind)
 		materials[name]=leaf
 		return leaf
-	var sources={"PBR_Rock":"rock_boulder_dry","PBR_Wood":"weathered_brown_planks","PBR_Bark":"pine_bark","PBR_Clay":"brown_mud_dry","Brick":"brown_mud_dry","Sandstone":"rock_ground","Plaster":"rock_ground","Roof":"weathered_brown_planks"}
+	var sources={"PBR_Rock":"rock_boulder_dry","PBR_SeaRock":"rock_boulder_dry","PBR_Crag":"rock_boulder_dry","PBR_Wood":"weathered_brown_planks","PBR_Bark":"pine_bark","PBR_Clay":"brown_mud_dry","Brick":"brown_mud_dry","Sandstone":"rock_ground","Plaster":"rock_ground","Roof":"weathered_brown_planks"}
 	if sources.has(name):
 		var surface_material=ShaderMaterial.new()
 		surface_material.shader=load("res://shaders/premium_surface.gdshader")
 		bind_maps(surface_material,sources[name],["albedo"])
 		surface_material.set_shader_parameter("tint",SURFACES[name])
 		surface_material.set_shader_parameter("texture_scale",2.0)
-		surface_material.set_shader_parameter("texture_strength",.10)
+		surface_material.set_shader_parameter("texture_strength",.32 if name in ["PBR_SeaRock","PBR_Crag"] else .10)
 
 		materials[name]=surface_material
 		return surface_material

@@ -24,7 +24,7 @@ The scripts also write size reports and checksums under `build/`. Windows has a 
 python3 tools/audit_build_size.py 'build/linux/N Catan.x86_64' --verify
 ```
 
-Export presets exclude authoring textures, old models, generated releases and unused material maps. They retain the game's texture tiers, audio, font license and texture source information. The original assets and Blender sources remain in the repository. See [build size measurements](build-size.md) for the earlier size reduction and validation results.
+Export presets exclude authoring textures, generated releases and tooling. They retain the game's texture tiers, audio, font license and texture source information. The full resolution textures and Blender sources remain in the repository. `tools/prepare_tile_textures.py` writes only the runtime maps `tile_art.gd` samples, so unused maps never enter the project. See [build size measurements](build-size.md) for the earlier size reduction and validation results.
 
 ## Releases and updates
 
@@ -164,21 +164,23 @@ Every mesh in the game is modeled in Blender except the player pieces, which are
 
 | Source | Models |
 | --- | --- |
-| `actors.blend` | Sheep, woodcutter, quarry worker, farmer, outlaw and town dweller |
-| `settlements.blend` | Cottage, harbor, robber camp and worksites |
-| `props.blend` | Sailboat, lighthouse, number token, die, markers, production halo and offshore rocks |
+| `actors.blend` | Sheep, woodcutter, quarry worker, farmer, outlaw and town dweller, built by `tools/build_actors.py` |
+| `settlements.blend` | Cottage, harbor, robber camp and worksites, built by `tools/build_settlements.py` |
+| `sea_props.blend` | Lighthouse, sailboat and offshore rocks, built by `tools/build_sea_props.py` |
+| `props.blend` | Number token, die, markers and production halo (it still holds the old lighthouse, sailboat and rocks, which are no longer exported) |
 | `seafaring.blend` | The player's ship, the treasure chest and the fog bank, built by `tools/build_seafaring.py` |
 | `sealife.blend` | Shore boulders, three fish, kelp, seagrass, red coral, a sea fan, sponges and a starfish, built by `tools/build_sealife.py` |
 | `terrain.blend` | The ground of each biome and the cliff skirt |
 | `mainland.blend` | The backdrop mainland |
 
-`tools/build_seafaring.py` and `tools/build_sealife.py` build their models from code with Blender's Python module, sharing helpers in `tools/blender_kit.py`. Run them with `python3` and the `bpy` package installed, or with `blender --background --python`. Each saves its `.blend` and exports each glTF itself. Sea life models are single joined meshes in metres, because the board draws them in MultiMeshes and colors them in its own shaders. Keep the hull's faces pointing outward; the script asserts it, because the textured wood shader culls back faces.
+The `tools/build_*.py` scripts for actors, settlements, sea props, seafaring and sea life build their models from code with Blender's Python module, sharing helpers in `tools/blender_kit.py`. The newer ones sculpt with `tools/model_kit.py`: a `Part` gathers rounded shapes (lathes, tubes, bevelled boxes, chiselled crags, sweeps) into one mesh per part, each face tagged with a material and flat or smooth shading. Run them with `python3` and the `bpy` package installed, or with `blender --background --python`. Each saves its `.blend` and exports each glTF itself. Sea life models are single joined meshes in metres, because the board draws them in MultiMeshes and colors them in its own shaders. Keep the hull's faces pointing outward; the script asserts it, because the textured wood shader culls back faces.
 
 Export each model's collection with the glTF exporter, using **+Y Up**, **Apply Modifiers**, **Custom Properties** and, for models with lamps, **Punctual Lights**. The code relies on these conventions:
 
-- **Pivots.** Animated parts hang from empties with an identity rest rotation, such as `Body/Leg0/Knee0` on the sheep and `Torso/UpperArm0/Forearm0` or `Torso/Tool` on workers. `scripts/living_world.gd` drives them by name.
+- **Pivots.** Animated parts hang from empties with an identity rest rotation, such as `Body/Leg0/Knee0` on the sheep and `Torso/UpperArm0/Forearm0` or `Torso/Tool` on workers. `scripts/living_world.gd` drives them by name. Pivots are top-level objects in their collection, with no wrapper root. The sheep's `Body` rests at .070; workers' thighs hang from .079.
+- **Sea props.** Offshore rocks stand upright in `board.tscn` with z 0 at the water line. The lighthouse's water line is at z .175, and its `Lamp` is centred at z 1.0, where the scene hangs the beam. Its `Rowboat` origin is its own water line: `lighthouse.gd` rests it on the calm sea and the board adds the swell, like the harbor boats. Sailboat hulls float with their water line at z -.07 and their bow towards Blender -Y.
 - **Recolored surfaces.** A material named after a role, optionally with a signed percentage, takes its color at runtime: `Shirt`, `Shirt-16` (darkened 16%), `Shirt+07` (lightened 7%). Roles are `Shirt` and `Skin` on actors and `Owner` on player pieces such as the ship. A surface whose glTF material is double sided, like a sail, stays double sided after recoloring. `CatanModelTint.paint()` applies them.
-- **Textured surfaces.** Materials named `PBR_Rock`, `PBR_Wood` and similar take that surface's texture tier from `CatanTileArt.surface()`.
+- **Textured surfaces.** Materials named `PBR_Rock`, `PBR_Wood` and similar take that surface's texture tier from `CatanTileArt.surface()`. `PBR_SeaRock` (offshore rocks, the lighthouse islet) and `PBR_Crag` (mountain peaks) are a darker, warmer stone, because the tile rock tint washes out to near white in full sun.
 - **Night lights.** Meshes named `NightWindow`, `NightLantern` or `Campfire` glow at night, lit by the `NightLight` point light that shares their pivot. Each light's `local_range` and `night_energy` custom properties become Godot metadata.
 - **Ground.** Workers, cottages and the robber camp stand on `CatanTileArt.height_at()`, which samples the exported ground mesh. Sculpt it freely, but keep the rim at 0.20 units so tiles meet the cliffs. Godot generates the ground's LODs; Model Detail sets their `lod_bias`.
 
@@ -200,7 +202,7 @@ Camera input moves goals (`goal_focus`, `goal_zoom`, `goal_yaw`, `goal_pitch`), 
 
 `assets/world/layout.json` defines cottages, work areas, return paths and sleeping places. Both `scripts/world_layout.gd` and the Blender generator read it. Keep the numbered tiles and a 0.40-unit radius around board corners clear; cities extend beyond their circular bases. One tile unit is 25 metres: regular hexes measure 50 metres tip to tip and about 43.3 metres across their flats. Workers and sheep retain their earlier physical size while the scenery expands. Town buildings are 20% taller; settlements contain 6 animated residents and cities contain 16. Residents take independent short trips between courtyard spots, turn before walking, pause and gesture on different schedules, and disappear at night.
 
-Rebuild scenery with `blender --background --factory-startup --python tools/build_premium_tiles.py`, then import the project in Godot. The generator writes twelve biome models and `assets/source/sculpted-tiles.blend`. Plants and small props avoid occupied areas. Extra saplings, flowers, log piles, brick drying racks, hay feeders, cargo wagons and broken columns fill clear pockets in each biome. Sheep are created only at runtime.
+Rebuild scenery with `blender --background --factory-startup --python tools/build_premium_tiles.py`, then import the project in Godot. The generator writes twelve biome models and `assets/source/sculpted-tiles.blend`. Plants and small props avoid occupied areas. Extra saplings, flowers, log piles, brick drying racks, hay feeders, cargo wagons and broken columns fill clear pockets in each biome. Sheep are created only at runtime. The treasure tile reuses the desert ground and sets its chest at (-0.34, -0.22), so the desert keeps that spot clear.
 
 The surrounding mainland is `assets/models/world/mainland.glb`, twelve vertex-colored sectors that `scripts/background_landscape.gd` loads on clients. Keep all its geometry beyond 9.5 scenery units so boat routes remain open. `shaders/background_landscape.gdshader` adds distance haze.
 
