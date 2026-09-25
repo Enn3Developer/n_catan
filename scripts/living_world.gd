@@ -108,13 +108,15 @@ func animate_sheep(actor: Dictionary,time: float,art,daylight: float):
 	# Walk: hind then fore on one side, then the other, each foot lifted as it swings.
 	const GAIT=[PI*.5,0.0,PI*1.5,PI]
 	var breathe=sin(t*1.9)*.0012*(1.0-moving)
-	actor.body.position.y=.070-rest*.026+absf(sin(stride*2))*.0016*moving+breathe
+	actor.body.position.y=.070-rest*.042+absf(sin(stride*2))*.0016*moving+breathe
 	actor.body.rotation.z=sin(stride)*.035*moving
 	actor.body.rotation.x=sin(stride*2)*.02*moving
 	for i in 4:
 		var gait=stride+GAIT[i]
-		actor.limbs[i].rotation.x=sin(gait)*.42*moving+rest*1.12
-		actor.knees[i].rotation.x=-maxf(0,cos(gait))*.62*moving-rest*1.95
+		# Lying down, every hoof tucks under the belly: fore shins fold back, hind shins forward.
+		var tuck=-1.0 if actor.limbs[i].position.z>0 else 1.0
+		actor.limbs[i].rotation.x=sin(gait)*.42*moving+rest*.35*tuck
+		actor.knees[i].rotation.x=-maxf(0,cos(gait))*.62*moving-rest*2.6*tuck
 	# Graze: lower the head, nibble in short bobs, lift it to chew and look about.
 	var graze=smoothstep(6.0,7.5,local)*(1.0-smoothstep(12.0,13.5,local))*daylight
 	var nibble=maxf(0,sin(t*7.5))*.10*graze*(1.0-now_and_then(t,4.3,1.4))

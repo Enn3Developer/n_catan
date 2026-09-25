@@ -25,7 +25,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from blender_kit import empty, export, lamp, material, new_collection, reset, save  # noqa: E402
-from model_kit import Part, euler, triangles  # noqa: E402
+from model_kit import Part, aim, euler, triangles  # noqa: E402
 from mathutils import Matrix, Vector  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -279,8 +279,27 @@ def harbor():
     for y in (.12, -.12):
         b.box((0, y, .075), (.27, .03, .012), PLANK, .003)
     b.tube((0, .05, .06), (0, .05, .80), .012, .008, TIMBER, 8)
-    b.tube((0, .05, .30), (0, -.30, .26), .007, .007, TIMBER, 6)
-    b.lathe([(.024, -.2), (.030, -.1), (.028, .0), (.020, .1), (.0, .12)], material('Canvas', 'e9dfc6'), 10, matrix=Matrix.Translation((0, -.13, .285)) @ Matrix.Rotation(math.pi / 2, 4, 'X') @ Matrix.Rotation(-.12, 4, 'X'))
+    # The sail is furled along the boom: a fat, folded bundle of canvas held by rope ties.
+    canvas = material('Canvas', 'e9dfc6')
+    rope = material('Rope', '5a4634')
+    boom_a, boom_b = Vector((0, .04, .30)), Vector((0, -.34, .255))
+    b.tube(boom_a, boom_b, .008, .007, TIMBER, 6)
+    length = (boom_b - boom_a).length
+    folds = [(.012 + .032 * math.sin(math.pi * min(1, t / .9)) ** .6 + .007 * abs(math.sin(t * math.pi * 6)), t * length)
+             for t in [k / 24 for k in range(25)]]
+    folds = [(.0, -.004)] + folds + [(.0, length + .004)]
+    lift = Vector((0, 0, .03))
+    b.lathe(folds, canvas, 12, matrix=aim(boom_a + lift, boom_b + lift), scale=(1.0, .8))
+    axis = (boom_b - boom_a).normalized()
+    for t in (.18, .42, .66, .86):
+        at = boom_a + lift + axis * (length * t)
+        r = .012 + .032 * math.sin(math.pi * min(1, t / .9)) ** .6
+        b.torus(at, r + .002, .004, rope, 16, 4, matrix=aim(Vector(), axis))
+    # Stays from the masthead to the bow, the stern and both rails, and a pennant.
+    head = Vector((0, .05, .76))
+    for end in ((0, -.43, .12), (0, .44, .12), (.14, .06, .08), (-.14, .06, .08)):
+        b.tube(head, end, .003, .003, rope, 4, smooth=False)
+    b.quad_strip([[Vector((0, .05 + k * .03, .80 - k * .004)), Vector((0, .05 + k * .03, .76 - k * .002))] for k in range(6)], stripe, smooth=True)
     b.build(col, boat)
     # The harbourmaster's cottage on the quay.
     house = empty('TimberHouse', col, (-.025, -.055, .238))
