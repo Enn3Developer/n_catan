@@ -24,7 +24,7 @@ Executable SHA-256: `fbd9fa8b97c4b51407a8f3f167ad7612d470bfe19dadd1f93fb7c2becc0
 ## Changes made for this export
 
 - Excluded nine unused full-resolution authoring texture directories, five obsolete GLBs, development tests, tools, documentation, source files and build outputs through the Linux export preset. All authoring files remain in the project.
-- Excluded the unused `rock_face` texture set at all three tiers.
+- Excluded the unused `rock_face` texture set at all three tiers. It has since been deleted from the repository, along with the unused runtime maps and the five obsolete GLBs.
 - Changed material texture loading to request only channels actually sampled by each shader. Sculpted props use albedo; cliffs use albedo and normal; ground uses all three maps. Unused bark/wood normal and ORM maps and cliff ORM maps are excluded from the package. This also avoids allocating those unused textures during play.
 - Preserved all 57 sampled textures, all mipmaps, all three resolution choices, all 12 current biome models, both fonts, all cosmetic styles and all 10 audio clips. All **67 retained texture/audio payloads match the old pack's MD5 checksums**; there is no new texture or audio recompression.
 - Included the font license and texture provenance explicitly. Added `build/.gdignore` so generated distributions cannot enter Godot's import pipeline.

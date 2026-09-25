@@ -24,7 +24,7 @@ The scripts also write size reports and checksums under `build/`. Windows has a 
 python3 tools/audit_build_size.py 'build/linux/N Catan.x86_64' --verify
 ```
 
-Export presets exclude authoring textures, old models, generated releases and unused material maps. They retain the game's texture tiers, audio, font license and texture source information. The original assets and Blender sources remain in the repository. See [build size measurements](build-size.md) for the earlier size reduction and validation results.
+Export presets exclude authoring textures, generated releases and tooling. They retain the game's texture tiers, audio, font license and texture source information. The full resolution textures and Blender sources remain in the repository. `tools/prepare_tile_textures.py` writes only the runtime maps `tile_art.gd` samples, so unused maps never enter the project. See [build size measurements](build-size.md) for the earlier size reduction and validation results.
 
 ## Releases and updates
 
