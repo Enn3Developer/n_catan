@@ -8,7 +8,7 @@
 script = ExtResource("script")
 
 [node name="Title" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
-text = "The robber approaches"
+text = "A seven was rolled"
 
 [node name="Instructions" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true

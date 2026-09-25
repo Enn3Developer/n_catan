@@ -12,8 +12,8 @@ msgstr "\n%d ready · %d bought this turn"
 msgid "\nLargest army +2"
 msgstr "\nLargest army +2"
 
-msgid "\nLeave this room before installing; hosting an update would close it."
-msgstr "\nLeave this room before installing; hosting an update would close it."
+msgid "\nLeave this room before installing. Installing restarts the game."
+msgstr "\nLeave this room before installing. Installing restarts the game."
 
 msgid "\nLongest road +2"
 msgstr "\nLongest road +2"
@@ -21,8 +21,6 @@ msgstr "\nLongest road +2"
 msgid "\nNew action cards become playable next turn."
 msgstr "\nNew action cards become playable next turn."
 
-msgid "\nNo legal building space or no pieces remaining."
-msgstr "\nNo legal building space or no pieces remaining."
 
 msgid "\nRelease %s · Protocol %d"
 msgstr "\nRelease %s · Protocol %d"
@@ -45,8 +43,6 @@ msgstr " You don't have the requested resources."
 msgid " disconnected. Waiting to reconnect."
 msgstr " disconnected. Waiting to reconnect."
 
-msgid " offers:"
-msgstr " offers:"
 
 msgid " wins!"
 msgstr " wins!"
@@ -56,8 +52,6 @@ msgstr " · Bot"
 
 
 
-msgid "%d FPS · %.1f ms / frame · %.0f MB VRAM"
-msgstr "%d FPS · %.1f ms / frame · %.0f MB VRAM"
 
 msgid "%s accepted your trade."
 msgstr "%s accepted your trade."
@@ -74,8 +68,8 @@ msgstr "%s offers %s for %s."
 msgid "%s played a Knight card."
 msgstr "%s played a Knight card."
 
-msgid "%s reconnected. The expedition continues."
-msgstr "%s reconnected. The expedition continues."
+msgid "%s reconnected."
+msgstr "%s reconnected."
 
 msgid "%s rolled %d."
 msgstr "%s rolled %d."
@@ -96,11 +90,7 @@ msgstr "%s traded %s with the bank for %s."
 msgid "%s withdrew their trade offer."
 msgstr "%s withdrew their trade offer."
 
-msgid "%s · Bank has %d"
-msgstr "%s · Bank has %d"
 
-msgid "%s · You have %d · Bank rate %d:1"
-msgstr "%s · You have %d · Bank rate %d:1"
 
 msgid "%s%s\n%d points · %d resources · %d development cards\nRoad length %d · %d knights%s%s"
 msgstr "%s%s\n%d points · %d resources · %d development cards\nRoad length %d · %d knights%s%s"
@@ -108,11 +98,11 @@ msgstr "%s%s\n%d points · %d resources · %d development cards\nRoad length %d 
 msgid "+ Add bot"
 msgstr "+ Add bot"
 
-msgid "%d hexes · Classic"
-msgstr "%d hexes · Classic"
+msgid "%d land hexes"
+msgstr "%d land hexes"
 
-msgid "%d hexes · Paired turns"
-msgstr "%d hexes · Paired turns"
+msgid "%d land hexes · paired turns"
+msgstr "%d land hexes · paired turns"
 
 msgid "3D render scale"
 msgstr "3D render scale"
@@ -120,8 +110,6 @@ msgstr "3D render scale"
 msgid "A trade on the table"
 msgstr "A trade on the table"
 
-msgid "AUDIO"
-msgstr "AUDIO"
 
 
 msgid "Accessibility"
@@ -142,14 +130,14 @@ msgstr "Adjust ocean mesh resolution, wave layers, fine ripples and shoreline fo
 msgid "Adjust orbit and pan speed. Drag the board or hold WASD to pan; right-drag or Q/E orbits; the wheel or +/- zooms; Home fits the board."
 msgstr "Adjust orbit and pan speed. Drag the board or hold WASD to pan; right-drag or Q/E orbits; the wheel or +/- zooms; Home fits the board."
 
-msgid "Adjust scene brightness before cinematic tone mapping. Does not change the interface."
-msgstr "Adjust scene brightness before cinematic tone mapping. Does not change the interface."
+msgid "Brightens or darkens the 3D scene. The interface stays the same."
+msgstr "Brightens or darkens the 3D scene. The interface stays the same."
 
 msgid "Adjust terrain tessellation, mesh level-of-detail bias and small scene details. Large landmarks and gameplay pieces stay visible at every level."
 msgstr "Adjust terrain tessellation, mesh level-of-detail bias and small scene details. Large landmarks and gameplay pieces stay visible at every level."
 
-msgid "Adjust the pause between bot actions without changing their difficulty or decisions."
-msgstr "Adjust the pause between bot actions without changing their difficulty or decisions."
+msgid "How long bots pause between actions. Their choices stay the same."
+msgstr "How long bots pause between actions. Their choices stay the same."
 
 msgid "All 15 of your roads are on the board. You have none left to place."
 msgstr "All 15 of your roads are on the board. You have none left to place."
@@ -179,8 +167,8 @@ msgstr "Anisotropic filtering"
 msgid "Appearance"
 msgstr "Appearance"
 
-msgid "Apply a coordinated set of model, texture, lighting, water and anti-aliasing settings. Individual changes switch this to Custom. Display and audio preferences are preserved."
-msgstr "Apply a coordinated set of model, texture, lighting, water and anti-aliasing settings. Individual changes switch this to Custom. Display and audio preferences are preserved."
+msgid "Sets models, textures, lighting, water and anti-aliasing together. Changing one of them switches this to Custom. Display and audio settings stay as they are."
+msgstr "Sets models, textures, lighting, water and anti-aliasing together. Changing one of them switches this to Custom. Display and audio settings stay as they are."
 
 
 msgid "Atmospheric haze"
@@ -210,8 +198,6 @@ msgstr "Bank trade"
 msgid "Bank trade completed."
 msgstr "Bank trade completed."
 
-msgid "Bank trade · %d:1"
-msgstr "Bank trade · %d:1"
 
 msgid "Bloom"
 msgstr "Bloom"
@@ -228,23 +214,15 @@ msgstr "Bright harp, flute and warm strings"
 msgid "Build two roads for free."
 msgstr "Build two roads for free."
 
-msgid "Build, play a card, or trade with the bank."
-msgstr "Build, play a card, or trade with the bank."
 
-msgid "Build, trade or play a card"
-msgstr "Build, trade or play a card"
 
 msgid "Buy card"
 msgstr "Buy card"
 
-msgid "Buy development card: 1 wool, 1 grain, 1 ore. %d left in deck."
-msgstr "Buy development card: 1 wool, 1 grain, 1 ore. %d left in deck."
 
-msgid "COMPATIBILITY / LIMITED LIGHTING"
-msgstr "COMPATIBILITY / LIMITED LIGHTING"
 
-msgid "CPU / GPU geometry"
-msgstr "CPU / GPU geometry"
+msgid "Geometry cost on CPU and GPU"
+msgstr "Geometry cost on CPU and GPU"
 
 msgid "Camera sensitivity"
 msgstr "Camera sensitivity"
@@ -256,8 +234,8 @@ msgid "Cannot write the update cache."
 msgstr "Cannot write the update cache."
 
 
-msgid "Change the actual albedo, normal and occlusion/roughness textures used by terrain, stone and wood. Higher settings retain detail during close inspection."
-msgstr "Change the actual albedo, normal and occlusion/roughness textures used by terrain, stone and wood. Higher settings retain detail during close inspection."
+msgid "The resolution of the terrain, stone and wood textures. Higher settings keep detail when you zoom in."
+msgstr "The resolution of the terrain, stone and wood textures. Higher settings keep detail when you zoom in."
 
 
 msgid "Check for a newer release."
@@ -269,8 +247,8 @@ msgstr "Check for updates"
 msgid "Checking for updates…"
 msgstr "Checking for updates…"
 
-msgid "Choose Easy bots for a gentle first game, Normal for purposeful builders, or Hard for opponents that plan resource diversity and expansion. You can mix difficulty levels in the lobby. The reference guide remains available during every game."
-msgstr "Choose Easy bots for a gentle first game, Normal for purposeful builders, or Hard for opponents that plan resource diversity and expansion. You can mix difficulty levels in the lobby. The reference guide remains available during every game."
+msgid "Easy bots play gently. Normal bots build with a plan. Hard bots aim for a spread of resources and expand. You can mix levels in the lobby, and the guide is one click away in every game."
+msgstr "Easy bots play gently. Normal bots build with a plan. Hard bots aim for a spread of resources and expand. You can mix levels in the lobby, and the guide is one click away in every game."
 
 msgid "Choose a connected road, or finish building."
 msgstr "Choose a connected road, or finish building."
@@ -327,8 +305,6 @@ msgid "Choose a neighboring player to steal from."
 msgstr "Choose a neighboring player to steal from."
 
 
-msgid "Choose a player to steal from."
-msgstr "Choose a player to steal from."
 
 msgid "Choose a resource."
 msgstr "Choose a resource."
@@ -339,8 +315,8 @@ msgstr "Choose an empty corner at least two edges from another settlement."
 msgid "Choose an empty corner on your road, at least two edges from every settlement or city."
 msgstr "Choose an empty corner on your road, at least two edges from every settlement or city."
 
-msgid "Choose an empty edge connected to your road or building. Another player’s building blocks the route."
-msgstr "Choose an empty edge connected to your road or building. Another player’s building blocks the route."
+msgid "Choose an empty edge connected to your road or building. Another player's building blocks the route."
+msgstr "Choose an empty edge connected to your road or building. Another player's building blocks the route."
 
 msgid "Choose at least one resource to give and one to receive."
 msgstr "Choose at least one resource to give and one to receive."
@@ -351,8 +327,6 @@ msgstr "Choose different resources."
 msgid "Choose exactly %d resources to discard."
 msgstr "Choose exactly %d resources to discard."
 
-msgid "Choose half your resources to return to the bank."
-msgstr "Choose half your resources to return to the bank."
 
 msgid "Choose one of your settlements to upgrade to a city."
 msgstr "Choose one of your settlements to upgrade to a city."
@@ -375,8 +349,8 @@ msgstr "Citadel"
 msgid "City"
 msgstr "City"
 
-msgid "Classic · 19 hexes"
-msgstr "Classic · 19 hexes"
+msgid "19 land hexes"
+msgstr "19 land hexes"
 
 msgid "Click Roll dice. This practice roll will produce resources beside one of your settlements. A settlement collects 1 resource, a city 2. Everyone collects on every player's roll, not just their own turn."
 msgstr "Click Roll dice. This practice roll will produce resources beside one of your settlements. A settlement collects 1 resource, a city 2. Everyone collects on every player's roll, not just their own turn."
@@ -396,8 +370,6 @@ msgstr "Close"
 msgid "Connect your settlement"
 msgstr "Connect your settlement"
 
-msgid "Connecting to the island…"
-msgstr "Connecting to the island…"
 
 msgid "Connection failed. Check the address, UDP port and firewall."
 msgstr "Connection failed. Check the address, UDP port and firewall."
@@ -405,8 +377,6 @@ msgstr "Connection failed. Check the address, UDP port and firewall."
 msgid "Connection lost. Use Reconnect to return to your seat if the server is still running."
 msgstr "Connection lost. Use Reconnect to return to your seat if the server is still running."
 
-msgid "Connection lost. Use Reconnect to return to your seat."
-msgstr "Connection lost. Use Reconnect to return to your seat."
 
 msgid "Continue"
 msgstr "Continue"
@@ -462,8 +432,6 @@ msgstr "Disabled"
 msgid "Discard"
 msgstr "Discard"
 
-msgid "Discard selected resources"
-msgstr "Discard selected resources"
 
 msgid "Dismiss"
 msgstr "Dismiss"
@@ -518,8 +486,8 @@ msgstr "Find a home"
 msgid "Finish roads"
 msgstr "Finish roads"
 
-msgid "Follow the current tutorial step, or choose Skip lesson."
-msgstr "Follow the current tutorial step, or choose Skip lesson."
+msgid "Follow the lesson's step, or choose Skip."
+msgstr "Follow the lesson's step, or choose Skip."
 
 msgid "Frame limit"
 msgstr "Frame limit"
@@ -530,11 +498,9 @@ msgstr "Full"
 msgid "Fullscreen"
 msgstr "Fullscreen"
 
-msgid "GPU workload increases with resolution"
-msgstr "GPU workload increases with resolution"
+msgid "Larger sizes cost more GPU"
+msgstr "Larger sizes cost more GPU"
 
-msgid "GRAPHICS"
-msgstr "GRAPHICS"
 
 msgid "Game log"
 msgstr "Game log"
@@ -604,14 +570,12 @@ msgstr "High · 4K"
 msgid "I'm ready"
 msgstr "I'm ready"
 
-msgid "In return for:"
-msgstr "In return for:"
 
 msgid "Incompatible multiplayer versions. Host: %s (protocol %d). Yours: %s (protocol %d). Check for updates from the main menu."
 msgstr "Incompatible multiplayer versions. Host: %s (protocol %d). Yours: %s (protocol %d). Check for updates from the main menu."
 
-msgid "Increase smaller interface labels for readability. Menus scroll when necessary."
-msgstr "Increase smaller interface labels for readability. Menus scroll when necessary."
+msgid "Small labels render at 16 px instead of 14 px. Menus scroll when they run out of room."
+msgstr "Small labels render at 16 px instead of 14 px. Menus scroll when they run out of room."
 
 msgid "Inspect board (H)"
 msgstr "Inspect board (H)"
@@ -625,8 +589,8 @@ msgstr "Invite address: "
 msgid "Invite friends"
 msgstr "Invite friends"
 
-msgid "It is another player’s turn. You can act when yours begins."
-msgstr "It is another player’s turn. You can act when yours begins."
+msgid "It's another player's turn. You can act when yours begins."
+msgstr "It's another player's turn. You can act when yours begins."
 
 msgid "Italiano"
 msgstr "Italiano"
@@ -634,8 +598,6 @@ msgstr "Italiano"
 msgid "Join"
 msgstr "Join"
 
-msgid "Join room"
-msgstr "Join room"
 
 msgid "Joining room soundtrack…"
 msgstr "Joining room soundtrack…"
@@ -673,12 +635,12 @@ msgstr "Leave game"
 msgid "Leave the current room before restarting to update."
 msgstr "Leave the current room before restarting to update."
 
-msgid "Leave the expedition?"
-msgstr "Leave the expedition?"
+msgid "Leave the game?"
+msgstr "Leave the game?"
 
 
-msgid "Let the island provide"
-msgstr "Let the island provide"
+msgid "Roll for resources"
+msgstr "Roll for resources"
 
 msgid "Lighting"
 msgstr "Lighting"
@@ -747,8 +709,6 @@ msgstr "Move the robber and steal a resource."
 msgid "Move the robber to a different hex."
 msgstr "Move the robber to a different hex."
 
-msgid "Move the robber to a hex"
-msgstr "Move the robber to a hex"
 
 msgid "Music"
 msgstr "Music"
@@ -802,14 +762,14 @@ msgstr "Online"
 msgid "Online room"
 msgstr "Online room"
 
-msgid "Open Development cards and play the supplied Knight. Knights move the robber and build your army. Other cards grant roads, resources, a monopoly or hidden points. Newly bought action cards wait a turn; play only one per turn."
-msgstr "Open Development cards and play the supplied Knight. Knights move the robber and build your army. Other cards grant roads, resources, a monopoly or hidden points. Newly bought action cards wait a turn; play only one per turn."
+msgid "Click the Knight card beside the action bar to play it. Knights move the robber and count toward the largest army. Other cards give roads, resources, a monopoly or hidden points. A card bought this turn waits for your next one, and you can play one card per turn."
+msgstr "Click the Knight card beside the action bar to play it. Knights move the robber and count toward the largest army. Other cards give roads, resources, a monopoly or hidden points. A card bought this turn waits for your next one, and you can play one card per turn."
 
-msgid "Open Trade resources and exchange with the bank. Usually 4 of one resource buys 1 of another. A 3:1 harbor improves every trade; a 2:1 harbor improves its pictured resource. In a real game you can also offer a trade to other players."
-msgstr "Open Trade resources and exchange with the bank. Usually 4 of one resource buys 1 of another. A 3:1 harbor improves every trade; a 2:1 harbor improves its pictured resource. In a real game you can also offer a trade to other players."
+msgid "Click Trade and swap with the bank. Usually 4 of one resource buys 1 of another. A 3:1 harbor improves every trade; a 2:1 harbor improves its pictured resource. In a real game you can also offer a trade to other players."
+msgstr "Click Trade and swap with the bank. Usually 4 of one resource buys 1 of another. A 3:1 harbor improves every trade; a 2:1 harbor improves its pictured resource. In a real game you can also offer a trade to other players."
 
-msgid "Open room · no password"
-msgstr "Open room · no password"
+msgid "No password. Anyone with the invite can join."
+msgstr "No password. Anyone with the invite can join."
 
 msgid "Open seat"
 msgstr "Open seat"
@@ -826,14 +786,12 @@ msgstr "Overall volume, including music, effects, ocean ambience and weather."
 msgid "Paired turn"
 msgstr "Paired turn"
 
-msgid "Paired turns allow building, cards and bank trading."
-msgstr "Paired turns allow building, cards and bank trading."
 
 msgid "Particle effects"
 msgstr "Particle effects"
 
-msgid "Password required to join"
-msgstr "Password required to join"
+msgid "Guests need the invite and the password."
+msgstr "Guests need the invite and the password."
 
 
 msgid "Paste a valid invite code from the host."
@@ -860,11 +818,7 @@ msgstr "Place a road beside your new settlement."
 msgid "Place a settlement"
 msgstr "Place a settlement"
 
-msgid "Place an adjoining road"
-msgstr "Place an adjoining road"
 
-msgid "Place up to two connected roads for free."
-msgstr "Place up to two connected roads for free."
 
 msgid "Play a development card"
 msgstr "Play a development card"
@@ -892,8 +846,6 @@ msgstr "Players"
 msgid "Plenty"
 msgstr "Plenty"
 
-msgid "Power / smoothness"
-msgstr "Power / smoothness"
 
 msgid "Practice"
 msgstr "Practice"
@@ -920,14 +872,12 @@ msgstr "Previous track / restart"
 msgid "Public address:24567"
 msgstr "Public address:24567"
 
-msgid "Reach 10 victory points by building settlements and cities. Resources come from the land around them. This guided expedition lets you try each core action, with a fresh practice board for later lessons."
-msgstr "Reach 10 victory points by building settlements and cities. Resources come from the land around them. This guided expedition lets you try each core action, with a fresh practice board for later lessons."
+msgid "Reach 10 victory points by building settlements and cities. Resources come from the land around them. Each lesson has you try one action, and later lessons start on a fresh practice board."
+msgstr "Reach 10 victory points by building settlements and cities. Resources come from the land around them. Each lesson has you try one action, and later lessons start on a fresh practice board."
 
 msgid "Ready"
 msgstr "Ready"
 
-msgid "Receive"
-msgstr "Receive"
 
 msgid "Reconnect"
 msgstr "Reconnect"
@@ -987,8 +937,6 @@ msgstr "Roll dice"
 msgid "Roll the dice first."
 msgstr "Roll the dice first."
 
-msgid "Roll to collect resources"
-msgstr "Roll to collect resources"
 
 
 msgid "Router mapped for 1 hour. Invite address: %s:%d"
@@ -1080,12 +1028,10 @@ msgstr "Start game"
 msgid "Stay"
 msgstr "Stay"
 
-msgid "Steal: "
-msgstr "Steal: "
 
 
-msgid "Stop wind, waves, scenery movement, particles and construction animations while retaining all gameplay actions."
-msgstr "Stop wind, waves, scenery movement, particles and construction animations while retaining all gameplay actions."
+msgid "Stops wind, waves, scenery movement, particles and building animations. Gameplay is unchanged."
+msgstr "Stops wind, waves, scenery movement, particles and building animations. Gameplay is unchanged."
 
 msgid "Subtle light bleed from bright reflections and highlights. Does not blur interface text."
 msgstr "Subtle light bleed from bright reflections and highlights. Does not blur interface text."
@@ -1111,8 +1057,6 @@ msgstr "The bank has none of that resource."
 msgid "The bank has only %d %s. Choose a different resource."
 msgstr "The bank has only %d %s. Choose a different resource."
 
-msgid "The expedition is complete."
-msgstr "The expedition is complete."
 
 msgid "The game has finished."
 msgstr "The game has finished."
@@ -1132,11 +1076,9 @@ msgstr "The paired player may trade only with the bank."
 msgid "The password is incorrect."
 msgstr "The password is incorrect."
 
-msgid "The player making this offer no longer has the resources. Ask them for a new offer."
-msgstr "The player making this offer no longer has the resources. Ask them for a new offer."
 
-msgid "The robber approaches"
-msgstr "The robber approaches"
+msgid "A seven was rolled"
+msgstr "A seven was rolled"
 
 msgid "The room host controls the shared soundtrack. Your volume is personal."
 msgstr "The room host controls the shared soundtrack. Your volume is personal."
@@ -1153,8 +1095,8 @@ msgstr "The updater stopped. Your installed game has not been changed. Try again
 msgid "This action is unavailable at this stage of the turn."
 msgstr "This action is unavailable at this stage of the turn."
 
-msgid "This action is unavailable. Please choose an action from the game controls."
-msgstr "This action is unavailable. Please choose an action from the game controls."
+msgid "That action isn't available right now."
+msgstr "That action isn't available right now."
 
 msgid "This game has started. Use Reconnect to return to your saved seat."
 msgstr "This game has started. Use Reconnect to return to your saved seat."
@@ -1169,8 +1111,6 @@ msgid "Timber"
 msgstr "Timber"
 
 
-msgid "To build or buy this, you still need %s."
-msgstr "To build or buy this, you still need %s."
 
 msgid "Tracks"
 msgstr "Tracks"
@@ -1190,14 +1130,12 @@ msgstr "Trade offer"
 msgid "Trade offer withdrawn."
 msgstr "Trade offer withdrawn."
 
-msgid "Turn your plans into victory"
-msgstr "Turn your plans into victory"
 
 msgid "Ultra"
 msgstr "Ultra"
 
-msgid "Ultra favors image quality over frame rate"
-msgstr "Ultra favors image quality over frame rate"
+msgid "Ultra has a high GPU cost"
+msgstr "Ultra has a high GPU cost"
 
 msgid "Ultra · 8K"
 msgstr "Ultra · 8K"
@@ -1238,8 +1176,6 @@ msgstr "Use distance haze to soften distant water and scenery while keeping the 
 msgid "Use seat color"
 msgstr "Use seat color"
 
-msgid "Useful at reduced render scale"
-msgstr "Useful at reduced render scale"
 
 msgid "Vegetation density"
 msgstr "Vegetation density"
@@ -1256,8 +1192,8 @@ msgstr "Victory"
 msgid "Victory points"
 msgstr "Victory points"
 
-msgid "Video memory"
-msgstr "Video memory"
+msgid "Uses more video memory"
+msgstr "Uses more video memory"
 
 msgid "View offer"
 msgstr "View offer"
@@ -1277,8 +1213,6 @@ msgstr "Volume of the original instrumental soundtrack."
 msgid "WELL DONE"
 msgstr "WELL DONE"
 
-msgid "WORLD"
-msgstr "WORLD"
 
 msgid "Wait for all players to discard."
 msgstr "Wait for all players to discard."
@@ -1289,11 +1223,7 @@ msgstr "Waiting"
 msgid "Waiting for players"
 msgstr "Waiting for players"
 
-msgid "Waiting for players to discard."
-msgstr "Waiting for players to discard."
 
-msgid "Watch the island grow. Your turn is coming."
-msgstr "Watch the island grow. Your turn is coming."
 
 msgid "Water detail"
 msgstr "Water detail"
@@ -1343,8 +1273,6 @@ msgstr "You can only discard resources you have."
 msgid "You control playback. Everyone keeps their own volume."
 msgstr "You control playback. Everyone keeps their own volume."
 
-msgid "You do not have the resources requested."
-msgstr "You do not have the resources requested."
 
 msgid "You do not have this development card."
 msgstr "You do not have this development card."
@@ -1367,8 +1295,8 @@ msgstr "You need %s more to accept this offer."
 msgid "You need %s more to make this offer."
 msgstr "You need %s more to make this offer."
 
-msgid "You're ready to set sail"
-msgstr "You're ready to set sail"
+msgid "Your first real game"
+msgstr "Your first real game"
 
 msgid "Your best port rate: %d:1 · Bank stock: %d"
 msgstr "Your best port rate: %d:1 · Bank stock: %d"
@@ -1385,14 +1313,12 @@ msgstr "Your name"
 msgid "Your pieces"
 msgstr "Your pieces"
 
-msgid "Your resources"
-msgstr "Your resources"
 
 msgid "Your room"
 msgstr "Your room"
 
-msgid "Your seat is unavailable. Please reconnect to the game."
-msgstr "Your seat is unavailable. Please reconnect to the game."
+msgid "Your seat is unavailable. Reconnect to take it back."
+msgstr "Your seat is unavailable. Reconnect to take it back."
 
 msgid "Your trade offer: %s for %s."
 msgstr "Your trade offer: %s for %s."
@@ -1431,8 +1357,8 @@ msgid "Day/night cycle"
 msgstr "Day/night cycle"
 
 
-msgid "Turn off to keep the island in daylight. This setting is personal."
-msgstr "Turn off to keep the island in daylight. This setting is personal."
+msgid "Turn off to keep the island in daylight. Only your screen changes."
+msgstr "Turn off to keep the island in daylight. Only your screen changes."
 
 msgid "Bot"
 msgstr "Bot"
@@ -1446,11 +1372,7 @@ msgstr "Bilinear"
 msgid "Anti-aliasing"
 msgstr "Anti-aliasing"
 
-msgid "FORWARD+ / VULKAN"
-msgstr "FORWARD+ / VULKAN"
 
-msgid "CONTROLS"
-msgstr "CONTROLS"
 
 msgid "Harbor at Dawn"
 msgstr "Harbor at Dawn"
@@ -1476,8 +1398,6 @@ msgstr "Steal from %s"
 msgid "%s wins!"
 msgstr "%s wins!"
 
-msgid "%s offers:"
-msgstr "%s offers:"
 
 msgid "%s disconnected. Waiting to reconnect."
 msgstr "%s disconnected. Waiting to reconnect."
@@ -1709,8 +1629,6 @@ msgstr "Rain"
 msgid "Thunderstorm"
 msgstr "Thunderstorm"
 
-msgid "Clouds and rain"
-msgstr "Clouds and rain"
 
 msgid "Choose changing weather or keep one condition. Rain and thunder have their own volume under Audio. Reduced motion disables rain and lightning flashes."
 msgstr "Choose changing weather or keep one condition. Rain and thunder have their own volume under Audio. Reduced motion disables rain and lightning flashes."
@@ -2113,17 +2031,17 @@ msgstr "Fence"
 msgid "Posts and rope"
 msgstr "Posts and rope"
 
-msgid "Timber framing, clay tiles and a village well. A classic island expedition."
-msgstr "Timber framing, clay tiles and a village well. A classic island expedition."
+msgid "Timber framing, clay tiles and a village well."
+msgstr "Timber framing, clay tiles and a village well."
 
-msgid "Stilt houses, plank roads and a lighthouse. Built for life beside the sea."
-msgstr "Stilt houses, plank roads and a lighthouse. Built for life beside the sea."
+msgid "Stilt houses, plank roads and a lighthouse."
+msgstr "Stilt houses, plank roads and a lighthouse."
 
-msgid "Carved stone, battlements and a square keep. An island stronghold."
-msgstr "Carved stone, battlements and a square keep. An island stronghold."
+msgid "Carved stone, battlements and a square keep."
+msgstr "Carved stone, battlements and a square keep."
 
-msgid "Log cabins, leafy roofs and a great tree. A home among the forest."
-msgstr "Log cabins, leafy roofs and a great tree. A home among the forest."
+msgid "Log cabins, leafy roofs and a great tree."
+msgstr "Log cabins, leafy roofs and a great tree."
 
 msgid "Homes"
 msgstr "Homes"
@@ -2245,8 +2163,6 @@ msgstr "Classic hexagon"
 msgid "Collected"
 msgstr "Collected"
 
-msgid "Counters:"
-msgstr "Counters:"
 
 msgid "Counter…"
 msgstr "Counter…"
@@ -2329,8 +2245,8 @@ msgstr "Stole"
 msgid "The friendly robber spares players with 3 points or fewer. Choose another hex."
 msgstr "The friendly robber spares players with 3 points or fewer. Choose another hex."
 
-msgid "The robber cannot be placed next to a player with 3 points or fewer."
-msgstr "The robber cannot be placed next to a player with 3 points or fewer."
+msgid "The robber can't be placed next to a player with 3 or fewer visible points, unless no other hex is left."
+msgstr "The robber can't be placed next to a player with 3 or fewer visible points, unless no other hex is left."
 
 msgid "The same seed and player count always build the same island. Share it to replay a map."
 msgstr "The same seed and player count always build the same island. Share it to replay a map."
@@ -2359,8 +2275,6 @@ msgstr "You get"
 msgid "You give"
 msgstr "You give"
 
-msgid "You offer:"
-msgstr "You offer:"
 
 msgid "Counter-offer"
 msgstr "Counter-offer"
@@ -2371,8 +2285,6 @@ msgstr "\n%d points win the game."
 msgid "for"
 msgstr "for"
 
-msgid "Water and wind"
-msgstr "Water and wind"
 
 msgid "of %d"
 msgstr "of %d"
@@ -2404,8 +2316,8 @@ msgstr "Each player places two settlements, each with a road. The order reverses
 msgid "A turn"
 msgstr "A turn"
 
-msgid "Roll the dice. Every settlement next to a hex with that number collects 1 resource, every city 2. Then build, trade with players or the bank, and play at most one development card. Ports give better bank rates."
-msgstr "Roll the dice. Every settlement next to a hex with that number collects 1 resource, every city 2. Then build, trade with players or the bank, and play at most one development card. Ports give better bank rates."
+msgid "Roll the dice. Every settlement next to a hex with that number collects 1 resource, every city 2. Then build, trade with players or the bank, and play at most one development card. Harbors give better bank rates."
+msgstr "Roll the dice. Every settlement next to a hex with that number collects 1 resource, every city 2. Then build, trade with players or the bank, and play at most one development card. Harbors give better bank rates."
 
 msgid "Building costs"
 msgstr "Building costs"
@@ -2422,8 +2334,8 @@ msgstr "Click glowing markers to build. Drag the board or hold WASD to pan, righ
 msgid "Five or six players"
 msgstr "Five or six players"
 
-msgid "The island has 30 hexes and turns come in pairs. After the main turn, the player three seats ahead builds, plays cards and trades with the bank. Then the next main player rolls."
-msgstr "The island has 30 hexes and turns come in pairs. After the main turn, the player three seats ahead builds, plays cards and trades with the bank. Then the next main player rolls."
+msgid "The island is bigger, with 30 land hexes, and turns come in pairs. After the main turn, the player three seats ahead builds, plays cards and trades with the bank. Then the next main player rolls."
+msgstr "The island is bigger, with 30 land hexes, and turns come in pairs. After the main turn, the player three seats ahead builds, plays cards and trades with the bank. Then the next main player rolls."
 
 msgid "Hosting online"
 msgstr "Hosting online"
@@ -2609,8 +2521,8 @@ msgstr "To build a ship, you still need %s."
 msgid "Treasure tile"
 msgstr "Treasure tile"
 
-msgid "When its number is rolled, the treasure gives each settlement on it 2 random resources (a city 4), then draws a new number. No one can start within 3 roads of it."
-msgstr "When its number is rolled, the treasure gives each settlement on it 2 random resources (a city 4), then draws a new number. No one can start within 3 roads of it."
+msgid "When its number is rolled, the treasure gives each settlement on it 2 random resources (a city 4), then draws a new number. Starting settlements must be at least 3 roads from it."
+msgstr "When its number is rolled, the treasure gives each settlement on it 2 random resources (a city 4), then draws a new number. Starting settlements must be at least 3 roads from it."
 
 msgid "Rain and thunder"
 msgstr "Rain and thunder"
@@ -2699,8 +2611,8 @@ msgstr "Resuming a saved game. Friends rejoin with the invite and take their sea
 msgid "Resuming a saved game. Waiting for %s to rejoin with the invite. If you start now, a bot plays for them until they join."
 msgstr "Resuming a saved game. Waiting for %s to rejoin with the invite. If you start now, a bot plays for them until they join."
 
-msgid "%s · turn %d · saved %04d-%02d-%02d %02d:%02d. Starting a new game replaces it."
-msgstr "%s · turn %d · saved %04d-%02d-%02d %02d:%02d. Starting a new game replaces it."
+msgid "%s · turn %d · saved %04d-%02d-%02d %02d:%02d. A new game replaces it."
+msgstr "%s · turn %d · saved %04d-%02d-%02d %02d:%02d. A new game replaces it."
 
 msgid "Saved seat, a bot plays until they rejoin"
 msgstr "Saved seat, a bot plays until they rejoin"
@@ -2854,3 +2766,12 @@ msgstr "The room closes for everyone. The game is saved, so you can host again a
 
 msgid "The others wait a minute for you, then a bot plays your seat. Use Reconnect to take it back."
 msgstr "The others wait a minute for you, then a bot plays your seat. Use Reconnect to take it back."
+
+msgid "%s · setup · saved %04d-%02d-%02d %02d:%02d. A new game replaces it."
+msgstr "%s · setup · saved %04d-%02d-%02d %02d:%02d. A new game replaces it."
+
+msgid "%s pieces"
+msgstr "%s pieces"
+
+msgid "After each turn, the player three seats ahead builds, plays cards and trades with the bank."
+msgstr "After each turn, the player three seats ahead builds, plays cards and trades with the bank."

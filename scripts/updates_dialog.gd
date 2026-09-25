@@ -16,7 +16,7 @@ func show_status(data: Dictionary,supported: bool,busy: bool,online: bool):
 		details=tr("%s download · %.1f MiB") % [tr("Delta") if data.get("kind","")=="delta" else tr("Full"),float(data.total)/1048576.0]
 	if data.has("version"):details+=tr("\nRelease %s · Protocol %d") % [data.version,data.get("protocol",CatanBuildInfo.PROTOCOL)]
 	if data.get("protocol",CatanBuildInfo.PROTOCOL)!=CatanBuildInfo.PROTOCOL:details+=tr("\nThis release changes multiplayer compatibility. Your group should update together.")
-	if online:details+=tr("\nLeave this room before installing; hosting an update would close it.")
+	if online:details+=tr("\nLeave this room before installing. Installing restarts the game.")
 	%UpdateDetails.text=details
 	%UpdateProgress.visible=stage in ["downloading","preparing"]
 	%UpdateProgress.value=100.0*float(data.get("bytes",0))/maxf(1,float(data.get("total",0)))

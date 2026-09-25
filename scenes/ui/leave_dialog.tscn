@@ -7,7 +7,7 @@
 script = ExtResource("script")
 
 [node name="Title" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
-text = "Leave the expedition?"
+text = "Leave the game?"
 
 [node name="Message" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 unique_name_in_owner = true

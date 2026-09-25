@@ -5,11 +5,11 @@ extends CatanDialog
 const SECTIONS=[
 	["How to win","Reach the room's points target on your turn, 10 unless the host changes it. Settlements give 1 point, cities 2, and longest road and largest army 2 each."],
 	["Setup","Each player places two settlements, each with a road. The order reverses for the second round."],
-	["A turn","Roll the dice. Every settlement next to a hex with that number collects 1 resource, every city 2. Then build, trade with players or the bank, and play at most one development card. Ports give better bank rates."],
+	["A turn","Roll the dice. Every settlement next to a hex with that number collects 1 resource, every city 2. Then build, trade with players or the bank, and play at most one development card. Harbors give better bank rates."],
 	["Building costs",""],
 	["Rolling a seven","Anyone holding more than seven resources discards half, rounded down. Then the roller moves the robber, which stops that hex producing, and steals a resource from a neighbor."],
 	["Controls","Click glowing markers to build. Drag the board or hold WASD to pan, right-drag or Q/E to orbit and scroll to zoom. F focuses a tile, H hides the interface and Home fits the board."],
-	["Five or six players","The island has 30 hexes and turns come in pairs. After the main turn, the player three seats ahead builds, plays cards and trades with the bank. Then the next main player rolls."],
+	["Five or six players","The island is bigger, with 30 land hexes, and turns come in pairs. After the main turn, the player three seats ahead builds, plays cards and trades with the bank. Then the next main player rolls."],
 	["Saved games","The host's game saves about once a second, and again when the host leaves. In the lobby, Resume saved game picks it up. Friends rejoin with the new invite and get their seats back by name. You can start before they're back: a bot plays for them until they join."],
 	["Hosting online","The host's UDP port 24567 must be reachable from the internet. Use router mapping, port forwarding or a dedicated server."],
 ]

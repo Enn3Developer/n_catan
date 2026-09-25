@@ -12,8 +12,8 @@ msgstr "\n%d disponibili · %d comprate in questo turno"
 msgid "\nLargest army +2"
 msgstr "\nEsercito più grande +2"
 
-msgid "\nLeave this room before installing; hosting an update would close it."
-msgstr "\nLascia la stanza prima di installare. Se sei l’host, aggiornare chiuderà la stanza."
+msgid "\nLeave this room before installing. Installing restarts the game."
+msgstr "\nLascia la stanza prima di installare. L'installazione riavvia il gioco."
 
 msgid "\nLongest road +2"
 msgstr "\nStrada più lunga +2"
@@ -21,8 +21,6 @@ msgstr "\nStrada più lunga +2"
 msgid "\nNew action cards become playable next turn."
 msgstr "\nLe nuove carte azione si possono giocare dal prossimo turno."
 
-msgid "\nNo legal building space or no pieces remaining."
-msgstr "\nNon ci sono posizioni valide oppure hai finito le pedine."
 
 msgid "\nRelease %s · Protocol %d"
 msgstr "\nVersione %s · Protocollo %d"
@@ -45,8 +43,6 @@ msgstr " Ti mancano le risorse richieste."
 msgid " disconnected. Waiting to reconnect."
 msgstr " si è disconnesso. In attesa della riconnessione."
 
-msgid " offers:"
-msgstr " offre:"
 
 msgid " wins!"
 msgstr " vince!"
@@ -56,8 +52,6 @@ msgstr " · Bot"
 
 
 
-msgid "%d FPS · %.1f ms / frame · %.0f MB VRAM"
-msgstr "%d FPS · %.1f ms / fotogramma · %.0f MB VRAM"
 
 msgid "%s accepted your trade."
 msgstr "%s ha accettato il tuo scambio."
@@ -74,8 +68,8 @@ msgstr "%s offre %s in cambio di %s."
 msgid "%s played a Knight card."
 msgstr "%s ha giocato una carta Cavaliere."
 
-msgid "%s reconnected. The expedition continues."
-msgstr "%s si è riconnesso. La partita riprende."
+msgid "%s reconnected."
+msgstr "%s si è riconnesso."
 
 msgid "%s rolled %d."
 msgstr "%s ha tirato %d."
@@ -96,11 +90,7 @@ msgstr "%s ha scambiato %s con la banca per %s."
 msgid "%s withdrew their trade offer."
 msgstr "%s ha ritirato l’offerta di scambio."
 
-msgid "%s · Bank has %d"
-msgstr "%s · La banca ne ha %d"
 
-msgid "%s · You have %d · Bank rate %d:1"
-msgstr "%s · Ne hai %d · Rapporto banca %d:1"
 
 msgid "%s%s\n%d points · %d resources · %d development cards\nRoad length %d · %d knights%s%s"
 msgstr "%s%s\n%d punti · %d risorse · %d carte sviluppo\nLunghezza strada %d · %d cavalieri%s%s"
@@ -108,11 +98,11 @@ msgstr "%s%s\n%d punti · %d risorse · %d carte sviluppo\nLunghezza strada %d �
 msgid "+ Add bot"
 msgstr "+ Aggiungi bot"
 
-msgid "%d hexes · Classic"
-msgstr "%d esagoni · Classico"
+msgid "%d land hexes"
+msgstr "%d esagoni di terra"
 
-msgid "%d hexes · Paired turns"
-msgstr "%d esagoni · Turni abbinati"
+msgid "%d land hexes · paired turns"
+msgstr "%d esagoni di terra · turni in coppia"
 
 msgid "3D render scale"
 msgstr "Scala di rendering 3D"
@@ -120,8 +110,6 @@ msgstr "Scala di rendering 3D"
 msgid "A trade on the table"
 msgstr "Proposta di scambio"
 
-msgid "AUDIO"
-msgstr "AUDIO"
 
 
 msgid "Accessibility"
@@ -142,14 +130,14 @@ msgstr "Regola il dettaglio dell’oceano, le onde, le increspature e la schiuma
 msgid "Adjust orbit and pan speed. Drag the board or hold WASD to pan; right-drag or Q/E orbits; the wheel or +/- zooms; Home fits the board."
 msgstr "Regola la velocità della telecamera. Trascina il tabellone o tieni premuto WASD per spostarti; trascina col destro o usa Q/E per ruotare; rotella o +/- per lo zoom; Home inquadra il tabellone."
 
-msgid "Adjust scene brightness before cinematic tone mapping. Does not change the interface."
-msgstr "Regola la luminosità della scena prima della mappatura tonale. Non modifica l’interfaccia."
+msgid "Brightens or darkens the 3D scene. The interface stays the same."
+msgstr "Schiarisce o scurisce la scena 3D. L'interfaccia resta uguale."
 
 msgid "Adjust terrain tessellation, mesh level-of-detail bias and small scene details. Large landmarks and gameplay pieces stay visible at every level."
 msgstr "Regola la suddivisione del terreno, il livello di dettaglio dei modelli e i piccoli elementi della scena. I punti di riferimento e le pedine restano sempre visibili."
 
-msgid "Adjust the pause between bot actions without changing their difficulty or decisions."
-msgstr "Regola la pausa tra le azioni dei bot senza modificarne difficoltà o decisioni."
+msgid "How long bots pause between actions. Their choices stay the same."
+msgstr "Quanto aspettano i bot tra un'azione e l'altra. Le loro scelte non cambiano."
 
 msgid "All 15 of your roads are on the board. You have none left to place."
 msgstr "Tutte le tue 15 strade sono sul tabellone. Non ne hai altre da posizionare."
@@ -179,8 +167,8 @@ msgstr "Filtro anisotropico"
 msgid "Appearance"
 msgstr "Aspetto"
 
-msgid "Apply a coordinated set of model, texture, lighting, water and anti-aliasing settings. Individual changes switch this to Custom. Display and audio preferences are preserved."
-msgstr "Applica un insieme di impostazioni per modelli, texture, luci, acqua e anti-aliasing. Le modifiche singole passano a Personalizzata. Le preferenze di schermo e audio restano invariate."
+msgid "Sets models, textures, lighting, water and anti-aliasing together. Changing one of them switches this to Custom. Display and audio settings stay as they are."
+msgstr "Imposta insieme modelli, texture, luci, acqua e anti-aliasing. Cambiarne uno porta questa voce su Personalizzata. Schermo e audio restano come sono."
 
 
 msgid "Atmospheric haze"
@@ -210,8 +198,6 @@ msgstr "Scambia con la banca"
 msgid "Bank trade completed."
 msgstr "Scambio con la banca completato."
 
-msgid "Bank trade · %d:1"
-msgstr "Scambio con la banca · %d:1"
 
 msgid "Bloom"
 msgstr "Bagliore"
@@ -228,23 +214,15 @@ msgstr "Arpa vivace, flauto e archi caldi"
 msgid "Build two roads for free."
 msgstr "Costruisci due strade gratuitamente."
 
-msgid "Build, play a card, or trade with the bank."
-msgstr "Costruisci, gioca una carta o scambia con la banca."
 
-msgid "Build, trade or play a card"
-msgstr "Costruisci, scambia o gioca una carta"
 
 msgid "Buy card"
 msgstr "Compra carta"
 
-msgid "Buy development card: 1 wool, 1 grain, 1 ore. %d left in deck."
-msgstr "Compra carta sviluppo: 1 lana, 1 grano, 1 minerale. Ne restano %d nel mazzo."
 
-msgid "COMPATIBILITY / LIMITED LIGHTING"
-msgstr "COMPATIBILITÀ / ILLUMINAZIONE LIMITATA"
 
-msgid "CPU / GPU geometry"
-msgstr "Geometria su CPU e GPU"
+msgid "Geometry cost on CPU and GPU"
+msgstr "Costo di geometria su CPU e GPU"
 
 msgid "Camera sensitivity"
 msgstr "Sensibilità telecamera"
@@ -256,8 +234,8 @@ msgid "Cannot write the update cache."
 msgstr "Impossibile salvare i file dell’aggiornamento. Controlla spazio libero e permessi della cartella."
 
 
-msgid "Change the actual albedo, normal and occlusion/roughness textures used by terrain, stone and wood. Higher settings retain detail during close inspection."
-msgstr "Cambia la risoluzione delle texture di colore, rilievo e superficie per terreno, pietra e legno. I valori alti mantengono i dettagli da vicino."
+msgid "The resolution of the terrain, stone and wood textures. Higher settings keep detail when you zoom in."
+msgstr "La risoluzione delle texture di terreno, pietra e legno. I livelli più alti mantengono i dettagli quando ingrandisci."
 
 
 msgid "Check for a newer release."
@@ -269,8 +247,8 @@ msgstr "Cerca aggiornamenti"
 msgid "Checking for updates…"
 msgstr "Ricerca aggiornamenti…"
 
-msgid "Choose Easy bots for a gentle first game, Normal for purposeful builders, or Hard for opponents that plan resource diversity and expansion. You can mix difficulty levels in the lobby. The reference guide remains available during every game."
-msgstr "Scegli bot Facili per una prima partita tranquilla, Normali per costruttori più attivi o Difficili per avversari che pianificano risorse ed espansione. Puoi mescolare le difficoltà nella stanza. La guida resta disponibile durante ogni partita."
+msgid "Easy bots play gently. Normal bots build with a plan. Hard bots aim for a spread of resources and expand. You can mix levels in the lobby, and the guide is one click away in every game."
+msgstr "I bot Facili giocano con calma. I bot Normali costruiscono con un piano. I bot Difficili puntano a risorse varie e si espandono. Puoi mescolare i livelli nella stanza, e la guida è a un clic in ogni partita."
 
 msgid "Choose a connected road, or finish building."
 msgstr "Scegli un lato collegato alla tua rete, oppure termina la costruzione."
@@ -327,8 +305,6 @@ msgid "Choose a neighboring player to steal from."
 msgstr "Scegli un giocatore vicino al brigante a cui rubare una risorsa."
 
 
-msgid "Choose a player to steal from."
-msgstr "Scegli un giocatore a cui rubare una risorsa."
 
 msgid "Choose a resource."
 msgstr "Scegli una risorsa."
@@ -339,7 +315,7 @@ msgstr "Scegli un vertice libero ad almeno due lati di distanza dalle altre colo
 msgid "Choose an empty corner on your road, at least two edges from every settlement or city."
 msgstr "Scegli un vertice libero lungo una tua strada, ad almeno due lati da qualsiasi colonia o città."
 
-msgid "Choose an empty edge connected to your road or building. Another player’s building blocks the route."
+msgid "Choose an empty edge connected to your road or building. Another player's building blocks the route."
 msgstr "Scegli un lato libero collegato a una tua strada o edificio. Gli edifici degli altri giocatori interrompono il percorso."
 
 msgid "Choose at least one resource to give and one to receive."
@@ -351,8 +327,6 @@ msgstr "Scegli risorse diverse."
 msgid "Choose exactly %d resources to discard."
 msgstr "Scegli esattamente %d risorse da scartare."
 
-msgid "Choose half your resources to return to the bank."
-msgstr "Scegli metà delle tue risorse da restituire alla banca, arrotondando per difetto."
 
 msgid "Choose one of your settlements to upgrade to a city."
 msgstr "Scegli una delle tue colonie da trasformare in città."
@@ -375,8 +349,8 @@ msgstr "Cittadella"
 msgid "City"
 msgstr "Città"
 
-msgid "Classic · 19 hexes"
-msgstr "Classico · 19 esagoni"
+msgid "19 land hexes"
+msgstr "19 esagoni di terra"
 
 msgid "Click Roll dice. This practice roll will produce resources beside one of your settlements. A settlement collects 1 resource, a city 2. Everyone collects on every player's roll, not just their own turn."
 msgstr "Clicca su Tira i dadi. Questo tiro di prova produrrà risorse accanto a una tua colonia. Una colonia raccoglie 1 risorsa, una città 2. Tutti raccolgono a ogni tiro, anche nei turni degli altri."
@@ -396,8 +370,6 @@ msgstr "Chiudi"
 msgid "Connect your settlement"
 msgstr "Collega la tua colonia"
 
-msgid "Connecting to the island…"
-msgstr "Connessione in corso…"
 
 msgid "Connection failed. Check the address, UDP port and firewall."
 msgstr "Connessione non riuscita. Controlla indirizzo, porta UDP e firewall."
@@ -405,8 +377,6 @@ msgstr "Connessione non riuscita. Controlla indirizzo, porta UDP e firewall."
 msgid "Connection lost. Use Reconnect to return to your seat if the server is still running."
 msgstr "Connessione persa. Usa Riconnetti per tornare al tuo posto se il server è ancora attivo."
 
-msgid "Connection lost. Use Reconnect to return to your seat."
-msgstr "Connessione persa. Usa Riconnetti per tornare al tuo posto."
 
 msgid "Continue"
 msgstr "Continua"
@@ -462,8 +432,6 @@ msgstr "Disattivato"
 msgid "Discard"
 msgstr "Scarta"
 
-msgid "Discard selected resources"
-msgstr "Scarta risorse selezionate"
 
 msgid "Dismiss"
 msgstr "Chiudi"
@@ -518,8 +486,8 @@ msgstr "Scegli dove stabilirti"
 msgid "Finish roads"
 msgstr "Termina strade"
 
-msgid "Follow the current tutorial step, or choose Skip lesson."
-msgstr "Completa il passaggio della lezione, oppure scegli Salta."
+msgid "Follow the lesson's step, or choose Skip."
+msgstr "Segui il passo della lezione, oppure scegli Salta."
 
 msgid "Frame limit"
 msgstr "Limite fotogrammi"
@@ -530,11 +498,9 @@ msgstr "Completo"
 msgid "Fullscreen"
 msgstr "Schermo intero"
 
-msgid "GPU workload increases with resolution"
-msgstr "Il carico sulla GPU aumenta con la risoluzione"
+msgid "Larger sizes cost more GPU"
+msgstr "Dimensioni maggiori costano più GPU"
 
-msgid "GRAPHICS"
-msgstr "GRAFICA"
 
 msgid "Game log"
 msgstr "Registro partita"
@@ -604,14 +570,12 @@ msgstr "Alta · 4K"
 msgid "I'm ready"
 msgstr "Sono pronto"
 
-msgid "In return for:"
-msgstr "In cambio di:"
 
 msgid "Incompatible multiplayer versions. Host: %s (protocol %d). Yours: %s (protocol %d). Check for updates from the main menu."
 msgstr "Versioni multigiocatore incompatibili. Host: %s (protocollo %d). Tu: %s (protocollo %d). Cerca aggiornamenti dal menu principale."
 
-msgid "Increase smaller interface labels for readability. Menus scroll when necessary."
-msgstr "Ingrandisce i testi più piccoli per facilitarne la lettura. I menu scorrono quando serve."
+msgid "Small labels render at 16 px instead of 14 px. Menus scroll when they run out of room."
+msgstr "Le etichette piccole passano da 14 a 16 px. I menu scorrono quando lo spazio finisce."
 
 msgid "Inspect board (H)"
 msgstr "Osserva tabellone (H)"
@@ -625,7 +589,7 @@ msgstr "Indirizzo invito: "
 msgid "Invite friends"
 msgstr "Invita amici"
 
-msgid "It is another player’s turn. You can act when yours begins."
+msgid "It's another player's turn. You can act when yours begins."
 msgstr "È il turno di un altro giocatore. Potrai agire quando inizierà il tuo."
 
 msgid "Italiano"
@@ -634,8 +598,6 @@ msgstr "Italiano"
 msgid "Join"
 msgstr "Entra"
 
-msgid "Join room"
-msgstr "Entra nella stanza"
 
 msgid "Joining room soundtrack…"
 msgstr "Sincronizzazione della musica…"
@@ -673,12 +635,12 @@ msgstr "Lascia partita"
 msgid "Leave the current room before restarting to update."
 msgstr "Lascia la stanza prima di riavviare per aggiornare."
 
-msgid "Leave the expedition?"
+msgid "Leave the game?"
 msgstr "Vuoi lasciare la partita?"
 
 
-msgid "Let the island provide"
-msgstr "Raccogli le risorse"
+msgid "Roll for resources"
+msgstr "Tira per le risorse"
 
 msgid "Lighting"
 msgstr "Illuminazione"
@@ -747,8 +709,6 @@ msgstr "Sposta il brigante e ruba una risorsa."
 msgid "Move the robber to a different hex."
 msgstr "Sposta il brigante su un altro esagono."
 
-msgid "Move the robber to a hex"
-msgstr "Sposta il brigante su un esagono"
 
 msgid "Music"
 msgstr "Musica"
@@ -802,14 +762,14 @@ msgstr "Online"
 msgid "Online room"
 msgstr "Stanza online"
 
-msgid "Open Development cards and play the supplied Knight. Knights move the robber and build your army. Other cards grant roads, resources, a monopoly or hidden points. Newly bought action cards wait a turn; play only one per turn."
-msgstr "Apri Carte sviluppo e gioca il Cavaliere fornito. I cavalieri spostano il brigante e rafforzano il tuo esercito. Le altre carte danno strade, risorse, un monopolio o punti nascosti. Le carte azione appena comprate si giocano dal turno successivo, al massimo una per turno."
+msgid "Click the Knight card beside the action bar to play it. Knights move the robber and count toward the largest army. Other cards give roads, resources, a monopoly or hidden points. A card bought this turn waits for your next one, and you can play one card per turn."
+msgstr "Fai clic sulla carta Cavaliere accanto alla barra delle azioni per giocarla. I cavalieri spostano il brigante e contano per l'esercito più grande. Le altre carte danno strade, risorse, un monopolio o punti nascosti. Una carta comprata in questo turno aspetta il prossimo, e puoi giocare una carta per turno."
 
-msgid "Open Trade resources and exchange with the bank. Usually 4 of one resource buys 1 of another. A 3:1 harbor improves every trade; a 2:1 harbor improves its pictured resource. In a real game you can also offer a trade to other players."
-msgstr "Apri Scambia ed effettua uno scambio con la banca. Di solito servono 4 risorse uguali per riceverne 1 diversa. Un porto 3:1 migliora tutti gli scambi; un porto 2:1 migliora quelli della risorsa raffigurata. In partita puoi anche proporre scambi agli altri giocatori."
+msgid "Click Trade and swap with the bank. Usually 4 of one resource buys 1 of another. A 3:1 harbor improves every trade; a 2:1 harbor improves its pictured resource. In a real game you can also offer a trade to other players."
+msgstr "Fai clic su Scambia e commercia con la banca. Di solito 4 risorse uguali ne comprano 1 di un altro tipo. Un porto 3:1 migliora ogni scambio; un porto 2:1 migliora la risorsa raffigurata. In una partita vera puoi anche proporre scambi agli altri giocatori."
 
-msgid "Open room · no password"
-msgstr "Stanza aperta · senza password"
+msgid "No password. Anyone with the invite can join."
+msgstr "Nessuna password. Chiunque abbia l'invito può entrare."
 
 msgid "Open seat"
 msgstr "Posto libero"
@@ -826,14 +786,12 @@ msgstr "Volume generale, inclusi musica, effetti, suoni dell’oceano e meteo."
 msgid "Paired turn"
 msgstr "Turno abbinato"
 
-msgid "Paired turns allow building, cards and bank trading."
-msgstr "Nei turni abbinati puoi costruire, giocare carte e scambiare con la banca."
 
 msgid "Particle effects"
 msgstr "Effetti particellari"
 
-msgid "Password required to join"
-msgstr "Password richiesta per entrare"
+msgid "Guests need the invite and the password."
+msgstr "Gli ospiti devono avere l'invito e la password."
 
 
 msgid "Paste a valid invite code from the host."
@@ -860,11 +818,7 @@ msgstr "Posiziona una strada accanto alla tua nuova colonia."
 msgid "Place a settlement"
 msgstr "Posiziona una colonia"
 
-msgid "Place an adjoining road"
-msgstr "Posiziona una strada accanto alla colonia"
 
-msgid "Place up to two connected roads for free."
-msgstr "Posiziona fino a due strade collegate gratuitamente."
 
 msgid "Play a development card"
 msgstr "Gioca una carta sviluppo"
@@ -892,8 +846,6 @@ msgstr "Giocatori"
 msgid "Plenty"
 msgstr "Abbondanza"
 
-msgid "Power / smoothness"
-msgstr "Consumi e fluidità"
 
 msgid "Practice"
 msgstr "Esercitazione"
@@ -920,14 +872,12 @@ msgstr "Brano precedente / ricomincia"
 msgid "Public address:24567"
 msgstr "Indirizzo pubblico:24567"
 
-msgid "Reach 10 victory points by building settlements and cities. Resources come from the land around them. This guided expedition lets you try each core action, with a fresh practice board for later lessons."
-msgstr "Raggiungi 10 punti vittoria costruendo colonie e città. Le risorse arrivano dai terreni circostanti. Queste lezioni ti fanno provare le azioni principali, con un nuovo tabellone di prova per le lezioni successive."
+msgid "Reach 10 victory points by building settlements and cities. Resources come from the land around them. Each lesson has you try one action, and later lessons start on a fresh practice board."
+msgstr "Raggiungi 10 punti vittoria costruendo colonie e città. Le risorse arrivano dalla terra intorno a loro. Ogni lezione ti fa provare un'azione, e le lezioni successive partono da un tabellone di prova nuovo."
 
 msgid "Ready"
 msgstr "Pronto"
 
-msgid "Receive"
-msgstr "Ricevi"
 
 msgid "Reconnect"
 msgstr "Riconnetti"
@@ -987,8 +937,6 @@ msgstr "Tira i dadi"
 msgid "Roll the dice first."
 msgstr "Prima tira i dadi."
 
-msgid "Roll to collect resources"
-msgstr "Tira i dadi per raccogliere risorse"
 
 
 msgid "Router mapped for 1 hour. Invite address: %s:%d"
@@ -1080,12 +1028,10 @@ msgstr "Inizia partita"
 msgid "Stay"
 msgstr "Resta"
 
-msgid "Steal: "
-msgstr "Ruba a: "
 
 
-msgid "Stop wind, waves, scenery movement, particles and construction animations while retaining all gameplay actions."
-msgstr "Ferma vento, onde, paesaggio, particelle e animazioni di costruzione. Tutte le azioni di gioco restano disponibili."
+msgid "Stops wind, waves, scenery movement, particles and building animations. Gameplay is unchanged."
+msgstr "Ferma vento, onde, movimenti del paesaggio, particelle e animazioni di costruzione. Il gioco non cambia."
 
 msgid "Subtle light bleed from bright reflections and highlights. Does not blur interface text."
 msgstr "Aggiunge un lieve bagliore ai riflessi e alle zone luminose. Non sfoca il testo."
@@ -1111,8 +1057,6 @@ msgstr "La banca ha esaurito questa risorsa."
 msgid "The bank has only %d %s. Choose a different resource."
 msgstr "La banca ha solo %d %s. Scegli un’altra risorsa."
 
-msgid "The expedition is complete."
-msgstr "La partita è finita."
 
 msgid "The game has finished."
 msgstr "La partita è finita."
@@ -1132,11 +1076,9 @@ msgstr "Nel turno abbinato puoi scambiare solo con la banca."
 msgid "The password is incorrect."
 msgstr "La password non è corretta."
 
-msgid "The player making this offer no longer has the resources. Ask them for a new offer."
-msgstr "Chi ha proposto lo scambio non ha più le risorse necessarie. Chiedi una nuova offerta."
 
-msgid "The robber approaches"
-msgstr "Scarta le risorse"
+msgid "A seven was rolled"
+msgstr "È uscito un sette"
 
 msgid "The room host controls the shared soundtrack. Your volume is personal."
 msgstr "L’host controlla la musica della stanza. Puoi regolare il tuo volume."
@@ -1153,8 +1095,8 @@ msgstr "Il programma di aggiornamento si è interrotto. Il gioco installato non 
 msgid "This action is unavailable at this stage of the turn."
 msgstr "Questa azione non è disponibile in questa fase del turno."
 
-msgid "This action is unavailable. Please choose an action from the game controls."
-msgstr "Questa azione non è disponibile. Scegli un’azione dai comandi di gioco."
+msgid "That action isn't available right now."
+msgstr "Questa azione ora non è disponibile."
 
 msgid "This game has started. Use Reconnect to return to your saved seat."
 msgstr "La partita è già iniziata. Usa Riconnetti per tornare al tuo posto salvato."
@@ -1169,8 +1111,6 @@ msgid "Timber"
 msgstr "Legno"
 
 
-msgid "To build or buy this, you still need %s."
-msgstr "Per questa costruzione o acquisto ti servono ancora %s."
 
 msgid "Tracks"
 msgstr "Brani"
@@ -1190,14 +1130,12 @@ msgstr "Offerta di scambio"
 msgid "Trade offer withdrawn."
 msgstr "Offerta di scambio ritirata."
 
-msgid "Turn your plans into victory"
-msgstr "Conquista la vittoria"
 
 msgid "Ultra"
 msgstr "Ultra"
 
-msgid "Ultra favors image quality over frame rate"
-msgstr "Ultra privilegia la qualità rispetto alla fluidità"
+msgid "Ultra has a high GPU cost"
+msgstr "Ultra ha un costo GPU alto"
 
 msgid "Ultra · 8K"
 msgstr "Ultra · 8K"
@@ -1238,8 +1176,6 @@ msgstr "Usa la foschia per sfumare acqua e paesaggio lontani, mantenendo chiaro 
 msgid "Use seat color"
 msgstr "Usa colore del posto"
 
-msgid "Useful at reduced render scale"
-msgstr "Utile con scala di rendering ridotta"
 
 msgid "Vegetation density"
 msgstr "Densità vegetazione"
@@ -1256,8 +1192,8 @@ msgstr "Vittoria"
 msgid "Victory points"
 msgstr "Punti vittoria"
 
-msgid "Video memory"
-msgstr "Memoria video"
+msgid "Uses more video memory"
+msgstr "Usa più memoria video"
 
 msgid "View offer"
 msgstr "Vedi offerta"
@@ -1277,8 +1213,6 @@ msgstr "Volume della colonna sonora strumentale originale."
 msgid "WELL DONE"
 msgstr "BEN FATTO"
 
-msgid "WORLD"
-msgstr "COMANDI"
 
 msgid "Wait for all players to discard."
 msgstr "Aspetta che tutti abbiano scartato le risorse."
@@ -1289,11 +1223,7 @@ msgstr "In attesa"
 msgid "Waiting for players"
 msgstr "In attesa dei giocatori"
 
-msgid "Waiting for players to discard."
-msgstr "In attesa che i giocatori scartino."
 
-msgid "Watch the island grow. Your turn is coming."
-msgstr "È il turno di un altro giocatore."
 
 msgid "Water detail"
 msgstr "Dettaglio acqua"
@@ -1343,8 +1273,6 @@ msgstr "Puoi scartare solo le risorse che possiedi."
 msgid "You control playback. Everyone keeps their own volume."
 msgstr "Controlli la riproduzione. Ognuno regola il proprio volume."
 
-msgid "You do not have the resources requested."
-msgstr "Ti mancano alcune delle risorse richieste per questo scambio."
 
 msgid "You do not have this development card."
 msgstr "Non possiedi questa carta sviluppo."
@@ -1367,8 +1295,8 @@ msgstr "Ti servono ancora %s per accettare questa offerta."
 msgid "You need %s more to make this offer."
 msgstr "Ti servono ancora %s per proporre questo scambio."
 
-msgid "You're ready to set sail"
-msgstr "Sei pronto a giocare"
+msgid "Your first real game"
+msgstr "La tua prima partita vera"
 
 msgid "Your best port rate: %d:1 · Bank stock: %d"
 msgstr "Miglior rapporto al porto: %d:1 · Scorte banca: %d"
@@ -1385,14 +1313,12 @@ msgstr "Il tuo nome"
 msgid "Your pieces"
 msgstr "Le tue pedine"
 
-msgid "Your resources"
-msgstr "Le tue risorse"
 
 msgid "Your room"
 msgstr "La tua stanza"
 
-msgid "Your seat is unavailable. Please reconnect to the game."
-msgstr "Il tuo posto non è disponibile. Riconnettiti alla partita."
+msgid "Your seat is unavailable. Reconnect to take it back."
+msgstr "Il tuo posto non è disponibile. Riconnettiti per riprenderlo."
 
 msgid "Your trade offer: %s for %s."
 msgstr "La tua offerta: %s in cambio di %s."
@@ -1431,8 +1357,8 @@ msgid "Day/night cycle"
 msgstr "Ciclo giorno/notte"
 
 
-msgid "Turn off to keep the island in daylight. This setting is personal."
-msgstr "Disattiva per mantenere l’isola alla luce del giorno. Questa impostazione è personale."
+msgid "Turn off to keep the island in daylight. Only your screen changes."
+msgstr "Disattiva per tenere l'isola sempre di giorno. Cambia solo il tuo schermo."
 
 msgid "Bot"
 msgstr "Bot"
@@ -1446,11 +1372,7 @@ msgstr "Bilineare"
 msgid "Anti-aliasing"
 msgstr "Anti-aliasing"
 
-msgid "FORWARD+ / VULKAN"
-msgstr "FORWARD+ / VULKAN"
 
-msgid "CONTROLS"
-msgstr "COMANDI"
 
 msgid "Harbor at Dawn"
 msgstr "Il porto all’alba"
@@ -1476,8 +1398,6 @@ msgstr "Ruba a %s"
 msgid "%s wins!"
 msgstr "%s vince!"
 
-msgid "%s offers:"
-msgstr "%s offre:"
 
 msgid "%s disconnected. Waiting to reconnect."
 msgstr "%s si è disconnesso. In attesa della riconnessione."
@@ -1709,8 +1629,6 @@ msgstr "Pioggia"
 msgid "Thunderstorm"
 msgstr "Temporale"
 
-msgid "Clouds and rain"
-msgstr "Nuvole e pioggia"
 
 msgid "Choose changing weather or keep one condition. Rain and thunder have their own volume under Audio. Reduced motion disables rain and lightning flashes."
 msgstr "Scegli un meteo variabile o una condizione fissa. Pioggia e tuoni hanno un volume a parte nella sezione Audio. Il movimento ridotto disattiva pioggia e lampi."
@@ -2113,17 +2031,17 @@ msgstr "Recinzione"
 msgid "Posts and rope"
 msgstr "Pali e corda"
 
-msgid "Timber framing, clay tiles and a village well. A classic island expedition."
-msgstr "Travi a vista, coppi e un pozzo in piazza. La classica spedizione sull’isola."
+msgid "Timber framing, clay tiles and a village well."
+msgstr "Travi a vista, tegole in cotto e un pozzo di paese."
 
-msgid "Stilt houses, plank roads and a lighthouse. Built for life beside the sea."
-msgstr "Case su palafitte, strade di assi e un faro. Fatte per vivere accanto al mare."
+msgid "Stilt houses, plank roads and a lighthouse."
+msgstr "Palafitte, strade di assi e un faro."
 
-msgid "Carved stone, battlements and a square keep. An island stronghold."
-msgstr "Pietra scolpita, merli e un mastio quadrato. Una roccaforte sull’isola."
+msgid "Carved stone, battlements and a square keep."
+msgstr "Pietra scolpita, merli e un mastio quadrato."
 
-msgid "Log cabins, leafy roofs and a great tree. A home among the forest."
-msgstr "Capanne di tronchi, tetti di foglie e un grande albero. Una casa nel bosco."
+msgid "Log cabins, leafy roofs and a great tree."
+msgstr "Capanne di tronchi, tetti di foglie e un grande albero."
 
 msgid "Homes"
 msgstr "Case"
@@ -2245,8 +2163,6 @@ msgstr "Esagono classico"
 msgid "Collected"
 msgstr "Raccolte"
 
-msgid "Counters:"
-msgstr "Controproposta:"
 
 msgid "Counter…"
 msgstr "Controproposta…"
@@ -2329,8 +2245,8 @@ msgstr "Rubate"
 msgid "The friendly robber spares players with 3 points or fewer. Choose another hex."
 msgstr "Il brigante amichevole risparmia chi ha 3 punti o meno. Scegli un altro esagono."
 
-msgid "The robber cannot be placed next to a player with 3 points or fewer."
-msgstr "Il brigante non può essere messo accanto a un giocatore con 3 punti o meno."
+msgid "The robber can't be placed next to a player with 3 or fewer visible points, unless no other hex is left."
+msgstr "Il brigante non può andare accanto a un giocatore con 3 punti visibili o meno, a meno che non resti nessun altro esagono."
 
 msgid "The same seed and player count always build the same island. Share it to replay a map."
 msgstr "Lo stesso seme con lo stesso numero di giocatori crea sempre la stessa isola. Condividilo per rigiocare una mappa."
@@ -2359,8 +2275,6 @@ msgstr "Ricevi"
 msgid "You give"
 msgstr "Dai"
 
-msgid "You offer:"
-msgstr "Offri:"
 
 msgid "Counter-offer"
 msgstr "Controproposta"
@@ -2371,8 +2285,6 @@ msgstr "\n%d punti vincono la partita."
 msgid "for"
 msgstr "per"
 
-msgid "Water and wind"
-msgstr "Acqua e vento"
 
 msgid "of %d"
 msgstr "su %d"
@@ -2404,7 +2316,7 @@ msgstr "Ogni giocatore posiziona due colonie, ciascuna con una strada. Al second
 msgid "A turn"
 msgstr "Un turno"
 
-msgid "Roll the dice. Every settlement next to a hex with that number collects 1 resource, every city 2. Then build, trade with players or the bank, and play at most one development card. Ports give better bank rates."
+msgid "Roll the dice. Every settlement next to a hex with that number collects 1 resource, every city 2. Then build, trade with players or the bank, and play at most one development card. Harbors give better bank rates."
 msgstr "Tira i dadi. Ogni colonia accanto a un esagono con quel numero raccoglie 1 risorsa, ogni città 2. Poi costruisci, scambia con i giocatori o la banca e gioca al massimo una carta sviluppo. I porti offrono rapporti migliori con la banca."
 
 msgid "Building costs"
@@ -2422,8 +2334,8 @@ msgstr "Clicca sui punti illuminati per costruire. Trascina il tabellone o tieni
 msgid "Five or six players"
 msgstr "Cinque o sei giocatori"
 
-msgid "The island has 30 hexes and turns come in pairs. After the main turn, the player three seats ahead builds, plays cards and trades with the bank. Then the next main player rolls."
-msgstr "L’isola ha 30 esagoni e i turni sono abbinati. Dopo il turno principale, il giocatore tre posti più avanti costruisce, gioca carte e scambia con la banca. Poi il giocatore principale successivo tira i dadi."
+msgid "The island is bigger, with 30 land hexes, and turns come in pairs. After the main turn, the player three seats ahead builds, plays cards and trades with the bank. Then the next main player rolls."
+msgstr "L'isola è più grande, con 30 esagoni di terra, e i turni vanno in coppia. Dopo il turno principale, il giocatore tre posti più avanti costruisce, gioca carte e commercia con la banca. Poi tira il giocatore principale successivo."
 
 msgid "Hosting online"
 msgstr "Ospitare online"
@@ -2609,8 +2521,8 @@ msgstr "Per costruire una nave ti servono ancora %s."
 msgid "Treasure tile"
 msgstr "Tessera del tesoro"
 
-msgid "When its number is rolled, the treasure gives each settlement on it 2 random resources (a city 4), then draws a new number. No one can start within 3 roads of it."
-msgstr "Quando esce il suo numero, il tesoro dà 2 risorse a caso a ogni colonia che lo tocca (4 a una città), poi pesca un nuovo numero. Nessuno può partire a meno di 3 strade da lui."
+msgid "When its number is rolled, the treasure gives each settlement on it 2 random resources (a city 4), then draws a new number. Starting settlements must be at least 3 roads from it."
+msgstr "Quando esce il suo numero, il tesoro dà a ogni colonia sul suo esagono 2 risorse a caso (a una città 4), poi pesca un nuovo numero. Le colonie iniziali devono stare ad almeno 3 strade da lui."
 
 msgid "Rain and thunder"
 msgstr "Pioggia e tuoni"
@@ -2699,7 +2611,7 @@ msgstr "Si riprende una partita salvata. Gli amici rientrano con l’invito e ri
 msgid "Resuming a saved game. Waiting for %s to rejoin with the invite. If you start now, a bot plays for them until they join."
 msgstr "Si riprende una partita salvata. In attesa che %s rientri con l’invito. Se inizi ora, gioca un bot al suo posto finché non entra."
 
-msgid "%s · turn %d · saved %04d-%02d-%02d %02d:%02d. Starting a new game replaces it."
+msgid "%s · turn %d · saved %04d-%02d-%02d %02d:%02d. A new game replaces it."
 msgstr "%s · turno %d · salvata il %04d-%02d-%02d alle %02d:%02d. Una nuova partita la sostituisce."
 
 msgid "Saved seat, a bot plays until they rejoin"
@@ -2854,3 +2766,12 @@ msgstr "La stanza si chiude per tutti. La partita è salvata, quindi puoi ospita
 
 msgid "The others wait a minute for you, then a bot plays your seat. Use Reconnect to take it back."
 msgstr "Gli altri ti aspettano un minuto, poi un bot gioca al tuo posto. Usa Riconnetti per riprenderlo."
+
+msgid "%s · setup · saved %04d-%02d-%02d %02d:%02d. A new game replaces it."
+msgstr "%s · preparazione · salvata il %04d-%02d-%02d alle %02d:%02d. Una nuova partita la sostituisce."
+
+msgid "%s pieces"
+msgstr "Pezzi %s"
+
+msgid "After each turn, the player three seats ahead builds, plays cards and trades with the bank."
+msgstr "Dopo ogni turno, il giocatore tre posti più avanti costruisce, gioca carte e commercia con la banca."

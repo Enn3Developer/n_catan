@@ -69,14 +69,14 @@ const FIELDS=[
 	{"key":"garden","group":"town","label":"Garden","kind":"choice","options":["None","Vegetable rows","Flower beds","Haystacks","Woodpile"],"default":0,"since":2,"after":"centerpiece"}]
 
 const PRESETS=[
-	{"name":"Voyager","description":"Timber framing, clay tiles and a village well. A classic island expedition.","values":{}},
-	{"name":"Harbor","description":"Stilt houses, plank roads and a lighthouse. Built for life beside the sea.",
+	{"name":"Voyager","description":"Timber framing, clay tiles and a village well.","values":{}},
+	{"name":"Harbor","description":"Stilt houses, plank roads and a lighthouse.",
 		"values":{"foundation":1,"foundation_height":.75,"wall_material":3,"framing":0,"window_shape":2,"shutters":false,"door_style":0,"chimneys":0,"roof_style":0,"roof_material":2,"roof_pitch":34.0,"roof_overhang":.7,"square":4,"centerpiece":5,"lanterns":3,"banner_shape":1,"emblem":3,"city_wall":1,"wall_height":.7,"crenels":false,"towers":2,"tower_roof":3,"keep":3,"keep_height":1.3,"road_surface":0,"road_edges":4,"road_lamps":true,
 		"wall_color":"8fa7b3","roof_color":"50606e","trim_color":"ece6d6","stone_color":"8c8a82","accent_color":"d0643f","road_color":"a88862","ground_color":"b89c78","emblem_color":"ece6d6"}},
-	{"name":"Citadel","description":"Carved stone, battlements and a square keep. An island stronghold.",
+	{"name":"Citadel","description":"Carved stone, battlements and a square keep.",
 		"values":{"house_depth":1.1,"stories":2,"story_height":.9,"foundation":0,"foundation_height":.5,"wall_material":1,"framing":0,"window_shape":1,"shutters":false,"door_style":1,"chimneys":1,"roof_style":1,"roof_material":2,"roof_pitch":30.0,"roof_overhang":.15,"ridge_cap":false,"square":1,"centerpiece":3,"lanterns":4,"border":3,"banner_shape":3,"emblem":2,"city_wall":0,"wall_height":1.4,"towers":6,"tower_roof":1,"tower_height":1.2,"keep":1,"keep_height":1.2,"road_surface":1,"road_edges":1,
 		"wall_color":"b0aa9c","roof_color":"5d6470","trim_color":"5a4a3c","stone_color":"8a867c","accent_color":"7a3b34","road_color":"9d978b","ground_color":"a8a294","emblem_color":"e8c35a"}},
-	{"name":"Wildwood","description":"Log cabins, leafy roofs and a great tree. A home among the forest.",
+	{"name":"Wildwood","description":"Log cabins, leafy roofs and a great tree.",
 		"values":{"house_width":.9,"house_depth":.9,"foundation":3,"wall_material":4,"framing":0,"window_shape":2,"shutters":false,"flower_boxes":true,"door_style":3,"chimneys":1,"roof_style":0,"roof_material":4,"roof_pitch":50.0,"roof_overhang":.6,"ridge_cap":false,"wobble":.6,"variety":.7,"square":2,"centerpiece":2,"lanterns":2,"border":2,"banner_shape":0,"emblem":4,"city_wall":1,"wall_height":1.1,"crenels":false,"towers":2,"tower_roof":0,"keep":5,"keep_height":1.4,"road_surface":3,"road_width":.85,"road_edges":3,
 		"wall_color":"8a6040","roof_color":"6e9a4c","trim_color":"5c3f28","stone_color":"857d6c","accent_color":"b4513a","road_color":"a8835c","ground_color":"7fa060","foliage_color":"5c8c45","emblem_color":"f0e2bd"}}]
 

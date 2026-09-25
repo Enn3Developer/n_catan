@@ -28,9 +28,10 @@ func show_room(net: CatanNetwork,invite_address: String,connection_status: Strin
 	var controller=net.is_controller()
 	var extended=net.roster.size()>4
 	var hexes=(30 if extended else 19)+((5 if extended else 4) if net.room_settings.island=="archipelago" else 0)+(1 if net.room_settings.get("treasure",false) else 0)
-	%RoomSummary.text=(tr("%d hexes · Paired turns") if extended else tr("%d hexes · Classic")) % hexes
+	%RoomSummary.text=(tr("%d land hexes · paired turns") if extended else tr("%d land hexes")) % hexes
+	%RoomSummary.tooltip_text=tr("After each turn, the player three seats ahead builds, plays cards and trades with the bank.") if extended else ""
 	%RoomAccess.visible=not net.solo
-	%RoomAccess.text=tr("Password required to join") if not net.room_password.is_empty() else tr("Open room · no password")
+	%RoomAccess.text=tr("Guests need the invite and the password.") if not net.room_password.is_empty() else tr("No password. Anyone with the invite can join.")
 	for i in CatanNetwork.MAX_PLAYERS:
 		var slot=PLAYER_SLOT.instantiate()
 		%PlayerSlots.add_child(slot)
@@ -116,7 +117,10 @@ func _show_saved(net: CatanNetwork,controller: bool):
 		%SavedInfo.text=tr("The saved game is from version %s, which plays by different rules. It can't be resumed here, and starting a new game replaces it.") % summary.version
 		return
 	var when=Time.get_datetime_dict_from_unix_time(int(summary.saved)+int(Time.get_time_zone_from_system().bias)*60)
-	%SavedInfo.text=tr("%s · turn %d · saved %04d-%02d-%02d %02d:%02d. Starting a new game replaces it.") % [", ".join(summary.names),summary.turn,when.year,when.month,when.day,when.hour,when.minute]
+	var saved=[when.year,when.month,when.day,when.hour,when.minute]
+	# Turn 0 is still the setup round.
+	if summary.turn==0:%SavedInfo.text=tr("%s · setup · saved %04d-%02d-%02d %02d:%02d. A new game replaces it.") % ([", ".join(summary.names)]+saved)
+	else:%SavedInfo.text=tr("%s · turn %d · saved %04d-%02d-%02d %02d:%02d. A new game replaces it.") % ([", ".join(summary.names),summary.turn]+saved)
 
 ## A labelled switch for one house rule, made once and kept in the rules grid.
 func _house_rule(rule: String) -> CheckButton:
