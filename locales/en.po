@@ -2378,8 +2378,8 @@ msgstr "You give"
 msgid "You offer:"
 msgstr "You offer:"
 
-msgid "Your counter-offer"
-msgstr "Your counter-offer"
+msgid "Counter-offer"
+msgstr "Counter-offer"
 
 msgid "\n%d points win the game."
 msgstr "\n%d points win the game."
@@ -2495,8 +2495,8 @@ msgstr "wants"
 msgid "Answers"
 msgstr "Answers"
 
-msgid "This is the offer as it stands. Accept it instead."
-msgstr "This is the offer as it stands. Accept it instead."
+msgid "These are the offer's terms. Change something, or go back and accept."
+msgstr "These are the offer's terms. Change something, or go back and accept."
 
 msgid "Any"
 msgstr "Any"
@@ -2776,3 +2776,15 @@ msgstr "A bot plays for %s until they return."
 
 msgid "The saved game is from version %s, which plays by different rules. It can't be resumed here, and starting a new game replaces it."
 msgstr "The saved game is from version %s, which plays by different rules. It can't be resumed here, and starting a new game replaces it."
+
+msgid "%s offers %s for %s. Change the terms and send them back."
+msgstr "%s offers %s for %s. Change the terms and send them back."
+
+msgid "You sent a counter-offer. %s picks who to trade with."
+msgstr "You sent a counter-offer. %s picks who to trade with."
+
+msgid "You give %s and get %s."
+msgstr "You give %s and get %s."
+
+msgid "Edit counter…"
+msgstr "Edit counter…"

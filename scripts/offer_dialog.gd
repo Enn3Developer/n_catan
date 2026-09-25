@@ -1,7 +1,9 @@
 extends CatanDialog
 ## The open trade offer, shown from the viewer's side of the table. Other
 ## players accept, decline or counter; the offering player then picks one
-## partner from everyone who said yes.
+## partner from everyone who said yes. Countering is a step of its own: the
+## offer shrinks to one line, the terms become steppers and the footer holds
+## only Back and Send.
 
 signal response_requested(action: Dictionary)
 signal withdraw_requested
@@ -10,22 +12,35 @@ const RESOURCE_ROW=preload("res://scenes/ui/resource_row.tscn")
 var state: Dictionary
 var seat=-1
 var offer_id=-1
+var network: CatanNetwork
+## Whether the viewer is writing a counter-offer.
+var countering=false
 
 func show_offer(snapshot: Dictionary,player: int,net: CatanNetwork):
 	state=snapshot
 	seat=player
+	network=net
 	var offer: Dictionary=state.offer
 	var own=int(offer.from)==seat
+	if own:countering=false
 	var rules=CatanRules.new();rules.s=state
 	var responses: Dictionary=offer.get("responses",{})
 	var mine: Dictionary=responses.get(str(seat),{})
 	var waiting: bool=offer.get("waiting",false)
-	%Offerer.text=tr("Your offer to the other players.") if own else tr("%s offers you a trade.") % state.players[offer.from].name
+	var offerer: String=state.players[offer.from].name
+	%Title.text=tr("Counter-offer") if countering else tr("A trade on the table")
+	%Offerer.text=tr("Your offer to the other players.") if own else tr("%s offers %s for %s. Change the terms and send them back.") % [offerer,_amounts(offer.give),_amounts(offer.receive)] if countering else tr("%s offers you a trade.") % offerer
+	%Terms.visible=not countering
 	# "give" is always what the offering player hands over.
 	%YouGive.show_amounts(offer.give if own else offer.receive)
 	%YouGet.show_amounts(offer.receive if own else offer.give)
 	var hand: Array=state.players[seat].hand
 	if int(offer.get("id",0))!=offer_id:
+		# A new offer starts over, even in the middle of a counter.
+		countering=false
+		%Title.text=tr("A trade on the table")
+		%Offerer.text=tr("Your offer to the other players.") if own else tr("%s offers you a trade.") % offerer
+		%Terms.visible=true
 		offer_id=int(offer.get("id",0))
 		var have=[]
 		for resource in 5:have.append(tr("have %d") % hand[resource])
@@ -40,18 +55,23 @@ func show_offer(snapshot: Dictionary,player: int,net: CatanNetwork):
 	if own:
 		%Status.text=tr("Waiting for answers…") if waiting else tr("Everyone declined. Withdraw the offer to make a new one.") if accepted==0 and responses.size()>=state.players.size()-1 else tr("Choose who to trade with.") if accepted>0 else ""
 	else:
-		%Status.text=tr("You accepted. %s picks who to trade with.") % state.players[offer.from].name if mine.get("answer","") in ["accept","counter"] else ""
-	%Status.visible=not %Status.text.is_empty()
+		%Status.text=tr("You accepted. %s picks who to trade with.") % offerer if mine.get("answer","")=="accept" else tr("You sent a counter-offer. %s picks who to trade with.") % offerer if mine.get("answer","")=="counter" else ""
+	%Status.visible=not %Status.text.is_empty() and not countering
 	for child in %Responses.get_children():child.free()
 	for p in state.players.size():
 		if p!=int(offer.from):_add_response(p,responses.get(str(p),{}),own and not waiting,rules,net.player_color(p))
-	%Answers.visible=not own
+	%Answers.visible=not own and not countering
+	%CounterSteps.visible=countering
+	%Close.visible=not countering
 	%Accept.disabled=not rules.can_pay(seat,offer.receive) or mine.get("answer","")=="accept"
 	%Decline.disabled=mine.get("answer","")=="decline"
-	%Missing.visible=not own and not rules.can_pay(seat,offer.receive)
+	# The steppers still hold a counter already sent, so the button offers to change it.
+	%Counter.text=tr("Edit counter…") if mine.get("answer","")=="counter" else tr("Counter…")
+	%Missing.visible=not own and not countering and not rules.can_pay(seat,offer.receive)
 	if %Missing.visible:%Missing.text=CatanI18n.render(CatanI18n.message("You need %s more to accept this offer.",[rules._missing(seat,offer.receive)]))
-	%CounterPanel.visible=not own and %Counter.button_pressed
-	_show_answers()
+	%CounterPanel.visible=countering
+	%AnswersLabel.visible=not countering
+	%Responses.visible=not countering
 	%Withdraw.visible=own
 	_refresh_counter()
 
@@ -111,16 +131,19 @@ func _add_response(p: int,response: Dictionary,can_pick: bool,rules: CatanRules,
 func _answer(action_type: String):
 	response_requested.emit({"type":action_type})
 
-## While a counter is being written the other answers step aside to make room.
-func _show_answers():
-	%AnswersLabel.visible=not %CounterPanel.visible
-	%Responses.visible=not %CounterPanel.visible
-
-func _on_counter_toggled(_pressed: bool):
-	%CounterPanel.visible=%Counter.button_pressed
-	_show_answers()
-	_refresh_counter()
+## Switches between answering the offer and writing a counter-offer.
+func _set_countering(on: bool):
+	countering=on
+	if not state.is_empty():show_offer(state,seat,network)
 	fit()
+
+## "2 Wool and 1 Ore": the amounts in words.
+func _amounts(amounts: Array) -> String:
+	var parts=[]
+	for resource in 5:
+		if amounts[resource]>0:parts.append("%d %s" % [amounts[resource],tr(CatanRules.RES[resource])])
+	if parts.size()<2:return "".join(parts)
+	return tr("%s and %s") % [", ".join(parts.slice(0,-1)),parts[-1]]
 
 func _refresh_counter():
 	if state.is_empty() or not %CounterPanel.visible:return
@@ -136,9 +159,12 @@ func _refresh_counter():
 	var complete=%CounterGive.total()>0 and %CounterGet.total()>0
 	var same=give==state.offer.receive and receive==state.offer.give
 	%SendCounter.disabled=not complete or same
-	%CounterReason.text=tr("Choose what you give and what you want in return.") if not complete else tr("This is the offer as it stands. Accept it instead.") if same else ""
+	%CounterPreview.text=tr("You give %s and get %s.") % [_amounts(give),_amounts(receive)] if complete else ""
+	%CounterPreview.visible=complete
+	%CounterReason.text=tr("Choose what you give and what you want in return.") if not complete else tr("These are the offer's terms. Change something, or go back and accept.") if same else ""
+	%CounterReason.visible=not %CounterReason.text.is_empty()
 
 func _on_send_counter_pressed():
 	# Counters keep the offer's orientation: "give" is what the offering player hands over.
 	response_requested.emit({"type":"counter_trade","give":%CounterGet.values.duplicate(),"receive":%CounterGive.values.duplicate()})
-	%Counter.button_pressed=false
+	_set_countering(false)
