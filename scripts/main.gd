@@ -179,6 +179,16 @@ func _show_join_form(connecting: bool):
 	screen.show_connecting(connecting)
 
 func _on_board_picked(kind: String,id: int):
+	# Moving a ship takes two picks: the ship, then its new edge.
+	if kind=="move_ship":
+		board.move_from=id
+		mode="move_to"
+		board.set_mode(mode,net.seat)
+		_hud()
+		return
+	if kind=="move_to":
+		net.act({"type":"move_ship","id":board.move_from,"to":id})
+		return
 	net.act({"type":kind,"id":id})
 
 func _network_changed():
@@ -211,6 +221,8 @@ func _lobby():
 		"bot_difficulty_changed":func(seat,level):net.configure_bot("difficulty",seat,level),
 		"bot_remove_requested":func(seat):net.configure_bot("remove",seat),
 		"setting_changed":net.choose_setting,
+		"resume_requested":net.resume_saved,
+		"new_game_requested":net.cancel_resume,
 	})
 	screen.invite_address_edited.connect(func(text):invite_address=text)
 	_apply_text(screen)
@@ -363,6 +375,11 @@ func _show_victory():
 
 func _choose(kind: String):
 	var rules=CatanRules.new();rules.s=state
+	if kind=="move_ship":
+		mode="" if mode in ["move_ship","move_to"] else kind
+		board.set_mode(mode,net.seat)
+		_hud()
+		return
 	if state.phase=="play" and rules.build_sites(net.seat,kind).is_empty():
 		_notice(tr("No legal space to build a %s.") % tr(kind))
 		return

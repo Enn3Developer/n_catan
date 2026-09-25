@@ -22,7 +22,8 @@ func show_seat(net: CatanNetwork,index: int,controller: bool):
 	modulate.a=1.0 if occupied else 0.55
 	%PlayerName.text=row.name if occupied else tr("Open seat")
 	var info=""
-	if occupied: info=tr("Bot") if bot else tr("You") if index==net.seat else tr("Player")
+	var waiting=occupied and row.get("saved_seat",false) and not row.connected
+	if occupied: info=tr("Bot") if bot else tr("Saved seat, waiting to rejoin") if waiting else tr("You") if index==net.seat else tr("Player")
 	if occupied:
 		var preset=CatanAppearance.preset_of(row.get("look",PackedByteArray()))
 		info+=" · "+(tr(CatanAppearance.PRESETS[preset].name) if preset>=0 else tr("Custom pieces"))
@@ -35,7 +36,8 @@ func show_seat(net: CatanNetwork,index: int,controller: bool):
 		for level in CatanBot.LEVELS: %Difficulty.add_item(level)
 		%Difficulty.select(row.difficulty)
 		%Difficulty.disabled=not controller
-	%Remove.visible=bot and controller
+	%Remove.visible=bot and controller and not net.room_settings.get("resuming",false)
+	if waiting:modulate.a=.7
 
 func _on_difficulty_item_selected(level: int):
 	difficulty_selected.emit(seat,level)

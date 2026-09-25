@@ -2635,3 +2635,105 @@ msgstr "Rain and thunder"
 
 msgid "Volume of rain and thunder. Drizzle stays soft and muffled; only a downpour plays at full level."
 msgstr "Volume of rain and thunder. Drizzle stays soft and muffled; only a downpour plays at full level."
+
+msgid "Moving ships"
+msgstr "Moving ships"
+
+msgid "Archipelago only. Once per turn, after rolling, you may move one ship from the open end of a line to another sea edge you could build on. A ship built this turn stays put."
+msgstr "Archipelago only. Once per turn, after rolling, you may move one ship from the open end of a line to another sea edge you could build on. A ship built this turn stays put."
+
+msgid "Fog"
+msgstr "Fog"
+
+msgid "Archipelago only. The outer islands start hidden in fog. A road, ship or settlement that reaches a hidden hex reveals it, and a resource hex gives its finder one of that resource."
+msgstr "Archipelago only. The outer islands start hidden in fog. A road, ship or settlement that reaches a hidden hex reveals it, and a resource hex gives its finder one of that resource."
+
+msgid "Moving ships is a house rule this room does not use."
+msgstr "Moving ships is a house rule this room does not use."
+
+msgid "You have moved a ship this turn. You can move another next turn."
+msgstr "You have moved a ship this turn. You can move another next turn."
+
+msgid "Choose one of your ships at the open end of a line. Ships built this turn cannot move."
+msgstr "Choose one of your ships at the open end of a line. Ships built this turn cannot move."
+
+msgid "Choose a sea edge you could build a ship on."
+msgstr "Choose a sea edge you could build a ship on."
+
+msgid "%s moved a ship."
+msgstr "%s moved a ship."
+
+msgid "%s revealed a hex in the fog and found %s."
+msgstr "%s revealed a hex in the fog and found %s."
+
+msgid "%s revealed the treasure in the fog."
+msgstr "%s revealed the treasure in the fog."
+
+msgid "%s revealed a hex in the fog."
+msgstr "%s revealed a hex in the fog."
+
+msgid "Move a ship"
+msgstr "Move a ship"
+
+msgid "Once per turn, move a ship from the open end of a line"
+msgstr "Once per turn, move a ship from the open end of a line"
+
+msgid "You have moved a ship this turn."
+msgstr "You have moved a ship this turn."
+
+msgid "No ship can move: only ships at the open end of a line, not built this turn."
+msgstr "No ship can move: only ships at the open end of a line, not built this turn."
+
+msgid "Choose a glowing ship to move"
+msgstr "Choose a glowing ship to move"
+
+msgid "Choose a glowing sea edge for the ship"
+msgstr "Choose a glowing sea edge for the ship"
+
+msgid "Points over time"
+msgstr "Points over time"
+
+msgid "Goal"
+msgstr "Goal"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "Turn %d"
+msgstr "Turn %d"
+
+msgid "Saved game"
+msgstr "Saved game"
+
+msgid "Resume saved game"
+msgstr "Resume saved game"
+
+msgid "New game instead"
+msgstr "New game instead"
+
+msgid "Resuming a saved game. Friends rejoin with the invite and take their seats back."
+msgstr "Resuming a saved game. Friends rejoin with the invite and take their seats back."
+
+msgid "Resuming a saved game. Waiting for %s to rejoin with the invite."
+msgstr "Resuming a saved game. Waiting for %s to rejoin with the invite."
+
+msgid "%s · turn %d · saved %04d-%02d-%02d %02d:%02d. Starting a new game replaces it."
+msgstr "%s · turn %d · saved %04d-%02d-%02d %02d:%02d. Starting a new game replaces it."
+
+msgid "Saved seat, waiting to rejoin"
+msgstr "Saved seat, waiting to rejoin"
+
+msgid "The saved game could not be read."
+msgstr "The saved game could not be read."
+
+msgid "This room is resuming a saved game and every seat is taken."
+msgstr "This room is resuming a saved game and every seat is taken."
+
+msgid "The game resumes from where it was saved."
+msgstr "The game resumes from where it was saved."
+
+msgid "Saved games"
+msgstr "Saved games"
+
+msgid "The host's game saves about once a second, and again when the host leaves. In the lobby, Resume saved game picks it up. Friends rejoin with the new invite and get their seats back by name."
+msgstr "The host's game saves about once a second, and again when the host leaves. In the lobby, Resume saved game picks it up. Friends rejoin with the new invite and get their seats back by name."

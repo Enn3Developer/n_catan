@@ -126,6 +126,10 @@ func choose(data: Dictionary,p: int,difficulty: int=1) -> Dictionary:
 				if value>highest: highest=value; resource=res
 			return {"type":"play_card","id":3,"resource":resource}
 	if goal in ["road","ship"] and not step.is_empty() and r.can_pay(p,CatanRules.COST[goal]): return step
+	# Moving ships: a spare ship sails to the front of the planned route for free.
+	if difficulty>0 and step.get("type","")=="ship":
+		for ship in r.movable_ships(p):
+			if int(step.id) in r.ship_moves(p,ship): return {"type":"move_ship","id":ship,"to":step.id}
 	if r.can_pay(p,CatanRules.COST.buy_card) and int(data.get("deck_count",0))>0 and (goal=="buy_card" or r.total(player.hand)>8 or player.points>=7): return {"type":"buy_card"}
 	# Turn surplus into precisely what the next build needs. Easy bots trade less often.
 	if difficulty>0 or random.randf()<0.5:
@@ -164,6 +168,8 @@ func _site(data: Dictionary,p: int,v: int,difficulty: int) -> float:
 		if data.get("island","")=="archipelago" and not islands.is_empty() and int(tile.get("island",0)) not in islands: new_island=true
 		# Two random resources, worth a little more than one known one.
 		if tile.kind==CatanRules.TREASURE: value+=_pips(tile.number)*1.6
+		# A hex in the fog is worth an average hex, and a free resource when found.
+		if tile.kind==CatanRules.FOG: value+=3.4
 		if tile.kind>=CatanRules.DESERT: continue
 		var weight=1.0
 		if difficulty==2: weight=1.0+2.5/(1.0+income[tile.kind])

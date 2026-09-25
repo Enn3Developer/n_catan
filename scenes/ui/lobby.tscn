@@ -177,6 +177,42 @@ layout_mode = 2
 theme_type_variation = &"MutedLabel"
 autowrap_mode = 3
 
+[node name="SavedGame" type="VBoxContainer" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="SavedHeading" type="Label" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/SavedGame"]
+layout_mode = 2
+theme_type_variation = &"SectionLabel"
+text = "Saved game"
+uppercase = true
+
+[node name="SavedInfo" type="Label" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/SavedGame"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+autowrap_mode = 3
+
+[node name="SavedActions" type="HBoxContainer" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/SavedGame"]
+layout_mode = 2
+
+[node name="ResumeGame" type="Button" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/SavedGame/SavedActions" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+text = "Resume saved game"
+
+[node name="NewGameInstead" type="Button" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/SavedGame/SavedActions" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+text = "New game instead"
+
 [node name="InviteGap" type="Control" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 8)
@@ -354,3 +390,5 @@ text = "Back"
 [connection signal="item_selected" from="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid/TimerPicker" to="." method="_on_timer_selected"]
 [connection signal="item_selected" from="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid/PointsPicker" to="." method="_on_points_selected"]
 [connection signal="toggled" from="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/RulesGrid/FriendlyRobber" to="." method="_on_friendly_robber_toggled"]
+[connection signal="pressed" from="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/SavedGame/SavedActions/ResumeGame" to="." method="emit_signal" binds= ["resume_requested"]]
+[connection signal="pressed" from="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent/SavedGame/SavedActions/NewGameInstead" to="." method="emit_signal" binds= ["new_game_requested"]]

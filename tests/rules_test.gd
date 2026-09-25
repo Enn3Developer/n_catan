@@ -17,6 +17,9 @@ func _init():
 	_start_card()
 	_treasure()
 	_archipelago()
+	_moving_ships()
+	_fog()
+	_points_history()
 	print("rules_test: %s" % ("FAILED (%d)" % failures if failures else "ok"))
 	quit(1 if failures else 0)
 
@@ -270,6 +273,110 @@ func _archipelago():
 		var before=s.players[0].points
 		check(rules.apply(0,{"type":"settlement","id":target})=="","settle the new island")
 		check(s.players[0].points==before+1+CatanRules.ISLAND_BONUS,"island bonus")
+
+## A player with a coastal town and a line of ships, ready to test moving.
+func _sea_game(options: Dictionary) -> CatanRules:
+	var rules=CatanRules.new()
+	var merged={"island":"archipelago"}
+	merged.merge(options,true)
+	var s=rules.create(["A","B","C"],5,merged)
+	_setup(rules)
+	s.rolled=true
+	s.players[0].hand=[9,9,9,9,9]
+	if rules.build_sites(0,"ship").is_empty():
+		for v in s.vertices.size():
+			if rules._open_corner(v) and rules._on_island(v,0):
+				var coastal=false
+				for eid in s.vertices[v].edges: if s.edges[eid].tiles<2: coastal=true
+				if coastal:
+					s.vertices[v].owner=0;s.vertices[v].level=1
+					break
+	return rules
+
+func _moving_ships():
+	var rules=_sea_game({"move_ships":true})
+	var s=rules.s
+	var first=rules.build_sites(0,"ship")[0]
+	check(rules.apply(0,{"type":"ship","id":first})=="","build a ship")
+	var tip=-1
+	for eid in rules.build_sites(0,"ship"):
+		var e=s.edges[eid]
+		for v in [e.a,e.b]:
+			if v in [s.edges[first].a,s.edges[first].b] and s.vertices[v].owner!=0: tip=eid
+	check(tip>=0 and rules.apply(0,{"type":"ship","id":tip})=="","extend the line")
+	check(rules.movable_ships(0).is_empty(),"ships built this turn stay put")
+	check(rules.apply(0,{"type":"move_ship","id":tip,"to":first})!="","cannot move a new ship")
+	check(rules.apply(0,{"type":"end"})=="","end turn")
+	s.turn=0;s.rolled=true
+	var open=rules.movable_ships(0)
+	check(tip in open,"the end of the line can move next turn")
+	var town_side=false
+	for v in [s.edges[first].a,s.edges[first].b]: if s.vertices[v].owner==0: town_side=true
+	if town_side: check(first not in open,"a ship tied to town and ship is closed")
+	var moves=rules.ship_moves(0,tip)
+	check(not moves.is_empty() and tip not in moves,"somewhere to sail, not the same edge")
+	if moves.is_empty(): return
+	check(rules.apply(0,{"type":"move_ship","id":tip,"to":first})!="","cannot move onto a taken edge")
+	check(rules.apply(0,{"type":"move_ship","id":tip,"to":moves[0]})=="","move the ship")
+	check(s.edges[moves[0]].owner==0 and rules.is_ship(moves[0]) and s.edges[tip].owner==-1 and not rules.is_ship(tip),"ship changed edges")
+	check(rules.movable_ships(0).is_empty(),"one move per turn")
+	check(rules.pieces(0,"ship")==2,"still two ships")
+	var plain=_sea_game({})
+	var ship=plain.build_sites(0,"ship")[0]
+	plain.apply(0,{"type":"ship","id":ship})
+	plain.s.new_ships=[]
+	check(plain.movable_ships(0).is_empty(),"without the house rule ships stay put")
+	var land=CatanRules.new()
+	land.create(["A","B","C"],5,{"island":"random","move_ships":true,"fog":true})
+	check(not land.s.move_ships and not land.s.fog,"sea rules need the archipelago")
+
+func _fog():
+	var rules=_sea_game({"fog":true})
+	var s=rules.s
+	var hidden=0
+	for t in s.tiles:
+		if int(t.island)>0: check(t.get("fog",false),"outer islands start in fog")
+		else: check(not t.get("fog",false),"the main island is clear")
+		if t.get("fog",false): hidden+=1
+	check(hidden>0,"some fog")
+	var view=rules.snapshot(1)
+	for i in s.tiles.size():
+		if s.tiles[i].get("fog",false): check(view.tiles[i].kind==CatanRules.FOG and view.tiles[i].number==0,"snapshots hide fogged hexes")
+	check(s.tiles.any(func(t):return t.get("fog",false) and t.kind!=CatanRules.FOG),"the host keeps the real hex")
+	for t in rules.robber_sites(0): check(not s.tiles[t].get("fog",false),"the robber stays out of the fog")
+	var before=s.players[0].hand.duplicate()
+	var bank=s.bank.duplicate()
+	var target=_sail(rules,0)
+	var revealed=[]
+	for t in s.tiles.size():
+		if int(s.tiles[t].island)>0 and not s.tiles[t].get("fog",false): revealed.append(t)
+	check(target>=0 and not revealed.is_empty(),"sailing up to an island clears its fog")
+	var fog_log=s.log.filter(func(line):return "in the fog" in line)
+	check(fog_log.size()==revealed.size(),"one log line per revealed hex")
+
+func _points_history():
+	var rules=CatanRules.new()
+	rules.create(["A","B","C"],21)
+	var bots=[CatanBot.new(1),CatanBot.new(2),CatanBot.new(3)]
+	var guard=0
+	while rules.s.winner==-1 and guard<20000:
+		guard+=1
+		var moved=false
+		for p in 3:
+			var action=bots[p].choose(rules.snapshot(p),p,2)
+			if action.is_empty(): continue
+			if rules.apply(p,action)!="" and p==rules.s.turn and rules.s.phase=="play" and rules.s.rolled: rules.apply(p,{"type":"end"})
+			if rules.s.has("offer") and not rules.s.offer.is_empty(): rules.open_offer()
+			moved=true
+			break
+		if not moved: break
+		if guard%50==0: check(not rules.snapshot(1).has("points_history"),"points stay hidden during the game")
+	check(rules.s.winner!=-1,"a bot game finishes")
+	var history: Array=rules.s.get("points_history",[])
+	check(history.size()>5,"points recorded each turn: %d" % history.size())
+	check(history[0]==[2,2,2],"everyone starts on 2 points: %s" % [history[0]])
+	check(int(history[-1][rules.s.winner])>=rules.target(),"the last row has the winning score")
+	check(rules.snapshot(1).get("points_history",[])==history,"the chart data arrives with the result")
 
 ## Builds ships along the shortest sea route to another island's free corner.
 func _sail(rules: CatanRules,p: int) -> int:

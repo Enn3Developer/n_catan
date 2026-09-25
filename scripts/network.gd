@@ -46,7 +46,7 @@ var bot_turn=-1
 const TURN_SECONDS=60.0
 ## Seconds other players have to answer a trade offer before the offerer picks.
 const TRADE_WINDOW=4.0
-const DEFAULT_SETTINGS={"seed":0,"island":"random","turn_seconds":int(TURN_SECONDS),"points":10,"friendly_robber":false,"random_start":false,"start_card":false,"treasure":false}
+const DEFAULT_SETTINGS={"seed":0,"island":"random","turn_seconds":int(TURN_SECONDS),"points":10,"friendly_robber":false,"random_start":false,"start_card":false,"treasure":false,"move_ships":false,"fog":false}
 ## House rules and the map seed, chosen in the lobby by the room controller.
 var room_settings=DEFAULT_SETTINGS.duplicate()
 var turn_seconds=TURN_SECONDS
@@ -69,6 +69,14 @@ var music_one_way=0.0
 var music_ping_clock=0.0
 var music_ping_sent=-1
 var music_last_command=-1000
+## Save and resume: the host keeps one saved game for solo play and one for
+## online rooms, rewritten about once a second while a game runs.
+const SAVE_DIR="user://saves"
+const SAVE_FORMAT=1
+## The save being resumed while the lobby waits for its players, or empty.
+var resuming={}
+var save_dirty=false
+var save_clock=0.0
 
 
 func _ready():
@@ -143,6 +151,8 @@ func _secure_connected(connection: ENetConnection):
 
 func leave():
 	CatanDiagnostics.event("network.leave","online=%s started=%s"%[online,started])
+	if _can_save():save_game()
+	resuming={}
 	var continuing_music=music_state() if multiplayer.multiplayer_peer.get_connection_status()!=MultiplayerPeer.CONNECTION_DISCONNECTED else {}
 	if multiplayer.multiplayer_peer: multiplayer.multiplayer_peer.close()
 	multiplayer.multiplayer_peer=OfflineMultiplayerPeer.new()
@@ -195,6 +205,9 @@ func _register(pname: String,password: String,version: int,token: String="",look
 				_broadcast_lobby()
 				_sync()
 				return
+	if not started and not resuming.is_empty() and password==room_password and _seat_for(id)==-1:
+		_claim_saved_seat(id,pname)
+		return
 	if version!=PROTOCOL or password!=room_password or started or roster.size()>=MAX_PLAYERS or _seat_for(id)!=-1:
 		_registration_failed.rpc_id(id,"The password is incorrect." if password!=room_password else "This game has started. Use Reconnect to return to your saved seat." if started else "This room is full. Ask the host to free a seat." if roster.size()>=MAX_PLAYERS else "You already have a seat in this room.")
 		return
@@ -280,6 +293,9 @@ func _start(id: int):
 	if id!=1 and (not dedicated or _seat_for(id)!=0): return
 	for row in roster:
 		if not row.ready: return
+	if not resuming.is_empty():
+		_restore()
+		return
 	world_seconds=150.0
 	world_days=0
 	_new_game()
@@ -339,7 +355,7 @@ func _setting_request(key: String,value: Variant):
 	if online and multiplayer.is_server():_set_setting(multiplayer.get_remote_sender_id(),key,value)
 
 func _set_setting(sender: int,key: String,value: Variant):
-	if started or (sender!=1 and (not dedicated or _seat_for(sender)!=0)):return
+	if started or not resuming.is_empty() or (sender!=1 and (not dedicated or _seat_for(sender)!=0)):return
 	match key:
 		"seed":
 			if not (value is int) or value<1 or value>999999999:return
@@ -402,6 +418,7 @@ func _sync():
 		for row in roster:state.piece_looks.append(row.get("look",CatanAppearance.default_bytes()))
 		if roster[p].id==1: received.emit(state)
 		else: _state.rpc_id(roster[p].id,state)
+	save_dirty=true
 
 @rpc("authority","call_remote","reliable")
 func _state(state: Dictionary):
@@ -429,6 +446,12 @@ func _disconnected(id: int):
 		roster[p].connected=false
 		rules._log(CatanI18n.message("%s disconnected. The game is paused.",[roster[p].name]))
 		_sync()
+	elif roster[p].get("saved_seat",false):
+		# A saved seat stays open for its player to come back.
+		roster[p].id=0
+		roster[p].connected=false
+		roster[p].ready=false
+		seat_tokens.erase(p)
 	else:
 		roster.remove_at(p)
 		var remapped={}
@@ -457,6 +480,7 @@ func _mapping_done(message: String):
 	notice.emit(message)
 
 func _exit_tree():
+	if _can_save():save_game()
 	if multiplayer.multiplayer_peer:multiplayer.multiplayer_peer.close()
 	secure_transport.stop()
 	if upnp_thread: upnp_thread.wait_to_finish()
@@ -484,6 +508,8 @@ func _bot_request(operation: String,index: int,difficulty: int):
 
 func _edit_bot(sender: int,operation: String,index: int,difficulty: int):
 	if started or difficulty<0 or difficulty>2: return
+	# A resumed game keeps its seats, though bots may still change difficulty.
+	if not resuming.is_empty() and operation!="difficulty": return
 	if sender!=1 and (not dedicated or _seat_for(sender)!=0): return
 	if operation=="add" and roster.size()<MAX_PLAYERS:
 		var id=-1
@@ -540,6 +566,10 @@ func player_look(player: int) -> PackedByteArray:
 func _process(delta: float):
 	secure_transport.poll()
 	_process_music(delta)
+	save_clock-=delta
+	if save_dirty and save_clock<=0.0 and _can_save():
+		save_clock=1.0
+		save_game()
 	if online and started and multiplayer.is_server() and not paused and roster.all(func(row):return row.connected):
 		if world_seconds+delta>=600.0:world_days+=1
 		world_seconds=fposmod(world_seconds+delta,600.0)
@@ -764,3 +794,154 @@ func _set_color(sender: int,target: int,value: String):
 	if target==seat:my_color=value.to_lower()
 	_broadcast_lobby()
 	if started:_sync()
+
+
+static func save_path(solo_game: bool) -> String:
+	return SAVE_DIR+("/solo.save" if solo_game else "/room.save")
+
+func _can_save() -> bool:
+	return online and started and not tutorial and multiplayer.is_server() and not rules.s.is_empty()
+
+## Writes the whole game: the rules state with its hidden deck, dice and dice
+## stream, the seats and the room settings. A finished game clears its slot.
+func save_game():
+	save_dirty=false
+	var path=save_path(solo)
+	if int(rules.s.get("winner",-1))!=-1:
+		if FileAccess.file_exists(path):DirAccess.remove_absolute(path)
+		return
+	DirAccess.make_dir_recursive_absolute(SAVE_DIR)
+	var seats=[]
+	for row in roster:
+		seats.append({"name":str(row.name),"bot":bool(row.get("bot",false)),"difficulty":int(row.get("difficulty",1)),"look":row.get("look",CatanAppearance.default_bytes()),"color":str(row.get("color","")),"host":int(row.id)==1})
+	var data={"format":SAVE_FORMAT,"protocol":PROTOCOL,"version":CatanBuildInfo.VERSION,"saved":int(Time.get_unix_time_from_system()),"solo":solo,
+		"rules":rules.s,"rng_seed":rules.rng.seed,"rng_state":rules.rng.state,"seats":seats,"settings":room_settings,"world_seconds":world_seconds,"world_days":world_days}
+	# Write beside the save and swap it in, so a crash mid-write keeps the old one.
+	var file=FileAccess.open(path+".tmp",FileAccess.WRITE)
+	if file==null:return
+	file.store_var(data)
+	file.close()
+	DirAccess.rename_absolute(path+".tmp",path)
+
+## The saved game for this kind of room, or an empty dictionary when there is
+## none or it came from a build that plays by different rules.
+static func load_save(solo_game: bool) -> Dictionary:
+	var path=save_path(solo_game)
+	if not FileAccess.file_exists(path):return {}
+	var file=FileAccess.open(path,FileAccess.READ)
+	if file==null:return {}
+	var data=file.get_var(false)
+	if not data is Dictionary or int(data.get("format",0))!=SAVE_FORMAT or int(data.get("protocol",0))!=PROTOCOL:return {}
+	for key in ["rules","seats","settings"]:
+		if not data.has(key):return {}
+	if not data.rules is Dictionary or not data.seats is Array or data.seats.size()<MIN_PLAYERS or data.seats.size()>MAX_PLAYERS:return {}
+	return data
+
+## What the lobby shows about the saved game: who played, how far it got and when.
+func saved_summary() -> Dictionary:
+	if not online or not multiplayer.is_server() or dedicated or started or not resuming.is_empty():return {}
+	var data=load_save(solo)
+	if data.is_empty():return {}
+	var names=[]
+	for seat_row in data.seats:names.append(str(seat_row.name))
+	return {"names":names,"turn":maxi(0,data.rules.get("points_history",[]).size()-1),"saved":int(data.get("saved",0))}
+
+## Seats the lobby from the save: bots return as they were, the host takes
+## their old seat, and every other seat waits for its player to rejoin.
+func resume_saved():
+	if not online or not multiplayer.is_server() or dedicated or started:return
+	var data=load_save(solo)
+	if data.is_empty():
+		notice.emit("The saved game could not be read.")
+		return
+	resuming=data
+	room_settings=DEFAULT_SETTINGS.duplicate()
+	room_settings.merge(data.settings,true)
+	room_settings.resuming=true
+	var guests=[]
+	for row in roster:
+		if int(row.id)>1 and row.connected:guests.append(row)
+	roster=[]
+	seat_tokens={}
+	for i in data.seats.size():
+		var saved: Dictionary=data.seats[i]
+		var row={"name":saved.name,"look":CatanAppearance.sanitize(saved.look),"color":saved.color if valid_color(saved.color) else "","bot":saved.bot}
+		if saved.bot:
+			row.merge({"id":-1-i,"ready":true,"connected":true,"difficulty":clampi(int(saved.difficulty),0,2)})
+		elif saved.host:
+			row.merge({"id":1,"ready":solo,"connected":true})
+		else:
+			row.merge({"id":0,"ready":false,"connected":false,"saved_seat":true})
+		roster.append(row)
+	seat=_seat_for(1)
+	if seat>=0:my_look=roster[seat].look
+	# Guests already in the room take the seats that wait for them.
+	for guest in guests:_claim_saved_seat(int(guest.id),str(guest.name))
+	_broadcast_lobby()
+	if solo:_start(1)
+
+## Puts a joining player in a saved seat: the one with their name, else the
+## first seat still free. With none free, they cannot join this room.
+func _claim_saved_seat(id: int,pname: String):
+	var chosen=-1
+	for p in roster.size():
+		if roster[p].get("saved_seat",false) and not roster[p].connected and str(roster[p].name).to_lower()==pname.strip_edges().to_lower():chosen=p
+	if chosen<0:
+		for p in roster.size():
+			if roster[p].get("saved_seat",false) and not roster[p].connected:
+				chosen=p
+				break
+	if chosen<0:
+		_registration_failed.rpc_id(id,"This room is resuming a saved game and every seat is taken.")
+		return
+	roster[chosen].id=id
+	roster[chosen].connected=true
+	roster[chosen].ready=false
+	var session_token=Crypto.new().generate_random_bytes(24).hex_encode()
+	seat_tokens[chosen]=session_token
+	_session.rpc_id(id,session_token)
+	_broadcast_lobby()
+
+## Drops the saved game from the lobby: the players who are here stay, the
+## seats that were waiting for someone go.
+func cancel_resume():
+	if resuming.is_empty() or started:return
+	resuming={}
+	room_settings.erase("resuming")
+	var kept=[]
+	var tokens={}
+	for p in roster.size():
+		if roster[p].get("saved_seat",false) and not roster[p].connected:continue
+		roster[p].erase("saved_seat")
+		if seat_tokens.has(p):tokens[kept.size()]=seat_tokens[p]
+		kept.append(roster[p])
+	roster=kept
+	seat_tokens=tokens
+	seat=_seat_for(1)
+	_broadcast_lobby()
+
+func _restore():
+	var data=resuming
+	resuming={}
+	room_settings.erase("resuming")
+	rules.s=data.rules.duplicate(true)
+	rules.rng.seed=int(data.get("rng_seed",0))
+	rules.rng.state=int(data.get("rng_state",0))
+	# An offer waiting for answers when the game was saved would wait forever.
+	rules.s.offer={}
+	for row in roster:row.erase("saved_seat")
+	game_count+=1
+	rules.s.game_id=game_count
+	turn_seconds=float(room_settings.turn_seconds)
+	world_seconds=float(data.get("world_seconds",150.0))
+	world_days=int(data.get("world_days",0))
+	started=true
+	bot_brains={}
+	bot_turn=-1
+	bot_action_count=0
+	turn_mark=[]
+	offer_clock=0.0
+	rules._log("The game resumes from where it was saved.")
+	_refresh_turn_clock()
+	_broadcast_lobby()
+	_sync()

@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/victory_dialog.gd" id="script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/dialog.tscn" id="base"]
+[ext_resource type="Script" path="res://scripts/points_chart.gd" id="points_chart"]
 
 [node name="Victory" instance=ExtResource("base")]
 script = ExtResource("script")
@@ -23,6 +24,19 @@ layout_mode = 2
 theme_override_constants/h_separation = 14
 theme_override_constants/v_separation = 6
 columns = 7
+
+[node name="PointsHeading" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 20
+text = "Points over time"
+
+[node name="PointsChart" type="Control" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 170)
+layout_mode = 2
+script = ExtResource("points_chart")
 
 [node name="DiceHeading" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
 layout_mode = 2

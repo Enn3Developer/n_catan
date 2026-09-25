@@ -15,6 +15,8 @@ signal invite_address_edited(address: String)
 signal bot_difficulty_changed(seat: int,level: int)
 signal bot_remove_requested(seat: int)
 signal setting_changed(key: String,value: Variant)
+signal resume_requested
+signal new_game_requested
 
 const PLAYER_SLOT=preload("res://scenes/ui/player_slot.tscn")
 var shown_seed=0
@@ -53,6 +55,7 @@ func show_room(net: CatanNetwork,invite_address: String,connection_status: Strin
 	%ConnectionHelp.text=tr("Share the invite code. Host: open UDP 24567.")
 	if not connection_status.is_empty() and not net.solo:%ConnectionHelp.text=CatanI18n.render(connection_status)
 	_show_rules(net.room_settings,controller,net.solo)
+	_show_saved(net,controller)
 
 func _show_rules(settings: Dictionary,controller: bool,solo: bool):
 	shown_seed=int(settings.seed)
@@ -80,8 +83,35 @@ func _show_rules(settings: Dictionary,controller: bool,solo: bool):
 		if rule=="friendly_robber":continue
 		var toggle: CheckButton=_house_rule(rule)
 		toggle.set_pressed_no_signal(bool(settings.get(rule,false)))
+		# Sea rules only show for the archipelago, where there are ships to move and islands to hide.
+		var shown=rule not in CatanRules.SEA_RULES or settings.island=="archipelago"
+		toggle.visible=shown
+		%RulesGrid.get_node(toggle.name+"Label").visible=shown
 		switches.append(toggle)
-	for control: Control in [%IslandPicker,%TimerPicker,%PointsPicker]+switches:control.set("disabled",not controller)
+	# A resumed game plays by the rules it was saved with.
+	var locked=not controller or bool(settings.get("resuming",false))
+	for control: Control in [%IslandPicker,%TimerPicker,%PointsPicker]+switches:control.set("disabled",locked)
+	%SeedField.editable=not locked
+	%NewSeed.disabled=locked
+
+## The saved game: an offer to resume it, or while resuming, which seats are
+## still waiting for their players.
+func _show_saved(net: CatanNetwork,controller: bool):
+	var resumed=bool(net.room_settings.get("resuming",false))
+	var summary=net.saved_summary() if controller else {}
+	%SavedGame.visible=resumed or not summary.is_empty()
+	%ResumeGame.visible=not resumed
+	%NewGameInstead.visible=resumed and controller
+	if resumed:
+		var waiting=[]
+		for row in net.roster:
+			if row.get("saved_seat",false) and not row.connected:waiting.append(row.name)
+		%SavedInfo.text=tr("Resuming a saved game. Friends rejoin with the invite and take their seats back.") if waiting.is_empty() else tr("Resuming a saved game. Waiting for %s to rejoin with the invite.") % ", ".join(waiting)
+		for control: Control in [%AddBot]:control.set("disabled",true)
+		return
+	if summary.is_empty():return
+	var when=Time.get_datetime_dict_from_unix_time(int(summary.saved)+int(Time.get_time_zone_from_system().bias)*60)
+	%SavedInfo.text=tr("%s · turn %d · saved %04d-%02d-%02d %02d:%02d. Starting a new game replaces it.") % [", ".join(summary.names),summary.turn,when.year,when.month,when.day,when.hour,when.minute]
 
 ## A labelled switch for one house rule, made once and kept in the rules grid.
 func _house_rule(rule: String) -> CheckButton:
