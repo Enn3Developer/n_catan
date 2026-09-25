@@ -62,8 +62,8 @@ msgstr "%d FPS · %.1f ms / fotogramma · %.0f MB VRAM"
 msgid "%s accepted your trade."
 msgstr "%s ha accettato il tuo scambio."
 
-msgid "%s disconnected. The game is paused."
-msgstr "%s si è disconnesso. La partita è in pausa."
+msgid "%s disconnected. The game is paused, and a bot takes their seat if they are not back in a minute."
+msgstr "%s si è disconnesso. La partita è in pausa, e se non torna entro un minuto un bot prende il suo posto."
 
 msgid "%s download · %.1f MiB"
 msgstr "Download %s · %.1f MiB"
@@ -71,8 +71,8 @@ msgstr "Download %s · %.1f MiB"
 msgid "%s offers %s for %s."
 msgstr "%s offre %s in cambio di %s."
 
-msgid "%s played a development card."
-msgstr "%s ha giocato una carta sviluppo."
+msgid "%s played a Knight card."
+msgstr "%s ha giocato una carta Cavaliere."
 
 msgid "%s reconnected. The expedition continues."
 msgstr "%s si è riconnesso. La partita riprende."
@@ -89,8 +89,8 @@ msgstr "Tocca a %s per il turno abbinato: costruzioni, carte e scambi con la ban
 msgid "%s traded with %s."
 msgstr "%s ha scambiato con %s."
 
-msgid "%s traded with the bank."
-msgstr "%s ha scambiato con la banca."
+msgid "%s traded %s with the bank for %s."
+msgstr "%s ha scambiato %s con la banca per %s."
 
 
 msgid "%s withdrew their trade offer."
@@ -2378,8 +2378,8 @@ msgstr "Dai"
 msgid "You offer:"
 msgstr "Offri:"
 
-msgid "Your counter-offer"
-msgstr "La tua controproposta"
+msgid "Counter-offer"
+msgstr "Controproposta"
 
 msgid "\n%d points win the game."
 msgstr "\n%d punti vincono la partita."
@@ -2495,8 +2495,8 @@ msgstr "vuole"
 msgid "Answers"
 msgstr "Risposte"
 
-msgid "This is the offer as it stands. Accept it instead."
-msgstr "È l’offerta così com’è. Accettala invece."
+msgid "These are the offer's terms. Change something, or go back and accept."
+msgstr "Sono i termini dell’offerta. Cambia qualcosa, oppure torna indietro e accetta."
 
 msgid "Any"
 msgstr "Qualsiasi"
@@ -2714,14 +2714,14 @@ msgstr "Nuova partita"
 msgid "Resuming a saved game. Friends rejoin with the invite and take their seats back."
 msgstr "Si riprende una partita salvata. Gli amici rientrano con l’invito e ritrovano il loro posto."
 
-msgid "Resuming a saved game. Waiting for %s to rejoin with the invite."
-msgstr "Si riprende una partita salvata. In attesa che %s rientri con l’invito."
+msgid "Resuming a saved game. Waiting for %s to rejoin with the invite. If you start now, a bot plays for them until they join."
+msgstr "Si riprende una partita salvata. In attesa che %s rientri con l’invito. Se inizi ora, gioca un bot al suo posto finché non entra."
 
 msgid "%s · turn %d · saved %04d-%02d-%02d %02d:%02d. Starting a new game replaces it."
 msgstr "%s · turno %d · salvata il %04d-%02d-%02d alle %02d:%02d. Una nuova partita la sostituisce."
 
-msgid "Saved seat, waiting to rejoin"
-msgstr "Posto salvato, in attesa del rientro"
+msgid "Saved seat, a bot plays until they rejoin"
+msgstr "Posto salvato, gioca un bot finché non rientra"
 
 msgid "The saved game could not be read."
 msgstr "Impossibile leggere la partita salvata."
@@ -2735,5 +2735,56 @@ msgstr "La partita riprende da dove era stata salvata."
 msgid "Saved games"
 msgstr "Partite salvate"
 
-msgid "The host's game saves about once a second, and again when the host leaves. In the lobby, Resume saved game picks it up. Friends rejoin with the new invite and get their seats back by name."
-msgstr "La partita dell’host si salva circa una volta al secondo, e di nuovo quando l’host esce. Nella stanza, Riprendi la partita salvata la fa ripartire. Gli amici rientrano con il nuovo invito e ritrovano il loro posto in base al nome."
+msgid "The host's game saves about once a second, and again when the host leaves. In the lobby, Resume saved game picks it up. Friends rejoin with the new invite and get their seats back by name. You can start before they're back: a bot plays for them until they join."
+msgstr "La partita dell’host si salva circa una volta al secondo, e di nuovo quando l’host esce. Nella stanza, Riprendi la partita salvata la fa ripartire. Gli amici rientrano con il nuovo invito e ritrovano il loro posto in base al nome. Puoi iniziare prima che tornino: un bot gioca per loro finché non entrano."
+
+msgid "%s played the Road building card."
+msgstr "%s ha giocato la carta Costruzione di strade."
+
+msgid "%s played the Year of plenty card and took %s."
+msgstr "%s ha giocato la carta Anno dell’abbondanza e ha preso %s."
+
+msgid "%s played the Monopoly card and took %d %s."
+msgstr "%s ha giocato la carta Monopolio e ha preso %d %s."
+
+msgid "%s traded %s to %s for %s."
+msgstr "%s ha dato %s a %s in cambio di %s."
+
+msgid "%s stole 1 %s from %s."
+msgstr "%s ha rubato 1 %s a %s."
+
+msgid "%s stole 1 %s from you."
+msgstr "%s ti ha rubato 1 %s."
+
+msgid "You stole 1 %s from %s."
+msgstr "Hai rubato 1 %s a %s."
+
+msgid "The robber can't go into the fog. Choose a hex that has been revealed."
+msgstr "Il brigante non può entrare nella nebbia. Scegli un esagono già scoperto."
+
+msgid "Too many actions at once. Wait a moment and try again."
+msgstr "Troppe azioni in una volta. Aspetta un attimo e riprova."
+
+msgid "%s rejoined and takes their seat back."
+msgstr "%s è rientrato e riprende il suo posto."
+
+msgid "%s is still away. A bot plays their seat until they return."
+msgstr "%s è ancora assente. Un bot gioca al suo posto finché non torna."
+
+msgid "A bot plays for %s until they return."
+msgstr "Un bot gioca per %s finché non torna."
+
+msgid "The saved game is from version %s, which plays by different rules. It can't be resumed here, and starting a new game replaces it."
+msgstr "La partita salvata viene dalla versione %s, che usa regole diverse. Non si può riprendere qui, e una nuova partita la sostituisce."
+
+msgid "%s offers %s for %s. Change the terms and send them back."
+msgstr "%s offre %s per %s. Cambia i termini e rimandali."
+
+msgid "You sent a counter-offer. %s picks who to trade with."
+msgstr "Hai inviato una controproposta. %s sceglie con chi scambiare."
+
+msgid "You give %s and get %s."
+msgstr "Dai %s e ricevi %s."
+
+msgid "Edit counter…"
+msgstr "Modifica controproposta…"

@@ -42,8 +42,9 @@ func show_room(net: CatanNetwork,invite_address: String,connection_status: Strin
 	# Solo players are always ready; the only choice left is to start.
 	%ReadyButton.visible=not net.solo
 	var all_ready=net.roster.size()>=CatanNetwork.MIN_PLAYERS and net.roster.size()<=CatanNetwork.MAX_PLAYERS
+	# Saved seats nobody has come back for start with a bot in them.
 	for row in net.roster:
-		if not row.ready: all_ready=false
+		if not row.ready and not CatanNetwork._waiting_seat(row): all_ready=false
 	%StartGame.disabled=not controller or not all_ready
 	%LobbyStatus.text="" if all_ready else tr("Add %d more player(s)") % (CatanNetwork.MIN_PLAYERS-net.roster.size()) if net.roster.size()<CatanNetwork.MIN_PLAYERS else tr("Waiting for players")
 	var hosting=net.multiplayer.is_server()
@@ -100,16 +101,19 @@ func _show_saved(net: CatanNetwork,controller: bool):
 	var resumed=bool(net.room_settings.get("resuming",false))
 	var summary=net.saved_summary() if controller else {}
 	%SavedGame.visible=resumed or not summary.is_empty()
-	%ResumeGame.visible=not resumed
+	%ResumeGame.visible=not resumed and not summary.get("outdated",false)
 	%NewGameInstead.visible=resumed and controller
 	if resumed:
 		var waiting=[]
 		for row in net.roster:
 			if row.get("saved_seat",false) and not row.connected:waiting.append(row.name)
-		%SavedInfo.text=tr("Resuming a saved game. Friends rejoin with the invite and take their seats back.") if waiting.is_empty() else tr("Resuming a saved game. Waiting for %s to rejoin with the invite.") % ", ".join(waiting)
+		%SavedInfo.text=tr("Resuming a saved game. Friends rejoin with the invite and take their seats back.") if waiting.is_empty() else tr("Resuming a saved game. Waiting for %s to rejoin with the invite. If you start now, a bot plays for them until they join.") % ", ".join(waiting)
 		for control: Control in [%AddBot]:control.set("disabled",true)
 		return
 	if summary.is_empty():return
+	if summary.get("outdated",false):
+		%SavedInfo.text=tr("The saved game is from version %s, which plays by different rules. It can't be resumed here, and starting a new game replaces it.") % summary.version
+		return
 	var when=Time.get_datetime_dict_from_unix_time(int(summary.saved)+int(Time.get_time_zone_from_system().bias)*60)
 	%SavedInfo.text=tr("%s · turn %d · saved %04d-%02d-%02d %02d:%02d. Starting a new game replaces it.") % [", ".join(summary.names),summary.turn,when.year,when.month,when.day,when.hour,when.minute]
 

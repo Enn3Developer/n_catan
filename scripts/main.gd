@@ -48,6 +48,8 @@ var quitting=false
 ## The whole game log. Snapshots carry only the newest lines, which are merged in here.
 var game_log=[]
 var log_pending=false
+## Who the last away toast named, so it shows once per change.
+var away_shown=""
 
 func _ready():
 	CatanDiagnostics.event("main.ready")
@@ -80,7 +82,7 @@ func _ready():
 func _clear(scene_path: String):
 	CatanDiagnostics.event("ui.screen",scene_path)
 	if is_instance_valid(screen): screen.free()
-	var keep_modal=is_instance_valid(modal) and (modal.name in ["Settings","Cosmetics","MusicLibrary","Updates"] or (scene_path=="res://scenes/ui/hud.tscn" and modal.name in ["Guide","GameLog","LeaveConfirm","TradeOffer","Victory"]))
+	var keep_modal=is_instance_valid(modal) and (modal.name in ["Settings","Cosmetics","MusicLibrary","Updates"] or (scene_path=="res://scenes/ui/hud.tscn" and modal.name in ["Guide","GameLog","LeaveConfirm","TradeOffer","Victory","Discard","ResourceCard"]))
 	if is_instance_valid(modal) and not keep_modal: modal.free()
 	screen=load(scene_path).instantiate()
 	screens.add_child(screen)
@@ -100,6 +102,7 @@ func _home():
 	state={}
 	game_log=[]
 	log_pending=false
+	away_shown=""
 	turn_clock_limit=0.0
 	turn_clock_left=0.0
 	guide=null
@@ -146,7 +149,7 @@ func _host():
 	if pname.is_empty(): pname="Voyager"
 	preferences.set_value("player_name",pname)
 	var err=net.host(pname,host_password_field.text)
-	if err!=OK: _notice(tr("Could not host on UDP 24567. Another server may be running."))
+	if err!=OK: _rejected(tr("Could not host on UDP 24567. Another server may be running."))
 
 func _join():
 	var pname=name_field.text.strip_edges()
@@ -228,15 +231,16 @@ func _lobby():
 	_apply_text(screen)
 
 func _copy_invite(address: String):
-	if address.is_empty(): _notice(tr("Enter your public address first, or use Map router."))
+	if address.is_empty(): _rejected(tr("Enter your public address first, or use Map router."))
 	else:
 		var code=net.invite(address)
-		if code.is_empty():_notice(tr("Enter a valid public address and optional UDP port."))
+		if code.is_empty():_rejected(tr("Enter a valid public address and optional UDP port."))
 		else:DisplayServer.clipboard_set(code);_notice(tr("Invite copied. Share it with your guests."))
 
 func _received(data: Dictionary):
 	CatanDiagnostics.event("state.received","turn=%s phase=%s"%[data.get("turn",-1),data.get("phase","")])
 	if server_only or not is_node_ready(): return
+	var previous=state
 	var previous_trade=state.get("trade_event",{})
 	var previous_offer=state.get("offer",{})
 	var trading=is_instance_valid(modal) and modal.name=="TradeDialog"
@@ -261,7 +265,7 @@ func _received(data: Dictionary):
 	board.day_count=int(state.get("world_days",board.day_count))
 	board.advance_day(0)
 	if produced: board.throw_dice(state.dice)
-	mode=""
+	mode=_kept_mode(previous,fresh)
 	if state.turn==net.seat:
 		if state.phase=="setup_settlement": mode="settlement"
 		if state.phase=="setup_road": mode="road"
@@ -271,6 +275,8 @@ func _received(data: Dictionary):
 	board.set_mode("" if inspection_mode else mode,-1 if inspection_mode else net.seat)
 	_hud()
 	_trade_notifications(previous_trade,previous_offer,fresh)
+	_theft_notification(previous,fresh)
+	_follow_card_dialogs(previous,fresh)
 	if new_turn and state.turn==net.seat and state.winner==-1:_show_turn_banner()
 	elif state.turn!=net.seat or state.winner!=-1:
 		turn_banner.hide()
@@ -280,6 +286,41 @@ func _received(data: Dictionary):
 	elif is_instance_valid(modal) and modal.name=="TradeOffer":
 		if state.offer.is_empty() or state.winner!=-1:_close_modal()
 		else:modal.show_offer(state,net.seat,net)
+
+## A build or ship move the player has picked stays picked through snapshots
+## about something else, such as an answer to their trade offer. It ends when
+## the player acts: a build pays resources and a move changes the board.
+func _kept_mode(previous: Dictionary,fresh: bool) -> String:
+	if fresh or mode.is_empty() or state.turn!=net.seat or state.phase!="play" or not state.rolled or state.winner!=-1:return ""
+	if previous.get("turn",-1)!=state.turn or previous.get("paired",false)!=state.get("paired",false):return ""
+	if previous.players[net.seat].hand!=state.players[net.seat].hand or previous.edges!=state.edges or previous.vertices!=state.vertices:return ""
+	var rules=CatanRules.new();rules.s=state
+	match mode:
+		"move_ship":return mode if not rules.movable_ships(net.seat).is_empty() else ""
+		"move_to":return mode if board.move_from in rules.movable_ships(net.seat) else ""
+		"road","ship","settlement","city":return mode if rules.can_pay(net.seat,CatanRules.COST[mode]) and not rules.build_sites(net.seat,mode).is_empty() else ""
+	return ""
+
+## The discard dialog opens when a seven asks this player to discard, stays
+## open while others discard, and closes once it's done. The Year of plenty and
+## Monopoly picker closes when the card can no longer be played.
+func _follow_card_dialogs(previous: Dictionary,fresh: bool):
+	var must_discard=state.phase=="discard" and state.discards.has(str(net.seat)) and state.winner==-1
+	var had_to=not fresh and previous.get("phase","")=="discard" and previous.get("discards",{}).has(str(net.seat))
+	var open=modal.name if is_instance_valid(modal) else ""
+	if open=="Discard" and not must_discard:_close_modal()
+	elif must_discard and not had_to and open in ["","TradeOffer"]:_discard()
+	if open=="ResourceCard" and (state.turn!=net.seat or state.phase!="play" or state.card_played or state.winner!=-1):_close_modal()
+
+## Only the thief and the victim learn what was taken.
+func _theft_notification(previous: Dictionary,fresh: bool):
+	var theft: Dictionary=state.get("theft",{})
+	if fresh or theft.is_empty() or not theft.has("resource") or int(theft.id)==int(previous.get("theft",{}).get("id",0)):return
+	var taken=tr(CatanRules.RES[int(theft.resource)])
+	if int(theft.victim)==net.seat:
+		notifications.show_notice("theft",tr("%s stole 1 %s from you.") % [state.players[int(theft.thief)].name,taken],"",Callable())
+	elif int(theft.thief)==net.seat:
+		notifications.show_notice("theft",tr("You stole 1 %s from %s.") % [taken,state.players[int(theft.victim)].name],"",Callable())
 
 func _merge_log(data: Dictionary):
 	var start=int(data.get("log_start",0))
@@ -308,7 +349,7 @@ func _process(delta):
 	if music_ui_clock<=0:
 		music_ui_clock=.15
 		_refresh_music_library(soundtrack)
-	var live=net.started and not net.paused and net.roster.all(func(player):return player.connected)
+	var live=net.started and not net.paused and not net.waiting_for_player()
 	if live:board.advance_day(delta)
 	ui_day_night.advance(board.daylight,delta)
 	if live and turn_clock_limit>0.0:
@@ -340,9 +381,22 @@ func _hud():
 	if state.winner!=-1 and not (is_instance_valid(modal) and modal.name in ["Victory","GameLog"]):
 		_show_victory()
 	if guide!=null:_tutorial_ui()
-	for row_player in net.roster:
-		if not row_player.connected:_notice(tr("%s disconnected. Waiting to reconnect.") % row_player.name)
+	_show_away()
 	_queue_layout()
+
+## One toast when someone leaves, and one when a bot takes their seat.
+func _show_away():
+	var away=[]
+	var covered=[]
+	for row_player in net.roster:
+		if row_player.connected:continue
+		if row_player.get("stand_in",false):covered.append(row_player.name)
+		else:away.append(row_player.name)
+	var shown=",".join(away)+"|"+",".join(covered)
+	if shown==away_shown:return
+	away_shown=shown
+	for player_name in away:_notice(tr("%s disconnected. Waiting to reconnect.") % player_name)
+	if not covered.is_empty():_notice(tr("A bot plays for %s until they return.") % ", ".join(covered))
 
 func _set_music_volume(value: float):
 	preferences.set_value("music",value)
@@ -381,7 +435,7 @@ func _choose(kind: String):
 		_hud()
 		return
 	if state.phase=="play" and rules.build_sites(net.seat,kind).is_empty():
-		_notice(tr("No legal space to build a %s.") % tr(kind))
+		_rejected(tr("No legal space to build a %s.") % tr(kind))
 		return
 	mode=kind
 	board.set_mode(mode,net.seat)
@@ -394,7 +448,6 @@ func _notice(message: String):
 		audio.play("error")
 		_join_failed(message)
 		return
-	if "failed" in message.to_lower() or "not enough" in message.to_lower(): audio.play("error")
 	if message.begins_with("Router") or message.begins_with("Automatic mapping"):
 		if "Invite address: " in message: invite_address=message.get_slice("Invite address: ",1)
 		connection_status=message
@@ -405,6 +458,11 @@ func _notice(message: String):
 	var generation=toast_generation
 	get_tree().create_timer(5).timeout.connect(func():
 		if is_instance_valid(toast) and toast_generation==generation: toast.hide())
+
+## A refused action or a failed connection: the notice plus the error sound.
+func _rejected(message: String):
+	if not server_only and is_node_ready() and not (joining and not net.online):audio.play("error")
+	_notice(message)
 
 # Modals are scenes with a close_requested signal; one is shown at a time.
 func _present(scene_path: String) -> Control:
@@ -474,10 +532,6 @@ func _discard():
 	var dialog=_present("res://scenes/ui/discard_dialog.tscn")
 	dialog.show_discard(state.discards[str(net.seat)],state.players[net.seat].hand)
 	_route(dialog,{"discard_requested":func(cards):net.act({"type":"discard","cards":cards})})
-
-func _cards():
-	# Compatibility for tutorial shortcuts: cards are always present in the HUD.
-	_close_modal()
 
 func _resource_card(id: int):
 	var dialog=_present("res://scenes/ui/resource_card_dialog.tscn")

@@ -15,10 +15,20 @@ func choose(data: Dictionary,p: int,difficulty: int=1) -> Dictionary:
 	if data.phase=="discard" and data.discards.has(str(p)):
 		var hand=player.hand.duplicate()
 		var cards=[0,0,0,0,0]
+		# Normal and Hard bots hold on to what their next builds need and let
+		# the surplus go first. Easy bots drop whatever they hold most of.
+		var keep=[0,0,0,0,0]
+		if difficulty>0:
+			var goals=["settlement","road"]
+			for v in data.vertices:
+				if v.owner==p and v.level==1: goals.append("city")
+			for goal in goals:
+				for res in 5: keep[res]=maxi(keep[res],CatanRules.COST[goal][res])
 		for i in int(data.discards[str(p)]):
-			var largest=0
+			var largest=-1
 			for res in 5:
-				if hand[res]>hand[largest]: largest=res
+				if hand[res]<1: continue
+				if largest<0 or hand[res]-keep[res]>hand[largest]-keep[largest] or (hand[res]-keep[res]==hand[largest]-keep[largest] and hand[res]>hand[largest]): largest=res
 			cards[largest]+=1
 			hand[largest]-=1
 		return {"type":"discard","cards":cards}

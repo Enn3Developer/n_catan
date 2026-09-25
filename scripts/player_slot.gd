@@ -23,7 +23,7 @@ func show_seat(net: CatanNetwork,index: int,controller: bool):
 	%PlayerName.text=row.name if occupied else tr("Open seat")
 	var info=""
 	var waiting=occupied and row.get("saved_seat",false) and not row.connected
-	if occupied: info=tr("Bot") if bot else tr("Saved seat, waiting to rejoin") if waiting else tr("You") if index==net.seat else tr("Player")
+	if occupied: info=tr("Bot") if bot else tr("Saved seat, a bot plays until they rejoin") if waiting else tr("You") if index==net.seat else tr("Player")
 	if occupied:
 		var preset=CatanAppearance.preset_of(row.get("look",PackedByteArray()))
 		info+=" · "+(tr(CatanAppearance.PRESETS[preset].name) if preset>=0 else tr("Custom pieces"))

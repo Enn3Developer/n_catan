@@ -479,9 +479,23 @@ func _trade_event(kind: String,actor: int,other: int=-1):
 	var previous=s.get("trade_event",{})
 	s.trade_event={"id":int(previous.get("id",0))+1,"kind":kind,"actor":actor,"other":other}
 
-func _log(message: String):
+func _log(message: Variant):
 	s.log.append(message)
 	if s.log.size()>LOG_LIMIT: s.log.pop_front()
+
+## A log line with more detail for some seats: they read the private line and
+## everyone else the public one. A robbery tells only the two players involved
+## what was taken.
+func _log_private(public: String,private: String,seen: Array):
+	_log({"public":public,"private":private,"seen":seen})
+
+## The log as one seat reads it.
+static func log_for(viewer: int,entries: Array) -> Array:
+	var result=[]
+	for entry in entries:
+		if entry is Dictionary:result.append(entry.private if viewer in entry.get("seen",[]) else entry.public)
+		else:result.append(entry)
+	return result
 
 func total(hand: Array) -> int:
 	var count=0
@@ -656,6 +670,7 @@ func apply(p: int,a: Dictionary) -> String:
 	elif s.phase=="discard": return "Wait for all players to discard."
 	elif s.phase=="robber":
 		if action!="robber" or id<0 or id>=s.tiles.size() or id==s.robber: return "Move the robber to a different hex."
+		if s.tiles[id].get("fog",false): return "The robber can't go into the fog. Choose a hex that has been revealed."
 		if id not in robber_sites(p): return "The friendly robber spares players with 3 points or fewer. Choose another hex."
 		s.robber=id
 		_log(CatanI18n.message("%s moved the robber.",[player.name]))
@@ -676,7 +691,9 @@ func apply(p: int,a: Dictionary) -> String:
 		_stat(p,"stolen",1)
 		_stat(id,"lost",1)
 		s.phase="play"
-		_log(CatanI18n.message("%s stole a resource from %s.",[player.name,s.players[id].name]))
+		var public=CatanI18n.message("%s stole a resource from %s.",[player.name,s.players[id].name])
+		_log_private(public,CatanI18n.message("%s stole 1 %s from %s.",[player.name,CatanI18n.term(RES[r]),s.players[id].name]),[p,id])
+		s.theft={"id":int(s.get("theft",{}).get("id",0))+1,"thief":p,"victim":id,"resource":r}
 	elif s.phase=="free_roads":
 		if action=="finish_roads":
 			s.free_roads=0
@@ -726,11 +743,13 @@ func apply(p: int,a: Dictionary) -> String:
 				for r in 5:
 					s.bank[r]-=selected[r]
 					player.hand[r]+=selected[r]
+			var taken=0
 			if card==3:
 				var r=int(a.get("resource",-1))
 				if r<0 or r>=5: return "Choose a resource."
 				for i in s.players.size():
 					if i!=p:
+						taken+=s.players[i].hand[r]
 						player.hand[r]+=s.players[i].hand[r]
 						s.players[i].hand[r]=0
 			player.cards[card]-=1
@@ -742,7 +761,11 @@ func apply(p: int,a: Dictionary) -> String:
 			if card==1:
 				s.free_roads=2
 				s.phase="free_roads"
-			_log(CatanI18n.message("%s played a development card.",[player.name]))
+			match card:
+				0:_log(CatanI18n.message("%s played a Knight card.",[player.name]))
+				1:_log(CatanI18n.message("%s played the Road building card.",[player.name]))
+				2:_log(CatanI18n.message("%s played the Year of plenty card and took %s.",[player.name,_amounts(a.cards)]))
+				3:_log(CatanI18n.message("%s played the Monopoly card and took %d %s.",[player.name,taken,CatanI18n.term(RES[int(a.resource)])]))
 		else:
 			if not s.rolled: return "Roll the dice first."
 			if action in COST:
@@ -786,7 +809,11 @@ func apply(p: int,a: Dictionary) -> String:
 				player.hand[receive]+=1
 				s.bank[receive]-=1
 				_stat(p,"bank_trades",1)
-				_log(CatanI18n.message("%s traded with the bank.",[player.name]))
+				var paid=[0,0,0,0,0]
+				paid[give]=amount
+				var got=[0,0,0,0,0]
+				got[receive]=1
+				_log(CatanI18n.message("%s traded %s with the bank for %s.",[player.name,_amounts(paid),_amounts(got)]))
 				_trade_event("bank",p)
 			elif action=="offer_trade":
 				if s.get("paired",false): return "The paired player may trade only with the bank."
@@ -914,7 +941,7 @@ func _confirm(p: int,partner: int) -> String:
 		s.players[p].hand[r]+=receive[r]-give[r]
 	_stat(p,"trades",1)
 	_stat(partner,"trades",1)
-	_log(CatanI18n.message("%s traded with %s.",[s.players[p].name,s.players[partner].name]))
+	_log(CatanI18n.message("%s traded %s to %s for %s.",[s.players[p].name,_amounts(give),s.players[partner].name,_amounts(receive)]))
 	_trade_event("accepted",p,partner)
 	s.offer={}
 	return ""
@@ -1174,8 +1201,10 @@ func snapshot(viewer: int,log_tail: int=40) -> Dictionary:
 	s.log=[]
 	var result=s.duplicate(true)
 	s.log=history
-	result.log=history.slice(maxi(0,history.size()-log_tail))
+	result.log=log_for(viewer,history.slice(maxi(0,history.size()-log_tail)))
 	result.log_start=history.size()-result.log.size()
+	# Only the two players in a robbery learn what was taken.
+	if result.has("theft") and viewer not in [int(result.theft.thief),int(result.theft.victim)]:result.theft.erase("resource")
 	result.deck_count=result.deck.size()
 	result.erase("deck")
 	# Upcoming rolls stay with the host.
@@ -1198,10 +1227,15 @@ func snapshot(viewer: int,log_tail: int=40) -> Dictionary:
 	return result
 
 func _missing(player: int,cost: Array) -> Dictionary:
+	var short=[]
+	for r in 5:short.append(maxi(0,int(cost[r])-int(s.players[player].hand[r])))
+	return _amounts(short)
+
+## "2 Wool, 1 Ore" as a wire argument that each client renders in its language.
+static func _amounts(amounts: Array) -> Dictionary:
 	var parts=[]
 	for r in 5:
-		var amount=maxi(0,int(cost[r])-int(s.players[player].hand[r]))
-		if amount>0:parts.append({"key":"%d %s","args":[amount,CatanI18n.term(RES[r])]})
+		if int(amounts[r])>0:parts.append({"key":"%d %s","args":[int(amounts[r]),CatanI18n.term(RES[r])]})
 	return {"list":parts}
 
 func cost_error(player: int,kind: String) -> String:

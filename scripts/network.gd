@@ -4,6 +4,8 @@ extends Node
 signal changed
 signal received(state: Dictionary)
 signal notice(message: String)
+## A refused action or a failed connection: shown like a notice, with the error sound.
+signal rejected(message: String)
 signal applied(player: int, action: Dictionary)
 signal log_received(entries: Array)
 const PORT=24567
@@ -46,6 +48,11 @@ var bot_turn=-1
 const TURN_SECONDS=60.0
 ## Seconds other players have to answer a trade offer before the offerer picks.
 const TRADE_WINDOW=4.0
+## Seconds a disconnected player has to come back before a bot plays their seat.
+const STAND_IN_SECONDS=60.0
+## Actions a player may send in a burst, and how many a second refill it.
+const ACTION_BURST=8.0
+const ACTION_RATE=10.0
 const DEFAULT_SETTINGS={"seed":0,"island":"random","turn_seconds":int(TURN_SECONDS),"points":10,"friendly_robber":false,"random_start":false,"start_card":false,"treasure":false,"move_ships":false,"fog":false}
 ## House rules and the map seed, chosen in the lobby by the room controller.
 var room_settings=DEFAULT_SETTINGS.duplicate()
@@ -77,6 +84,8 @@ const SAVE_FORMAT=1
 var resuming={}
 var save_dirty=false
 var save_clock=0.0
+## Seconds each disconnected seat has been away, kept by the host.
+var away_clock={}
 
 
 func _ready():
@@ -92,7 +101,7 @@ func _ready():
 
 func _connection_ended(message: String):
 	leave()
-	notice.emit(message)
+	rejected.emit(message)
 
 func host(pname: String,password: String="",server_only: bool=false) -> Error:
 	CatanDiagnostics.event("network.host","dedicated=%s"%server_only)
@@ -123,7 +132,7 @@ func join_room(address: String,pname: String,password: String="") -> Error:
 	address=address.strip_edges()
 	var endpoint=SECURE_INVITE.decode(address)
 	if endpoint.is_empty():
-		notice.emit("Paste a valid invite code from the host.")
+		rejected.emit("Paste a valid invite code from the host.")
 		return ERR_INVALID_PARAMETER
 	leave()
 	my_name=pname
@@ -165,6 +174,7 @@ func leave():
 	bot_brains={}
 	bot_action_count=0
 	bot_turn=-1
+	away_clock={}
 	turn_clock=TURN_SECONDS
 	turn_mark=[]
 	turn_expired=false
@@ -199,14 +209,31 @@ func _register(pname: String,password: String,version: int,token: String="",look
 				var old_id=int(roster[p].id)
 				roster[p].id=id
 				roster[p].connected=true
+				roster[p].erase("stand_in")
+				away_clock.erase(p)
 				if old_id!=id and old_id in multiplayer.get_peers():multiplayer.multiplayer_peer.disconnect_peer(old_id)
 				_session.rpc_id(id,token)
 				rules._log(CatanI18n.message("%s reconnected. The expedition continues.",[roster[p].name]))
 				_broadcast_lobby()
 				_sync()
 				return
+	if started and password==room_password and _seat_for(id)==-1:
+		# A seat resumed without its player, played by a bot until they come back.
+		for p in roster.size():
+			if roster[p].get("stand_in",false) and not seat_tokens.has(p) and str(roster[p].name).to_lower()==pname.strip_edges().to_lower():
+				roster[p].id=id
+				roster[p].connected=true
+				roster[p].erase("stand_in")
+				roster[p].look=CatanAppearance.sanitize(look)
+				if not requested_color.is_empty() and valid_color(requested_color):roster[p].color=requested_color.to_lower()
+				away_clock.erase(p)
+				_give_session(p,id)
+				rules._log(CatanI18n.message("%s rejoined and takes their seat back.",[roster[p].name]))
+				_broadcast_lobby()
+				_sync()
+				return
 	if not started and not resuming.is_empty() and password==room_password and _seat_for(id)==-1:
-		_claim_saved_seat(id,pname)
+		_claim_saved_seat(id,pname,look,requested_color)
 		return
 	if version!=PROTOCOL or password!=room_password or started or roster.size()>=MAX_PLAYERS or _seat_for(id)!=-1:
 		_registration_failed.rpc_id(id,"The password is incorrect." if password!=room_password else "This game has started. Use Reconnect to return to your saved seat." if started else "This room is full. Ask the host to free a seat." if roster.size()>=MAX_PLAYERS else "You already have a seat in this room.")
@@ -214,10 +241,14 @@ func _register(pname: String,password: String,version: int,token: String="",look
 	pname=pname.strip_edges().replace("\n"," ").substr(0,20)
 	if pname.is_empty(): pname="Voyager"
 	roster.append({"id":id,"name":pname,"ready":false,"connected":true,"bot":false,"look":CatanAppearance.sanitize(look),"color":requested_color if valid_color(requested_color) else ""})
-	var session_token=Crypto.new().generate_random_bytes(24).hex_encode()
-	seat_tokens[roster.size()-1]=session_token
-	_session.rpc_id(id,session_token)
+	_give_session(roster.size()-1,id)
 	_broadcast_lobby()
+
+## A new bearer token for a seat, sent to the player who holds it.
+func _give_session(p: int,id: int):
+	var session_token=Crypto.new().generate_random_bytes(24).hex_encode()
+	seat_tokens[p]=session_token
+	_session.rpc_id(id,session_token)
 
 @rpc("authority","call_remote","reliable")
 func _session(token: String):
@@ -243,7 +274,7 @@ func _registration_failed(message: String):
 func reconnect():
 	if not reconnect_address.is_empty():
 		var err=join_room(reconnect_address,reconnect_name,reconnect_password)
-		if err!=OK:notice.emit("Could not reconnect. Ask the host for a new invite code.")
+		if err!=OK:rejected.emit("Could not reconnect. Ask the host for a new invite code.")
 
 func _seat_for(id: int) -> int:
 	for i in roster.size():
@@ -292,7 +323,7 @@ func _start(id: int):
 	if started or roster.size()<MIN_PLAYERS or roster.size()>MAX_PLAYERS: return
 	if id!=1 and (not dedicated or _seat_for(id)!=0): return
 	for row in roster:
-		if not row.ready: return
+		if not row.ready and not _waiting_seat(row): return
 	if not resuming.is_empty():
 		_restore()
 		return
@@ -331,7 +362,7 @@ func _rematch_request():
 func _rematch(id: int):
 	if not started or tutorial or rules.s.is_empty() or int(rules.s.winner)==-1: return
 	if id!=1 and (not dedicated or _seat_for(id)!=0): return
-	if not roster.all(func(row):return row.connected):
+	if waiting_for_player():
 		_send_error(id,"Wait for every player to reconnect before starting another game.")
 		return
 	room_settings.seed=_random_seed()
@@ -374,7 +405,7 @@ func _set_setting(sender: int,key: String,value: Variant):
 func act(action: Dictionary):
 	if not started or seat<0: return
 	if tutorial and not tutorial_expected.is_empty() and str(action.get("type",""))!=tutorial_expected:
-		notice.emit("Follow the current tutorial step, or choose Skip lesson.")
+		rejected.emit("Follow the current tutorial step, or choose Skip lesson.")
 		return
 	if multiplayer.is_server(): _apply(1,action)
 	else: _action.rpc_id(1,action)
@@ -387,13 +418,25 @@ func _apply(id: int,action: Dictionary):
 	if not started or var_to_bytes(action).size()>2048: return
 	var p=_seat_for(id)
 	if p<0: return
+	# A burst of quick clicks goes through; only a flood is turned away.
 	var now=Time.get_ticks_msec()
-	if now-int(last_action.get(id,0))<80: return
-	last_action[id]=now
-	for row in roster:
-		if not row.connected:
-			_send_error(id,"Game paused while a disconnected player reconnects.")
-			return
+	var budget: Array=last_action.get(id,[ACTION_BURST,now])
+	budget[0]=minf(ACTION_BURST,budget[0]+(now-int(budget[1]))/1000.0*ACTION_RATE)
+	budget[1]=now
+	last_action[id]=budget
+	if budget[0]<1.0:
+		_send_error(id,"Too many actions at once. Wait a moment and try again.")
+		return
+	budget[0]-=1.0
+	_apply_seat(p,action,id)
+
+## Applies an action for a seat. Errors go back to the player who sent it;
+## bots and seats a bot plays for pass 0 and are not told.
+func _apply_seat(p: int,action: Dictionary,reply_to: int):
+	var id=reply_to
+	if waiting_for_player():
+		_send_error(id,"Game paused while a disconnected player reconnects.")
+		return
 	CatanDiagnostics.event("action.begin","seat=%d type=%s turn=%s phase=%s"%[p,str(action.get("type","")).substr(0,40),rules.s.get("turn",-1),rules.s.get("phase","")])
 	var error=rules.apply(p,action)
 	CatanDiagnostics.event("action.complete","accepted=%s"%error.is_empty())
@@ -426,12 +469,20 @@ func _state(state: Dictionary):
 	received.emit(state)
 
 func _send_error(id: int,message: String):
-	if id==1: notice.emit(message)
-	else: _error.rpc_id(id,message)
+	if id==1: rejected.emit(message)
+	elif id>1 and id in multiplayer.get_peers(): _error.rpc_id(id,message)
 
 @rpc("authority","call_remote","reliable")
 func _error(message: String):
-	notice.emit(message)
+	rejected.emit(message)
+
+## True while the game waits for someone who left and no bot plays for them yet.
+func waiting_for_player() -> bool:
+	return roster.any(func(row):return not row.connected and not row.get("stand_in",false) and not _waiting_seat(row))
+
+## A saved seat still waiting in the lobby for its player.
+static func _waiting_seat(row: Dictionary) -> bool:
+	return row.get("saved_seat",false) and not row.connected
 
 func _disconnected(id: int):
 	CatanDiagnostics.event("network.disconnected","seat=%d"%_seat_for(id))
@@ -444,7 +495,8 @@ func _disconnected(id: int):
 	if p<0: return
 	if started:
 		roster[p].connected=false
-		rules._log(CatanI18n.message("%s disconnected. The game is paused.",[roster[p].name]))
+		away_clock[p]=0.0
+		rules._log(CatanI18n.message("%s disconnected. The game is paused, and a bot takes their seat if they are not back in a minute.",[roster[p].name]))
 		_sync()
 	elif roster[p].get("saved_seat",false):
 		# A saved seat stays open for its player to come back.
@@ -570,12 +622,12 @@ func _process(delta: float):
 	if save_dirty and save_clock<=0.0 and _can_save():
 		save_clock=1.0
 		save_game()
-	if online and started and multiplayer.is_server() and not paused and roster.all(func(row):return row.connected):
+	if online and started and multiplayer.is_server() and not paused and not waiting_for_player():
 		if world_seconds+delta>=600.0:world_days+=1
 		world_seconds=fposmod(world_seconds+delta,600.0)
 	if not online or not started or not multiplayer.is_server() or tutorial or paused or rules.s.is_empty() or rules.s.winner!=-1: return
-	for row in roster:
-		if not row.connected: return
+	_advance_away_clock(delta)
+	if waiting_for_player(): return
 	_advance_turn_clock(delta)
 	_advance_offer_clock(delta)
 	bot_clock-=delta
@@ -586,15 +638,29 @@ func _process(delta: float):
 		bot_action_count=0
 	for p in roster.size():
 		var forced=_timed_out(p)
-		if not roster[p].get("bot",false) and not forced: continue
+		var automatic=roster[p].get("bot",false) or roster[p].get("stand_in",false)
+		if not automatic and not forced: continue
 		if not bot_brains.has(p): bot_brains[p]=CatanBot.new()
-		var action=_timeout_action(p) if forced else bot_brains[p].choose(rules.snapshot(p),p,int(roster[p].difficulty))
+		var action=_timeout_action(p) if forced and not automatic else bot_brains[p].choose(rules.snapshot(p),p,int(roster[p].get("difficulty",1)))
 		if action.is_empty(): continue
 		if p==rules.s.turn:
 			bot_action_count+=1
 			if bot_action_count>30 and rules.s.phase=="play" and rules.s.rolled: action={"type":"end"}
-		_apply(roster[p].id,action)
+		_apply_seat(p,action,0 if automatic else int(roster[p].id))
 		return
+
+## A player who stays away past STAND_IN_SECONDS gets a bot in their seat. It
+## plays until they reconnect, so one lost connection doesn't stop the game.
+func _advance_away_clock(delta: float):
+	for p in roster.size():
+		var row: Dictionary=roster[p]
+		if row.connected or row.get("stand_in",false) or row.get("bot",false):continue
+		away_clock[p]=float(away_clock.get(p,0.0))+delta
+		if away_clock[p]<STAND_IN_SECONDS:continue
+		row.stand_in=true
+		rules._log(CatanI18n.message("%s is still away. A bot plays their seat until they return.",[row.name]))
+		_broadcast_lobby()
+		_sync()
 
 func _advance_offer_clock(delta: float):
 	if rules.s.offer.is_empty() or not rules.s.offer.get("waiting",false):return
@@ -607,15 +673,16 @@ func _advance_offer_clock(delta: float):
 ## asks for the whole history when it has a gap.
 func request_log():
 	if not online or not started:return
-	if multiplayer.is_server():log_received.emit(rules.s.get("log",[]).duplicate())
+	if multiplayer.is_server():log_received.emit(CatanRules.log_for(seat,rules.s.get("log",[])))
 	else:_log_request.rpc_id(1)
 
 @rpc("any_peer","call_remote","reliable")
 func _log_request():
 	if not online or not multiplayer.is_server() or not started:return
 	var sender=multiplayer.get_remote_sender_id()
-	if _seat_for(sender)<0:return
-	_full_log.rpc_id(sender,rules.s.get("log",[]))
+	var p=_seat_for(sender)
+	if p<0:return
+	_full_log.rpc_id(sender,CatanRules.log_for(p,rules.s.get("log",[])))
 
 @rpc("authority","call_remote","reliable")
 func _full_log(entries: Array):
@@ -692,7 +759,7 @@ func _music_snapshot() -> Dictionary:
 
 func music_control(operation: String,track: int=-1):
 	if not can_control_music():
-		notice.emit("The room host controls the shared soundtrack. Your volume is personal.")
+		rejected.emit("The room host controls the shared soundtrack. Your volume is personal.")
 		return
 	if not online or multiplayer.is_server():_set_music(1,operation,track)
 	else:_music_command.rpc_id(1,operation,track)
@@ -826,12 +893,8 @@ func save_game():
 ## The saved game for this kind of room, or an empty dictionary when there is
 ## none or it came from a build that plays by different rules.
 static func load_save(solo_game: bool) -> Dictionary:
-	var path=save_path(solo_game)
-	if not FileAccess.file_exists(path):return {}
-	var file=FileAccess.open(path,FileAccess.READ)
-	if file==null:return {}
-	var data=file.get_var(false)
-	if not data is Dictionary or int(data.get("format",0))!=SAVE_FORMAT or int(data.get("protocol",0))!=PROTOCOL:return {}
+	var data=_read_save(solo_game)
+	if data.is_empty() or int(data.get("format",0))!=SAVE_FORMAT or int(data.get("protocol",0))!=PROTOCOL:return {}
 	for key in ["rules","seats","settings"]:
 		if not data.has(key):return {}
 	if not data.rules is Dictionary or not data.seats is Array or data.seats.size()<MIN_PLAYERS or data.seats.size()>MAX_PLAYERS:return {}
@@ -841,10 +904,22 @@ static func load_save(solo_game: bool) -> Dictionary:
 func saved_summary() -> Dictionary:
 	if not online or not multiplayer.is_server() or dedicated or started or not resuming.is_empty():return {}
 	var data=load_save(solo)
-	if data.is_empty():return {}
+	if data.is_empty():
+		# A save from a build with different rules can't be resumed; say so.
+		var raw=_read_save(solo)
+		if raw.is_empty():return {}
+		return {"outdated":true,"version":str(raw.get("version","?")).substr(0,40)}
 	var names=[]
 	for seat_row in data.seats:names.append(str(seat_row.name))
 	return {"names":names,"turn":maxi(0,data.rules.get("points_history",[]).size()-1),"saved":int(data.get("saved",0))}
+
+static func _read_save(solo_game: bool) -> Dictionary:
+	var path=save_path(solo_game)
+	if not FileAccess.file_exists(path):return {}
+	var file=FileAccess.open(path,FileAccess.READ)
+	if file==null:return {}
+	var data=file.get_var(false)
+	return data if data is Dictionary else {}
 
 ## Seats the lobby from the save: bots return as they were, the host takes
 ## their old seat, and every other seat waits for its player to rejoin.
@@ -852,7 +927,7 @@ func resume_saved():
 	if not online or not multiplayer.is_server() or dedicated or started:return
 	var data=load_save(solo)
 	if data.is_empty():
-		notice.emit("The saved game could not be read.")
+		rejected.emit("The saved game could not be read.")
 		return
 	resuming=data
 	room_settings=DEFAULT_SETTINGS.duplicate()
@@ -876,13 +951,14 @@ func resume_saved():
 	seat=_seat_for(1)
 	if seat>=0:my_look=roster[seat].look
 	# Guests already in the room take the seats that wait for them.
-	for guest in guests:_claim_saved_seat(int(guest.id),str(guest.name))
+	for guest in guests:_claim_saved_seat(int(guest.id),str(guest.name),guest.get("look",PackedByteArray()),str(guest.get("color","")))
 	_broadcast_lobby()
 	if solo:_start(1)
 
 ## Puts a joining player in a saved seat: the one with their name, else the
-## first seat still free. With none free, they cannot join this room.
-func _claim_saved_seat(id: int,pname: String):
+## first seat still free. With none free, they cannot join this room. The
+## player brings their current pieces and colour.
+func _claim_saved_seat(id: int,pname: String,look: PackedByteArray=PackedByteArray(),color: String=""):
 	var chosen=-1
 	for p in roster.size():
 		if roster[p].get("saved_seat",false) and not roster[p].connected and str(roster[p].name).to_lower()==pname.strip_edges().to_lower():chosen=p
@@ -897,9 +973,9 @@ func _claim_saved_seat(id: int,pname: String):
 	roster[chosen].id=id
 	roster[chosen].connected=true
 	roster[chosen].ready=false
-	var session_token=Crypto.new().generate_random_bytes(24).hex_encode()
-	seat_tokens[chosen]=session_token
-	_session.rpc_id(id,session_token)
+	if not look.is_empty():roster[chosen].look=CatanAppearance.sanitize(look)
+	if not color.is_empty() and valid_color(color):roster[chosen].color=color.to_lower()
+	_give_session(chosen,id)
 	_broadcast_lobby()
 
 ## Drops the saved game from the lobby: the players who are here stay, the
@@ -929,7 +1005,17 @@ func _restore():
 	rules.rng.state=int(data.get("rng_state",0))
 	# An offer waiting for answers when the game was saved would wait forever.
 	rules.s.offer={}
-	for row in roster:row.erase("saved_seat")
+	# Seats nobody came back for start with a bot; their player can still
+	# rejoin by name with the invite and take over.
+	for p in roster.size():
+		var row: Dictionary=roster[p]
+		if _waiting_seat(row):
+			row.id=-100-p
+			row.stand_in=true
+			row.ready=true
+			rules._log(CatanI18n.message("%s is still away. A bot plays their seat until they return.",[row.name]))
+		row.erase("saved_seat")
+	away_clock={}
 	game_count+=1
 	rules.s.game_id=game_count
 	turn_seconds=float(room_settings.turn_seconds)

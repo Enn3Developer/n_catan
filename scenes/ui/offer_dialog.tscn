@@ -19,6 +19,7 @@ theme_override_font_sizes/font_size = 18
 autowrap_mode = 3
 
 [node name="Terms" type="HBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
 
@@ -108,14 +109,6 @@ visible = false
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="CounterHeading" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel"]
-custom_minimum_size = Vector2(0, 36)
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 20
-text = "Your counter-offer"
-vertical_alignment = 2
-
 [node name="CounterGiveLabel" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel"]
 layout_mode = 2
 theme_type_variation = &"SectionLabel"
@@ -142,27 +135,20 @@ theme_override_constants/separation = 8
 script = ExtResource("steppers")
 compact = true
 
-[node name="CounterActions" type="HBoxContainer" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel"]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="CounterReason" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterActions"]
+[node name="CounterPreview" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 17
+autowrap_mode = 3
+
+[node name="CounterReason" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel"]
+unique_name_in_owner = true
+layout_mode = 2
 theme_type_variation = &"MutedLabel"
 autowrap_mode = 3
 
-[node name="SendCounter" type="Button" parent="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterActions" groups=["ui_click"]]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-size_flags_vertical = 0
-mouse_default_cursor_shape = 2
-theme_type_variation = &"PrimaryButton"
-text = "Send counter-offer"
-
 [node name="Close" type="Button" parent="DialogMargin/Panel/Frame/Footer" groups=["ui_click"]]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 size_flags_vertical = 0
@@ -187,7 +173,6 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-toggle_mode = true
 text = "Counter…"
 
 [node name="Decline" type="Button" parent="DialogMargin/Panel/Frame/Footer/Answers" groups=["ui_click"]]
@@ -205,11 +190,33 @@ mouse_default_cursor_shape = 2
 theme_type_variation = &"PrimaryButton"
 text = "Accept"
 
+[node name="CounterSteps" type="HBoxContainer" parent="DialogMargin/Panel/Frame/Footer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Back" type="Button" parent="DialogMargin/Panel/Frame/Footer/CounterSteps" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "Back"
+
+[node name="SendCounter" type="Button" parent="DialogMargin/Panel/Frame/Footer/CounterSteps" groups=["ui_click"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_type_variation = &"PrimaryButton"
+text = "Send counter-offer"
+
 [connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/Close" to="." method="close"]
 [connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/Answers/Accept" to="." method="_answer" binds= ["accept_trade"]]
 [connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/Answers/Decline" to="." method="_answer" binds= ["decline_trade"]]
-[connection signal="toggled" from="DialogMargin/Panel/Frame/Footer/Answers/Counter" to="." method="_on_counter_toggled"]
+[connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/Answers/Counter" to="." method="_set_countering" binds= [true]]
+[connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/CounterSteps/Back" to="." method="_set_countering" binds= [false]]
 [connection signal="changed" from="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterGive" to="." method="_refresh_counter"]
 [connection signal="changed" from="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterGet" to="." method="_refresh_counter"]
-[connection signal="pressed" from="DialogMargin/Panel/Frame/DialogScroll/Body/CounterPanel/CounterActions/SendCounter" to="." method="_on_send_counter_pressed"]
+[connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/CounterSteps/SendCounter" to="." method="_on_send_counter_pressed"]
 [connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/Withdraw" to="." method="emit_signal" binds= ["withdraw_requested"]]

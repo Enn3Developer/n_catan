@@ -20,6 +20,8 @@ func _init():
 	_moving_ships()
 	_fog()
 	_points_history()
+	_private_log()
+	_bot_discard()
 	print("rules_test: %s" % ("FAILED (%d)" % failures if failures else "ok"))
 	quit(1 if failures else 0)
 
@@ -98,6 +100,7 @@ func _trade_flow():
 	check(s.players[0].hand==[0,0,1,0,0] and s.players[2].hand==[2,0,2,0,0],"counter terms applied")
 	check(s.offer.is_empty(),"offer closes")
 	check(s.players[0].stats.trades==1 and s.players[2].stats.trades==1,"trade stats")
+	check("traded %s to %s for %s." in str(s.log[-1]),"the log says what was traded")
 
 func _friendly_robber():
 	var rules=CatanRules.new()
@@ -397,3 +400,58 @@ func _sail(rules: CatanRules,p: int) -> int:
 		s.players[p].hand=[9,9,9,9,9]
 		if rules.apply(p,{"type":"ship","id":best})!="": return -1
 	return -1
+
+## A robbery tells the thief and the victim what was taken and everyone else
+## only that it happened. Played cards are named in the log.
+func _private_log():
+	var rules=CatanRules.new()
+	rules.create(["A","B","C"],31)
+	_setup(rules)
+	var s=rules.s
+	s.rolled=true
+	var target=-1
+	for t in s.tiles.size():
+		if t==s.robber: continue
+		for v in s.tiles[t].corners:
+			if s.vertices[v].owner==1 and target<0: target=t
+	for p in 3: s.players[p].hand=[0,0,0,0,0]
+	s.players[1].hand=[0,0,1,0,0]
+	s.phase="robber"
+	check(rules.apply(0,{"type":"robber","id":target})=="","robber moves")
+	if s.phase=="steal": check(rules.apply(0,{"type":"steal","id":1})=="","steal")
+	check(s.players[0].hand==[0,0,1,0,0],"thief takes the wool")
+	var thief=rules.snapshot(0)
+	var victim=rules.snapshot(1)
+	var other=rules.snapshot(2)
+	check("stole 1 %s from %s." in str(thief.log[-1]) and "stole 1 %s from %s." in str(victim.log[-1]),"thief and victim see the resource")
+	check("stole a resource from %s." in str(other.log[-1]),"others see only the robbery")
+	check(thief.theft.has("resource") and victim.theft.has("resource") and not other.theft.has("resource"),"theft event hides the resource from others")
+	check(CatanRules.log_for(2,s.log)[-1]==other.log[-1],"full log matches the snapshot")
+	s.phase="play"
+	s.card_played=false
+	s.players[0].cards=[0,0,0,1,0]
+	s.players[1].hand=[0,0,2,0,0]
+	s.players[2].hand=[0,0,1,0,0]
+	check(rules.apply(0,{"type":"play_card","id":3,"resource":2})=="","monopoly")
+	check("Monopoly card and took %d %s." in str(s.log[-1]) and "3" in str(s.log[-1]),"monopoly log says how much was taken")
+	s.phase="robber"
+	for t in s.tiles.size():
+		if t!=s.robber: s.tiles[t].fog=true
+	s.fog=true
+	var error=rules.apply(0,{"type":"robber","id":(s.robber+1)%s.tiles.size()})
+	check("fog" in error,"the robber error names the fog")
+
+## Normal bots keep what their next build needs when they discard.
+func _bot_discard():
+	var rules=CatanRules.new()
+	rules.create(["A","B","C"],41)
+	_setup(rules)
+	var s=rules.s
+	s.phase="discard"
+	s.players[0].hand=[1,1,1,1,6]
+	s.discards={"0":5}
+	var action=CatanBot.new(5).choose(rules.snapshot(0),0,1)
+	check(action.type=="discard" and CatanRules.new().total(action.cards)==5,"discard count")
+	check(action.cards[4]>=3,"surplus ore goes first")
+	check(rules.apply(0,action)=="","discard applies")
+	check(s.players[0].hand[3]==1,"keeps the scarce grain")
