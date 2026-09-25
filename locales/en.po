@@ -772,8 +772,6 @@ msgstr "Next track"
 msgid "No development cards remain."
 msgstr "No development cards remain."
 
-msgid "No legal space to build a %s."
-msgstr "No legal space to build a %s."
 
 msgid "No published update is available yet."
 msgstr "No published update is available yet."
@@ -1406,20 +1404,10 @@ msgstr "Your trade offer: %s for %s."
 msgid "Your turn"
 msgstr "Your turn"
 
-msgid "buy card"
-msgstr "buy card"
 
-msgid "city"
-msgstr "city"
 
-msgid "road"
-msgstr "road"
 
-msgid "settlement"
-msgstr "settlement"
 
-msgid "%s: %s."
-msgstr "%s: %s."
 
 msgid "You"
 msgstr "You"
@@ -2788,3 +2776,36 @@ msgstr "You give %s and get %s."
 
 msgid "Edit counter…"
 msgstr "Edit counter…"
+
+msgid "%s built a road."
+msgstr "%s built a road."
+
+msgid "%s built a ship."
+msgstr "%s built a ship."
+
+msgid "%s built a settlement."
+msgstr "%s built a settlement."
+
+msgid "%s upgraded a settlement to a city."
+msgstr "%s upgraded a settlement to a city."
+
+msgid "%s bought a development card."
+msgstr "%s bought a development card."
+
+msgid "No legal space to build a road."
+msgstr "No legal space to build a road."
+
+msgid "No legal space to build a ship."
+msgstr "No legal space to build a ship."
+
+msgid "No legal space to build a settlement."
+msgstr "No legal space to build a settlement."
+
+msgid "No settlement to upgrade to a city."
+msgstr "No settlement to upgrade to a city."
+
+msgid "The host removed you from the room."
+msgstr "The host removed you from the room."
+
+msgid "Remove player"
+msgstr "Remove player"

@@ -33,6 +33,13 @@ uppercase = true
 unique_name_in_owner = true
 layout_mode = 2
 
+[node name="Reason" type="Label" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_type_variation = &"ErrorLabel"
+autowrap_mode = 3
+
 [node name="Back" type="Button" parent="DialogMargin/Panel/Frame/Footer" groups=["ui_click"]]
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
@@ -41,6 +48,7 @@ mouse_default_cursor_shape = 2
 text = "Back"
 
 [node name="PlayCard" type="Button" parent="DialogMargin/Panel/Frame/Footer" groups=["ui_click"]]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 size_flags_vertical = 0
@@ -50,3 +58,5 @@ text = "Play card"
 
 [connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/Back" to="." method="close"]
 [connection signal="pressed" from="DialogMargin/Panel/Frame/Footer/PlayCard" to="." method="_on_play_pressed"]
+[connection signal="changed" from="DialogMargin/Panel/Frame/DialogScroll/Body/First" to="." method="_on_choice_changed"]
+[connection signal="changed" from="DialogMargin/Panel/Frame/DialogScroll/Body/Second" to="." method="_on_choice_changed"]

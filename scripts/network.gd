@@ -238,11 +238,24 @@ func _register(pname: String,password: String,version: int,token: String="",look
 	if version!=PROTOCOL or password!=room_password or started or roster.size()>=MAX_PLAYERS or _seat_for(id)!=-1:
 		_registration_failed.rpc_id(id,"The password is incorrect." if password!=room_password else "This game has started. Use Reconnect to return to your saved seat." if started else "This room is full. Ask the host to free a seat." if roster.size()>=MAX_PLAYERS else "You already have a seat in this room.")
 		return
-	pname=pname.strip_edges().replace("\n"," ").substr(0,20)
-	if pname.is_empty(): pname="Voyager"
+	pname=_unique_name(pname.strip_edges().replace("\n"," ").substr(0,20))
 	roster.append({"id":id,"name":pname,"ready":false,"connected":true,"bot":false,"look":CatanAppearance.sanitize(look),"color":requested_color if valid_color(requested_color) else ""})
 	_give_session(roster.size()-1,id)
 	_broadcast_lobby()
+
+## The name as given, or with a number added when someone in the room already
+## has it, so the log, trades and scoreboard can tell players apart.
+func _unique_name(pname: String) -> String:
+	if pname.is_empty(): pname="Voyager"
+	var taken={}
+	for row in roster: taken[str(row.name).to_lower()]=true
+	var result=pname
+	var n=2
+	while taken.has(result.to_lower()):
+		var suffix=" %d" % n
+		result=pname.substr(0,20-suffix.length())+suffix
+		n+=1
+	return result
 
 ## A new bearer token for a seat, sent to the player who holds it.
 func _give_session(p: int,id: int):
@@ -400,7 +413,15 @@ func _set_setting(sender: int,key: String,value: Variant):
 			if key not in CatanRules.HOUSE_RULES or not (value is bool):return
 	if room_settings.get(key)==value:return
 	room_settings[key]=value
+	_unready(sender)
 	_broadcast_lobby()
+
+## The rules changed, so everyone but the player who changed them readies up
+## again for the game they will actually play.
+func _unready(sender: int):
+	if solo: return
+	for row in roster:
+		if not row.get("bot",false) and int(row.id)!=sender: row.ready=false
 
 func act(action: Dictionary):
 	if not started or seat<0: return
@@ -504,14 +525,17 @@ func _disconnected(id: int):
 		roster[p].connected=false
 		roster[p].ready=false
 		seat_tokens.erase(p)
-	else:
-		roster.remove_at(p)
-		var remapped={}
-		for key in seat_tokens:
-			if key<p: remapped[key]=seat_tokens[key]
-			elif key>p: remapped[key-1]=seat_tokens[key]
-		seat_tokens=remapped
+	else: _remove_seat(p)
 	_broadcast_lobby()
+
+## Takes a seat out of the lobby; the seats after it move up one.
+func _remove_seat(p: int):
+	roster.remove_at(p)
+	var remapped={}
+	for key in seat_tokens:
+		if key<p: remapped[key]=seat_tokens[key]
+		elif key>p: remapped[key-1]=seat_tokens[key]
+	seat_tokens=remapped
 
 func map_router():
 	if upnp_thread and upnp_thread.is_alive(): return
@@ -566,17 +590,43 @@ func _edit_bot(sender: int,operation: String,index: int,difficulty: int):
 	if operation=="add" and roster.size()<MAX_PLAYERS:
 		var id=-1
 		while _seat_for(id)>=0: id-=1
-		var bot_name=["Juniper","Flint","Coral","Atlas","Willow","Slate"][(-id-1)%6]
+		var bot_name=_unique_name(["Juniper","Flint","Coral","Atlas","Willow","Slate"][(-id-1)%6])
 		roster.append({"id":id,"name":bot_name,"ready":true,"connected":true,"bot":true,"difficulty":difficulty,"look":_bot_look(id)})
 	elif index>=0 and index<roster.size() and roster[index].get("bot",false):
 		if operation=="difficulty": roster[index].difficulty=difficulty
-		elif operation=="remove":
-			roster.remove_at(index)
-			var remapped={}
-			for key in seat_tokens:
-				if key<index: remapped[key]=seat_tokens[key]
-				elif key>index: remapped[key-1]=seat_tokens[key]
-			seat_tokens=remapped
+		elif operation=="remove": _remove_seat(index)
+	# Another seat changes the board and the turn order.
+	if operation in ["add","remove"]: _unready(sender)
+	_broadcast_lobby()
+
+## The room controller sends a player out of the lobby, say one who joined and
+## never readied up. The host's own seat and the controller's can't be removed.
+## A player in a resumed game's seat leaves it open for its owner.
+func remove_player(index: int):
+	if multiplayer.is_server(): _remove_player(1,index)
+	else: _remove_player_request.rpc_id(1,index)
+
+@rpc("any_peer","call_remote","reliable")
+func _remove_player_request(index: int):
+	if multiplayer.is_server(): _remove_player(multiplayer.get_remote_sender_id(),index)
+
+func _remove_player(sender: int,index: int):
+	if started or index<0 or index>=roster.size(): return
+	if sender!=1 and (not dedicated or _seat_for(sender)!=0): return
+	var row: Dictionary=roster[index]
+	var id=int(row.id)
+	if row.get("bot",false) or id==1 or id==sender or not row.connected: return
+	if id in multiplayer.get_peers():
+		# The guest leaves on this message; the timer closes the link if it doesn't.
+		_registration_failed.rpc_id(id,"The host removed you from the room.")
+		get_tree().create_timer(2.0).timeout.connect(func():
+			if id in multiplayer.get_peers() and _seat_for(id)<0: multiplayer.multiplayer_peer.disconnect_peer(id))
+	if row.get("saved_seat",false):
+		row.id=0
+		row.connected=false
+		row.ready=false
+		seat_tokens.erase(index)
+	else: _remove_seat(index)
 	_broadcast_lobby()
 
 ## Bots wear a preset with their own variation seed, so two Harbor bots still differ.
@@ -647,6 +697,9 @@ func _process(delta: float):
 			bot_action_count+=1
 			if bot_action_count>30 and rules.s.phase=="play" and rules.s.rolled: action={"type":"end"}
 		_apply_seat(p,action,0 if automatic else int(roster[p].id))
+		# Answers to an offer don't move the game on, so every bot answers in
+		# the same tick and none misses the offer window.
+		if str(action.get("type","")) in ["accept_trade","decline_trade","counter_trade"]: continue
 		return
 
 ## A player who stays away past STAND_IN_SECONDS gets a bot in their seat. It

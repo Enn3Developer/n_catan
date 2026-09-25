@@ -22,7 +22,7 @@ Choose **Host a room** and create it. Enter your public IP address or hostname i
 
 Everyone in a room needs the same release, because room rules and the new trading flow change multiplayer compatibility. By default each turn has a 60-second limit so one player cannot hold up the room. The remaining time shows in the interface, and when it runs out the host finishes that turn: it rolls if needed, makes the placements the rules require and passes play on. Solo games and the tutorial have no limit.
 
-The host sets the room rules in the lobby: the map seed, the island (random, classic or archipelago), the turn timer (off, or 30 seconds to 3 minutes) and the points needed to win (5 to 15). The same seed and player count always build the same island and harbors. Dice draw from a shuffled deck of all 36 outcomes, so every total turns up about as often as the odds say it should.
+The host sets the room rules in the lobby: the map seed, the island (random, classic or archipelago), the turn timer (off, or 30 seconds to 3 minutes) and the points needed to win (5 to 15). The same seed and player count always build the same island and harbors. The seed doesn't decide anything hidden: the development cards, the dice and what lies under the fog come from a secret draw on the host, so knowing the seed tells you nothing about them. Changing a rule or a seat sends every other player back to not ready, so nobody starts a game they didn't agree to. The host can remove a guest from the lobby, and a guest who joins with a name already in the room gets a number after it. Dice draw from a shuffled deck of all 36 outcomes, so every total turns up about as often as the odds say it should.
 
 The lobby also has house rules, all off by default:
 

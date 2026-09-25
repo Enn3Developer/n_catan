@@ -222,13 +222,18 @@ func _lobby():
 		"map_router_requested":net.map_router,
 		"invite_requested":_copy_invite,
 		"bot_difficulty_changed":func(seat,level):net.configure_bot("difficulty",seat,level),
-		"bot_remove_requested":func(seat):net.configure_bot("remove",seat),
+		"bot_remove_requested":_remove_seat,
 		"setting_changed":net.choose_setting,
 		"resume_requested":net.resume_saved,
 		"new_game_requested":net.cancel_resume,
 	})
 	screen.invite_address_edited.connect(func(text):invite_address=text)
 	_apply_text(screen)
+
+func _remove_seat(seat: int):
+	if seat<0 or seat>=net.roster.size():return
+	if net.roster[seat].get("bot",false):net.configure_bot("remove",seat)
+	else:net.remove_player(seat)
 
 func _copy_invite(address: String):
 	if address.is_empty(): _rejected(tr("Enter your public address first, or use Map router."))
@@ -435,7 +440,7 @@ func _choose(kind: String):
 		_hud()
 		return
 	if state.phase=="play" and rules.build_sites(net.seat,kind).is_empty():
-		_rejected(tr("No legal space to build a %s.") % tr(kind))
+		_rejected(tr(CatanRules.NO_SPACE[kind]))
 		return
 	mode=kind
 	board.set_mode(mode,net.seat)
@@ -535,7 +540,7 @@ func _discard():
 
 func _resource_card(id: int):
 	var dialog=_present("res://scenes/ui/resource_card_dialog.tscn")
-	dialog.show_card(id)
+	dialog.show_card(id,state.bank)
 	_route(dialog,{"play_requested":net.act})
 
 func _confirm_leave():

@@ -55,7 +55,7 @@ func show_game(net: CatanNetwork,state: Dictionary,mode: String):
 		if not mine:button.unavailable_reason=tr("Wait for your turn.")
 		elif rules.pieces(seat,kind)>=CatanRules.PIECE_LIMITS[kind]:
 			button.unavailable_reason=tr({"ship":"All 15 of your ships are at sea. You have none left to place.","road":"All 15 of your roads are on the board. You have none left to place.","settlement":"All 5 of your settlements are on the board. Upgrade one to a city to free a settlement piece.","city":"All 4 of your cities are on the board. You have none left to place."}[kind])
-		elif rules.can_pay(seat,CatanRules.COST[kind]) and sites.is_empty():button.unavailable_reason=tr("No legal space to build a %s.") % tr(kind)
+		elif rules.can_pay(seat,CatanRules.COST[kind]) and sites.is_empty():button.unavailable_reason=tr(CatanRules.NO_SPACE[kind])
 	%TradeAction.disabled=not play or not state.rolled
 	%FinishRoads.visible=state.phase=="free_roads" and mine
 	%MoveShip.visible=play and state.rolled and state.get("move_ships",false)

@@ -772,8 +772,6 @@ msgstr "Brano successivo"
 msgid "No development cards remain."
 msgstr "Le carte sviluppo sono esaurite."
 
-msgid "No legal space to build a %s."
-msgstr "Non ci sono posizioni valide per costruire: %s."
 
 msgid "No published update is available yet."
 msgstr "Non sono ancora disponibili aggiornamenti pubblicati."
@@ -1406,20 +1404,10 @@ msgstr "La tua offerta: %s in cambio di %s."
 msgid "Your turn"
 msgstr "È il tuo turno"
 
-msgid "buy card"
-msgstr "acquisto carta"
 
-msgid "city"
-msgstr "città"
 
-msgid "road"
-msgstr "strada"
 
-msgid "settlement"
-msgstr "colonia"
 
-msgid "%s: %s."
-msgstr "%s: %s."
 
 msgid "You"
 msgstr "Tu"
@@ -2788,3 +2776,36 @@ msgstr "Dai %s e ricevi %s."
 
 msgid "Edit counter…"
 msgstr "Modifica controproposta…"
+
+msgid "%s built a road."
+msgstr "%s ha costruito una strada."
+
+msgid "%s built a ship."
+msgstr "%s ha costruito una nave."
+
+msgid "%s built a settlement."
+msgstr "%s ha costruito una colonia."
+
+msgid "%s upgraded a settlement to a city."
+msgstr "%s ha trasformato una colonia in città."
+
+msgid "%s bought a development card."
+msgstr "%s ha comprato una carta sviluppo."
+
+msgid "No legal space to build a road."
+msgstr "Non ci sono posizioni valide per una strada."
+
+msgid "No legal space to build a ship."
+msgstr "Non ci sono posizioni valide per una nave."
+
+msgid "No legal space to build a settlement."
+msgstr "Non ci sono posizioni valide per una colonia."
+
+msgid "No settlement to upgrade to a city."
+msgstr "Non hai colonie da trasformare in città."
+
+msgid "The host removed you from the room."
+msgstr "L’host ti ha rimosso dalla stanza."
+
+msgid "Remove player"
+msgstr "Rimuovi giocatore"
