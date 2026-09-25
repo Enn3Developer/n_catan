@@ -41,9 +41,9 @@ The camera eases between views. Drag the board or hold WASD to pan, right-drag o
 
 Trading works the way it does at a real table. Your offer goes to everyone; each player accepts, declines or sends a counter-offer. After a few seconds, or once everyone has answered, you pick who to trade with.
 
-Closing the host closes the room. Disconnected players can reconnect while the host remains running.
+Closing the host closes the room. Disconnected players can reconnect while the host remains running. The game pauses while they are gone, and after a minute a bot plays their seat until they come back.
 
-The host saves the game as it goes, so closing it does not lose the game. Solo games and online rooms each keep one save. Open the lobby again and choose **Resume saved game**. For an online room, share the new invite: friends who rejoin get their old seats back by name, and bots come back on their own. Starting a new game replaces the save, and a finished game clears it.
+The host saves the game as it goes, so closing it does not lose the game. Solo games and online rooms each keep one save. Open the lobby again and choose **Resume saved game**. For an online room, share the new invite: friends who rejoin get their old seats back by name, and bots come back on their own. You can also start before everyone is back: a bot plays each empty seat, and a friend who joins later with the same name takes over. Starting a new game replaces the save, and a finished game clears it.
 
 ## Updates
 

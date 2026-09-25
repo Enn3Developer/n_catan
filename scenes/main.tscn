@@ -147,6 +147,7 @@ script = ExtResource("10_notices")
 [connection signal="changed" from="Network" to="." method="_network_changed"]
 [connection signal="received" from="Network" to="." method="_received"]
 [connection signal="notice" from="Network" to="." method="_notice"]
+[connection signal="rejected" from="Network" to="." method="_rejected"]
 [connection signal="applied" from="Network" to="." method="_action_applied"]
 [connection signal="log_received" from="Network" to="." method="_log_received"]
 [connection signal="picked" from="Board" to="." method="_on_board_picked"]
