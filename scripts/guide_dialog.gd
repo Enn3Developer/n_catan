@@ -10,8 +10,7 @@ const SECTIONS=[
 	["Rolling a seven","Anyone holding more than seven resources discards half, rounded down. Then the roller moves the robber, which stops that hex producing, and steals a resource from a neighbor."],
 	["Controls","Click glowing markers to build. Drag the board or hold WASD to pan, right-drag or Q/E to orbit and scroll to zoom. F focuses a tile, H hides the interface and Home fits the board."],
 	["Five or six players","The island is bigger, with 30 land hexes, and turns come in pairs. After the main turn, the player three seats ahead builds, plays cards and trades with the bank. Then the next main player rolls."],
-	["Saved games","The host's game saves about once a second, and again when the host leaves. In the lobby, Resume saved game picks it up. Friends rejoin with the new invite and get their seats back by name. You can start before they're back: a bot plays for them until they join."],
-	["Hosting online","The host's UDP port 24567 must be reachable from the internet. Use router mapping, port forwarding or a dedicated server."],
+	["Saved games","Leaving saves the game. Resume saved game in the lobby picks it up. Friends rejoin with the new invite and get their seats back by name, and a bot plays for anyone not back yet."],
 ]
 const COSTS=[["Road","road"],["Settlement","settlement"],["City","city"],["Development card","buy_card"]]
 

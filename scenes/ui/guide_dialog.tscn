@@ -7,7 +7,7 @@
 script = ExtResource("script")
 
 [node name="Title" parent="DialogMargin/Panel/Frame/DialogScroll/Body"]
-text = "Your guide to the island"
+text = "Guide"
 
 [node name="ChartCourse" type="Button" parent="DialogMargin/Panel/Frame/Footer" groups=["ui_click"]]
 custom_minimum_size = Vector2(120, 40)

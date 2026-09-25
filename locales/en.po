@@ -1281,8 +1281,6 @@ msgid "Your first real game"
 msgstr "Your first real game"
 
 
-msgid "Your guide to the island"
-msgstr "Your guide to the island"
 
 msgid "Your music volume · does not affect other players"
 msgstr "Your music volume · does not affect other players"
@@ -2315,11 +2313,7 @@ msgstr "Five or six players"
 msgid "The island is bigger, with 30 land hexes, and turns come in pairs. After the main turn, the player three seats ahead builds, plays cards and trades with the bank. Then the next main player rolls."
 msgstr "The island is bigger, with 30 land hexes, and turns come in pairs. After the main turn, the player three seats ahead builds, plays cards and trades with the bank. Then the next main player rolls."
 
-msgid "Hosting online"
-msgstr "Hosting online"
 
-msgid "The host's UDP port 24567 must be reachable from the internet. Use router mapping, port forwarding or a dedicated server."
-msgstr "The host's UDP port 24567 must be reachable from the internet. Use router mapping, port forwarding or a dedicated server."
 
 msgid "Development card"
 msgstr "Development card"
@@ -2605,8 +2599,8 @@ msgstr "The game resumes from where it was saved."
 msgid "Saved games"
 msgstr "Saved games"
 
-msgid "The host's game saves about once a second, and again when the host leaves. In the lobby, Resume saved game picks it up. Friends rejoin with the new invite and get their seats back by name. You can start before they're back: a bot plays for them until they join."
-msgstr "The host's game saves about once a second, and again when the host leaves. In the lobby, Resume saved game picks it up. Friends rejoin with the new invite and get their seats back by name. You can start before they're back: a bot plays for them until they join."
+msgid "Leaving saves the game. Resume saved game in the lobby picks it up. Friends rejoin with the new invite and get their seats back by name, and a bot plays for anyone not back yet."
+msgstr "Leaving saves the game. Resume saved game in the lobby picks it up. Friends rejoin with the new invite and get their seats back by name, and a bot plays for anyone not back yet."
 
 msgid "%s played the Road building card."
 msgstr "%s played the Road building card."
@@ -2726,8 +2720,6 @@ msgstr "bot"
 msgid "you"
 msgstr "you"
 
-msgid "This game is over. You go back to the main menu."
-msgstr "This game is over. You go back to the main menu."
 
 msgid "The lesson ends here. You can start it again from the main menu."
 msgstr "The lesson ends here. You can start it again from the main menu."

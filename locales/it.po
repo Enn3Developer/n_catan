@@ -1281,8 +1281,6 @@ msgid "Your first real game"
 msgstr "La tua prima partita vera"
 
 
-msgid "Your guide to the island"
-msgstr "Guida al gioco"
 
 msgid "Your music volume · does not affect other players"
 msgstr "Il tuo volume musicale · non modifica quello degli altri"
@@ -2315,11 +2313,7 @@ msgstr "Cinque o sei giocatori"
 msgid "The island is bigger, with 30 land hexes, and turns come in pairs. After the main turn, the player three seats ahead builds, plays cards and trades with the bank. Then the next main player rolls."
 msgstr "L'isola è più grande, con 30 esagoni di terra, e i turni vanno in coppia. Dopo il turno principale, il giocatore tre posti più avanti costruisce, gioca carte e commercia con la banca. Poi tira il giocatore principale successivo."
 
-msgid "Hosting online"
-msgstr "Ospitare online"
 
-msgid "The host's UDP port 24567 must be reachable from the internet. Use router mapping, port forwarding or a dedicated server."
-msgstr "La porta UDP 24567 dell’host deve essere raggiungibile da internet. Usa la mappatura del router, l’inoltro della porta o un server dedicato."
 
 msgid "Development card"
 msgstr "Carta sviluppo"
@@ -2605,8 +2599,8 @@ msgstr "La partita riprende da dove era stata salvata."
 msgid "Saved games"
 msgstr "Partite salvate"
 
-msgid "The host's game saves about once a second, and again when the host leaves. In the lobby, Resume saved game picks it up. Friends rejoin with the new invite and get their seats back by name. You can start before they're back: a bot plays for them until they join."
-msgstr "La partita dell’host si salva circa una volta al secondo, e di nuovo quando l’host esce. Nella stanza, Riprendi la partita salvata la fa ripartire. Gli amici rientrano con il nuovo invito e ritrovano il loro posto in base al nome. Puoi iniziare prima che tornino: un bot gioca per loro finché non entrano."
+msgid "Leaving saves the game. Resume saved game in the lobby picks it up. Friends rejoin with the new invite and get their seats back by name, and a bot plays for anyone not back yet."
+msgstr "Uscire salva la partita. Riprendi la partita salvata, nella stanza, la fa ripartire. Gli amici rientrano con il nuovo invito e riprendono il loro posto per nome, e un bot gioca per chi non è ancora tornato."
 
 msgid "%s played the Road building card."
 msgstr "%s ha giocato la carta Costruzione di strade."
@@ -2726,8 +2720,6 @@ msgstr "bot"
 msgid "you"
 msgstr "tu"
 
-msgid "This game is over. You go back to the main menu."
-msgstr "La partita è finita. Torni al menu principale."
 
 msgid "The lesson ends here. You can start it again from the main menu."
 msgstr "La lezione finisce qui. Puoi ricominciarla dal menu principale."

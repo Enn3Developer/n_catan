@@ -546,8 +546,12 @@ func _resource_card(id: int):
 	_route(dialog,{"play_requested":net.act})
 
 func _confirm_leave():
+	# A finished game has nothing left to lose.
+	if state.get("winner",-1)!=-1:
+		net.leave()
+		return
 	var dialog=_present("res://scenes/ui/leave_dialog.tscn")
-	dialog.show_leave(net,state.get("winner",-1)!=-1)
+	dialog.show_leave(net)
 	_route(dialog,{"leave_requested":net.leave})
 
 func _help():
