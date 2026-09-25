@@ -12,7 +12,7 @@ for collection in list(scene.collection.children):
  for obj in list(collection.objects):bpy.data.objects.remove(obj,do_unlink=True)
  bpy.data.collections.remove(collection)
 bpy.context.window.scene=scene
-PALETTE={'PBR_Bark':'74543c','PBR_Wood':'b39162','PBR_Rock':'83939d','PBR_Clay':'bd7655','ClayLight':'d08b63','ClayDark':'9b5e49','PineNeedles':'426e57','PineTips':'588568','OakLeaves':'749455','OakLight':'8ba766','Grass':'417638','DryGrass':'84603c','Wheat':'dab15e','Fern':'476b3e','Moss':'6b8660','FlowerWhite':'f0e2bd','FlowerGold':'dbaf60','FlowerViolet':'9c91ad','Wool':'e9dfc5','Skin':'5a5146','Iron':'54616b','Ore':'abc1c6','Brick':'ba7555','Roof':'657a85','Plaster':'dfcba3','Sandstone':'d0ac79','Cactus':'739575','Water':'67979b','Dark':'353f40','Rope':'bfa878'}
+PALETTE={'PBR_Bark':'74543c','PBR_Wood':'b39162','PBR_Rock':'83939d','PBR_Clay':'bd7655','ClayLight':'d08b63','ClayDark':'9b5e49','PineNeedles':'426e57','PineTips':'588568','OakLeaves':'749455','OakLight':'8ba766','Grass':'417638','DryGrass':'84603c','Wheat':'dab15e','Fern':'476b3e','Moss':'6b8660','FlowerWhite':'f0e2bd','FlowerGold':'dbaf60','FlowerViolet':'9c91ad','Wool':'e9dfc5','Skin':'5a5146','Iron':'54616b','Ore':'abc1c6','Brick':'ba7555','Roof':'657a85','Plaster':'dfcba3','Sandstone':'d0ac79','Cactus':'739575','Water':'67979b','Dark':'353f40','Rope':'bfa878','PBR_Crag':'746d64','Snow':'eef1ef','Turf':'7d8c4c','SandstoneDark':'b58a5c','Timber':'6b4a2f'}
 materials={}
 def mat(name):
  if name not in materials:
@@ -213,6 +213,49 @@ class Art:
     a=j*sides+i;b=j*sides+(i+1)%sides
     self.face([pts[a],pts[b],pts[b+sides],pts[a+sides]],'PBR_Rock','Landmarks',False)
   self.face(pts[:sides][::-1],'PBR_Rock');self.face(pts[-sides:],'PBR_Rock')
+ def peak(self,x,y,h,rx,ry,snow=.62,material='PBR_Crag'):
+  # A craggy summit: jagged rings stepping up to an off-centre point, flat
+  # faceted like split rock, with a snow cap whose lower edge is ragged.
+  self.occupy(x,y,rx*1.05,ry*1.08)
+  sides=14;rings=[0,.14,.3,.46,.6,.72,.84,.93];phase=[self.r.uniform(0,2*pi) for _ in range(4)]
+  jitter=[[self.r.uniform(-.1,.1) for _ in range(sides)] for _ in rings]
+  lean=(self.r.uniform(-.25,.25)*rx,self.r.uniform(-.2,.1)*ry)
+  pts=[]
+  for j,t in enumerate(rings):
+   r=(1-t)**.85
+   for i in range(sides):
+    a=i*2*pi/sides
+    ridge=1+.2*sin(a*3+phase[0])+.12*sin(a*5+phase[1]+t*2)+jitter[j][i]
+    xx=x+cos(a)*rx*r*ridge+lean[0]*t;yy=y+sin(a)*ry*r*ridge+lean[1]*t
+    ledge=.035*sin(a*2+phase[2])*sin(t*pi)
+    base=self.ground(xx,yy)-.02 if j==0 else self.ground(x,y)
+    pts.append((xx,yy,base+(t*h+ledge if j else 0)))
+  apex=(x+lean[0],y+lean[1],self.ground(x,y)+h)
+  def pick(level,a):return 'Snow' if level>snow+.07*sin(a*4+phase[3]) else material
+  for j in range(len(rings)-1):
+   for i in range(sides):
+    a=j*sides+i;b=j*sides+(i+1)%sides
+    self.face([pts[a],pts[b],pts[b+sides],pts[a+sides]],pick((rings[j]+rings[j+1])/2,i*2*pi/sides),'Landmarks',False)
+  top=(len(rings)-1)*sides
+  for i in range(sides):self.face([pts[top+i],pts[top+(i+1)%sides],apex],pick(1,i*2*pi/sides),'Landmarks',False)
+  self.face(pts[:sides][::-1],material)
+ def strata(self,x,y,rx,ry,h,layers,materials,top=None,taper=.16):
+  # A butte or cut bank built from stacked beds; each bed is a little
+  # narrower than the one below, so the layers read as ledges.
+  self.occupy(x,y,rx*1.05,ry*1.05)
+  sides=15;shape=[1+.16*sin(i*2*pi/sides*2+self.r.uniform(0,2*pi))+self.r.uniform(-.12,.12) for i in range(sides)]
+  wob=[[shape[i]*(1+self.r.uniform(-.09,.09)) for i in range(sides)] for _ in range(layers+1)]
+  beds=[self.r.uniform(.55,1.45) for _ in range(layers)];beds=[b*h/sum(beds) for b in beds]
+  z=self.ground(x,y)-.012;shrink=1.0
+  for k in range(layers):
+   step=beds[k];s0=shrink;shrink-=taper/max(1,layers-1)*self.r.uniform(.4,1.6);s1=s0-self.r.uniform(.02,.07)
+   ring=lambda s,zz,w:[(x+cos(i*2*pi/sides)*rx*s*w[i],y+sin(i*2*pi/sides)*ry*s*w[i],zz) for i in range(sides)]
+   lo=ring(s0,z if k else z-.02,wob[k]);hi=ring(s1,z+step,wob[k])
+   m=materials[k%len(materials)]
+   for i in range(sides):j=(i+1)%sides;self.face([lo[i],lo[j],hi[j],hi[i]],m,'Landmarks',False)
+   self.face(hi,top if (top and k==layers-1) else m)
+   if k==0:self.face(lo[::-1],m)
+   z+=step
  def generate(self):
   k=self.kind
   if k==0:
@@ -225,7 +268,11 @@ class Art:
     self.tube((x,y+.047,z+.015),(x,y+.049,z+.015),.011,.011,'PBR_Wood',12,'SmallDetails')
    self.occupy(-.43,.10,.064,.07);self.grass(1250)
   elif k==1:
-   for x,y,sz in [(-.25,-.37,.21),(.035,-.35,.24),(.19,-.24,.11)]:self.rock(x,y,sz,'PBR_Clay')
+   # Cut clay banks: striped beds of clay under a turf cap, loose lumps below.
+   self.strata(-.25,-.37,.19,.12,.12,4,['PBR_Clay','ClayLight','ClayDark','PBR_Clay'])
+   self.strata(.06,-.36,.2,.13,.16,5,['ClayDark','PBR_Clay','ClayLight','PBR_Clay','ClayDark'])
+   self.strata(.24,-.24,.1,.08,.06,2,['ClayLight','PBR_Clay'])
+   for lx,ly,ls in [(-.1,-.22,.022),(.17,-.16,.018),(-.34,-.22,.016)]:self.rock(lx,ly,ls,'PBR_Clay','SmallDetails')
    x,y=-.48,-.11;z=self.ground(x,y);self.occupy(x,y,.105)
    self.tube((x,y,z-.008),(x,y,z+.14),.078,.066,'Brick',24)
    self.tube((x,y,z+.14),(x,y,z+.245),.033,.026,'ClayDark',16)
@@ -274,11 +321,14 @@ class Art:
     self.occupy(x,y,.043)
    self.fence((-.56,-.20),(-.56,.11));self.grass(200,'DryGrass',lambda x,y:y>.30)
   elif k==4:
-   self.mountain(-.29,-.28,.39,.18,.18);self.mountain(.015,-.32,.62,.23,.19);self.mountain(.30,-.24,.37,.17,.17)
+   self.peak(-.29,-.29,.40,.18,.17,.66);self.peak(.015,-.34,.64,.23,.19,.55);self.peak(.31,-.25,.36,.17,.16,.7)
+   for sx,sy,ss in [(-.17,-.14,.03),(.18,-.12,.026),(-.38,-.12,.022),(.40,-.1,.02)]:self.rock(sx,sy,ss,'PBR_Crag','SmallDetails')
    x,y=.03,.015;z=self.ground(x,y)
    self.occupy(x,y-.05,.12,.16)
-   self.box((x,y-.075,z+.092),(.205,.19,.19),'PBR_Rock',bevel=.014)
-   self.box((x,y,z+.069),(.138,.07,.15),'Dark',bevel=.009)
+   # The adit is cut into a rocky shoulder; its mouth is dark behind the frame.
+   self.peak(x,y-.09,.27,.16,.13,2)
+   self.box((x,y-.004,z+.08),(.2,.07,.16),'PBR_Crag',bevel=.012)
+   self.box((x,y+.03,z+.069),(.138,.012,.15),'Dark',bevel=.004)
    for side in [-1,1]:self.box((x+side*.081,y+.043,z+.082),(.027,.050,.172),'PBR_Wood',bevel=.003)
    self.box((x,y+.043,z+.172),(.19,.051,.028),'PBR_Wood',bevel=.003)
    # Rails follow the slope and stop before the token; sleepers are fully seated.
@@ -294,7 +344,11 @@ class Art:
     if self.clear(xx,yy,sz):self.rock(xx,yy,sz,'Ore','SmallDetails')
    self.grass(260,'DryGrass')
   else:
-   for x,y,sz in [(-.32,-.34,.15),(.23,-.38,.18),(.49,-.01,.10)]:self.rock(x,y,sz,'Sandstone')
+   # Wind-cut buttes in bands of pale and rust sandstone.
+   for x,y,rx,ry,h,n in [(-.32,-.34,.14,.11,.2,5),(.23,-.38,.16,.12,.27,6),(.49,-.01,.08,.07,.12,3)]:
+    self.strata(x,y,rx*1.35,ry*1.35,h*.14,1,['SandstoneDark'],None,0)
+    self.strata(x,y,rx,ry,h,n,['Sandstone','SandstoneDark','Sandstone'],None,.1)
+    self.rock(x+rx*.9,y+ry*.8,rx*.22,'Sandstone','SmallDetails')
    for row in range(3):
     for col in range(4-row):
      x=-.52+col*.061;y=-.06+row*.012;z=self.ground(x,y)
