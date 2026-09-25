@@ -6,7 +6,7 @@ assets/models/props/. Sizes are in scenery units (one tile across).
 
 The game relies on these names and places (see docs/development.md):
 
-- Offshore rocks: one mesh "Rock" in PBR_Rock, about one unit across. The
+- Offshore rocks: one mesh "Rock" in PBR_SeaRock, about one unit across. The
   board stands them upright with z 0 at the water line; the part below
   spreads wide so it fades into the deep water.
 - Lighthouse: the water line is at z .175 on its islet. "Lamp" is the glazed
@@ -32,7 +32,7 @@ SOURCE = ROOT / 'assets/source/sea_props.blend'
 
 reset('SeaProps')
 
-ROCK = material('PBR_Rock', '83939d')
+ROCK = material('PBR_SeaRock', '675f56')
 MOSS = material('SeaMoss', '7d8a4c')
 GUANO = material('Guano', 'e6e1d2')
 report = {}
