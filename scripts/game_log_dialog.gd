@@ -5,6 +5,10 @@ var entries: Array=[]
 var names: Array=[]
 var seat=-1
 
+# Long games fill many screens; keep the title, filters and count in view.
+func _ready():
+	pin([%Title,%Filters,%Count])
+
 func show_log(lines: Array,player: int,state: Dictionary):
 	var players: Array=state.get("players",[])
 	if lines==entries and names.size()==players.size() and not entries.is_empty():return

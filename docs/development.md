@@ -88,11 +88,17 @@ The server owns dice rolls, the deck, hands, resources and action validation. Cl
 
 ### Room rules and the board
 
-`CatanNetwork.room_settings` holds the room's rules: `seed`, `island` (`random` or `classic`), `turn_seconds` (one of `CatanRules.TURN_TIMERS`, 0 for off), `points` (5 to 15) and `friendly_robber`. The host picks a random seed when the room opens. Only the room controller can change a setting, only in the lobby, and the host validates every value before it broadcasts the roster and settings with `_lobby`. `rules.create(names, seed, options)` builds the game from them and stores `seed`, `island`, `points_target` and `friendly_robber` in the state.
+`CatanNetwork.room_settings` holds the room's rules: `seed`, `island` (one of `CatanRules.ISLANDS`: `random`, `classic` or `archipelago`), `turn_seconds` (one of `CatanRules.TURN_TIMERS`, 0 for off), `points` (5 to 15) and one boolean for each entry in `CatanRules.HOUSE_RULES` (`friendly_robber`, `random_start`, `start_card`, `treasure`). `CatanRules.HOUSE_RULE_TEXT` holds each rule's name and help, which the lobby and the victory screen use. The host picks a random seed when the room opens. Only the room controller can change a setting, only in the lobby, and the host validates every value before it broadcasts the roster and settings with `_lobby`. `rules.create(names, seed, options)` builds the game from them and stores `seed`, `island`, `points_target` and every house rule in the state.
+
+Dice come from a shuffled deck of the 36 outcomes of two dice, reshuffled when 5 or fewer remain (`CatanRules.DICE_RESHUFFLE`). The deck stays on the host; `snapshot()` removes it. Tests and the tutorial pick a roll with `force_roll()`.
 
 A random island grows outward from one hex. Each step picks a free neighbor, weighted towards hexes with more land around them, so the coast is ragged without long thin spits. Shapes that enclose water are thrown away and grown again. The finished island is centered on its average tile position. Tile and vertex keys are built before centering so shared corners round the same way. `CatanRules.island_scale()` returns how far the scenery ring (rocks, lighthouse, mainland) must scale out to clear the island, and the board uses it in place of the old fixed scale. Harbor types are shuffled with the same seed and spread evenly along the walked coastline from a seeded starting edge. Edges that face a narrow bay are skipped so moored boats have open water.
 
-The friendly robber refuses hexes that touch another player with 2 public points or fewer. If that leaves no legal hex, every hex is allowed again. `CatanRules.robber_sites()` is shared by the rules, the bot and the board markers.
+Random start skips the setup phases. `_random_setup()` ranks every open corner by pips plus new resource types and gives each player picks from the upper band, so starts are good without all being the best. Starting card deals one development card to each player when setup ends, and it can be played on the first turn. The treasure is tile kind `CatanRules.TREASURE` (6) on a coastal hex. `_treasure_near()` lists the corners within 2 steps of it, and setup refuses them. When its number is rolled and the robber is elsewhere, `_pay_treasure()` pays 2 random resources per settlement and 4 per city, then draws a new number from `TREASURE_NUMBERS` (2 to 12 without 7). The board reprints its token.
+
+The archipelago puts a main island at the center and three smaller ones around it, never touching. Every tile stores its `island` id. Sea hexes within 2 steps of land add vertices and edges with `tiles` set to 0, so ships have water to sail on. `valid_ship()` accepts an edge with fewer than 2 land tiles that joins the player's own building or ship. Roads never chain from ships. In `_walk()`, a road and a ship link only through the player's own building. The first settlement on a new island adds `ISLAND_BONUS` (2) points through `island_bonus`. Bots plan ships with `_route_step()` and value a new island in `_site()`.
+
+The friendly robber refuses hexes that touch another player with 3 public points or fewer. If that leaves no legal hex, every hex is allowed again. `CatanRules.robber_sites()` is shared by the rules, the bot and the board markers.
 
 ### Trades
 
@@ -112,7 +118,7 @@ Online rooms use ENet over authenticated DTLS. The `NC1-` invite carries the end
 
 A public UDP socket on 24567 serves certificate discovery and forwards encrypted datagrams to an ENet listener bound to loopback on an ephemeral port. This local forwarding needs no extra public port or external lookup service. Certificate responses are no larger than the padded requests, and relay allocations are bounded. Godot/mbedTLS handles encryption and separate session keys for each client. The public certificate and endpoint remain visible on the wire. Share invites through a trusted channel: replacing an invite replaces the host identity the client trusts.
 
-Protocol 16 adds room rules, counter-offers and rematches; protocol 14 added the turn timer; protocol 13 rejected bare addresses and older certificate invites, with no plaintext fallback. Saved reconnect invites remain valid while the original room runs; restarting the host requires a new invite. The certificate is valid for 30 days, so rooms left running longer must restart. Clients must update together. Update downloads retain signature and hash verification.
+Protocol 18 adds house rules, ships, the archipelago and the weather day counter; protocol 16 added room rules, counter-offers and rematches; protocol 14 added the turn timer; protocol 13 rejected bare addresses and older certificate invites, with no plaintext fallback. Saved reconnect invites remain valid while the original room runs; restarting the host requires a new invite. The certificate is valid for 30 days, so rooms left running longer must restart. Clients must update together. Update downloads retain signature and hash verification.
 
 ## Verification
 
@@ -140,23 +146,41 @@ Ownership stays readable whatever players choose. Banners, the town rim and the 
 
 ## Models
 
-Every mesh in the game is modeled in Blender except the player pieces, which are generated (see [Player pieces](#player-pieces)). Shader and particle carriers also stay Godot primitives: the ocean plane, rain, lightning, pollen and chimney smoke. The lighthouse beam is its spot light scattering in a night-only `FogVolume` of sea haze; it needs Forward+ with Atmosphere enabled, and other renderers still get the sweeping light on the water. Each group has an editable source in `assets/source/` and one `.glb` per model in `assets/models/<group>/`:
+Every mesh in the game is modeled in Blender except the player pieces, which are generated (see [Player pieces](#player-pieces)). Shader and particle carriers also stay Godot primitives: the ocean plane, the sea bed, rain, lightning, pollen and chimney smoke. The lighthouse beam is its spot light scattering in a night-only `FogVolume` of sea haze; it needs Forward+ with Atmosphere enabled, and other renderers still get the sweeping light on the water. Each group has an editable source in `assets/source/` and one `.glb` per model in `assets/models/<group>/`:
 
 | Source | Models |
 | --- | --- |
 | `actors.blend` | Sheep, woodcutter, quarry worker, farmer, outlaw and town dweller |
 | `settlements.blend` | Cottage, harbor, robber camp and worksites |
 | `props.blend` | Sailboat, lighthouse, number token, die, markers, production halo and offshore rocks |
+| `seafaring.blend` | The player's ship and the treasure chest, built by `tools/build_seafaring.py` |
+| `sealife.blend` | Shore boulders, three fish, kelp, seagrass, red coral, a sea fan, sponges and a starfish, built by `tools/build_sealife.py` |
 | `terrain.blend` | The ground of each biome and the cliff skirt |
 | `mainland.blend` | The backdrop mainland |
+
+`tools/build_seafaring.py` and `tools/build_sealife.py` build their models from code with Blender's Python module, sharing helpers in `tools/blender_kit.py`. Run them with `python3` and the `bpy` package installed, or with `blender --background --python`. Each saves its `.blend` and exports each glTF itself. Sea life models are single joined meshes in metres, because the board draws them in MultiMeshes and colors them in its own shaders. Keep the hull's faces pointing outward; the script asserts it, because the textured wood shader culls back faces.
 
 Export each model's collection with the glTF exporter, using **+Y Up**, **Apply Modifiers**, **Custom Properties** and, for models with lamps, **Punctual Lights**. The code relies on these conventions:
 
 - **Pivots.** Animated parts hang from empties with an identity rest rotation, such as `Body/Leg0/Knee0` on the sheep and `Torso/UpperArm0/Forearm0` or `Torso/Tool` on workers. `scripts/living_world.gd` drives them by name.
-- **Recolored surfaces.** A material named after a role, optionally with a signed percentage, takes its color at runtime: `Shirt`, `Shirt-16` (darkened 16%), `Shirt+07` (lightened 7%). Roles are `Shirt` and `Skin`. `CatanModelTint.paint()` applies them.
+- **Recolored surfaces.** A material named after a role, optionally with a signed percentage, takes its color at runtime: `Shirt`, `Shirt-16` (darkened 16%), `Shirt+07` (lightened 7%). Roles are `Shirt` and `Skin` on actors and `Owner` on player pieces such as the ship. A surface whose glTF material is double sided, like a sail, stays double sided after recoloring. `CatanModelTint.paint()` applies them.
 - **Textured surfaces.** Materials named `PBR_Rock`, `PBR_Wood` and similar take that surface's texture tier from `CatanTileArt.surface()`.
 - **Night lights.** Meshes named `NightWindow`, `NightLantern` or `Campfire` glow at night, lit by the `NightLight` point light that shares their pivot. Each light's `local_range` and `night_energy` custom properties become Godot metadata.
 - **Ground.** Workers, cottages and the robber camp stand on `CatanTileArt.height_at()`, which samples the exported ground mesh. Sculpt it freely, but keep the rim at 0.20 units so tiles meet the cliffs. Godot generates the ground's LODs; Model Detail sets their `lod_bias`.
+
+## Weather, water and camera
+
+Weather follows the synchronized world clock. Each ten-minute day uses one of the outlines in `weather.gd`'s `DAYS`, picked by `day_outline()` from the map seed and `world_days`, the number of whole days since the game began. Every client reaches the same sky. Keys drift by up to 20 seconds per day. Every outline opens and closes clear, so days join without a jump. Lightning strikes come in 24-second slots; about half the slots in a storm get one, at a hashed time, bearing and distance. Far strikes flash dimmer and rumble later, softer and lower. Overcast keeps a third of the sun as shadowless light and raises the ambient fill, so cloudy days stay readable.
+
+Rain and thunder play on a `Weather` bus that `audio.gd` creates at startup, with its own **Rain and thunder** volume. A low-pass filter on that bus opens from 1.4 kHz for drizzle to 7 kHz for a downpour. `tools/generate_weather_audio.py` writes the stereo rain loop and three thunder claps from near to far.
+
+The water is see-through. `shaders/water.gdshader` reads the depth buffer to find how far light travels underwater and absorbs red fastest, so the shallows are turquoise and deep water dark blue. The sea bed is a plane that `board.gd` sizes to each board. `shaders/seabed.gdshader` sinks it to the depth given by `seabed_depth()` in `shaders/sea_floor.gdshaderinc`: a sandy shelf near the coast, a step to a reef, then deep water between islands. Both shaders share the tile list through that include. Caustics on the bed fade with depth. The bed ends 170 metres beyond the outermost tile, where the water is too deep to see through.
+
+Shores come from `scripts/coast.gd` when a board is built. It walks every coastline (edges with one land tile), mitres the strip at each corner, and lays eight rows from the cliff foot out to an underwater toe that dips below the sea bed. Each sample blends sand, shingle and rock from the tile's biome (`BIOME_SHORE`) plus seeded noise along the coast; harbor edges are shingle. The mix sets the strip's width and height profile and goes to `shaders/shore.gdshader` as vertex color, which draws sand grain, pebbles, rock strata with lichen, weed at rocky waterlines and a wet band. Boulders scatter on rocky stretches, and rocky headlands sometimes get a sea stack 16 to 20 metres out, beyond the ship lane. Ships sit 0.36 tile units off the coast to clear the beach. The water draws foam wherever it is shallow over anything, using the same depth read as its color.
+
+`scripts/sea_life.gd` scatters plants by depth band from the map seed: seagrass and starfish on the shelf, kelp deeper, corals, sea fans, sponges and reef rocks on the reef. Foliage quality scales the counts. `shaders/sea_plant.gdshader` lowers each instance from the waterline to `bed_height()` under its origin, so plants sit on the same dunes the bed shader draws, and sways the tall ones. Fish swim in schools as boids: they keep apart, match heading, hold together, head for a wandering goal in open water, and turn away from the coast and the bed. They also scatter from the pointer: each frame `board.gd` casts the mouse ray onto the water plane, and when it lands on open water (not land, a beach or the HUD) fish within 11 m dart sideways and down, faster than their cruising speed. A fright fades over a second or so, and the school picks a new goal away from the cursor. `CatanSeaFloor` in `scripts/sea_floor.gd` mirrors the shader's shore distance and depth for this. `shaders/fish.gdshader` bends each body in a wave that grows towards the tail. Fish run on each client alone; Reduce motion stops them.
+
+Camera input moves goals (`goal_focus`, `goal_zoom`, `goal_yaw`, `goal_pitch`), and `_steer_camera()` eases the camera toward them each frame; Reduce motion snaps instead. The wheel zooms about the ground under the pointer. Dragging and orbiting follow the hand directly. `_fit_home()` frames the tiles' bounding box, so the archipelago fills the view. Code that moves the camera should set the goals.
 
 ## Scenery and placement
 

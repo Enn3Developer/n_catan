@@ -108,11 +108,11 @@ msgstr "%s%s\n%d punti · %d risorse · %d carte sviluppo\nLunghezza strada %d �
 msgid "+ Add bot"
 msgstr "+ Aggiungi bot"
 
-msgid "19 hexes · Classic"
-msgstr "19 esagoni · Classico"
+msgid "%d hexes · Classic"
+msgstr "%d esagoni · Classico"
 
-msgid "30 hexes · Paired turns"
-msgstr "30 esagoni · Turni abbinati"
+msgid "%d hexes · Paired turns"
+msgstr "%d esagoni · Turni abbinati"
 
 msgid "3D render scale"
 msgstr "Scala di rendering 3D"
@@ -139,8 +139,8 @@ msgstr "Regola risoluzione e morbidezza delle ombre. I livelli alti conservano r
 msgid "Adjust ocean mesh resolution, wave layers, fine ripples and shoreline foam. Reflections are set in the Lighting tab."
 msgstr "Regola il dettaglio dell’oceano, le onde, le increspature e la schiuma sulla costa. I riflessi si regolano nella scheda Illuminazione."
 
-msgid "Adjust orbit and pan speed. Right-drag orbits; middle-drag pans; the wheel zooms; Home fits the board."
-msgstr "Regola la velocità della telecamera. Trascina con il destro per ruotare e con il centrale per spostarti. La rotella regola lo zoom; Home inquadra il tabellone."
+msgid "Adjust orbit and pan speed. Drag the board or hold WASD to pan; right-drag or Q/E orbits; the wheel or +/- zooms; Home fits the board."
+msgstr "Regola la velocità della telecamera. Trascina il tabellone o tieni premuto WASD per spostarti; trascina col destro o usa Q/E per ruotare; rotella o +/- per lo zoom; Home inquadra il tabellone."
 
 msgid "Adjust scene brightness before cinematic tone mapping. Does not change the interface."
 msgstr "Regola la luminosità della scena prima della mappatura tonale. Non modifica l’interfaccia."
@@ -826,8 +826,8 @@ msgstr "Minerale"
 msgid "Other players can accept your offer. You can withdraw it to make a new one."
 msgstr "Gli altri giocatori possono accettare la tua offerta. Puoi ritirarla per proporne una nuova."
 
-msgid "Overall volume, including music, effects and ocean ambience."
-msgstr "Volume generale, inclusi musica, effetti e suoni dell’oceano."
+msgid "Overall volume, including music, effects, ocean ambience and weather."
+msgstr "Volume generale, inclusi musica, effetti, suoni dell’oceano e meteo."
 
 msgid "Paired turn"
 msgstr "Turno abbinato"
@@ -1728,8 +1728,8 @@ msgstr "Temporale"
 msgid "Clouds and rain"
 msgstr "Nuvole e pioggia"
 
-msgid "Choose changing weather or keep one condition. Rain and thunder use the ambience volume. Reduced motion disables rain and lightning flashes."
-msgstr "Scegli un meteo variabile o una condizione fissa. Pioggia e tuoni usano il volume ambiente. Il movimento ridotto disattiva pioggia e lampi."
+msgid "Choose changing weather or keep one condition. Rain and thunder have their own volume under Audio. Reduced motion disables rain and lightning flashes."
+msgstr "Scegli un meteo variabile o una condizione fissa. Pioggia e tuoni hanno un volume a parte nella sezione Audio. Il movimento ridotto disattiva pioggia e lampi."
 
 msgid "Enter a valid public address and optional UDP port."
 msgstr "Inserisci un indirizzo pubblico valido e, se serve, la porta UDP."
@@ -2342,11 +2342,11 @@ msgstr "Mostra le righe che citano un giocatore"
 msgid "Stole"
 msgstr "Rubate"
 
-msgid "The friendly robber spares players with 2 points or fewer. Choose another hex."
-msgstr "Il brigante amichevole risparmia chi ha 2 punti o meno. Scegli un altro esagono."
+msgid "The friendly robber spares players with 3 points or fewer. Choose another hex."
+msgstr "Il brigante amichevole risparmia chi ha 3 punti o meno. Scegli un altro esagono."
 
-msgid "The robber cannot be placed next to a player with 2 points or fewer."
-msgstr "Il brigante non può essere messo accanto a un giocatore con 2 punti o meno."
+msgid "The robber cannot be placed next to a player with 3 points or fewer."
+msgstr "Il brigante non può essere messo accanto a un giocatore con 3 punti o meno."
 
 msgid "The same seed and player count always build the same island. Share it to replay a map."
 msgstr "Lo stesso seme con lo stesso numero di giocatori crea sempre la stessa isola. Condividilo per rigiocare una mappa."
@@ -2432,8 +2432,8 @@ msgstr "Quando esce il 7"
 msgid "Anyone holding more than seven resources discards half, rounded down. Then the roller moves the robber, which stops that hex producing, and steals a resource from a neighbor."
 msgstr "Chi ha più di sette risorse ne scarta metà, arrotondando per difetto. Poi chi ha tirato sposta il brigante, che blocca la produzione di quell’esagono, e ruba una risorsa a un vicino."
 
-msgid "Click glowing markers to build. Right-drag to orbit, scroll to zoom and middle-drag to pan. F focuses a tile, H hides the interface and Home fits the board."
-msgstr "Clicca sui punti illuminati per costruire. Trascina col destro per ruotare, usa la rotella per lo zoom e trascina col centrale per spostarti. F mette a fuoco una tessera, H nasconde l’interfaccia e Home inquadra il tabellone."
+msgid "Click glowing markers to build. Drag the board or hold WASD to pan, right-drag or Q/E to orbit and scroll to zoom. F focuses a tile, H hides the interface and Home fits the board."
+msgstr "Clicca sui punti illuminati per costruire. Trascina il tabellone o tieni premuto WASD per spostarti, trascina col destro o usa Q/E per ruotare e la rotella per lo zoom. F mette a fuoco una tessera, H nasconde l’interfaccia e Home inquadra il tabellone."
 
 msgid "Five or six players"
 msgstr "Cinque o sei giocatori"
@@ -2569,3 +2569,69 @@ msgstr "Covoni"
 
 msgid "Woodpile"
 msgstr "Catasta di legna"
+
+msgid "%s found %d resources in the treasure."
+msgstr "%s ha trovato %d risorse nel tesoro."
+
+msgid "%s settled a new island: +%d points."
+msgstr "%s ha colonizzato una nuova isola: +%d punti."
+
+msgid "A main island and smaller ones across the sea. Build ships to reach them; the first settlement on each new island is worth 2 extra points."
+msgstr "Un'isola principale e altre più piccole oltre il mare. Costruisci navi per raggiungerle; la prima colonia su ogni nuova isola vale 2 punti in più."
+
+msgid "All 15 of your ships are at sea. You have none left to place."
+msgstr "Tutte le tue 15 navi sono in mare. Non ne hai altre da posizionare."
+
+msgid "Archipelago"
+msgstr "Arcipelago"
+
+msgid "Choose a glowing sea edge for your ship"
+msgstr "Scegli un lato di mare illuminato per la nave"
+
+msgid "Choose a sea edge next to your harbor town or the end of your ships."
+msgstr "Scegli un lato di mare accanto a una tua colonia costiera o in fondo alle tue navi."
+
+msgid "Everyone draws a development card before the first roll and can play it on their first turn."
+msgstr "Ognuno pesca una carta sviluppo prima del primo tiro e può giocarla già al primo turno."
+
+msgid "Everyone drew a development card to start."
+msgstr "Tutti hanno pescato una carta sviluppo per iniziare."
+
+msgid "Everyone's first two settlements and roads are placed for them, on good spots of similar value."
+msgstr "Le prime due colonie e strade di ognuno vengono piazzate in automatico, su buoni punti di valore simile."
+
+msgid "Place a free road or ship (%d left)"
+msgstr "Metti una strada o una nave gratuita (ne restano %d)"
+
+msgid "Random start"
+msgstr "Partenza casuale"
+
+msgid "Ship"
+msgstr "Nave"
+
+msgid "Starting card"
+msgstr "Carta iniziale"
+
+msgid "Starting settlements were placed at random."
+msgstr "Le colonie iniziali sono state piazzate a caso."
+
+msgid "The robber sits on the treasure. It pays nothing this time."
+msgstr "Il brigante è sul tesoro. Questa volta non paga nulla."
+
+msgid "The treasure moves on. Its number is now %d."
+msgstr "Il tesoro si sposta. Ora il suo numero è %d."
+
+msgid "To build a ship, you still need %s."
+msgstr "Per costruire una nave ti servono ancora %s."
+
+msgid "Treasure tile"
+msgstr "Tessera del tesoro"
+
+msgid "When its number is rolled, the treasure gives each settlement on it 2 random resources (a city 4), then draws a new number. No one can start within 3 roads of it."
+msgstr "Quando esce il suo numero, il tesoro dà 2 risorse a caso a ogni colonia che lo tocca (4 a una città), poi pesca un nuovo numero. Nessuno può partire a meno di 3 strade da lui."
+
+msgid "Rain and thunder"
+msgstr "Pioggia e tuoni"
+
+msgid "Volume of rain and thunder. Drizzle stays soft and muffled; only a downpour plays at full level."
+msgstr "Volume di pioggia e tuoni. La pioggerella resta leggera e ovattata; solo un acquazzone suona a pieno volume."

@@ -41,6 +41,12 @@ size_flags_vertical = 4
 layout_mode = 2
 theme_override_constants/separation = 16
 
+[node name="Header" type="VBoxContainer" parent="DialogMargin/Panel/Frame"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 12
+
 [node name="DialogScroll" type="ScrollContainer" parent="DialogMargin/Panel/Frame"]
 unique_name_in_owner = true
 layout_mode = 2

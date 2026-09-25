@@ -23,7 +23,9 @@ func show_room(net: CatanNetwork,invite_address: String,connection_status: Strin
 	%LobbyTitle.text=tr("Solo game") if net.solo else tr("Online room")
 	%PlayerCount.text="%d / 6" % net.roster.size()
 	var controller=net.is_controller()
-	%RoomSummary.text=tr("30 hexes · Paired turns") if net.roster.size()>4 else tr("19 hexes · Classic")
+	var extended=net.roster.size()>4
+	var hexes=(30 if extended else 19)+((5 if extended else 4) if net.room_settings.island=="archipelago" else 0)+(1 if net.room_settings.get("treasure",false) else 0)
+	%RoomSummary.text=(tr("%d hexes · Paired turns") if extended else tr("%d hexes · Classic")) % hexes
 	%RoomAccess.visible=not net.solo
 	%RoomAccess.text=tr("Password required to join") if not net.room_password.is_empty() else tr("Open room · no password")
 	for i in CatanNetwork.MAX_PLAYERS:
@@ -60,6 +62,8 @@ func _show_rules(settings: Dictionary,controller: bool,solo: bool):
 	%IslandPicker.clear()
 	%IslandPicker.add_item(tr("Random coastline"))
 	%IslandPicker.add_item(tr("Classic hexagon"))
+	%IslandPicker.add_item(tr("Archipelago"))
+	%IslandPicker.set_item_tooltip(2,tr("A main island and smaller ones across the sea. Build ships to reach them; the first settlement on each new island is worth 2 extra points."))
 	%IslandPicker.select(CatanRules.ISLANDS.find(settings.island))
 	%TimerPicker.clear()
 	for seconds in CatanRules.TURN_TIMERS:%TimerPicker.add_item(tr("Off") if seconds==0 else tr("%d s") % seconds if seconds<60 else tr("%d min") % (seconds/60) if seconds%60==0 else tr("%d:%02d min") % [seconds/60,seconds%60])
@@ -71,7 +75,37 @@ func _show_rules(settings: Dictionary,controller: bool,solo: bool):
 	for points in range(CatanRules.POINT_TARGETS[0],CatanRules.POINT_TARGETS[1]+1):%PointsPicker.add_item(str(points))
 	%PointsPicker.select(int(settings.points)-CatanRules.POINT_TARGETS[0])
 	%FriendlyRobber.set_pressed_no_signal(bool(settings.friendly_robber))
-	for control: Control in [%IslandPicker,%TimerPicker,%PointsPicker,%FriendlyRobber]:control.set("disabled",not controller)
+	var switches: Array[Control]=[%FriendlyRobber]
+	for rule in CatanRules.HOUSE_RULES:
+		if rule=="friendly_robber":continue
+		var toggle: CheckButton=_house_rule(rule)
+		toggle.set_pressed_no_signal(bool(settings.get(rule,false)))
+		switches.append(toggle)
+	for control: Control in [%IslandPicker,%TimerPicker,%PointsPicker]+switches:control.set("disabled",not controller)
+
+## A labelled switch for one house rule, made once and kept in the rules grid.
+func _house_rule(rule: String) -> CheckButton:
+	var node_name=rule.to_pascal_case()
+	var existing=%RulesGrid.get_node_or_null(node_name)
+	if existing:return existing
+	var text: Array=CatanRules.HOUSE_RULE_TEXT[rule]
+	var label=Label.new()
+	label.name=node_name+"Label"
+	label.text=text[0]
+	label.tooltip_text=text[1]
+	label.mouse_filter=Control.MOUSE_FILTER_PASS
+	label.add_theme_font_size_override("font_size",15)
+	%RulesGrid.add_child(label)
+	var toggle=CheckButton.new()
+	toggle.name=node_name
+	toggle.custom_minimum_size=Vector2(0,40)
+	toggle.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	toggle.tooltip_text=text[1]
+	toggle.mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND
+	toggle.add_to_group("ui_click")
+	toggle.toggled.connect(func(enabled):setting_changed.emit(rule,enabled))
+	%RulesGrid.add_child(toggle)
+	return toggle
 
 func arrange(viewport: Vector2,_overlay_bottom: float) -> Rect2:
 	%Voyage.custom_minimum_size.x=320 if viewport.x<1100 else 380

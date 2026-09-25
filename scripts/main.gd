@@ -95,7 +95,7 @@ func _home():
 	inspection_hint.hide()
 	board.show_labels=true
 	if not menu_island:_build_menu_island()
-	board.reset_camera()
+	board.reset_camera(true)
 	_clear("res://scenes/ui/home.tscn")
 	state={}
 	game_log=[]
@@ -246,12 +246,14 @@ func _received(data: Dictionary):
 	turn_clock_limit=float(state.get("turn_limit",0.0))
 	turn_clock_left=float(state.get("turn_seconds",0.0))
 	board.day_seconds=state.get("world_seconds",board.day_seconds)
+	board.day_count=int(state.get("world_days",board.day_count))
 	board.advance_day(0)
 	if produced: board.throw_dice(state.dice)
 	mode=""
 	if state.turn==net.seat:
 		if state.phase=="setup_settlement": mode="settlement"
-		if state.phase in ["setup_road","free_roads"]: mode="road"
+		if state.phase=="setup_road": mode="road"
+		if state.phase=="free_roads": mode="route" if state.get("island","")=="archipelago" else "road"
 		if state.phase=="robber": mode="robber"
 	if guide!=null and guide.completed: mode=""
 	board.set_mode("" if inspection_mode else mode,-1 if inspection_mode else net.seat)

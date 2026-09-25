@@ -14,9 +14,10 @@ func show_results(state: Dictionary,net: CatanNetwork):
 	var winner: int=state.winner
 	# The winner is the dialog's title; a separate "Victory" heading said the same thing.
 	%Title.text=tr("%s wins!") % state.players[winner].name
-	var island=tr("Random coastline") if state.get("island","random")=="random" else tr("Classic hexagon")
+	var island=tr({"random":"Random coastline","classic":"Classic hexagon","archipelago":"Archipelago"}.get(state.get("island","random"),"Random coastline"))
 	%Summary.text=tr("Map seed %d · %s · %d points to win") % [int(state.get("seed",0)),island,int(state.get("points_target",10))]
-	if state.get("friendly_robber",false):%Summary.text+=" · "+tr("Friendly robber")
+	for rule in CatanRules.HOUSE_RULES:
+		if state.get(rule,false):%Summary.text+=" · "+tr(CatanRules.HOUSE_RULE_TEXT[rule][0])
 	_show_stats(state,net)
 	_show_dice(state.get("dice_counts",[]))
 	var controller=net.is_controller() and not net.tutorial

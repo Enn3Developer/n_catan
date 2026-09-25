@@ -50,7 +50,7 @@ func reach(arm: Node3D,elbow: Node3D,target: Vector3,side: float):
 
 func populate(parent: Node3D,kind: int,index: int,art) -> Array:
 	var entries=[]
-	if kind==5:return entries
+	if kind>=5:return entries
 	var layout=CatanWorldLayout.biome(kind)
 	if layout.cottage!=null:
 		var hut=layout.cottage

@@ -74,8 +74,8 @@ func choose(data: Dictionary,p: int,difficulty: int=1) -> Dictionary:
 	if data.phase in ["discard","steal"]: return {}
 	var plan=_expansion(r,p,difficulty)
 	if data.phase=="free_roads":
-		var edge=_road(r,p,plan)
-		return {"type":"road","id":edge} if edge>=0 and r.pieces(p,"road")<15 else {"type":"finish_roads"}
+		var free=_route_step(r,p,plan)
+		return free if not free.is_empty() else {"type":"finish_roads"}
 	if data.phase!="play": return {}
 	if not data.rolled: return {"type":"roll"}
 	var settlements=[]
@@ -89,11 +89,14 @@ func choose(data: Dictionary,p: int,difficulty: int=1) -> Dictionary:
 		return {"type":"settlement","id":_best(settlements,difficulty)}
 	var goal="settlement" if not settlements.is_empty() and r.pieces(p,"settlement")<5 else "road"
 	if (not cities.is_empty() and (r.pieces(p,"settlement")>=4 or player.hand[4]>=2 or plan.is_empty())): goal="city"
-	if r.pieces(p,"road")>=15 or plan.is_empty(): goal="city" if not cities.is_empty() and r.pieces(p,"city")<4 else "buy_card"
+	var step=_route_step(r,p,plan)
+	if goal=="road" and not step.is_empty(): goal=step.type
+	if (goal=="road" and (r.pieces(p,"road")>=15 or step.is_empty())) or plan.is_empty():
+		if goal in ["road","ship"] or plan.is_empty(): goal="city" if not cities.is_empty() and r.pieces(p,"city")<4 else "buy_card"
 	var cost=CatanRules.COST[goal]
 	if not data.card_played:
 		if player.cards[0]>0: return {"type":"play_card","id":0}
-		if player.cards[1]>0 and r.pieces(p,"road")<15 and _road(r,p,plan)>=0: return {"type":"play_card","id":1}
+		if player.cards[1]>0 and not step.is_empty(): return {"type":"play_card","id":1}
 		if player.cards[2]>0:
 			var available=data.bank.duplicate()
 			var hand=player.hand.duplicate()
@@ -122,9 +125,7 @@ func choose(data: Dictionary,p: int,difficulty: int=1) -> Dictionary:
 				var value=production+maxi(0,cost[res]-player.hand[res])*2
 				if value>highest: highest=value; resource=res
 			return {"type":"play_card","id":3,"resource":resource}
-	if goal=="road" and r.can_pay(p,CatanRules.COST.road):
-		var edge=_road(r,p,plan)
-		if edge>=0 and r.pieces(p,"road")<15: return {"type":"road","id":edge}
+	if goal in ["road","ship"] and not step.is_empty() and r.can_pay(p,CatanRules.COST[goal]): return step
 	if r.can_pay(p,CatanRules.COST.buy_card) and int(data.get("deck_count",0))>0 and (goal=="buy_card" or r.total(player.hand)>8 or player.points>=7): return {"type":"buy_card"}
 	# Turn surplus into precisely what the next build needs. Easy bots trade less often.
 	if difficulty>0 or random.randf()<0.5:
@@ -156,9 +157,14 @@ func _site(data: Dictionary,p: int,v: int,difficulty: int) -> float:
 				if data.tiles[t].kind<5: income[data.tiles[t].kind]+=_pips(data.tiles[t].number)*owned.level
 	var value=0.0
 	var types={}
+	var islands: Array=data.players[p].get("islands",[])
+	var new_island=false
 	for t in data.vertices[v].tiles:
 		var tile=data.tiles[t]
-		if tile.kind==5: continue
+		if data.get("island","")=="archipelago" and not islands.is_empty() and int(tile.get("island",0)) not in islands: new_island=true
+		# Two random resources, worth a little more than one known one.
+		if tile.kind==CatanRules.TREASURE: value+=_pips(tile.number)*1.6
+		if tile.kind>=CatanRules.DESERT: continue
 		var weight=1.0
 		if difficulty==2: weight=1.0+2.5/(1.0+income[tile.kind])
 		value+=_pips(tile.number)*weight
@@ -166,6 +172,7 @@ func _site(data: Dictionary,p: int,v: int,difficulty: int) -> float:
 	if difficulty==2:
 		value+=types.size()*1.4
 		if data.vertices[v].port!=-2: value+=1.5
+	if new_island and not str(data.phase).begins_with("setup"): value+=5.0
 	return value
 
 func _best(candidates: Array,difficulty: int) -> int:
@@ -186,8 +193,11 @@ func _expansion(r: CatanRules,p: int,difficulty: int) -> Array:
 			open.append(v)
 	var visited={}
 	while not open.is_empty():
-		open.sort_custom(func(a,b):return distances[a]<distances[b])
-		var v=open.pop_front()
+		var nearest=0
+		for i in open.size():
+			if distances[open[i]]<distances[open[nearest]]: nearest=i
+		var v=open[nearest]
+		open.remove_at(nearest)
 		if visited.has(v): continue
 		visited[v]=true
 		if data.vertices[v].owner>=0 and data.vertices[v].owner!=p: continue
@@ -204,18 +214,23 @@ func _expansion(r: CatanRules,p: int,difficulty: int) -> Array:
 	var best=[]
 	var value=-INF
 	for v in distances:
-		if not r.valid_vertex(p,v,true) or paths[v].is_empty(): continue
+		if not r._open_corner(v) or paths[v].is_empty(): continue
 		var score=_site(data,p,v,difficulty)/pow(float(distances[v])+0.5,1.6)
 		if difficulty==0: score+=random.randf()*5
 		if score>value: value=score; best=paths[v]
 	return best
 
-func _road(r: CatanRules,p: int,plan: Array) -> int:
+## The next road or ship along the plan, else any road that extends the network.
+func _route_step(r: CatanRules,p: int,plan: Array) -> Dictionary:
+	var roads=r.pieces(p,"road")<CatanRules.PIECE_LIMITS.road
+	var ships=r.pieces(p,"ship")<CatanRules.PIECE_LIMITS.ship
 	for edge in plan:
-		if r.valid_edge(p,edge): return edge
-	for edge in r.s.edges.size():
-		if r.valid_edge(p,edge): return edge
-	return -1
+		if roads and r.valid_edge(p,edge): return {"type":"road","id":edge}
+		if ships and r.valid_ship(p,edge): return {"type":"ship","id":edge}
+	if roads:
+		for edge in r.s.edges.size():
+			if r.valid_edge(p,edge): return {"type":"road","id":edge}
+	return {}
 
 ## One of the bot's spare resources for one it needs for its next build, or
 ## two for one when it holds a large hand the robber could halve.

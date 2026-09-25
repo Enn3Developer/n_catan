@@ -1,6 +1,14 @@
 shader_type spatial;
 // Gerstner swells plus independently moving, filtered capillary ripples.
-render_mode cull_disabled;
+// The surface is see-through: light fades with the path it travels in the
+// water, so the sea bed shows in the shallows and deep water turns dark blue.
+render_mode cull_disabled,depth_draw_always;
+#include "res://shaders/sea_floor.gdshaderinc"
+uniform sampler2D depth_texture : hint_depth_texture,filter_nearest;
+uniform sampler2D screen_texture : hint_screen_texture,filter_linear_mipmap;
+// Fraction of red, green and blue light the water absorbs per metre.
+uniform vec3 absorption=vec3(.22,.07,.032);
+uniform float clarity=1.0;
 uniform float sun_strength=1.0;
 uniform vec3 sun_direction=vec3(0,1,0);
 uniform float animation_time=0.0;
@@ -11,9 +19,6 @@ uniform vec4 deep_color : source_color=vec4(.055,.235,.285,1.0);
 uniform vec4 shallow_color : source_color=vec4(.235,.49,.455,1.0);
 uniform float motion_speed=.65;
 uniform int water_quality=2;
-uniform int tile_count=0;
-uniform vec2 tile_centers[30];
-uniform float tile_radius=10.0;
 uniform int boat_count=0;
 uniform vec4 boat_sources[16]; // world X/Z, longitudinal direction X/Z
 varying vec2 sea_position;
@@ -38,15 +43,16 @@ vec2 rotate_domain(vec2 p){return vec2(p.x*.8-p.y*.6,p.x*.6+p.y*.8);}
 float painted_noise(vec2 p){
  return .62*noise(rotate_domain(p))+.26*noise(rotate_domain(p*2.07)+17.3)+.12*noise(rotate_domain(p*4.13)-9.1);
 }
-float shore_distance(vec2 p){
- float d=10000.0;
- for(int i=0;i<30;i++){
-  if(i>=tile_count)break;
-  vec2 q=p-tile_centers[i];
-  float e=max(abs(q.x),max(abs(q.x*.5+q.y*.8660254),abs(-q.x*.5+q.y*.8660254)))-tile_radius*.8660254;
-  d=min(d,e);
- }
- return d;
+// World position of whatever the depth buffer holds at a screen point.
+vec3 scene_point(vec2 uv,mat4 inv_projection,mat4 inv_view){
+ float depth=texture(depth_texture,uv).r;
+#if CURRENT_RENDERER == RENDERER_COMPATIBILITY
+ vec3 ndc=vec3(uv,depth)*2.0-1.0;
+#else
+ vec3 ndc=vec3(uv*2.0-1.0,depth);
+#endif
+ vec4 view=inv_projection*vec4(ndc,1.0);
+ return (inv_view*vec4(view.xyz/view.w,1.0)).xyz;
 }
 // Concentrate the existing mesh around the island; stretch only the distant ocean.
 vec2 ocean_grid(vec2 p){
@@ -109,9 +115,20 @@ void fragment(){
   slope+=normalize(local+vec2(.0001))*ripple*.04*rain_strength*(1.0-smoothstep(.6,2.0,footprint));
  }
  NORMAL=normalize((VIEW_MATRIX*vec4(-slope.x,1.0,-slope.y,0.0)).xyz);
+ // How far light travels underwater before reaching what lies below. Waves
+ // bend the view a little; a bent sample that lands above the water is dropped.
+ vec3 surface=(INV_VIEW_MATRIX*vec4(VERTEX,1.0)).xyz;
+ vec2 bend=slope*.035*clamp(-VERTEX.z*.004,.2,1.0);
+ vec2 uv=SCREEN_UV+bend;
+ vec3 below=scene_point(uv,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX);
+ if(below.y>surface.y-.05){uv=SCREEN_UV;below=scene_point(uv,INV_PROJECTION_MATRIX,INV_VIEW_MATRIX);}
+ float drop=max(surface.y-below.y,0.0);
  float coast_noise=painted_noise(p*.72+drift*.7);
- float wash=shore+(coast_noise-.5)*.40;
- float edge=1.0-smoothstep(.06,.58,wash);
+ // Beaches reach about 3 metres out from the cliffs before they meet the sea.
+ float wash=shore-3.0+(coast_noise-.5)*.40;
+ // Foam gathers wherever the water is shallow over something: beaches,
+ // boulders, piers and hulls alike.
+ float edge=1.0-smoothstep(.04,.75,drop+(coast_noise-.5)*.3);
  float lace=smoothstep(.29,.72,coast_noise);
  float foam=edge*(.23+.40*lace);
  if(water_quality>0){
@@ -119,7 +136,7 @@ void fragment(){
   float phase=wash*3.2-t*.58+coast_noise*1.8;
   float width=max(fwidth(phase),.08);
   float wavelet=1.0-smoothstep(.12,.12+width,abs(sin(phase)));
-  foam+=wavelet*exp(-shore*.60)*smoothstep(.42,.66,grain)*.22;
+  foam+=wavelet*exp(-max(wash,0.0)*.60)*smoothstep(.42,.66,grain)*.22;
  }
  float rings=0.0;
  if(water_quality>1){
@@ -136,7 +153,8 @@ void fragment(){
            smoothstep(.22,.70,noise(rotate_domain(q*.85)+drift));
   }
  }
- vec3 color=mix(deep_color.rgb,shallow_color.rgb,shallow*.78);
+ // The bed now shows the shallows, so the painted tint stays light.
+ vec3 color=mix(deep_color.rgb,shallow_color.rgb,shallow*.35);
  color*=.90+pigment*.17+grain*.045;
  if(water_quality>1){
   float filigree=1.0-smoothstep(.035,.095,abs(grain-.52));
@@ -148,13 +166,21 @@ void fragment(){
  }
  float fresnel=pow(1.0-clamp(dot(normalize(NORMAL),normalize(VIEW)),0.0,1.0),3.0);
  color=mix(color,vec3(.28,.43,.46),fresnel*.10);
- ALBEDO=mix(color,vec3(.66,.77,.70),clamp(foam+rings,0.0,.64));
+ float path=clamp(length(below-surface),0.0,400.0);
+ // Mostly the vertical depth, so a grazing view does not fog the shallows.
+ float optical=mix(drop,path,.35)/clarity;
+ vec3 transmit=exp(-absorption*optical)*(1.0-smoothstep(12.0,40.0,optical));
+ float opacity=1.0-dot(transmit,vec3(.3,.4,.3));
+ float cover=clamp(foam+rings,0.0,.64);
+ ALBEDO=mix(color*opacity*opacity,vec3(.66,.77,.70),cover);
+ vec3 seen=textureLod(screen_texture,uv,0.0).rgb;
+ EMISSION=seen*transmit*(1.0-cover)*(1.0-fresnel*.6);
  // Keep the sun confined to wave facets reflecting its direction toward the camera.
  // Limit peak brightness so individual glints stay distinct.
  vec3 light_view=normalize((VIEW_MATRIX*vec4(sun_direction,0.0)).xyz);
  float alignment=max(dot(reflect(-light_view,NORMAL),normalize(VIEW)),0.0);
  float glitter=pow(alignment,300.0);
- EMISSION=vec3(1.0,.86,.63)*glitter*sun_strength*1.4*(1.0-clamp(foam,0.0,1.0));
+ EMISSION+=vec3(1.0,.86,.63)*glitter*sun_strength*1.4*(1.0-clamp(foam,0.0,1.0));
  ROUGHNESS=mix(.16,.26,storm_strength);
  METALLIC=0.0;
  SPECULAR=0.0;
