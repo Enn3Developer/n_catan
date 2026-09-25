@@ -297,6 +297,7 @@ func _build_tile(i: int) -> Dictionary:
 		token.scale=Vector3.ONE*1.3
 		root.add_child(token)
 		token.show_number(t.number)
+		token.set_daylight(daylight)
 		facing.append(token)
 		tokens[i]=token
 	return entry
@@ -777,6 +778,8 @@ func advance_day(delta: float):
 	day_seconds=fposmod(day_seconds+delta,600.0)
 	var lighting_seconds=day_seconds if render_values.get("day_night_cycle",true) else 150.0
 	daylight=smoothstep(-.15,.35,sin(lighting_seconds/600.0*TAU))
+	for node in facing:
+		if is_instance_valid(node) and not node is CatanPortSign:node.set_daylight(daylight)
 	sun.rotation_degrees=Vector3(-15-60*absf(sin(lighting_seconds/600.0*TAU)),-34+lighting_seconds*.06,0)
 	sun.light_energy=lerpf(.52,1.65,daylight)
 	var dusk=Color("efa46f").lerp(Color("ffe4b9"),daylight)

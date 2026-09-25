@@ -213,7 +213,7 @@ func _register(pname: String,password: String,version: int,token: String="",look
 				away_clock.erase(p)
 				if old_id!=id and old_id in multiplayer.get_peers():multiplayer.multiplayer_peer.disconnect_peer(old_id)
 				_session.rpc_id(id,token)
-				rules._log(CatanI18n.message("%s reconnected. The expedition continues.",[roster[p].name]))
+				rules._log(CatanI18n.message("%s reconnected.",[roster[p].name]))
 				_broadcast_lobby()
 				_sync()
 				return
@@ -426,7 +426,7 @@ func _unready(sender: int):
 func act(action: Dictionary):
 	if not started or seat<0: return
 	if tutorial and not tutorial_expected.is_empty() and str(action.get("type",""))!=tutorial_expected:
-		rejected.emit("Follow the current tutorial step, or choose Skip lesson.")
+		rejected.emit("Follow the lesson's step, or choose Skip.")
 		return
 	if multiplayer.is_server(): _apply(1,action)
 	else: _action.rpc_id(1,action)
@@ -964,7 +964,7 @@ func saved_summary() -> Dictionary:
 		return {"outdated":true,"version":str(raw.get("version","?")).substr(0,40)}
 	var names=[]
 	for seat_row in data.seats:names.append(str(seat_row.name))
-	return {"names":names,"turn":maxi(0,data.rules.get("points_history",[]).size()-1),"saved":int(data.get("saved",0))}
+	return {"names":names,"turn":data.rules.get("points_history",[]).size(),"saved":int(data.get("saved",0))}
 
 static func _read_save(solo_game: bool) -> Dictionary:
 	var path=save_path(solo_game)

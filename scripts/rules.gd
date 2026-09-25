@@ -22,10 +22,10 @@ const HOUSE_RULES=["friendly_robber","random_start","start_card","treasure","mov
 ## House rules that only change an archipelago game.
 const SEA_RULES=["move_ships","fog"]
 const HOUSE_RULE_TEXT={
-	"friendly_robber":["Friendly robber","The robber cannot be placed next to a player with 3 points or fewer."],
+	"friendly_robber":["Friendly robber","The robber can't be placed next to a player with 3 or fewer visible points, unless no other hex is left."],
 	"random_start":["Random start","Everyone's first two settlements and roads are placed for them, on good spots of similar value."],
 	"start_card":["Starting card","Everyone draws a development card before the first roll and can play it on their first turn."],
-	"treasure":["Treasure tile","When its number is rolled, the treasure gives each settlement on it 2 random resources (a city 4), then draws a new number. No one can start within 3 roads of it."],
+	"treasure":["Treasure tile","When its number is rolled, the treasure gives each settlement on it 2 random resources (a city 4), then draws a new number. Starting settlements must be at least 3 roads from it."],
 	"move_ships":["Moving ships","Archipelago only. Once per turn, after rolling, you may move one ship from the open end of a line to another sea edge you could build on. A ship built this turn stays put."],
 	"fog":["Fog","Archipelago only. The outer islands start hidden in fog. A road, ship or settlement that reaches a hidden hex reveals it, and a resource hex gives its finder one of that resource."]}
 ## Numbers the treasure tile draws from each time it pays out.
@@ -157,7 +157,7 @@ func create(names: Array, game_seed: int = 0, options: Dictionary = {}) -> Dicti
 	_shuffle(s.deck)
 	s.treasure_near=_treasure_near()
 	s.home_island=0
-	_log("The island awaits. Place your first settlement.")
+	_log("Setup started.")
 	if s.random_start: _random_setup()
 	return s
 
@@ -645,7 +645,7 @@ func rate(p: int,r: int) -> int:
 	return result
 
 func apply(p: int,a: Dictionary) -> String:
-	if p<0 or p>=s.players.size(): return "Your seat is unavailable. Please reconnect to the game."
+	if p<0 or p>=s.players.size(): return "Your seat is unavailable. Reconnect to take it back."
 	if s.winner!=-1: return "The game has finished."
 	var action=str(a.get("type",""))
 	var id=int(a.get("id",-1))
@@ -661,7 +661,7 @@ func apply(p: int,a: Dictionary) -> String:
 		if s.discards.is_empty(): s.phase="robber"
 		return ""
 	if action in ["accept_trade","decline_trade","counter_trade"]: return _respond(p,action,a)
-	if p!=s.turn: return "It is another player’s turn. You can act when yours begins."
+	if p!=s.turn: return "It's another player's turn. You can act when yours begins."
 	var player=s.players[p]
 	if action=="cancel_trade":
 		if not s.offer.is_empty():_trade_event("withdrawn",p)
@@ -690,7 +690,7 @@ func apply(p: int,a: Dictionary) -> String:
 			s.turn=0
 			s.phase="play"
 			if s.get("start_card",false): _deal_start_cards()
-			_log("All settlements placed. Roll the dice to begin.")
+			_log("Setup finished.")
 			_score()
 			_record_points()
 		else:
@@ -801,7 +801,7 @@ func apply(p: int,a: Dictionary) -> String:
 				if not can_pay(p,COST[action]): return cost_error(p,action)
 				if action=="road":
 					if pieces(p,"road")>=15: return "All 15 of your roads are on the board. You have none left to place."
-					if not valid_edge(p,id): return "Choose an empty edge connected to your road or building. Another player’s building blocks the route."
+					if not valid_edge(p,id): return "Choose an empty edge connected to your road or building. Another player's building blocks the route."
 					s.edges[id].owner=p
 					_reveal_edge(p,id)
 				elif action=="ship":
@@ -892,7 +892,7 @@ func apply(p: int,a: Dictionary) -> String:
 				s.new_ships=[]
 				s.offer={}
 				s.offers_made=0
-			else: return "This action is unavailable. Please choose an action from the game controls."
+			else: return "That action isn't available right now."
 	else: return "This action is unavailable at this stage of the turn."
 	_score()
 	return ""

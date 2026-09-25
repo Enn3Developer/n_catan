@@ -26,10 +26,10 @@ The host sets the room rules in the lobby: the map seed, the island (random, cla
 
 The lobby also has house rules, all off by default:
 
-- **Friendly robber.** The robber stays away from players with 3 points or fewer.
+- **Friendly robber.** The robber stays away from players with 3 or fewer visible points, unless no other hex is left.
 - **Random start.** Everyone's first two settlements and roads are placed for them, on good spots of similar value.
 - **Starting card.** Everyone draws a development card before the first roll and can play it on their first turn.
-- **Treasure tile.** When its number comes up, each settlement on it gets 2 random resources and each city 4, then the tile draws a new number. Nobody can start within 3 roads of it.
+- **Treasure tile.** When its number comes up, each settlement on it gets 2 random resources and each city 4, then the tile draws a new number. Starting settlements must be at least 3 roads from it.
 - **Moving ships** (archipelago). Once per turn, after rolling, you can move one ship from the open end of a line to another sea edge you could build on. A ship built this turn stays put.
 - **Fog** (archipelago). The outer islands start hidden. A road, ship or settlement that reaches a hidden hex reveals it, and a resource hex gives you one of its resource.
 

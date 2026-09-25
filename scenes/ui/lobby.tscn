@@ -29,6 +29,7 @@ offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 16
+alignment = 1
 
 [node name="Header" type="HBoxContainer" parent="Frame"]
 unique_name_in_owner = true
@@ -107,6 +108,7 @@ uppercase = true
 [node name="PlayerCount" type="Label" parent="Frame/Columns/Left/Crew/CrewBody/CrewHeader"]
 unique_name_in_owner = true
 layout_mode = 2
+mouse_filter = 1
 theme_type_variation = &"MutedLabel"
 theme_override_font_sizes/font_size = 16
 text = "1 / 6"
@@ -163,18 +165,11 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RoomSummary" type="Label" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"HeadingLabel"
-theme_override_font_sizes/font_size = 22
-text = "Classic · 19 hexes"
-autowrap_mode = 3
-
 [node name="RoomAccess" type="Label" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"MutedLabel"
+text = "Guests need the invite and the password."
 autowrap_mode = 3
 
 [node name="SavedGame" type="VBoxContainer" parent="Frame/Columns/Voyage/VoyageBody/VoyageScroll/VoyageContent"]
@@ -349,7 +344,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
-tooltip_text = "The robber cannot be placed next to a player with 3 points or fewer."
+tooltip_text = "The robber can't be placed next to a player with 3 or fewer visible points, unless no other hex is left."
 mouse_default_cursor_shape = 2
 
 [node name="LobbyStatus" type="Label" parent="Frame/Columns/Voyage/VoyageBody"]

@@ -4,9 +4,13 @@ extends Control
 ## fan holds smaller cards and fits inside the bottom bar on small windows.
 
 const CARD_SIZE=Vector2(72,100)
-const STEP=56.0
+const STEP=60.0
 const TILT=5.0
 const MOST_CARDS=5
+## How much of a card's title band the next card leaves in view. The next card
+## tilts further clockwise about its bottom, so at the band, near the top, its
+## edge sits past the step by the lean of the card's height.
+const UNCOVERED=STEP+(CARD_SIZE.y-22)*sin(TILT*PI/180)
 ## Room kept around the cards for their tilt, shadow and lift.
 const PADDING=Vector2(6,18)
 const COMPACT_SCALE=.7
@@ -42,4 +46,4 @@ func _place_cards():
 		card.scale=Vector2.ONE*scale_by
 		# Cards scale about their bottom centre, so a small card is drawn that far in from its slot.
 		var shift=Vector2(CARD_SIZE.x/2,CARD_SIZE.y)*(1-scale_by)
-		card.rest_at(padding+Vector2(i*STEP,absf(offset)*absf(offset)*2.5)*scale_by-shift,deg_to_rad(offset*TILT))
+		card.rest_at(padding+Vector2(i*STEP,absf(offset)*absf(offset)*2.5)*scale_by-shift,deg_to_rad(offset*TILT),UNCOVERED if i<count-1 else 0.0)

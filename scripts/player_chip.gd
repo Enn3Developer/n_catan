@@ -6,7 +6,7 @@ extends PanelContainer
 const TURN_COLOR=Color("e4c18c")
 const BONUS_COLOR=Color("b77633")
 
-func show_player(state: Dictionary,index: int,seat: int,color: Color):
+func show_player(state: Dictionary,index: int,seat: int,color: Color,seat_row: Dictionary={}):
 	var player: Dictionary=state.players[index]
 	var scoring=CatanRules.new();scoring.s=state
 	var score=scoring.visible_points(index)
@@ -16,14 +16,33 @@ func show_player(state: Dictionary,index: int,seat: int,color: Color):
 	var hidden_points=player.cards[4]+player.new_cards[4] if player.cards.size()==5 else 0
 	tooltip_text+=tr("\n%d public points + %d victory-point cards = %d total") % [player.points,hidden_points,score] if player.cards.size()==5 else tr("\nVictory-point cards stay private until game end.")
 	%Name.text=player.name
+	# A short note after the name: who is you, who left, and who a bot covers.
+	var tag=""
+	var tag_tip=""
+	if seat_row.get("stand_in",false):
+		tag=tr("bot playing");tag_tip=tr("A bot plays this seat until its player reconnects.")
+	elif not seat_row.is_empty() and not seat_row.get("connected",true):
+		tag=tr("away");tag_tip=tr("Disconnected. The game waits a minute, then a bot plays this seat.")
+	elif seat_row.get("bot",false):tag=tr("bot")
+	elif index==seat:tag=tr("you")
+	%Tag.text=tag
+	%Tag.tooltip_text=tag_tip
+	%Tag.visible=not tag.is_empty()
 	# Seat colors can be too pale for lettering, so the name stays in ink beside a color bar.
 	%Accent.color=color
 	for stat in [[%Score,score,tr("Victory points")],[%Resources,player.resource_count,"Resources"],[%Cards,player.card_count,tr("Development cards")],[%RoadLength,player.road_length,tr("Longest road length")],[%Knights,player.knights,tr("Played knights")]]:
 		stat[0].tooltip_text=tr(stat[2])+": "+str(stat[1])
 		stat[0].get_node("Value").text=str(stat[1])
-	# Holders of longest road and largest army see those tallies in brass.
+	# Holders of longest road and largest army see those tallies in brass, with the +2 they earn.
 	for bonus in [[%RoadLength,state.longest==index,tr("\nLongest road +2")],[%Knights,state.army==index,tr("\nLargest army +2")]]:
 		if not bonus[1]:continue
 		bonus[0].get_node("Value").add_theme_color_override("font_color",BONUS_COLOR)
 		bonus[0].tooltip_text+=bonus[2]
+		var badge=Label.new()
+		badge.name="Bonus"
+		badge.text="+2"
+		badge.add_theme_color_override("font_color",BONUS_COLOR)
+		badge.add_theme_font_size_override("font_size",12)
+		badge.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		bonus[0].add_child(badge)
 	%Score.tooltip_text=tooltip_text+tr("\n%d points win the game.") % scoring.target()

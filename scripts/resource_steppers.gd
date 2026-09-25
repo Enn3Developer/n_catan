@@ -67,7 +67,9 @@ func set_limits(amounts: Array,have_text: String="of %d"):
 
 ## Replaces the note under each amount.
 func set_notes(texts: Array):
-	for resource in 5:have_labels[resource].text=texts[resource]
+	for resource in 5:
+		have_labels[resource].text=texts[resource]
+		have_labels[resource].visible=not texts[resource].is_empty()
 
 ## Restores an earlier choice, kept within the limits.
 func set_values(amounts: Array):
