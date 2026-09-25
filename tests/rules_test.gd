@@ -22,6 +22,10 @@ func _init():
 	_points_history()
 	_private_log()
 	_bot_discard()
+	_hidden_seed()
+	_build_log()
+	_free_roads_run_out()
+	_room_names()
 	print("rules_test: %s" % ("FAILED (%d)" % failures if failures else "ok"))
 	quit(1 if failures else 0)
 
@@ -455,3 +459,66 @@ func _bot_discard():
 	check(action.cards[4]>=3,"surplus ore goes first")
 	check(rules.apply(0,action)=="","discard applies")
 	check(s.players[0].hand[3]==1,"keeps the scarce grain")
+
+func _hidden_seed():
+	var options={"island":"archipelago","fog":true}
+	var decks={}
+	var fogs={}
+	for hidden in range(1,9):
+		var rules=CatanRules.new()
+		options.hidden_seed=hidden
+		var s=rules.create(["A","B","C"],5,options)
+		var again=CatanRules.new().create(["A","B","C"],5,options)
+		check(again.deck==s.deck and again.tiles==s.tiles,"the same hidden seed deals the same game")
+		decks[str(s.deck)]=true
+		var fog=[]
+		for t in s.tiles:
+			if t.get("fog",false): fog.append([t.kind,t.number])
+		fogs[str(fog)]=true
+		var plain=CatanRules.new().create(["A","B","C"],5,{"island":"archipelago"})
+		check(plain.tiles.size()==s.tiles.size() and plain.vertices==s.vertices,"the public seed still sets the shape")
+		check(not rules._reds_touch(),"6 and 8 stay apart under the fog")
+	check(decks.size()>4,"the public seed doesn't fix the deck: %d" % decks.size())
+	check(fogs.size()>4,"the public seed doesn't fix what the fog hides: %d" % fogs.size())
+
+func _build_log():
+	var rules=CatanRules.new()
+	rules.create(["A","B","C"],41)
+	_setup(rules)
+	var s=rules.s
+	s.rolled=true
+	s.players[0].hand=[1,1,0,0,0]
+	var sites=rules.build_sites(0,"road")
+	check(rules.apply(0,{"type":"road","id":sites[0]})=="","build a road")
+	check(CatanI18n.render(s.log[-1])=="A built a road.","build log reads as a sentence: %s" % CatanI18n.render(s.log[-1]))
+
+func _free_roads_run_out():
+	var rules=CatanRules.new()
+	rules.create(["A","B","C"],41)
+	_setup(rules)
+	var s=rules.s
+	s.rolled=true
+	# Place all but one road, then play Road building.
+	while rules.pieces(0,"road")<CatanRules.PIECE_LIMITS.road-1:
+		var sites=rules.build_sites(0,"road")
+		if sites.is_empty(): break
+		s.edges[sites[0]].owner=0
+	check(rules.pieces(0,"road")==CatanRules.PIECE_LIMITS.road-1,"one road left")
+	s.players[0].cards[1]=1
+	check(rules.apply(0,{"type":"play_card","id":1})=="","play Road building")
+	check(rules.apply(0,{"type":"road","id":rules.build_sites(0,"road")[0]})=="","place the last road")
+	check(s.phase=="play","Road building ends when no piece is left")
+
+func _room_names():
+	var net=CatanNetwork.new()
+	net.roster=[{"id":1,"name":"Anna","ready":true,"bot":false},{"id":5,"name":"Juniper","ready":true,"bot":false},{"id":-1,"name":"Flint","ready":true,"bot":true}]
+	check(net._unique_name("anna")=="anna 2","a repeated name gets a number")
+	check(net._unique_name("Juniper")=="Juniper 2","a bot's name gets a number too")
+	check(net._unique_name("Mara")=="Mara","a new name stays as it is")
+	check(net._unique_name("")=="Voyager","an empty name becomes Voyager")
+	check(net._unique_name("ABCDEFGHIJKLMNOPQRST".substr(0,20)).length()==20,"a long new name stays at 20")
+	net.roster.append({"id":6,"name":"ABCDEFGHIJKLMNOPQRST","ready":true,"bot":false})
+	check(net._unique_name("ABCDEFGHIJKLMNOPQRST")=="ABCDEFGHIJKLMNOPQR 2","a long repeated name is cut to fit")
+	net._unready(1)
+	check(net.roster[0].ready and not net.roster[1].ready and net.roster[2].ready,"a rule change unreadies everyone but the one who changed it and the bots")
+	net.free()

@@ -435,6 +435,9 @@ func set_mode(value: String,player: int):
 	var robber_sites=rules.robber_sites(seat) if mode=="robber" else []
 	var movable=rules.movable_ships(seat) if mode=="move_ship" else rules.ship_moves(seat,move_from) if mode=="move_to" else []
 	var edges=mode in ["road","ship","route","move_ship","move_to"]
+	# Free roads can't place a piece the player has run out of.
+	var roads_left=rules.pieces(seat,"road")<CatanRules.PIECE_LIMITS.road
+	var ships_left=rules.pieces(seat,"ship")<CatanRules.PIECE_LIMITS.ship
 	var source=state.edges if edges else state.tiles if mode=="robber" else state.vertices
 	for i in source.size():
 		var good=false
@@ -447,9 +450,9 @@ func set_mode(value: String,player: int):
 			pos=Vector3((a.x+b.x)/2,.45 if mode=="move_ship" else .2,(a.z+b.z)/2)
 		elif edges:
 			# "route" offers both, for free roads on an archipelago.
-			good=mode!="ship" and rules.valid_edge(seat,i,state.phase=="setup_road")
+			good=mode!="ship" and roads_left and rules.valid_edge(seat,i,state.phase=="setup_road")
 			kind="road"
-			if not good and mode!="road" and rules.valid_ship(seat,i):
+			if not good and mode!="road" and ships_left and rules.valid_ship(seat,i):
 				good=true
 				kind="ship"
 			var a=state.vertices[source[i].a]

@@ -41,6 +41,10 @@ const FRIENDLY_LIMIT=3
 const DICE_RESHUFFLE=5
 ## Unshifted center distance of the classic island's outer tile rim.
 const CLASSIC_EXTENT=4.4641
+## Log lines for building and buying.
+const BUILT={"road":"%s built a road.","ship":"%s built a ship.","settlement":"%s built a settlement.","city":"%s upgraded a settlement to a city.","buy_card":"%s bought a development card."}
+## Why a build has nowhere to go.
+const NO_SPACE={"road":"No legal space to build a road.","ship":"No legal space to build a ship.","settlement":"No legal space to build a settlement.","city":"No settlement to upgrade to a city."}
 const AXIAL=[Vector2i(1,0),Vector2i(1,-1),Vector2i(0,-1),Vector2i(-1,0),Vector2i(-1,1),Vector2i(0,1)]
 
 func create(names: Array, game_seed: int = 0, options: Dictionary = {}) -> Dictionary:
@@ -128,13 +132,7 @@ func create(names: Array, game_seed: int = 0, options: Dictionary = {}) -> Dicti
 		item.z-=middle.y
 	# Keep high-probability tokens apart.
 	for attempt in 500:
-		var valid=true
-		for e in s.edges:
-			var common=[]
-			for t in s.vertices[e.a].tiles:
-				if t in s.vertices[e.b].tiles: common.append(t)
-			if common.size()==2 and s.tiles[common[0]].kind<DESERT and s.tiles[common[1]].kind<DESERT and s.tiles[common[0]].number in [6,8] and s.tiles[common[1]].number in [6,8]: valid=false
-		if valid: break
+		if not _reds_touch(): break
 		_shuffle(numbers)
 		n=0
 		for t in s.tiles:
@@ -147,6 +145,12 @@ func create(names: Array, game_seed: int = 0, options: Dictionary = {}) -> Dicti
 	_place_ports(ports)
 	for pname in names:
 		s.players.append({"name":str(pname).substr(0,20),"hand":[0,0,0,0,0],"cards":[0,0,0,0,0],"new_cards":[0,0,0,0,0],"knights":0,"points":0,"road_length":0,"islands":[],"island_bonus":0,"stats":{"rolls":0,"produced":[0,0,0,0,0],"stolen":0,"lost":0,"discarded":0,"trades":0,"bank_trades":0,"cards_played":0}})
+	# The seed is public: it's in the lobby and on the victory screen, and it
+	# replays the board. What the board hides, the deck, the dice and what lies
+	# under the fog, comes from a secret stream instead.
+	var hidden_seed=int(settings.get("hidden_seed",0))
+	rng.seed=hidden_seed if hidden_seed!=0 else Crypto.new().generate_random_bytes(8).decode_s64(0)
+	if s.fog: _deal_fog()
 	for i in (20 if extended else 14): s.deck.append(0)
 	for i in 5: s.deck.append(4)
 	for i in (3 if extended else 2): s.deck.append_array([1,2,3])
@@ -156,6 +160,31 @@ func create(names: Array, game_seed: int = 0, options: Dictionary = {}) -> Dicti
 	_log("The island awaits. Place your first settlement.")
 	if s.random_start: _random_setup()
 	return s
+
+## True when two 6 or 8 tokens sit on neighboring hexes.
+func _reds_touch() -> bool:
+	for e in s.edges:
+		var common=[]
+		for t in s.vertices[e.a].tiles:
+			if t in s.vertices[e.b].tiles: common.append(t)
+		if common.size()==2 and s.tiles[common[0]].kind<DESERT and s.tiles[common[1]].kind<DESERT and s.tiles[common[0]].number in [6,8] and s.tiles[common[1]].number in [6,8]: return true
+	return false
+
+## Shuffles the land and numbers under the fog with the secret stream, so the
+## seed can't tell anyone what's hidden there. The robber's hex stays put,
+## since the robber on it is in plain sight.
+func _deal_fog():
+	var hidden=[]
+	for i in s.tiles.size():
+		if s.tiles[i].get("fog",false) and i!=s.robber: hidden.append(i)
+	var dealt=[]
+	for i in hidden: dealt.append([s.tiles[i].kind,s.tiles[i].number])
+	for attempt in 200:
+		_shuffle(dealt)
+		for n in hidden.size():
+			s.tiles[hidden[n]].kind=dealt[n][0]
+			s.tiles[hidden[n]].number=dealt[n][1]
+		if not _reds_touch(): break
 
 ## Groups land into islands: hexes that share a side belong together. The
 ## largest island is 0, where everyone starts on an archipelago.
@@ -702,13 +731,13 @@ func apply(p: int,a: Dictionary) -> String:
 			s.edges[id].owner=p
 			_reveal_edge(p,id)
 			s.free_roads-=1
-			if s.free_roads==0 or (pieces(p,"road")==15 and build_sites(p,"ship").is_empty()): s.phase="play"
+			if s.free_roads==0 or _no_free_route(p): s.phase="play"
 		elif action=="ship" and valid_ship(p,id) and pieces(p,"ship")<PIECE_LIMITS.ship:
 			s.edges[id].owner=p
 			s.edges[id].ship=true
 			_new_ship(p,id)
 			s.free_roads-=1
-			if s.free_roads==0: s.phase="play"
+			if s.free_roads==0 or _no_free_route(p): s.phase="play"
 		else: return "Choose a connected road, or finish building."
 	elif s.phase=="play":
 		if action=="roll":
@@ -796,7 +825,7 @@ func apply(p: int,a: Dictionary) -> String:
 					if s.deck.is_empty(): return "No development cards remain."
 					player.new_cards[s.deck.pop_back()]+=1
 				pay(p,COST[action])
-				_log(CatanI18n.message("%s: %s.",[player.name,CatanI18n.term(action.replace("_"," "))]))
+				_log(CatanI18n.message(BUILT[action],[player.name]))
 			elif action=="bank_trade":
 				var give=int(a.get("give",-1))
 				var receive=int(a.get("receive",-1))
@@ -867,6 +896,10 @@ func apply(p: int,a: Dictionary) -> String:
 	else: return "This action is unavailable at this stage of the turn."
 	_score()
 	return ""
+
+## Road building ends early once no road or ship can go anywhere.
+func _no_free_route(p: int) -> bool:
+	return build_sites(p,"road").is_empty() and build_sites(p,"ship").is_empty()
 
 ## Fairer dice: rolls come from a shuffled deck of all 36 two-dice outcomes, so
 ## over a game each total turns up about as often as the odds say. The deck is

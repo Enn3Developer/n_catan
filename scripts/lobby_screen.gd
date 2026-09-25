@@ -13,6 +13,7 @@ signal map_router_requested
 signal invite_requested(address: String)
 signal invite_address_edited(address: String)
 signal bot_difficulty_changed(seat: int,level: int)
+## A bot or a guest the controller wants out of the room.
 signal bot_remove_requested(seat: int)
 signal setting_changed(key: String,value: Variant)
 signal resume_requested

@@ -1,6 +1,6 @@
 extends PanelContainer
 ## One seat in the lobby: who sits there and whether they are ready, plus the
-## bot controls available to the room controller.
+## seat controls available to the room controller.
 
 signal difficulty_selected(seat: int,level: int)
 signal remove_requested(seat: int)
@@ -36,7 +36,10 @@ func show_seat(net: CatanNetwork,index: int,controller: bool):
 		for level in CatanBot.LEVELS: %Difficulty.add_item(level)
 		%Difficulty.select(row.difficulty)
 		%Difficulty.disabled=not controller
-	%Remove.visible=bot and controller and not net.room_settings.get("resuming",false)
+	# The controller can remove bots, and guests other than the host and themselves.
+	var guest=occupied and not bot and index!=net.seat and int(row.id)!=1 and row.connected
+	%Remove.visible=controller and ((bot and not net.room_settings.get("resuming",false)) or guest)
+	%Remove.tooltip_text=tr("Remove bot") if bot else tr("Remove player")
 	if waiting:modulate.a=.7
 
 func _on_difficulty_item_selected(level: int):
