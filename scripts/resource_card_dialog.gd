@@ -30,10 +30,10 @@ func _refresh():
 	var second_reasons=[]
 	for resource in 5:
 		var empty=tr("The bank has none of that resource.")
-		first_reasons.append(empty if bank[resource]<1 else "")
-		# The second pick can't take the bank's last one twice.
-		var left=bank[resource]-(1 if resource==%First.selected else 0)
-		second_reasons.append(empty if left<1 else "")
+		# Each pick leaves one fewer for the other, so the bank's last one
+		# can't be taken twice, whichever row picks it first.
+		first_reasons.append(empty if bank[resource]-(1 if resource==%Second.selected else 0)<1 else "")
+		second_reasons.append(empty if bank[resource]-(1 if resource==%First.selected else 0)<1 else "")
 	# The current choice stays clickable, so it can be seen.
 	first_reasons[%First.selected]=""
 	second_reasons[%Second.selected]=""
