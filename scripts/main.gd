@@ -529,6 +529,8 @@ func _trade_notifications(previous: Dictionary,previous_offer: Dictionary,fresh:
 
 func _view_offer():
 	if state.get("offer",{}).is_empty():return
+	# The offer is in front of the player now, so its notification goes.
+	notifications.dismiss("trade")
 	var dialog=_present("res://scenes/ui/offer_dialog.tscn")
 	dialog.show_offer(state,net.seat,net)
 	_route(dialog,{"response_requested":net.act,"withdraw_requested":func():net.act({"type":"cancel_trade"})})
@@ -545,7 +547,7 @@ func _resource_card(id: int):
 
 func _confirm_leave():
 	var dialog=_present("res://scenes/ui/leave_dialog.tscn")
-	dialog.show_leave(net.solo)
+	dialog.show_leave(net,state.get("winner",-1)!=-1)
 	_route(dialog,{"leave_requested":net.leave})
 
 func _help():
@@ -621,8 +623,10 @@ func _tutorial_step(direction: int):
 	guide.load_lesson(net,preferences.values.player_name)
 
 # Larger small text: labels keep their authored size but never render below 16 px (14 px by default).
+# A label that sizes its own text to fit, like a card title, is left alone.
 func _apply_text(root: Node):
 	for label in root.find_children("*","Label",true,false):
+		if label.has_meta("fits_text"):continue
 		if not label.has_meta("base_font_size"): label.set_meta("base_font_size",label.get_theme_font_size("font_size"))
 		label.add_theme_font_size_override("font_size",maxi(int(label.get_meta("base_font_size")),16 if preferences.values.large_text else 14))
 

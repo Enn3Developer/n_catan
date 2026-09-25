@@ -30,7 +30,7 @@ func show_game(net: CatanNetwork,state: Dictionary,mode: String):
 		var chip=PLAYER_CHIP.instantiate()
 		chip.name="PlayerChip%d" % i
 		%PlayersBody.add_child(chip)
-		chip.show_player(state,i,seat,net.player_color(i))
+		chip.show_player(state,i,seat,net.player_color(i),net.roster[i] if i<net.roster.size() else {})
 	var hand: Array=state.players[seat].hand
 	var mine=state.turn==seat and state.winner==-1
 	var play=mine and state.phase=="play"

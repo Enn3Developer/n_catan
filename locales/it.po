@@ -545,8 +545,6 @@ msgstr "Partita in pausa in attesa che un giocatore si riconnetta."
 msgid "Game updates"
 msgstr "Aggiornamenti del gioco"
 
-msgid "Gameplay"
-msgstr "Gioco"
 
 msgid "Gently soften scenery beyond the camera focus distance. Off keeps the whole board sharp for play. Focus a tile with F for close inspection."
 msgstr "Sfuma il paesaggio oltre la distanza di messa a fuoco. Se disattivata, tutto il tabellone resta nitido. Premi F su una tessera per osservarla da vicino."
@@ -678,8 +676,6 @@ msgstr "Lascia la stanza prima di riavviare per aggiornare."
 msgid "Leave the expedition?"
 msgstr "Vuoi lasciare la partita?"
 
-msgid "Leaving pauses this match for the other players.\nIf you host, the room will close."
-msgstr "Se esci, la partita resta in pausa per gli altri.\nSe sei l’host, la stanza verrà chiusa."
 
 msgid "Let the island provide"
 msgstr "Raccogli le risorse"
@@ -2477,8 +2473,6 @@ msgstr "Controproposta"
 msgid "gives"
 msgstr "dà"
 
-msgid "wants"
-msgstr "vuole"
 
 msgid "Answers"
 msgstr "Risposte"
@@ -2809,3 +2803,54 @@ msgstr "L’host ti ha rimosso dalla stanza."
 
 msgid "Remove player"
 msgstr "Rimuovi giocatore"
+
+msgid "Accepted"
+msgstr "Accettata"
+
+msgid "Declined"
+msgstr "Rifiutata"
+
+msgid "Countered"
+msgstr "Controproposta inviata"
+
+msgid "Not answered yet"
+msgstr "Non hai ancora risposto"
+
+msgid "you give"
+msgstr "dai"
+
+msgid "you get"
+msgstr "ricevi"
+
+msgid "bot playing"
+msgstr "gioca un bot"
+
+msgid "A bot plays this seat until its player reconnects."
+msgstr "Un bot gioca questo posto finché il giocatore non si riconnette."
+
+msgid "away"
+msgstr "assente"
+
+msgid "Disconnected. The game waits a minute, then a bot plays this seat."
+msgstr "Disconnesso. La partita aspetta un minuto, poi un bot gioca questo posto."
+
+msgid "bot"
+msgstr "bot"
+
+msgid "you"
+msgstr "tu"
+
+msgid "This game is over. You go back to the main menu."
+msgstr "La partita è finita. Torni al menu principale."
+
+msgid "The lesson ends here. You can start it again from the main menu."
+msgstr "La lezione finisce qui. Puoi ricominciarla dal menu principale."
+
+msgid "The game is saved. Choose Play solo, then Resume saved game, to carry on."
+msgstr "La partita è salvata. Scegli Gioca da solo, poi Riprendi la partita salvata, per continuare."
+
+msgid "The room closes for everyone. The game is saved, so you can host again and resume it."
+msgstr "La stanza si chiude per tutti. La partita è salvata, quindi puoi ospitarla di nuovo e riprenderla."
+
+msgid "The others wait a minute for you, then a bot plays your seat. Use Reconnect to take it back."
+msgstr "Gli altri ti aspettano un minuto, poi un bot gioca al tuo posto. Usa Riconnetti per riprenderlo."

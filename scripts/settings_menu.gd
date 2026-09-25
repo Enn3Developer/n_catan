@@ -5,17 +5,17 @@ extends Control
 signal preferences_changed
 signal close_requested
 ## Each entry: tab, node name, preference key, title, control, choices or range,
-## help text and what it costs. Tabs show in the order they first appear.
+## help text and what it costs to render, empty when it costs nothing. Tabs show in the order they first appear.
 const OPTIONS=[
-	["Game","Language","language","Language","option",["English","Italiano"],"Choose the language used on this computer.","Accessibility"],
-	["Game","BotSpeed","bot_speed","Bot turn speed","option",["Relaxed","Normal","Fast"],"Adjust the pause between bot actions without changing their difficulty or decisions.","Gameplay"],
-	["Game","Sensitivity","camera_speed","Camera sensitivity","slider",[0.4,2.0,0.1,1],"Adjust orbit and pan speed. Drag the board or hold WASD to pan; right-drag or Q/E orbits; the wheel or +/- zooms; Home fits the board.","Controls"],
+	["Game","Language","language","Language","option",["English","Italiano"],"Choose the language used on this computer.",""],
+	["Game","BotSpeed","bot_speed","Bot turn speed","option",["Relaxed","Normal","Fast"],"Adjust the pause between bot actions without changing their difficulty or decisions.",""],
+	["Game","Sensitivity","camera_speed","Camera sensitivity","slider",[0.4,2.0,0.1,1],"Adjust orbit and pan speed. Drag the board or hold WASD to pan; right-drag or Q/E orbits; the wheel or +/- zooms; Home fits the board.",""],
 	["World","DayNightCycle","day_night_cycle","Day/night cycle","toggle",[],"Turn off to keep the island in daylight. This setting is personal.","Negligible"],
 	["World","Weather","weather","Weather","option",["Automatic","Clear skies","Cloudy","Rain","Thunderstorm"],"Choose changing weather or keep one condition. Rain and thunder have their own volume under Audio. Reduced motion disables rain and lightning flashes.","Clouds and rain"],
 	["World","Wind","wind","Wind strength","slider",[0,100,5,100],"Control foliage sway and wind-driven wave motion. Reduced motion overrides animated movement.","Negligible"],
-	["Accessibility","ReducedMotion","reduce_motion","Reduced motion","toggle",[],"Stop wind, waves, scenery movement, particles and construction animations while retaining all gameplay actions.","Accessibility"],
-	["Accessibility","LargeText","large_text","Larger small text","toggle",[],"Increase smaller interface labels for readability. Menus scroll when necessary.","Accessibility"],
-	["Display","Fullscreen","fullscreen","Fullscreen","toggle",[],"Fill the current display. Window size is used only in windowed mode.","Display"],
+	["Accessibility","ReducedMotion","reduce_motion","Reduced motion","toggle",[],"Stop wind, waves, scenery movement, particles and construction animations while retaining all gameplay actions.",""],
+	["Accessibility","LargeText","large_text","Larger small text","toggle",[],"Increase smaller interface labels for readability. Menus scroll when necessary.",""],
+	["Display","Fullscreen","fullscreen","Fullscreen","toggle",[],"Fill the current display. Window size is used only in windowed mode.",""],
 	["Display","WindowSize","window_size","Window size","option",["1280 × 720","1440 × 900","1920 × 1080","2560 × 1440","3840 × 2160"],"Size of the game window. Fullscreen uses your desktop resolution; render scale controls 3D resolution independently.","GPU workload increases with resolution"],
 	["Display","VSync","vsync","Vertical sync","toggle",[],"Synchronize frame presentation with the display to prevent tearing. The frame limit can cap rendering below its refresh rate.","Can add input latency"],
 	["Display","FrameLimit","frame_limit","Frame limit","option",["Unlimited","30 FPS","60 FPS","90 FPS","120 FPS","144 FPS","240 FPS"],"Limit rendering to reduce GPU load and power use. Does not change game rules or bot speed.","Power / smoothness"],
@@ -38,10 +38,10 @@ const OPTIONS=[
 	["Lighting","Atmosphere","atmosphere","Atmospheric haze","toggle",[],"Use distance haze to soften distant water and scenery while keeping the board clear.","Low GPU impact"],
 	["Lighting","DepthOfField","depth_of_field","Cinematic depth of field","toggle",[],"Gently soften scenery beyond the camera focus distance. Off keeps the whole board sharp for play. Focus a tile with F for close inspection.","Moderate GPU impact"],
 	["Lighting","Exposure","exposure","Exposure","slider",[60,150,5,100],"Adjust scene brightness before cinematic tone mapping. Does not change the interface.","Negligible"],
-	["Audio","Master","master","Master volume","slider",[0,100,1,100],"Overall volume, including music, effects, ocean ambience and weather.","Audio"],
-	["Audio","Music","music","Music","slider",[0,100,1,100],"Volume of the original instrumental soundtrack.","Audio"],
-	["Audio","Effects","effects","Sound effects","slider",[0,100,1,100],"Volume of interface and gameplay cues.","Audio"],
-	["Audio","Ambience","ambience","Ocean ambience","slider",[0,100,1,100],"Volume of the ocean soundscape.","Audio"],
+	["Audio","Master","master","Master volume","slider",[0,100,1,100],"Overall volume, including music, effects, ocean ambience and weather.",""],
+	["Audio","Music","music","Music","slider",[0,100,1,100],"Volume of the original instrumental soundtrack.",""],
+	["Audio","Effects","effects","Sound effects","slider",[0,100,1,100],"Volume of interface and gameplay cues.",""],
+	["Audio","Ambience","ambience","Ocean ambience","slider",[0,100,1,100],"Volume of the ocean soundscape.",""],
 	["Audio","WeatherVolume","weather_volume","Rain and thunder","slider",[0,100,1,100],"Volume of rain and thunder. Drizzle stays soft and muffled; only a downpour plays at full level.","Audio"]]
 var preferences: CatanSettings
 const ROWS={"option":preload("res://scenes/ui/option_setting.tscn"),"toggle":preload("res://scenes/ui/toggle_setting.tscn"),"slider":preload("res://scenes/ui/slider_setting.tscn")}
@@ -139,5 +139,6 @@ func select_tab(title: String):
 func _help(spec: Array):
 	%HelpTitle.text=spec[3]
 	%HelpBody.text=spec[6]
-	# Audio and accessibility settings name their tab here, which the page title already says.
-	%HelpCost.text="" if spec[7]==spec[0] else spec[7]
+	# Only settings with a performance cost fill the corner tag.
+	%HelpCost.text=spec[7]
+	%HelpCost.visible=not spec[7].is_empty()

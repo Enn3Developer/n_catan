@@ -86,27 +86,33 @@ func _add_response(p: int,response: Dictionary,can_pick: bool,rules: CatanRules,
 	accent.color=color
 	row.add_child(accent)
 	var name_label=Label.new()
-	name_label.text=state.players[p].name
+	name_label.text=tr("You") if p==seat else state.players[p].name
 	name_label.custom_minimum_size.x=96
 	name_label.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS
 	name_label.auto_translate_mode=Node.AUTO_TRANSLATE_MODE_DISABLED
 	row.add_child(name_label)
 	var answer=str(response.get("answer",""))
 	var status=Label.new()
-	status.text={"accept":tr("Accepts"),"decline":tr("Declines"),"counter":tr("Counters")}.get(answer,tr("Thinking…"))
+	if p==seat:status.text={"accept":tr("Accepted"),"decline":tr("Declined"),"counter":tr("Countered")}.get(answer,tr("Not answered yet"))
+	else:status.text={"accept":tr("Accepts"),"decline":tr("Declines"),"counter":tr("Counters")}.get(answer,tr("Thinking…"))
 	status.theme_type_variation=&"MutedLabel" if answer in ["","decline"] else &"SectionLabel"
 	row.add_child(status)
 	var give: Array=response.get("give",[])
 	var receive: Array=response.get("receive",[])
 	if answer=="counter":
-		# From the counter's author: what they hand over, then what they want.
-		for part in [[tr("gives"),receive],[tr("wants"),give]]:
+		# Worded from this seat, like the terms above: the offering player reads
+		# what they would give and get; anyone else reads what the counter's
+		# author gives and what they ask for.
+		var own=int(state.offer.from)==seat
+		var parts=[[tr("you give"),give],[tr("you get"),receive]] if own else [[tr("gives"),receive],[tr("for"),give]]
+		for part in parts:
 			var joiner=Label.new()
 			joiner.text=part[0]
 			joiner.theme_type_variation=&"MutedLabel"
 			row.add_child(joiner)
 			var amounts=RESOURCE_ROW.instantiate()
-			amounts.icon_size=18
+			# Large enough that single resources keep their "1".
+			amounts.icon_size=20
 			row.add_child(amounts)
 			amounts.show_amounts(part[1])
 	var spacer=Control.new()
