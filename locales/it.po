@@ -2635,3 +2635,105 @@ msgstr "Pioggia e tuoni"
 
 msgid "Volume of rain and thunder. Drizzle stays soft and muffled; only a downpour plays at full level."
 msgstr "Volume di pioggia e tuoni. La pioggerella resta leggera e ovattata; solo un acquazzone suona a pieno volume."
+
+msgid "Moving ships"
+msgstr "Navi in movimento"
+
+msgid "Archipelago only. Once per turn, after rolling, you may move one ship from the open end of a line to another sea edge you could build on. A ship built this turn stays put."
+msgstr "Solo arcipelago. Una volta per turno, dopo il tiro, puoi spostare una nave dall’estremità aperta di una linea a un altro lato di mare dove potresti costruire. Una nave costruita in questo turno resta ferma."
+
+msgid "Fog"
+msgstr "Nebbia"
+
+msgid "Archipelago only. The outer islands start hidden in fog. A road, ship or settlement that reaches a hidden hex reveals it, and a resource hex gives its finder one of that resource."
+msgstr "Solo arcipelago. Le isole esterne partono nascoste nella nebbia. Una strada, una nave o una colonia che raggiunge un esagono nascosto lo scopre, e un esagono di risorse ne dà una a chi lo trova."
+
+msgid "Moving ships is a house rule this room does not use."
+msgstr "Le navi in movimento sono una regola della casa che questa stanza non usa."
+
+msgid "You have moved a ship this turn. You can move another next turn."
+msgstr "Hai già spostato una nave in questo turno. Potrai spostarne un’altra il prossimo turno."
+
+msgid "Choose one of your ships at the open end of a line. Ships built this turn cannot move."
+msgstr "Scegli una tua nave all’estremità aperta di una linea. Le navi costruite in questo turno non possono muoversi."
+
+msgid "Choose a sea edge you could build a ship on."
+msgstr "Scegli un lato di mare dove potresti costruire una nave."
+
+msgid "%s moved a ship."
+msgstr "%s ha spostato una nave."
+
+msgid "%s revealed a hex in the fog and found %s."
+msgstr "%s ha scoperto un esagono nella nebbia e ha trovato %s."
+
+msgid "%s revealed the treasure in the fog."
+msgstr "%s ha scoperto il tesoro nella nebbia."
+
+msgid "%s revealed a hex in the fog."
+msgstr "%s ha scoperto un esagono nella nebbia."
+
+msgid "Move a ship"
+msgstr "Sposta una nave"
+
+msgid "Once per turn, move a ship from the open end of a line"
+msgstr "Una volta per turno, sposta una nave dall’estremità aperta di una linea"
+
+msgid "You have moved a ship this turn."
+msgstr "Hai già spostato una nave in questo turno."
+
+msgid "No ship can move: only ships at the open end of a line, not built this turn."
+msgstr "Nessuna nave può muoversi: solo le navi all’estremità aperta di una linea, non costruite in questo turno."
+
+msgid "Choose a glowing ship to move"
+msgstr "Scegli una nave illuminata da spostare"
+
+msgid "Choose a glowing sea edge for the ship"
+msgstr "Scegli un lato di mare illuminato per la nave"
+
+msgid "Points over time"
+msgstr "Punti nel tempo"
+
+msgid "Goal"
+msgstr "Obiettivo"
+
+msgid "Start"
+msgstr "Inizio"
+
+msgid "Turn %d"
+msgstr "Turno %d"
+
+msgid "Saved game"
+msgstr "Partita salvata"
+
+msgid "Resume saved game"
+msgstr "Riprendi la partita salvata"
+
+msgid "New game instead"
+msgstr "Nuova partita"
+
+msgid "Resuming a saved game. Friends rejoin with the invite and take their seats back."
+msgstr "Si riprende una partita salvata. Gli amici rientrano con l’invito e ritrovano il loro posto."
+
+msgid "Resuming a saved game. Waiting for %s to rejoin with the invite."
+msgstr "Si riprende una partita salvata. In attesa che %s rientri con l’invito."
+
+msgid "%s · turn %d · saved %04d-%02d-%02d %02d:%02d. Starting a new game replaces it."
+msgstr "%s · turno %d · salvata il %04d-%02d-%02d alle %02d:%02d. Una nuova partita la sostituisce."
+
+msgid "Saved seat, waiting to rejoin"
+msgstr "Posto salvato, in attesa del rientro"
+
+msgid "The saved game could not be read."
+msgstr "Impossibile leggere la partita salvata."
+
+msgid "This room is resuming a saved game and every seat is taken."
+msgstr "Questa stanza sta riprendendo una partita salvata e tutti i posti sono occupati."
+
+msgid "The game resumes from where it was saved."
+msgstr "La partita riprende da dove era stata salvata."
+
+msgid "Saved games"
+msgstr "Partite salvate"
+
+msgid "The host's game saves about once a second, and again when the host leaves. In the lobby, Resume saved game picks it up. Friends rejoin with the new invite and get their seats back by name."
+msgstr "La partita dell’host si salva circa una volta al secondo, e di nuovo quando l’host esce. Nella stanza, Riprendi la partita salvata la fa ripartire. Gli amici rientrano con il nuovo invito e ritrovano il loro posto in base al nome."

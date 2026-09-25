@@ -1,4 +1,4 @@
-"""Build the ship piece and the treasure chest with Blender Python.
+"""Build the ship piece, the treasure chest and the fog bank with Blender Python.
 
 Run: python3 tools/build_seafaring.py (needs the bpy module or Blender's Python).
 It writes assets/source/seafaring.blend and one glTF per model in
@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from blender_kit import (Vector, bmesh, box, cylinder, blob, empty, export as export_to, from_bmesh, lamp,  # noqa: E402
+from blender_kit import (Vector, bmesh, box, cylinder, blob, empty, export as export_to, from_bmesh, join, lamp,  # noqa: E402
                          material, mesh, new_collection, reset, save)
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -170,9 +170,41 @@ for i, turn in enumerate((math.pi / 4, -math.pi / 4)):
     stroke.location = (0, -.13, 0)
 
 
+# ------------------------------------------------------------------ fog bank
+
+# A low bank of cloud that hides one hex under the Fog house rule. Puffs sit
+# on a hex grid inside the tile's corners (radius 1), a broad lower layer and
+# smaller ones heaped on top, so the hex reads as a soft mound of mist. The
+# game shades it by height and lets it drift; one mesh keeps it one draw call.
+import random  # noqa: E402
+
+rng = random.Random(7)
+MIST = material('Fog', 'e8edf0', roughness=1.0)
+fog_col = new_collection('FogBank')
+fog = empty('FogBank', fog_col)
+puffs = []
+spacing = .36
+for q in range(-3, 4):
+    for r in range(-3, 4):
+        x = spacing * (q + r * .5)
+        y = spacing * r * math.sqrt(3) / 2
+        if math.hypot(x, y) > .92:
+            continue
+        x += rng.uniform(-.05, .05)
+        y += rng.uniform(-.05, .05)
+        size = rng.uniform(.24, .3)
+        puffs.append(blob('Puff', (x, y, .2), (size, size, size * .5), MIST, fog_col, fog, 10, 6))
+for i in range(16):
+    angle = rng.uniform(0, math.tau)
+    reach = math.sqrt(rng.uniform(0, 1)) * .6
+    size = rng.uniform(.16, .24)
+    puffs.append(blob('Puff', (math.cos(angle) * reach, math.sin(angle) * reach, .3 + rng.uniform(0, .08)),
+                      (size, size, size * .62), MIST, fog_col, fog, 10, 6))
+join('FogBank', puffs, fog_col, fog)
 
 OUT.mkdir(parents=True, exist_ok=True)
 export(ship_col, 'ship.glb')
 export(treasure_col, 'treasure.glb')
+export(fog_col, 'fog_bank.glb')
 save(SOURCE)
 print('built', OUT / 'ship.glb', OUT / 'treasure.glb', SOURCE)

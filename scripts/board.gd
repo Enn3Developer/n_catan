@@ -13,6 +13,7 @@ const ROAD_BASE=.201
 const DICE_THROW=preload("res://scenes/world/dice_throw.tscn")
 const SHIP=preload("res://assets/models/props/ship.glb")
 const TREASURE=preload("res://assets/models/props/treasure.glb")
+const FOG_BANK=preload("res://assets/models/props/fog_bank.glb")
 # Matches the tile_centers array in water.gdshader.
 const MAX_WATER_TILES=48
 # Ships ride just above the calm water line.
@@ -38,6 +39,8 @@ var pitch=0.745
 var hover=-1
 var targets=[]
 var marker_nodes=[]
+## The ship picked to move while mode is "move_to".
+var move_from=-1
 @onready var boats: Array[Node3D]=[$Scenery/Boat0,$Scenery/Boat1,$Scenery/Boat2]
 var sea_traffic=preload("res://scripts/sea_traffic.gd").new()
 @onready var lighthouse=$Scenery/Lighthouse
@@ -100,11 +103,15 @@ var seabed_material: ShaderMaterial
 var coast=CatanCoast.new()
 ## Fish, weed and corals under the see-through water.
 var sea_life=CatanSeaLife.new()
+## Shared by every fog bank, so one animation_time moves them all.
+var fog_material: ShaderMaterial
 
 func _ready():
 	if "--server" in OS.get_cmdline_user_args():
 		set_process(false)
 		return
+	fog_material=ShaderMaterial.new()
+	fog_material.shader=preload("res://shaders/fog_bank.gdshader")
 	seabed_material=ShaderMaterial.new()
 	seabed_material.shader=preload("res://shaders/seabed.gdshader")
 	seabed=MeshInstance3D.new()
@@ -138,7 +145,7 @@ func apply_preferences(values: Dictionary):
 			tile.ground.lod_bias=CatanTileArt.lod_bias(values)
 			tile.ground.material_override=art.ground(tile.kind,tile.index)
 			tile.cliff.material_override=art.cliff()
-			art.apply_instance(tile.diorama,values)
+			if tile.diorama:art.apply_instance(tile.diorama,values)
 		coast.build(state,TILE_SIZE,art,values)
 		sea_life.build(state,CatanSeaFloor.new(water_centers,TILE_SIZE*.993),values)
 	if old.texture_quality!=values.texture_quality:_apply_surfaces(self)
@@ -203,47 +210,8 @@ func build(data: Dictionary):
 	var centers=PackedVector2Array()
 	for i in state.tiles.size():
 		var t=state.tiles[i]
-		# The treasure lies on a sandy tile like the desert's.
-		var kind=mini(int(t.kind),CatanRules.DESERT)
 		centers.append(Vector2(t.x,t.z)*TILE_SIZE)
-		var root=Node3D.new()
-		root.name="Tile_%02d_%s" % [i,"treasure" if t.kind==CatanRules.TREASURE else CatanTileArt.BIOMES[kind]]
-		root.position=Vector3(t.x,0,t.z)
-		terrain.add_child(root)
-		var side=MeshInstance3D.new()
-		side.name="StratifiedCliff"
-		side.mesh=art.cliff_mesh()
-		side.material_override=art.cliff()
-		root.add_child(side)
-		var top=MeshInstance3D.new()
-		top.name="SculptedGround"
-		top.mesh=art.ground_mesh(kind)
-		top.lod_bias=CatanTileArt.lod_bias(render_values)
-		top.material_override=art.ground(kind,i)
-		root.add_child(top)
-		var diorama=art.instantiate(kind,i,render_values)
-		root.add_child(diorama)
-		actors.append_array(living_world.populate(root,kind,i,art))
-		tile_nodes.append({"root":root,"ground":top,"cliff":side,"diorama":diorama,"kind":kind,"index":i})
-		if t.kind==CatanRules.TREASURE:
-			var spot=Vector2(-.34,-.22)
-			var chest: Node3D=TREASURE.instantiate()
-			_apply_surfaces(chest)
-			chest.position=Vector3(spot.x,art.height_at(spot,kind),spot.y)
-			chest.rotation.y=.5
-			chest.scale=Vector3.ONE*2.0
-			living_world.wire_lights(chest)
-			root.add_child(chest)
-		if t.number>0:
-			var marker=CatanWorldLayout.point(CatanWorldLayout.data.token)
-			var token=NUMBER_TOKEN.instantiate()
-			token.position=Vector3(marker.x,0,marker.y)
-			# Larger than the model so the printed number reads from the usual camera height.
-			token.scale=Vector3.ONE*1.3
-			root.add_child(token)
-			token.show_number(t.number)
-			facing.append(token)
-			tokens[i]=token
+		tile_nodes.append(_build_tile(i))
 
 	water_centers=centers.duplicate()
 	while centers.size()<MAX_WATER_TILES:centers.append(Vector2(10000,10000))
@@ -278,6 +246,86 @@ func build(data: Dictionary):
 	seagulls.configure()
 	_update_boat_wakes()
 
+## One hex: cliff, sculpted ground, its diorama and villagers, and the number
+## token. A hex still under the fog is bare ground under a fog bank.
+func _build_tile(i: int) -> Dictionary:
+	var t=state.tiles[i]
+	var hidden=int(t.kind)==CatanRules.FOG
+	# The treasure lies on a sandy tile like the desert's.
+	var kind=mini(int(t.kind),CatanRules.DESERT)
+	var root=Node3D.new()
+	root.name="Tile_%02d_%s" % [i,"fog" if hidden else "treasure" if t.kind==CatanRules.TREASURE else CatanTileArt.BIOMES[kind]]
+	root.position=Vector3(t.x,0,t.z)
+	terrain.add_child(root)
+	var side=MeshInstance3D.new()
+	side.name="StratifiedCliff"
+	side.mesh=art.cliff_mesh()
+	side.material_override=art.cliff()
+	root.add_child(side)
+	var top=MeshInstance3D.new()
+	top.name="SculptedGround"
+	top.mesh=art.ground_mesh(kind)
+	top.lod_bias=CatanTileArt.lod_bias(render_values)
+	top.material_override=art.ground(kind,i)
+	root.add_child(top)
+	var entry={"root":root,"ground":top,"cliff":side,"diorama":null,"kind":kind,"index":i,"shown":int(t.kind)}
+	if hidden:
+		var bank: Node3D=FOG_BANK.instantiate()
+		bank.name="FogBank"
+		bank.rotation.y=float(i)*1.7
+		for part in bank.find_children("*","MeshInstance3D",true,false):part.material_override=fog_material
+		root.add_child(bank)
+		return entry
+	var diorama=art.instantiate(kind,i,render_values)
+	root.add_child(diorama)
+	entry.diorama=diorama
+	actors.append_array(living_world.populate(root,kind,i,art))
+	if t.kind==CatanRules.TREASURE:
+		var spot=Vector2(-.34,-.22)
+		var chest: Node3D=TREASURE.instantiate()
+		_apply_surfaces(chest)
+		chest.position=Vector3(spot.x,art.height_at(spot,kind),spot.y)
+		chest.rotation.y=.5
+		chest.scale=Vector3.ONE*2.0
+		living_world.wire_lights(chest)
+		root.add_child(chest)
+	if t.number>0:
+		var marker=CatanWorldLayout.point(CatanWorldLayout.data.token)
+		var token=NUMBER_TOKEN.instantiate()
+		token.position=Vector3(marker.x,0,marker.y)
+		# Larger than the model so the printed number reads from the usual camera height.
+		token.scale=Vector3.ONE*1.3
+		root.add_child(token)
+		token.show_number(t.number)
+		facing.append(token)
+		tokens[i]=token
+	return entry
+
+## Hexes that came out of the fog since the last state: the hex is built for
+## real and its fog bank rises and thins away. The shore follows the new land.
+func _reveal_tiles() -> bool:
+	var changed=false
+	for i in mini(tile_nodes.size(),state.tiles.size()):
+		var entry=tile_nodes[i]
+		if int(entry.get("shown",-1))==int(state.tiles[i].kind):continue
+		changed=true
+		var bank: Node3D=entry.root.get_node_or_null("FogBank")
+		if bank:
+			var at=bank.global_transform
+			entry.root.remove_child(bank)
+			terrain.add_child(bank)
+			bank.global_transform=at
+			if reduce_motion:bank.queue_free()
+			else:
+				var lift=create_tween().set_parallel()
+				lift.tween_property(bank,"position:y",bank.position.y+.9,1.6).set_ease(Tween.EASE_IN)
+				lift.tween_property(bank,"scale",Vector3(1.4,.05,1.4),1.6).set_ease(Tween.EASE_IN)
+				lift.chain().tween_callback(bank.queue_free)
+		entry.root.free()
+		tile_nodes[i]=_build_tile(i)
+	if changed:coast.build(state,TILE_SIZE,art,render_values)
+	return changed
+
 func _update_boat_wakes():
 	var sources=PackedVector4Array()
 	var vessels=boats.duplicate()
@@ -293,6 +341,7 @@ func _update_boat_wakes():
 func refresh(data: Dictionary):
 	var old=state
 	state=data
+	_reveal_tiles()
 	dwellers=[]
 	for n in pieces_root.get_children(): n.free()
 	var joins={}
@@ -384,13 +433,19 @@ func set_mode(value: String,player: int):
 	var rules=CatanRules.new()
 	rules.s=state
 	var robber_sites=rules.robber_sites(seat) if mode=="robber" else []
-	var edges=mode in ["road","ship","route"]
+	var movable=rules.movable_ships(seat) if mode=="move_ship" else rules.ship_moves(seat,move_from) if mode=="move_to" else []
+	var edges=mode in ["road","ship","route","move_ship","move_to"]
 	var source=state.edges if edges else state.tiles if mode=="robber" else state.vertices
 	for i in source.size():
 		var good=false
 		var pos=Vector3.ZERO
 		var kind=mode
-		if edges:
+		if mode in ["move_ship","move_to"]:
+			good=i in movable
+			var a=state.vertices[source[i].a]
+			var b=state.vertices[source[i].b]
+			pos=Vector3((a.x+b.x)/2,.45 if mode=="move_ship" else .2,(a.z+b.z)/2)
+		elif edges:
 			# "route" offers both, for free roads on an archipelago.
 			good=mode!="ship" and rules.valid_edge(seat,i,state.phase=="setup_road")
 			kind="road"
@@ -432,6 +487,7 @@ func _process(delta):
 	elapsed+=delta
 	sea_material.set_shader_parameter("animation_time",elapsed)
 	if seabed_material:seabed_material.set_shader_parameter("animation_time",elapsed)
+	if fog_material:fog_material.set_shader_parameter("animation_time",elapsed)
 	_point_fish()
 	sea_life.animate(delta,elapsed)
 	environment.sky.sky_material.set_shader_parameter("animation_time",elapsed)

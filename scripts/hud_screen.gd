@@ -58,6 +58,10 @@ func show_game(net: CatanNetwork,state: Dictionary,mode: String):
 		elif rules.can_pay(seat,CatanRules.COST[kind]) and sites.is_empty():button.unavailable_reason=tr("No legal space to build a %s.") % tr(kind)
 	%TradeAction.disabled=not play or not state.rolled
 	%FinishRoads.visible=state.phase=="free_roads" and mine
+	%MoveShip.visible=play and state.rolled and state.get("move_ships",false)
+	%MoveShip.set_pressed_no_signal(mode in ["move_ship","move_to"])
+	%MoveShip.disabled=rules.movable_ships(seat).is_empty()
+	%MoveShip.tooltip_text=tr("You have moved a ship this turn.") if state.get("ship_moved",false) else tr("Once per turn, move a ship from the open end of a line") if not %MoveShip.disabled else tr("No ship can move: only ships at the open end of a line, not built this turn.")
 	%DiscardAction.visible=state.phase=="discard" and state.discards.has(str(seat))
 	if state.phase=="steal" and mine:
 		for victim in state.victims:_add_steal_action(victim,state.players[victim].name)
@@ -88,6 +92,8 @@ func _prompt(state: Dictionary,seat: int,mode: String) -> String:
 		"ship":return tr("Choose a glowing sea edge for your ship")
 		"settlement":return tr("Choose a glowing corner for your settlement")
 		"city":return tr("Choose a settlement to upgrade")
+		"move_ship":return tr("Choose a glowing ship to move")
+		"move_to":return tr("Choose a glowing sea edge for the ship")
 	return tr("Build, trade or end your turn") if state.rolled else tr("Roll dice")
 
 func show_turn_clock(seconds_left: float,limit: float,finished: bool):

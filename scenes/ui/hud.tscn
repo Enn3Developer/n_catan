@@ -194,6 +194,17 @@ size_flags_vertical = 4
 mouse_default_cursor_shape = 2
 text = "Finish roads"
 
+[node name="MoveShip" type="Button" parent="Bottom/BottomBody/PromptRow/PromptActions" groups=["ui_click"]]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Once per turn, move a ship from the open end of a line"
+mouse_default_cursor_shape = 2
+toggle_mode = true
+text = "Move a ship"
+
 [node name="DiscardAction" type="Button" parent="Bottom/BottomBody/PromptRow/PromptActions" groups=["ui_click"]]
 unique_name_in_owner = true
 visible = false
@@ -391,6 +402,7 @@ script = ExtResource("card_fan")
 [connection signal="pressed" from="Bottom/BottomBody/BottomRow/ActionsBody/TradeAction" to="." method="emit_signal" binds= ["trade_requested"]]
 [connection signal="pressed" from="Bottom/BottomBody/BottomRow/ActionsBody/EndTurn" to="." method="_request" binds= ["end"]]
 [connection signal="pressed" from="Bottom/BottomBody/PromptRow/PromptActions/FinishRoads" to="." method="_request" binds= ["finish_roads"]]
+[connection signal="pressed" from="Bottom/BottomBody/PromptRow/PromptActions/MoveShip" to="." method="emit_signal" binds= ["build_requested", "move_ship"]]
 [connection signal="pressed" from="Bottom/BottomBody/PromptRow/PromptActions/DiscardAction" to="." method="emit_signal" binds= ["discard_requested"]]
 [connection signal="pressed" from="Bottom/BottomBody/PromptRow/PromptActions/ViewOffer" to="." method="emit_signal" binds= ["offer_requested"]]
 [connection signal="minimum_size_changed" from="Scoreboard" to="." method="emit_signal" binds= ["layout_changed"]]

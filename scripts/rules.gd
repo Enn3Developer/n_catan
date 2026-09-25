@@ -8,20 +8,26 @@ const PIECE_LIMITS={"road":15,"settlement":5,"city":4,"ship":15}
 ## Tile kinds past the five resources.
 const DESERT=5
 const TREASURE=6
+## What snapshots show for a hex still under the fog.
+const FOG=7
 var s: Dictionary = {}
 var rng = RandomNumberGenerator.new()
 
 const ISLANDS=["random","classic","archipelago"]
 const TURN_TIMERS=[0,30,45,60,90,120,180]
 const POINT_TARGETS=[5,15]
-const DEFAULT_OPTIONS={"island":"random","points":10,"friendly_robber":false,"random_start":false,"start_card":false,"treasure":false}
+const DEFAULT_OPTIONS={"island":"random","points":10,"friendly_robber":false,"random_start":false,"start_card":false,"treasure":false,"move_ships":false,"fog":false}
 ## House rules that are simple switches in the lobby, with their name and help.
-const HOUSE_RULES=["friendly_robber","random_start","start_card","treasure"]
+const HOUSE_RULES=["friendly_robber","random_start","start_card","treasure","move_ships","fog"]
+## House rules that only change an archipelago game.
+const SEA_RULES=["move_ships","fog"]
 const HOUSE_RULE_TEXT={
 	"friendly_robber":["Friendly robber","The robber cannot be placed next to a player with 3 points or fewer."],
 	"random_start":["Random start","Everyone's first two settlements and roads are placed for them, on good spots of similar value."],
 	"start_card":["Starting card","Everyone draws a development card before the first roll and can play it on their first turn."],
-	"treasure":["Treasure tile","When its number is rolled, the treasure gives each settlement on it 2 random resources (a city 4), then draws a new number. No one can start within 3 roads of it."]}
+	"treasure":["Treasure tile","When its number is rolled, the treasure gives each settlement on it 2 random resources (a city 4), then draws a new number. No one can start within 3 roads of it."],
+	"move_ships":["Moving ships","Archipelago only. Once per turn, after rolling, you may move one ship from the open end of a line to another sea edge you could build on. A ship built this turn stays put."],
+	"fog":["Fog","Archipelago only. The outer islands start hidden in fog. A road, ship or settlement that reaches a hidden hex reveals it, and a resource hex gives its finder one of that resource."]}
 ## Numbers the treasure tile draws from each time it pays out.
 const TREASURE_NUMBERS=[2,3,4,5,6,8,9,10,11,12]
 ## A starting settlement must be at least this many roads from the treasure.
@@ -54,6 +60,10 @@ func create(names: Array, game_seed: int = 0, options: Dictionary = {}) -> Dicti
 	s.random_start=bool(settings.random_start)
 	s.start_card=bool(settings.start_card)
 	s.treasure=bool(settings.treasure)
+	s.move_ships=bool(settings.move_ships) and s.island=="archipelago"
+	s.fog=bool(settings.fog) and s.island=="archipelago"
+	s.ship_moved=false
+	s.new_ships=[]
 	s.dice_counts=[0,0,0,0,0,0,0,0,0,0,0]
 	s.resource_limit=24 if extended else 19
 	if extended: s.bank=[24,24,24,24,24]
@@ -106,6 +116,9 @@ func create(names: Array, game_seed: int = 0, options: Dictionary = {}) -> Dicti
 			s.edges[edge_keys[key]].tiles+=1
 		s.tiles.append(tile)
 	if s.island=="archipelago": _add_sea(centers,keys,edge_keys)
+	if s.fog:
+		for t in s.tiles:
+			if int(t.island)>0: t.fog=true
 	# Keys are built before centering so shared corners round identically.
 	var middle=Vector2.ZERO
 	for center in centers: middle+=center
@@ -627,6 +640,7 @@ func apply(p: int,a: Dictionary) -> String:
 	elif s.phase=="setup_road":
 		if action!="road" or not valid_edge(p,id,true): return "Place a road beside your new settlement."
 		s.edges[id].owner=p
+		_reveal_edge(p,id)
 		s.setup+=1
 		var count=s.players.size()
 		if s.setup==2*count:
@@ -634,6 +648,8 @@ func apply(p: int,a: Dictionary) -> String:
 			s.phase="play"
 			if s.get("start_card",false): _deal_start_cards()
 			_log("All settlements placed. Roll the dice to begin.")
+			_score()
+			_record_points()
 		else:
 			s.turn=s.setup if s.setup<count else 2*count-1-s.setup
 			s.phase="setup_settlement"
@@ -667,11 +683,13 @@ func apply(p: int,a: Dictionary) -> String:
 			s.phase="play"
 		elif action=="road" and valid_edge(p,id) and pieces(p,"road")<15:
 			s.edges[id].owner=p
+			_reveal_edge(p,id)
 			s.free_roads-=1
 			if s.free_roads==0 or (pieces(p,"road")==15 and build_sites(p,"ship").is_empty()): s.phase="play"
 		elif action=="ship" and valid_ship(p,id) and pieces(p,"ship")<PIECE_LIMITS.ship:
 			s.edges[id].owner=p
 			s.edges[id].ship=true
+			_new_ship(p,id)
 			s.free_roads-=1
 			if s.free_roads==0: s.phase="play"
 		else: return "Choose a connected road, or finish building."
@@ -733,17 +751,20 @@ func apply(p: int,a: Dictionary) -> String:
 					if pieces(p,"road")>=15: return "All 15 of your roads are on the board. You have none left to place."
 					if not valid_edge(p,id): return "Choose an empty edge connected to your road or building. Another player’s building blocks the route."
 					s.edges[id].owner=p
+					_reveal_edge(p,id)
 				elif action=="ship":
 					if pieces(p,"ship")>=PIECE_LIMITS.ship: return "All 15 of your ships are at sea. You have none left to place."
 					if not valid_ship(p,id): return "Choose a sea edge next to your harbor town or the end of your ships."
 					s.edges[id].owner=p
 					s.edges[id].ship=true
+					_new_ship(p,id)
 				elif action=="settlement":
 					if pieces(p,"settlement")>=5: return "All 5 of your settlements are on the board. Upgrade one to a city to free a settlement piece."
 					if not valid_vertex(p,id): return "Choose an empty corner on your road, at least two edges from every settlement or city."
 					s.vertices[id].owner=p
 					s.vertices[id].level=1
 					_claim_islands(p,id,true)
+					_reveal(p,[id])
 				elif action=="city":
 					if pieces(p,"city")>=4: return "All 4 of your cities are on the board. You have none left to place."
 					if id<0 or id>=s.vertices.size() or s.vertices[id].owner!=p or s.vertices[id].level!=1: return "Choose one of your settlements to upgrade to a city."
@@ -779,9 +800,23 @@ func apply(p: int,a: Dictionary) -> String:
 				s.offers_made=int(s.get("offers_made",0))+1
 				s.offer={"id":s.trade_event.id,"from":p,"give":give.duplicate(),"receive":receive.duplicate(),"responses":{},"waiting":true}
 			elif action=="confirm_trade": return _confirm(p,id)
+			elif action=="move_ship":
+				if not s.get("move_ships",false): return "Moving ships is a house rule this room does not use."
+				if s.get("ship_moved",false): return "You have moved a ship this turn. You can move another next turn."
+				if id not in movable_ships(p): return "Choose one of your ships at the open end of a line. Ships built this turn cannot move."
+				var to=int(a.get("to",-1))
+				if to not in ship_moves(p,id): return "Choose a sea edge you could build a ship on."
+				s.edges[id].owner=-1
+				s.edges[id].erase("ship")
+				s.edges[to].owner=p
+				s.edges[to].ship=true
+				s.ship_moved=true
+				_reveal_edge(p,to)
+				_log(CatanI18n.message("%s moved a ship.",[player.name]))
 			elif action=="end":
 				_score()
 				if s.winner!=-1: return ""
+				_record_points()
 				for i in 5:
 					player.cards[i]+=player.new_cards[i]
 					player.new_cards[i]=0
@@ -797,6 +832,8 @@ func apply(p: int,a: Dictionary) -> String:
 					s.paired=false
 					s.rolled=false
 				s.card_played=false
+				s.ship_moved=false
+				s.new_ships=[]
 				s.offer={}
 				s.offers_made=0
 			else: return "This action is unavailable. Please choose an action from the game controls."
@@ -888,7 +925,7 @@ func robber_sites(p: int) -> Array:
 	var open=[]
 	var friendly=[]
 	for t in s.tiles.size():
-		if t==s.robber: continue
+		if t==s.robber or s.tiles[t].get("fog",false): continue
 		open.append(t)
 		var spared=false
 		for v in s.tiles[t].corners:
@@ -896,6 +933,64 @@ func robber_sites(p: int) -> Array:
 			if owner>=0 and owner!=p and int(s.players[owner].points)<=FRIENDLY_LIMIT: spared=true
 		if not spared: friendly.append(t)
 	return friendly if s.get("friendly_robber",false) and not friendly.is_empty() else open
+
+## Moving ships: ships at the open end of a line, not built this turn, while
+## the player has not moved one yet this turn.
+func movable_ships(p: int) -> Array:
+	var result=[]
+	if not s.get("move_ships",false) or s.get("ship_moved",false) or p<0 or p>=s.players.size(): return result
+	for eid in s.edges.size():
+		if s.edges[eid].owner==p and is_ship(eid) and eid not in s.get("new_ships",[]) and _open_ship(p,eid): result.append(eid)
+	return result
+
+## A ship is open when one of its ends has neither another of the player's
+## ships nor the player's own settlement or city.
+func _open_ship(p: int,eid: int) -> bool:
+	var e=s.edges[eid]
+	for v in [e.a,e.b]:
+		if s.vertices[v].owner==p: continue
+		var linked=false
+		for other in s.vertices[v].edges:
+			if other!=eid and s.edges[other].owner==p and is_ship(other): linked=true
+		if not linked: return true
+	return false
+
+## Sea edges the ship could move to: anywhere the player could build a ship
+## once this one has left its edge.
+func ship_moves(p: int,eid: int) -> Array:
+	var result=[]
+	if eid<0 or eid>=s.edges.size() or s.edges[eid].owner!=p or not is_ship(eid): return result
+	s.edges[eid].owner=-1
+	for other in s.edges.size():
+		if other!=eid and valid_ship(p,other): result.append(other)
+	s.edges[eid].owner=p
+	return result
+
+func _new_ship(p: int,eid: int):
+	if not s.has("new_ships"): s.new_ships=[]
+	s.new_ships.append(eid)
+	_reveal_edge(p,eid)
+
+func _reveal_edge(p: int,eid: int):
+	_reveal(p,[s.edges[eid].a,s.edges[eid].b])
+
+## Fog: hexes touching these corners come out of the fog. A resource hex
+## gives the player who found it one of its resource, if the bank has one.
+func _reveal(p: int,corners: Array):
+	if not s.get("fog",false): return
+	for v in corners:
+		for t in s.vertices[v].tiles:
+			var tile=s.tiles[t]
+			if not tile.get("fog",false): continue
+			tile.erase("fog")
+			var kind=int(tile.kind)
+			if kind<DESERT and s.bank[kind]>0:
+				s.bank[kind]-=1
+				s.players[p].hand[kind]+=1
+				_produced(p,kind,1)
+				_log(CatanI18n.message("%s revealed a hex in the fog and found %s.",[s.players[p].name,CatanI18n.term(RES[kind])]))
+			elif kind==TREASURE: _log(CatanI18n.message("%s revealed the treasure in the fog.",[s.players[p].name]))
+			else: _log(CatanI18n.message("%s revealed a hex in the fog.",[s.players[p].name]))
 
 func _stat(p: int,key: String,amount: int):
 	var stats=s.players[p].get("stats",{})
@@ -906,7 +1001,7 @@ func produce(roll: int):
 	for p in s.players: gains.append([0,0,0,0,0])
 	for i in s.tiles.size():
 		var t=s.tiles[i]
-		if t.number!=roll or i==s.robber or t.kind>=DESERT: continue
+		if t.number!=roll or i==s.robber or t.kind>=DESERT or t.get("fog",false): continue
 		for vid in t.corners:
 			var v=s.vertices[vid]
 			if v.owner>=0: gains[v.owner][t.kind]+=v.level
@@ -932,7 +1027,7 @@ func produce(roll: int):
 func _pay_treasure(roll: int):
 	for i in s.tiles.size():
 		var t=s.tiles[i]
-		if t.kind!=TREASURE or t.number!=roll: continue
+		if t.kind!=TREASURE or t.number!=roll or t.get("fog",false): continue
 		if i==s.robber:
 			_log("The robber sits on the treasure. It pays nothing this time.")
 			continue
@@ -1059,7 +1154,16 @@ func _score():
 		s.players[p].points=points
 		if p==s.turn and points+s.players[p].cards[4]+s.players[p].new_cards[4]>=target():
 			s.winner=p
+			_record_points()
 			_log(CatanI18n.message("%s wins with %d victory points!",[s.players[p].name,points+s.players[p].cards[4]+s.players[p].new_cards[4]]))
+
+## Everyone's points with their hidden victory cards, after each turn. The
+## chart on the victory screen draws them; snapshots hold them back until then.
+func _record_points():
+	if not s.has("points_history"): s.points_history=[]
+	var row=[]
+	for p in s.players.size(): row.append(int(s.players[p].points)+int(s.players[p].cards[4])+int(s.players[p].new_cards[4]))
+	s.points_history.append(row)
 
 func target() -> int:
 	return int(s.get("points_target",10))
@@ -1077,6 +1181,12 @@ func snapshot(viewer: int,log_tail: int=40) -> Dictionary:
 	# Upcoming rolls stay with the host.
 	result.erase("dice_bag")
 	result.erase("next_dice")
+	if s.winner==-1: result.erase("points_history")
+	# Hexes under the fog keep their land and number with the host.
+	for t in result.tiles:
+		if t.get("fog",false):
+			t.kind=FOG
+			t.number=0
 	for p in result.players.size():
 		var player=result.players[p]
 		player.resource_count=total(player.hand)

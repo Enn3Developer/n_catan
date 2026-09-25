@@ -20,6 +20,16 @@ func show_results(state: Dictionary,net: CatanNetwork):
 		if state.get(rule,false):%Summary.text+=" · "+tr(CatanRules.HOUSE_RULE_TEXT[rule][0])
 	_show_stats(state,net)
 	_show_dice(state.get("dice_counts",[]))
+	var history: Array=state.get("points_history",[])
+	%PointsHeading.visible=history.size()>=2
+	%PointsChart.visible=history.size()>=2
+	var names=[]
+	var colors=[]
+	for p in state.players.size():
+		names.append(state.players[p].name)
+		# Seat colors are pale on parchment; darken the lines a little.
+		colors.append(net.player_color(p).darkened(.25))
+	%PointsChart.show_history(history,names,colors,int(state.get("points_target",10)))
 	var controller=net.is_controller() and not net.tutorial
 	%PlayAgain.visible=controller
 	%BackToMenu.theme_type_variation=&"" if controller else &"PrimaryButton"
