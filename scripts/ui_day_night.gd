@@ -22,6 +22,7 @@ const PALETTE={
 	"795635":"748197", "b5a07b":"1c2938", "91734d":"526276",
 	"6d8958":"789568", "496340":"566e4f", "b77633":"d6b878",
 	"526747":"9fbb8d", "b4c696":"506944", "a8402f":"f0907c",
+	"e6c98e":"3a4f66", "7d9a66":"8eab7c", "e3c894":"1c2938",
 }
 
 var amount=0.0
@@ -95,6 +96,13 @@ func _texture(source: Texture2D) -> Texture2D:
 	material.set_shader_parameter("accent","primary" in source.resource_path)
 	material.set_shader_parameter("selected","selected" in source.resource_path)
 	material.set_shader_parameter("icon",not "button" in source.resource_path and not "parchment" in source.resource_path)
+	# Hovered wood would land within a shade of resting wood, so it lifts a step.
+	material.set_shader_parameter("lift",.05 if "hover" in source.resource_path else 0.0)
+	# Small controls bring their own night art, drawn to the same shape.
+	var night_path=source.resource_path.get_basename()+"-night."+source.resource_path.get_extension()
+	if source.resource_path!="" and ResourceLoader.exists(night_path):
+		material.set_shader_parameter("paired",true)
+		material.set_shader_parameter("night_texture",load(night_path))
 	rect.material=material
 	atlas.add_child(rect)
 	materials.append(material)

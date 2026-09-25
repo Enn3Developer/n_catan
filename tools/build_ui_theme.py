@@ -31,7 +31,7 @@ def sunken(fill,edge):
  return f'<rect x="2" y="3" width="92" height="43" rx="9" fill="{fill}" stroke="{edge}" stroke-width="2"/>'
 for name,body in [
  ('button',raised('#e4c18c','#785334','#ffedc3','#bb8d55')),
- ('button-hover',raised('#f2d4a0','#85542c','#fff3d3','#c29354')),
+ ('button-hover',raised('#f7dfae','#85542c','#fff8e6','#c7995c')),
  ('button-selected',sunken('#e9bf73','#85542c')),
  ('button-primary',raised('#5f794f','#314831','#a3b782','#435b3e')),
  ('button-primary-hover',raised('#748c5c','#314831','#bfd298','#506b42')),
@@ -39,21 +39,43 @@ for name,body in [
  ('button-disabled',f'<rect x="2" y="3" width="92" height="43" rx="9" fill="#bbab8d" stroke="#a29478" stroke-width="2"/><rect x="3" y="3" width="90" height="37" rx="8" fill="#d4c4a5"/>')]:
  svg(name,body)
 # Knobs are plain brass buttons; grip lines on them read as a pause symbol.
-svg('slider-knob','<circle cx="10" cy="10" r="8" fill="#d4a355" stroke="#694729" stroke-width="2"/><circle cx="10" cy="9" r="5" fill="#f2d48b"/><circle cx="8.5" cy="7.5" r="1.6" fill="#fff3d3"/>',20,20)
+# Switches, checkboxes, radios and knobs are small and their state is all they
+# say, so each one also has hand-picked night art ("-night") instead of going
+# through the night shader, which would turn green and cream the same tan.
+# Each look sets the empty box, the switch track and its stroke, the "on" fill
+# and stroke, the knob face and stroke, its highlight, and the tick.
+LOOKS={
+ '':dict(box='#fff1d3',off='#d6bd90',off_edge='#6b5135',on='#617f50',on_edge='#40573a',knob='#f3d89c',knob_edge='#795330',shine='#fff3d3',tick='#fbf0d6'),
+ '-disabled':dict(box='#ece2cc',off='#ddd0b4',off_edge='#a8977a',on='#aab796',on_edge='#8f9c7e',knob='#e8dcc4',knob_edge='#a8977a',shine='#f4ecdc',tick='#f4ecdc'),
+ '-night':dict(box='#162230',off='#162230',off_edge='#7d8ba0',on='#6f9a5e',on_edge='#a8c592',knob='#e2c78a',knob_edge='#10171f',shine='#fff3dc',tick='#fff3dc'),
+ '-disabled-night':dict(box='#1c2836',off='#1c2836',off_edge='#435164',on='#3d5540',on_edge='#56705a',knob='#5d6b7d',knob_edge='#10171f',shine='#76849a',tick='#8d9aab'),
+}
+def knob(c,x,y,r,edge=2):
+ return f'<circle cx="{x}" cy="{y}" r="{r}" fill="{c["knob"]}" stroke="{c["knob_edge"]}" stroke-width="{edge}"/><circle cx="{x}" cy="{y-r*.08:.1f}" r="{r*.62:.1f}" fill="{c["shine"]}" fill-opacity=".35"/><circle cx="{x-r*.3}" cy="{y-r*.3}" r="{r*.22:.1f}" fill="{c["shine"]}"/>'
+for look,c in LOOKS.items():
+ for state,on in [('checked',True),('unchecked',False)]:
+  fill,edge=(c['on'],c['on_edge']) if on else (c['off'],c['off_edge'])
+  x=30 if on else 12
+  svg(f'switch-{state}{look}',f'<rect x="2" y="6" width="38" height="18" rx="9" fill="{fill}" stroke="{edge}" stroke-width="2"/>'+knob(c,x,15,10),44,30)
+  box=c['on'] if on else c['box']
+  tick=f'<path d="M6 12.5 L10 16.5 L18 7.5" fill="none" stroke="{c["tick"]}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' if on else ''
+  svg(f'checkbox-{state}{look}',f'<rect x="2" y="2" width="20" height="20" rx="5" fill="{box}" stroke="{edge}" stroke-width="2"/>{tick}',24,24)
+  dot=f'<circle cx="12" cy="12" r="4.5" fill="{c["tick"]}"/>' if on else ''
+  svg(f'radio-{state}{look}',f'<circle cx="12" cy="12" r="10" fill="{box}" stroke="{edge}" stroke-width="2"/>{dot}',24,24)
+# The slider knob brightens under the pointer; a disabled one greys out.
+for look,c in LOOKS.items():
+ for hover in (['','-hover'] if 'disabled' not in look else ['']):
+  face=dict(c,knob='#f7e0a8' if look=='' else '#efd79f',shine='#fff8e6') if hover else c
+  name='slider-knob'+hover+look
+  svg(name,knob(face,12,12,10),24,24)
 svg('arrow-down','<path d="M3 5 L9 11 L15 5" fill="none" stroke="#68472b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>',18,16)
 svg('arrow-up','<path d="M3 11 L9 5 L15 11" fill="none" stroke="#68472b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>',18,16)
-for state,on in [('checked',True),('unchecked',False)]:
- fill='#617f50' if on else '#beac8a';x=30 if on else 12
- svg('switch-'+state,f'<rect x="2" y="6" width="38" height="18" rx="9" fill="{fill}" stroke="#6b5135" stroke-width="2"/><circle cx="{x}" cy="15" r="10" fill="#f3d89c" stroke="#795330" stroke-width="2"/><circle cx="{x-3}" cy="12" r="2" fill="#fff3d3"/>',44,30)
- tick='<path d="M6 12.5 L10 16.5 L18 7.5" fill="none" stroke="#f6e7c4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' if on else ''
- svg('checkbox-'+state,f'<rect x="2" y="2" width="20" height="20" rx="5" fill="{"#617f50" if on else "#fff1d3"}" stroke="#6b5135" stroke-width="2"/>{tick}',24,24)
- dot='<circle cx="12" cy="12" r="4.5" fill="#f6e7c4"/>' if on else ''
- svg('radio-'+state,f'<circle cx="12" cy="12" r="10" fill="{"#617f50" if on else "#fff1d3"}" stroke="#6b5135" stroke-width="2"/>{dot}',24,24)
 
 def color(h,a=1):
  vals=[int(h[i:i+2],16)/255 for i in (0,2,4)]
  return 'Color('+', '.join(f'{v:.4f}' for v in vals)+f', {a})'
-TEXTURES=['parchment-panel','button','button-hover','button-selected','button-primary','button-primary-hover','button-primary-pressed','button-disabled','slider-knob','arrow-down','arrow-up','switch-checked','switch-unchecked','checkbox-checked','checkbox-unchecked','radio-checked','radio-unchecked']
+TOGGLES=[f'{kind}-{state}{look}' for kind in ['switch','checkbox','radio'] for state in ['checked','unchecked'] for look in ['','-disabled']]
+TEXTURES=['parchment-panel','button','button-hover','button-selected','button-primary','button-primary-hover','button-primary-pressed','button-disabled','slider-knob','slider-knob-hover','slider-knob-disabled','arrow-down','arrow-up']+TOGGLES
 lines=['[gd_resource type="Theme" format=3 uid="uid://cr50xu8k1vr3e"]','',
  '[ext_resource type="FontFile" path="res://assets/fonts/FiraSans-Regular.ttf" id="body"]',
  '[ext_resource type="FontFile" path="res://assets/fonts/FiraSans-Medium.ttf" id="button-font"]',
@@ -86,9 +108,14 @@ flat('Input','fff1d3','b49668',1)
 flat('InputFocus','fff5df','6b834f',2)
 flat('InputReadOnly','eedab0','b49668',1)
 flat('Popup','f4e2bb','795635',2,8,12,8)
-flat('Track','b5a07b','91734d',1,3,2,2)
-flat('Fill','6d8958','496340',1,3,2,2)
-flat('ScrollTrack','eedab0',None,1,5,5,5)
+# The pointed-at menu entry sits a step darker than the menu, at night lighter.
+flat('MenuHover','e6c98e',None,1,6,12,6)
+# Tracks are an 8 px groove; the slider draws them as tall as their content margins.
+flat('Track','b5a07b','91734d',1,4,2,4)
+flat('Fill','6d8958','496340',1,4,2,4)
+flat('FillHover','7d9a66','496340',1,4,2,4)
+# A shallow groove, so the scrollbar still reads on parchment.
+flat('ScrollTrack','e3c894',None,1,5,5,5)
 flat('ScrollGrabber','ac8654',None,1,5,5,5)
 flat('ScrollGrabberHover','8c522d',None,1,5,5,5)
 flat('Focus','fff1d3','b77633',2,9,0,0,0)
@@ -130,10 +157,10 @@ for typ in ['CheckButton','CheckBox']:
  prop(f'{typ}/styles/focus','SubResource("Focus")')
  prop(f'{typ}/constants/h_separation','10')
 for state in ['checked','unchecked']:
- for variant in [state,state+'_disabled']:
-  prop('CheckButton/icons/'+variant,f'ExtResource("switch-{state}")')
-  prop('CheckBox/icons/'+variant,f'ExtResource("checkbox-{state}")')
-  prop('CheckBox/icons/radio_'+variant,f'ExtResource("radio-{state}")')
+ for variant,look in [(state,''),(state+'_disabled','-disabled')]:
+  prop('CheckButton/icons/'+variant,f'ExtResource("switch-{state}{look}")')
+  prop('CheckBox/icons/'+variant,f'ExtResource("checkbox-{state}{look}")')
+  prop('CheckBox/icons/radio_'+variant,f'ExtResource("radio-{state}{look}")')
 prop('Label/colors/font_color',color(INK))
 prop('HeadingLabel/base_type','&"Label"')
 prop('HeadingLabel/fonts/font','ExtResource("heading-font")')
@@ -155,7 +182,7 @@ prop('Card/base_type','&"PanelContainer"');prop('Card/styles/panel','SubResource
 prop('Row/base_type','&"PanelContainer"');prop('Row/styles/panel','SubResource("Row")')
 prop('PlainRow/base_type','&"PanelContainer"');prop('PlainRow/styles/panel','SubResource("RowPlain")')
 prop('PopupPanel/styles/panel','SubResource("Popup")')
-prop('PopupMenu/styles/panel','SubResource("Popup")');prop('PopupMenu/styles/hover','SubResource("Row")')
+prop('PopupMenu/styles/panel','SubResource("Popup")');prop('PopupMenu/styles/hover','SubResource("MenuHover")')
 prop('PopupMenu/styles/separator','SubResource("Separator")')
 prop('PopupMenu/constants/v_separation','10');prop('PopupMenu/constants/item_start_padding','10');prop('PopupMenu/constants/item_end_padding','10')
 for key,h in [('font_color',INK),('font_hover_color',INK_HOVER),('font_disabled_color',DISABLED),('font_separator_color',MUTED)]:prop('PopupMenu/colors/'+key,color(h))
@@ -171,8 +198,8 @@ for direction in ['up','down']:
 prop('SpinBox/constants/buttons_width','28')
 prop('SpinBox/constants/field_and_buttons_separation','4')
 for typ in ['HSlider','VSlider']:
- for key in ['grabber','grabber_highlight','grabber_disabled']:prop(typ+'/icons/'+key,'ExtResource("slider-knob")')
- for state,style in [('slider','Track'),('grabber_area','Fill'),('grabber_area_highlight','Fill')]:prop(typ+'/styles/'+state,f'SubResource("{style}")')
+ for key,knob in [('grabber','slider-knob'),('grabber_highlight','slider-knob-hover'),('grabber_disabled','slider-knob-disabled')]:prop(typ+'/icons/'+key,f'ExtResource("{knob}")')
+ for state,style in [('slider','Track'),('grabber_area','Fill'),('grabber_area_highlight','FillHover')]:prop(typ+'/styles/'+state,f'SubResource("{style}")')
 for typ in ['HScrollBar','VScrollBar']:
  for state,style in [('scroll','ScrollTrack'),('scroll_focus','ScrollTrack'),('grabber','ScrollGrabber'),('grabber_highlight','ScrollGrabberHover'),('grabber_pressed','ScrollGrabberHover')]:prop(typ+'/styles/'+state,f'SubResource("{style}")')
 for typ in ['HSeparator','VSeparator']:
