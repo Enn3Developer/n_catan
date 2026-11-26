@@ -7,6 +7,8 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
+import struct
 import subprocess
 import tempfile
 import urllib.request
@@ -18,6 +20,8 @@ CONFIG = json.loads((ROOT / 'config/release.json').read_text())
 REPO = CONFIG['repository']
 PLATFORMS = {'linux-x86_64': ('linux', 'N Catan.x86_64', 'n-catan-updater'),
              'windows-x86_64': ('win', 'N Catan.exe', 'n-catan-updater.exe')}
+# Manual-download builds: shipped with the release, outside the signed updater.
+MANUAL = {'macos-arm64': 'N-Catan-macos-arm64.zip'}
 
 
 def run(*args, **kwargs):
@@ -46,7 +50,9 @@ def stamp(tag):
     text = re.sub(r'^config/version=.*\n', '', text, flags=re.M)
     path.write_text(text.replace('[application]\n', f'[application]\n\nconfig/version="{tag}"\n'))
     path = ROOT / 'export_presets.cfg'
-    path.write_text(re.sub(r'(application/(?:file|product)_version)=.*', rf'\1="{numeric}"', path.read_text()))
+    text = re.sub(r'(application/(?:file|product)_version)=.*', rf'\1="{numeric}"', path.read_text())
+    # CFBundleShortVersionString/CFBundleVersion accept only dotted integers.
+    path.write_text(re.sub(r'(application/(?:short_)?version)=.*', rf'\1="{numeric.removesuffix(".0")}"', text))
 
 
 def verify_manifest(path):
@@ -70,6 +76,36 @@ def spec(path):
     return {'name': path.name, 'size': path.stat().st_size, 'sha256': digest(path)}
 
 
+def arm64_slice(data):
+    """Return the arm64 slice of a Mach-O universal binary."""
+    magic, count = struct.unpack_from('>II', data)
+    if magic not in (0xcafebabe, 0xcafebabf):
+        raise ValueError('Not a universal Mach-O binary')
+    wide = magic == 0xcafebabf
+    for index in range(count):
+        if wide:
+            cpu, _, offset, size, _, _ = struct.unpack_from('>iiQQII', data, 8 + index * 32)
+        else:
+            cpu, _, offset, size, _ = struct.unpack_from('>iiIII', data, 8 + index * 20)
+        if cpu == 0x0100000c:
+            return data[offset:offset + size]
+    raise ValueError('No arm64 slice in universal binary')
+
+
+def macos_arm64_template(data):
+    """Godot's stock template is universal; arm64 exports want godot_macos_*.arm64."""
+    import io
+    result = io.BytesIO()
+    with zipfile.ZipFile(io.BytesIO(data)) as source, zipfile.ZipFile(result, 'w', zipfile.ZIP_DEFLATED) as target:
+        for info in source.infolist():
+            content = source.read(info)
+            if info.filename.endswith('.universal'):
+                content = arm64_slice(content)
+                info.filename = info.filename.removesuffix('.universal') + '.arm64'
+            target.writestr(info, content)
+    return result.getvalue()
+
+
 def bootstrap():
     dest = ROOT / 'build/godot'
     dest.mkdir(parents=True, exist_ok=True)
@@ -88,8 +124,9 @@ def bootstrap():
             else:
                 target = Path(os.environ.get('XDG_DATA_HOME', str(Path.home() / '.local/share'))) / 'godot/export_templates' / CONFIG['godot_version'].replace('-', '.')
                 target.mkdir(parents=True, exist_ok=True)
-                for filename in ['linux_release.x86_64', 'windows_release_x86_64.exe']:
-                    (target / filename).write_bytes(archive.read('templates/' + filename))
+                for filename in ['linux_release.x86_64', 'windows_release_x86_64.exe', 'macos.zip']:
+                    data = archive.read('templates/' + filename)
+                    (target / filename).write_bytes(macos_arm64_template(data) if filename == 'macos.zip' else data)
     print(executable)
 
 
@@ -144,7 +181,6 @@ def package(tag, key, commit, with_previous=True):
                         if info.file_size != old['game']['size'] or info.file_size > 1 << 30:
                             raise ValueError('Previous executable size mismatch')
                         with archive.open(info) as src, base.open('wb') as dst:
-                            import shutil
                             shutil.copyfileobj(src, dst)
                     if spec(base) != old['game']:
                         raise ValueError('Previous executable checksum mismatch')
@@ -158,6 +194,8 @@ def package(tag, key, commit, with_previous=True):
                 except (subprocess.CalledProcessError, ValueError, KeyError, OSError, zipfile.BadZipFile) as error:
                     print(f'{platform}: full package only: {error}')
             manifest['platforms'][platform] = data
+        for platform, name in MANUAL.items():
+            shutil.copyfile(ROOT / 'build' / name, out / f'n-catan-{tag}-{platform}.zip')
         payload = json.dumps(manifest, sort_keys=True, separators=(',', ':')).encode()
         raw = temp / 'payload'
         raw.write_bytes(payload)

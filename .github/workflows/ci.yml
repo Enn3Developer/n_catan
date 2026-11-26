@@ -22,6 +22,32 @@ jobs:
       - name: Import Godot project
         run: |
           python3 tools/release.py bootstrap
+          echo "GODOT_BIN=$PWD/build/godot/Godot_v4.7.2-stable_linux.x86_64" >> "$GITHUB_ENV"
           "$PWD/build/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --editor --import --quit
+      - name: Export macOS arm64
+        run: bash tools/export_macos.sh
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: macos-arm64
+          path: build/N-Catan-macos-arm64.zip
+          retention-days: 7
+  macos-arm64:
+    needs: test
+    runs-on: macos-15
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: macos-arm64
+      - name: Verify signature and launch headless
+        run: |
+          set -euo pipefail
+          ditto -x -k N-Catan-macos-arm64.zip app
+          test "$(uname -m)" = arm64
+          bundle=$(echo app/*.app)
+          executable=$(echo "$bundle"/Contents/MacOS/*)
+          codesign --verify --deep --strict --verbose=2 "$bundle"
+          test "$(lipo -archs "$executable")" = arm64
+          "$executable" --headless --quit-after 300 2>&1 | tee launch.log
+          ! grep -E "SCRIPT ERROR|Parse Error" launch.log
       - name: Rules tests
         run: '"$PWD/build/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --script tests/rules_test.gd'

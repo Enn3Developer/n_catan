@@ -20,7 +20,9 @@ func _ready():
 	# Never replace the editor, a renamed executable, or a source checkout.
 	supported=OS.get_name() in ["Linux","Windows"] and OS.get_executable_path().get_file()==expected and FileAccess.file_exists(helper)
 	if not supported:
-		status={"state":"unavailable","message":"Automatic updates are available in installed releases. Download a release with the updater included."}
+		var message="Automatic updates are available in installed releases. Download a release with the updater included."
+		if OS.get_name()=="macOS":message="Automatic updates are not available on macOS. Download new versions from the GitHub releases page."
+		status={"state":"unavailable","message":message}
 	changed.emit()
 
 func busy() -> bool:

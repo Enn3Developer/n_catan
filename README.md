@@ -14,7 +14,9 @@ This is an independent fan project, not an official Catan product.
 
 Get a build from [GitHub Releases](https://github.com/Enn3Developer/n_catan/releases) when one is available. Extract the ZIP into a writable folder and launch `N Catan.x86_64` on Linux or `N Catan.exe` on Windows. Keep the updater beside the executable.
 
-The game uses the Forward+ renderer and requires a Vulkan-capable GPU.
+On a Mac with Apple Silicon (macOS 11 or later), download the `macos-arm64` ZIP and open `CATAN · Tides and Timber.app`. The app is ad-hoc signed but not notarized, so the first time macOS may refuse to open it: choose **Open Anyway** in System Settings > Privacy & Security, or run `xattr -dr com.apple.quarantine "CATAN · Tides and Timber.app"`. The macOS build has no automatic updates; download each new release by hand.
+
+The game uses the Forward+ renderer and requires a Vulkan-capable GPU (Metal on macOS).
 
 ## Play with friends
 
@@ -47,7 +49,7 @@ The host saves the game as it goes, so closing it does not lose the game. Solo g
 
 ## Updates
 
-The game checks for stable releases at startup. Open **Game updates**, download the update, then leave your room and choose **Restart to update**. Updates use signed packages, delta downloads where available, and rollback if the new build fails to start. Dedicated servers need manual updates.
+The game checks for stable releases at startup. Open **Game updates**, download the update, then leave your room and choose **Restart to update**. Updates use signed packages, delta downloads where available, and rollback if the new build fails to start. Dedicated servers and the macOS build need manual updates.
 
 ## Run from source
 

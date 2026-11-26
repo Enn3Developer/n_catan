@@ -48,6 +48,8 @@ The Release workflow runs when you push a version tag or publish a GitHub releas
 
 It builds Linux x86-64 and Windows x86-64 packages with their native updaters. The Godot version and download checksums are pinned in `config/release.json`. Release assets include full ZIPs, delta ZIPs where they save enough space, `SHA256SUMS` and `update-manifest.json`.
 
+The same job cross-exports a macOS arm64 app bundle with `tools/export_macos.sh`. Godot ships only a universal macOS template, so `release.py bootstrap` extracts its arm64 slice as the `godot_macos_*.arm64` template. Godot's built-in signer ad-hoc signs the bundle; it is not notarized. The ZIP is listed in `SHA256SUMS` but not in the update manifest, because the updater does not support macOS. `project.godot` sets `config/name.macos` without the `&`, because Godot writes the bundle executable name into `Info.plist` without XML escaping. Arm64 exports need ETC2/ASTC textures, so the project imports both texture formats. CI exports the bundle on every push, then verifies the signature and launches it headless on an Apple Silicon runner.
+
 A tag push creates a draft release, uploads the packages and signed manifest, then publishes it. Publishing a release manually triggers the same build and upload. The workflow does not overwrite completed signed releases or accept a tag moved to a different commit. Retry a failed run to finish an incomplete release.
 
 The repository has the required `UPDATE_SIGNING_PRIVATE_KEY` secret. Its public key is `updater/update_public.pem`. Back up the private key securely. Without it, existing clients cannot trust new updates. Replacing the public key without a transition release requires users to install manually. Never commit the private key or include it in a build.
