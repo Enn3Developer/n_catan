@@ -24,6 +24,8 @@ jobs:
           python3 tools/release.py bootstrap
           echo "GODOT_BIN=$PWD/build/godot/Godot_v4.7.2-stable_linux.x86_64" >> "$GITHUB_ENV"
           "$PWD/build/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --editor --import --quit
+      - name: Rules tests
+        run: '"$PWD/build/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --script tests/rules_test.gd'
       - name: Export macOS arm64
         run: bash tools/export_macos.sh
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -49,5 +51,3 @@ jobs:
           test "$(lipo -archs "$executable")" = arm64
           "$executable" --headless --quit-after 300 2>&1 | tee launch.log
           ! grep -E "SCRIPT ERROR|Parse Error" launch.log
-      - name: Rules tests
-        run: '"$PWD/build/godot/Godot_v4.7.2-stable_linux.x86_64" --headless --path . --script tests/rules_test.gd'
